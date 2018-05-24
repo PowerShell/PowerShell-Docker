@@ -4,7 +4,11 @@ param(
     $Name,
     [Parameter(Mandatory)]
     [int]
-    $BuildDefinitionId
+    $BuildDefinitionId,
+    [Parameter(Mandatory)]
+    [ValidateSet('public','internal')]
+    [string]
+    $Namespace
 )
 
 
@@ -47,7 +51,8 @@ if (!$ShortTag) {
                 $parameters = @{
                     fromTag = $fromTag
                     imageTag = $actualTag
-                    PowerShellVersion = $psversion                    
+                    PowerShellVersion = $psversion
+                    Namespace = $Namespace.ToLowerInvariant()
                 }
                 $parametersJson = $parameters | ConvertTo-Json
                 Write-Verbose -Message "paramJson: $parametersJson"
