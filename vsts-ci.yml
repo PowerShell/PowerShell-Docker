@@ -1,0 +1,24 @@
+resources:
+- repo: self
+phases:
+- phase: Linux_Build
+
+  queue:
+    name: Hosted Linux Preview
+  steps:
+  - powershell: . build.ps1 '-build -name ubuntu14.04' 
+    displayName: Build Ubuntu14.04
+
+  - powershell: . build.ps1 '-build -name ubuntu16.04' 
+    displayName: Build Ubuntu16.04
+
+
+- phase: Windows_Build
+
+  queue:
+    name: Hosted VS2017
+  steps:
+  - powershell: . build.ps1 '-build -name nanoserver' 
+    displayName: Build nanoserver
+    enabled: false
+

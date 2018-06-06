@@ -54,71 +54,44 @@ Hello, World!
 
 ## Building the images
 
-The images are built with the [`docker image build`](https://docs.docker.com/engine/reference/commandline/image_build/) command.
+To build an image run `./build.ps1 -build -name <ImageFolderName>`.
 
 ### Example
 
+For example to build Ubuntu 16.04/xenial, which is in `./release/ubuntu16.04`:
+
 ```sh
-PS /powershell/docker> cd ./release/ubuntu16.04/
-PS /powershell/docker/release/ubuntu16.04> docker image build -t ps-ubuntu.16.04 .
-Sending build context to Docker daemon 3.072 kB
-Step 1/12 : FROM ubuntu:xenial
- ---> 7b9b13f7b9c0
-Step 2/12 : LABEL maintainer "PowerShell Team <powershellteam@hotmail.com>"
- ---> Using cache
- ---> c6515b7d596f
-Step 3/12 : LABEL readme.md "https://github.com/PowerShell/PowerShell/blob/master/docker/README.md"
- ---> Using cache
- ---> 721306ae4490
-Step 4/12 : LABEL description "This Dockerfile will install the latest release of PS."
- ---> Using cache
- ---> 80c06f5481d2
-Step 5/12 : RUN apt-get update     && apt-get install -y --no-install-recommends         apt-utils         ca-certificates         curl         apt-transport-https         locales    && rm -rf /var/lib/apt/lists/*
- ---> Using cache
- ---> 2d08e2300fc9
-Step 6/12 : ENV LANG en_US.UTF-8
- ---> Using cache
- ---> 6dfc363111c0
-Step 7/12 : ENV LC_ALL $LANG
- ---> Using cache
- ---> b7ef2cd3a7ed
-Step 8/12 : RUN locale-gen $LANG && update-locale
- ---> Using cache
- ---> e75306ddf3e0
-Step 9/12 : RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
- ---> Using cache
- ---> f476b7be22a2
-Step 10/12 : RUN curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | tee /etc/apt/sources.list.d/microsoft.list
- ---> Using cache
- ---> 909ca8e33a3b
-Step 11/12 : RUN apt-get update     && apt-get install -y --no-install-recommends     powershell
- ---> Using cache
- ---> f32b54204619
-Step 12/12 : ENTRYPOINT powershell
- ---> Using cache
- ---> ee667ad86a7b
-Successfully built ee667ad86a7b
+PS /powershell-docker> ./build.ps1 -Build -Name ubuntu14.04
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.0.2-ubuntu-14.04 PSversion: 6.0.2
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.0.2-ubuntu-trusty PSversion: 6.0.2
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.0.2-ubuntu-trusty-20180531 PSversion: 6.0.2
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.1.0-preview.2-ubuntu-14.04 PSversion: 6.1.0~preview.2
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.1.0-preview.2-ubuntu-trusty PSversion: 6.1.0~preview.2
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.1.0-preview.2-ubuntu-trusty-20180531 PSversion: 6.1.0~preview.2
+VERBOSE: image name: powershell.local:6.0.2-ubuntu-14.04
+VERBOSE: image name: powershell.local:6.0.2-ubuntu-trusty
+VERBOSE: image name: powershell.local:6.0.2-ubuntu-trusty-20180531
+VERBOSE: image name: powershell.local:6.1.0-preview.2-ubuntu-14.04
+VERBOSE: image name: powershell.local:6.1.0-preview.2-ubuntu-trusty
+VERBOSE: image name: powershell.local:6.1.0-preview.2-ubuntu-trusty-20180531
 ```
 
 ### Run the docker image you built
 
 ```sh
-PS /powershell/docker/release/ubuntu16.04> docker run -it ps-ubuntu.16.04 powershell -c '$psversiontable'
+PS /powershell-docker> docker run -it --rm powershell.local:6.1.0-preview.2-ubuntu-14.04 pwsh -c '$psversiontable'
 
 Name                           Value
 ----                           -----
-PSVersion                      6.0.0-beta
+PSVersion                      6.0.2
 PSEdition                      Core
-BuildVersion                   3.0.0.0
-CLRVersion
-GitCommitId                    v6.0.0-beta.2
-OS                             Linux 4.9.27-moby #1 SMP Thu May 11 04:01:18 ...
+GitCommitId                    v6.0.2
+OS                             Linux 4.9.87-linuxkit-aufs #1 SMP Wed Mar 14 15:12:16 UTC 2018
 Platform                       Unix
 PSCompatibleVersions           {1.0, 2.0, 3.0, 4.0...}
 PSRemotingProtocolVersion      2.3
 SerializationVersion           1.1.0.1
 WSManStackVersion              3.0
-
 ```
 
 ## NanoServer-Insider Release Notes
