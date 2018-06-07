@@ -37,7 +37,11 @@ param(
     $Namespace,
     [Parameter(ParameterSetName="localBuild")]
     [string]
-    $ImageName = 'powershell.local'
+    $ImageName = 'powershell.local',
+    [Parameter(Mandatory,ParameterSetName="GetTags")]
+    [Parameter(ParameterSetName="localBuild")]
+    [switch]
+    $CI
 )
 
 # this function wraps native command Execution
@@ -101,7 +105,7 @@ $tagsTemplates = Get-Content -Path $tagsJsonPath | ConvertFrom-Json
 $psVersions = Get-Content -Path $psversionsJsonPath | ConvertFrom-Json
 
 # Get the tag data for the image
-$tagData = & $scriptPath
+$tagData = & $scriptPath -CI:$CI.IsPresent
 
 # Create the URL and header for the REST calls
 $headers = @{  Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN"  }
