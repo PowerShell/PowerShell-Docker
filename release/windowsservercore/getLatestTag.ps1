@@ -23,4 +23,5 @@ if(!$CI.IsPresent)
 
 $shortTags = @('latest')
 
-Get-DockerTags -ShortTags $shortTags -Image "microsoft/windowsservercore" -FullTagFilter '10\.0\.14393\.\d*$' -AlternativeShortTag 'ltsc2016' -SkipShortTagFilter
+# The \d{4,} part of the regex is because the API is returning tags which have been deleted, which are 3 digits
+Get-DockerTags -ShortTags $shortTags -Image "microsoft/windowsservercore" -FullTagFilter '10\.0\.14393\.\d{4,}$' -AlternativeShortTag 'ltsc2016' -SkipShortTagFilter
