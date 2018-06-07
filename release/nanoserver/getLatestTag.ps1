@@ -3,6 +3,12 @@
 
 # return objects representing the tags we need to base the nanoserver image on
 
+
+param(
+    [Switch]
+    $CI
+)
+
 $parent = Join-Path -Path $PSScriptRoot -ChildPath '..'
 $repoRoot = Join-Path -Path $parent -ChildPath '..'
 $modulePath = Join-Path -Path $repoRoot -ChildPath 'tools\getDockerTags'
@@ -11,4 +17,13 @@ Import-Module $modulePath
 # The versions of nanoserver we care about
 $shortTags = @('1709','1803')
 
-Get-DockerTags -ShortTags $shortTags -Image "microsoft/nanoserver" -FullTagFilter '\d{4}_KB\d{7}'
+if(!$CI.IsPresent)
+{
+    Get-DockerTags -ShortTags $shortTags -Image "microsoft/nanoserver" -FullTagFilter '\d{4}_KB\d{7}'
+}
+else {
+    # This is not supported for nanoserver so don't build in production but try building it as a CI test for the dockerfile
+    $shortTags = @('latest')
+
+    Get-DockerTags -ShortTags $shortTags -Image "microsoft/nanoserver" -FullTagFilter '10\.0\.14393\.\d*$' -SkipShortTagFilter
+}
