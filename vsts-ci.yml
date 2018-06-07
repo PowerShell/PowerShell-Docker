@@ -1,24 +1,36 @@
 resources:
 - repo: self
+  clean: true
 phases:
 - phase: Linux_Build
 
   queue:
     name: Hosted Linux Preview
   steps:
-  - powershell: . build.ps1 '-build -name ubuntu14.04' 
-    displayName: Build Ubuntu14.04
+  - powershell: ./build.ps1 -build -name ubuntu14.04
+    displayName: Build Ubuntu 14.04
+    condition: succeededOrFailed()
 
-  - powershell: . build.ps1 '-build -name ubuntu16.04' 
-    displayName: Build Ubuntu16.04
+  - powershell: ./build.ps1 -build -name ubuntu16.04
+    displayName: Build Ubuntu 16.04
+    condition: succeededOrFailed()
 
 
+  - powershell: ./build.ps1 -build -name centos7
+    displayName: Build CentOS 7
+    condition: succeededOrFailed()
+
+
+# Use CI switch to disable 1709 and 1803 builds because the VSTS hosted instances don't yet support 1709 or 1803
 - phase: Windows_Build
 
   queue:
     name: Hosted VS2017
   steps:
-  - powershell: . build.ps1 '-build -name nanoserver' 
+  - powershell: ./build.ps1 -build -name nanoserver -CI
     displayName: Build nanoserver
-    enabled: false
+    condition: succeededOrFailed()
 
+  - powershell: ./build.ps1 -build -name windowsservercore -CI
+    displayName: Build WindowsServerCore
+    condition: succeededOrFailed()

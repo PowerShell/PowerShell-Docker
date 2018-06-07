@@ -19,7 +19,13 @@ function Get-DockerTags
 
         [parameter(Mandatory)]
         [string]
-        $FullTagFilter
+        $FullTagFilter,
+
+        [Switch]
+        $OnlyShortTags,
+
+        [Switch]
+        $SkipShortTagFilter
     )
 
     if($ShortTags.Count -gt 1 -and $AlternativeShortTag)
@@ -43,7 +49,7 @@ function Get-DockerTags
         # then, to full tags
         # then get the newest tag
         $fullTag = $tags |
-            Where-Object{$_.name -like "${shortTag}*"} |
+            Where-Object{$SkipShortTagFilter.IsPresent -or $_.name -like "${shortTag}*"} |
                 Where-Object{$_.name -match $FullTagFilter} |
                     Sort-Object -Descending -Property name |
                         Select-Object -ExpandProperty name -First 1
@@ -65,11 +71,14 @@ function Get-DockerTags
             }
         }
 
-        # Return the full form of the tag
-        $results += [PSCustomObject] @{
-            Type = 'Full'
-            Tag = $fullTag
-            FromTag = $fullTag
+        if(!$OnlyShortTags.IsPresent)
+        {
+            # Return the full form of the tag
+            $results += [PSCustomObject] @{
+                Type = 'Full'
+                Tag = $fullTag
+                FromTag = $fullTag
+            }
         }
     }
 
