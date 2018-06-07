@@ -14,7 +14,7 @@ $shortTags = @('trusty')
 $shortTags = @('trusty')
 
 $parent = Join-Path -Path $PSScriptRoot -ChildPath '..'
-$repoRoot = Join-Path -Path $parent -ChildPath '..'
+$repoRoot = Join-Path -path (Join-Path -Path $parent -ChildPath '..') -ChildPath '..'
 $modulePath = Join-Path -Path $repoRoot -ChildPath 'tools\getDockerTags'
 Import-Module $modulePath
 
