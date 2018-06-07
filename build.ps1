@@ -41,7 +41,10 @@ param(
     [Parameter(Mandatory,ParameterSetName="GetTags")]
     [Parameter(ParameterSetName="localBuild")]
     [switch]
-    $CI
+    $CI,
+    [ValidateSet('stable','preview')]
+    [string]
+    $Channel='stable'
 )
 
 # this function wraps native command Execution
@@ -58,7 +61,7 @@ function script:Start-NativeExecution
     try {
         if($VerboseOutputOnError.IsPresent)
         {
-            $output = & $sb
+            $output = & $sb 2>&1
         }
         else
         {
@@ -97,7 +100,8 @@ function script:Start-NativeExecution
 
 # Calculate the paths
 $releasePath = Join-Path -Path $PSScriptRoot -ChildPath 'release'
-$imagePath = Join-Path -Path $releasePath -ChildPath $Name
+$channelPath = Join-Path -Path $releasePath -ChildPath $Channel
+$imagePath = Join-Path -Path $channelPath -ChildPath $Name
 $scriptPath = Join-Path -Path $imagePath -ChildPath 'getLatestTag.ps1'
 $tagsJsonPath = Join-Path -Path $imagePath -ChildPath 'tags.json'
 $psversionsJsonPath = Join-Path -Path $imagePath -ChildPath 'psVersions.json'
