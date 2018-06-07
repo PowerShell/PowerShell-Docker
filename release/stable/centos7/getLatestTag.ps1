@@ -4,11 +4,11 @@
 # return objects representing the tags we need to base the xenial image on
 
 # The versions of xenial we care about
-$shortTags = @('xenial')
+$shortTags = @('7')
 
 $parent = Join-Path -Path $PSScriptRoot -ChildPath '..'
-$repoRoot = Join-Path -Path $parent -ChildPath '..'
+$repoRoot = Join-Path -path (Join-Path -Path $parent -ChildPath '..') -ChildPath '..'
 $modulePath = Join-Path -Path $repoRoot -ChildPath 'tools\getDockerTags'
 Import-Module $modulePath
 
-Get-DockerTags -ShortTags $shortTags -Image "ubuntu" -FullTagFilter 'xenial-\d{8}[\.\d{1}]?' -AlternativeShortTag '16.04'
+Get-DockerTags -ShortTags $shortTags -Image "centos" -FullTagFilter '^7$' -OnlyShortTags
