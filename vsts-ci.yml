@@ -32,5 +32,5 @@ phases:
     condition: succeededOrFailed()
 
   - powershell: ./build.ps1 -build -name windowsservercore -CI
-    displayName: Build nanoserver
+    displayName: Build WindowsServerCore
     condition: succeededOrFailed()
