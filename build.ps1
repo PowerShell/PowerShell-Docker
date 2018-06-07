@@ -149,6 +149,7 @@ if (!$ShortTag) {
                         imageTag          = $actualTag
                         PowerShellVersion = $psversion
                         Namespace         = $Namespace.ToLowerInvariant()
+                        ImageName         = $Name
                     }
 
                     # the rest body expects the parameters as an encoded json.
