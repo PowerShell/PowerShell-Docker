@@ -25,5 +25,6 @@ else {
     # This is not supported for nanoserver so don't build in production but try building it as a CI test for the dockerfile
     $shortTags = @('latest')
 
-    Get-DockerTags -ShortTags $shortTags -Image "microsoft/nanoserver" -FullTagFilter '10\.0\.14393\.\d*$' -SkipShortTagFilter
+    # The \d{4,} part of the regex is because the API is returning tags which are 3 digits and older than the 4 digit tags
+    Get-DockerTags -ShortTags $shortTags -Image "microsoft/nanoserver" -FullTagFilter '10\.0\.14393\.\d{4,}$' -SkipShortTagFilter
 }
