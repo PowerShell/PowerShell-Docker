@@ -1,7 +1,21 @@
 version: 1.0.{build}
-image:
-- Visual Studio 2017
+environment:
+  matrix:
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+    Purpose: Windows
+  - APPVEYOR_BUILD_WORKER_IMAGE: ubuntu
+    Purpose: linux
 
 build_script:
-- ps: ./build.ps1 -build -name nanoserver -CI
-- ps: ./build.ps1 -build -name windowsservercore -CI
+- ps: |
+    if($env:Purpose -eq 'Windows')
+    {
+      ./build.ps1 -build -name nanoserver -CI
+      ./build.ps1 -build -name windowsservercore -CI
+    }
+    else
+    {
+      ./build.ps1 -build -name ubuntu14.04
+      ./build.ps1 -build -name ubuntu16.04
+      ./build.ps1 -build -name centos7
+    }
