@@ -1,0 +1,7 @@
+version: 1.0.{build}
+image:
+- Visual Studio 2017
+
+build_script:
+- ps: ./build.ps1 -build -name nanoserver -CI
+- ps: ./build.ps1 -build -name windowsservercore -CI
