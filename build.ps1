@@ -175,6 +175,7 @@ if (!$ShortTag) {
                     $contextPath = Join-Path -Path $imagePath -ChildPath 'docker'
                     $vcf_ref = git rev-parse --short HEAD
                     $fullName = "powershell.local:$actualTag"
+                    $script:ErrorActionPreference = 'stop'
                     Start-NativeExecution {
                         docker build -t $fullName --build-arg fromTag=$fromTag --build-arg PS_VERSION=$psversion --build-arg VCS_REF=$vcf_ref $contextPath
                     } -VerboseOutputOnError
