@@ -7,8 +7,12 @@ environment:
     Purpose: Linux
 
 build_script:
-- ps: if ($env:Purpose -eq 'Windows') {./build.ps1 -build -name nanoserver -CI }
-- ps: if ($env:Purpose -eq 'Windows') {./build.ps1 -build -name windowsservercore -CI }
-- ps: if ($env:Purpose -eq 'Linux') {./build.ps1 -build -name ubuntu14.04 -CI }
-- ps: if ($env:Purpose -eq 'Linux') {./build.ps1 -build -name ubuntu16.04 -CI }
-- ps: if ($env:Purpose -eq 'Linux') {./build.ps1 -build -name centos7 -CI }
+# don't run CI for windows Preview because it takes too long
+- ps: if ($env:Purpose -eq 'Windows') {./build.ps1 -build -name nanoserver -CI -Channel 'stable' }
+- ps: if ($env:Purpose -eq 'Windows') {./build.ps1 -build -name windowsservercore -CI -Channel 'stable' }
+# run Preview for one debian and RedHat preview just to make sure preview images work generally.
+- ps: if ($env:Purpose -eq 'Linux') {./build.ps1 -build -name ubuntu14.04 -CI -Channel 'stable' }
+- ps: if ($env:Purpose -eq 'Linux') {./build.ps1 -build -name ubuntu14.04 -CI -Channel 'preview' }
+- ps: if ($env:Purpose -eq 'Linux') {./build.ps1 -build -name ubuntu16.04 -CI -Channel 'stable' }
+- ps: if ($env:Purpose -eq 'Linux') {./build.ps1 -build -name centos7 -CI -Channel 'stable' }
+- ps: if ($env:Purpose -eq 'Linux') {./build.ps1 -build -name centos7 -CI -Channel 'preview' }
