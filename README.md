@@ -2,7 +2,7 @@
 
 These DockerFiles enable running PowerShell in a container for each Linux distribution we support.
 
-This requires an up-to-date version of Docker, such as 1.12.
+This requires Docker 17.05 or newer.
 It also expects you to be able to run Docker without `sudo`.
 Please follow [Docker's official instructions][install] to install `docker` correctly.
 
