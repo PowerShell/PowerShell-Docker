@@ -41,9 +41,9 @@ RUN set -o pipefail \
 
 # Install latest powershell from Microsoft YUM Repo
 RUN yum install -y \
-        powershell-${PS_VERSION} \
+        powershell-preview-${PS_VERSION} \
     && yum clean all
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
-CMD [ "pwsh" ]
+CMD [ "pwsh-preview" ]
