@@ -38,7 +38,7 @@ param(
     [Parameter(ParameterSetName="localBuild")]
     [string]
     $ImageName = 'powershell.local',
-    [Parameter(Mandatory,ParameterSetName="GetTags")]
+    [Parameter(ParameterSetName="GetTags")]
     [Parameter(ParameterSetName="localBuild")]
     [switch]
     $CI,
