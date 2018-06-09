@@ -4,15 +4,25 @@ environment:
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     Purpose: Windows
   - APPVEYOR_BUILD_WORKER_IMAGE: ubuntu
-    Purpose: Linux
+    Purpose: Ubuntu
+  - APPVEYOR_BUILD_WORKER_IMAGE: ubuntu
+    Purpose: Centos
+  - APPVEYOR_BUILD_WORKER_IMAGE: ubuntu
+    Purpose: Fedora
 
 build_script:
 # don't run CI for windows Preview because it takes too long
 - ps: if ($env:Purpose -eq 'Windows') {./build.ps1 -build -name nanoserver -CI -Channel 'stable' }
 - ps: if ($env:Purpose -eq 'Windows') {./build.ps1 -build -name windowsservercore -CI -Channel 'stable' }
-# run Preview for one debian and RedHat preview just to make sure preview images work generally.
-- ps: if ($env:Purpose -eq 'Linux') {./build.ps1 -build -name ubuntu14.04 -CI -Channel 'stable' }
-- ps: if ($env:Purpose -eq 'Linux') {./build.ps1 -build -name ubuntu14.04 -CI -Channel 'preview' }
-- ps: if ($env:Purpose -eq 'Linux') {./build.ps1 -build -name ubuntu16.04 -CI -Channel 'stable' }
-- ps: if ($env:Purpose -eq 'Linux') {./build.ps1 -build -name centos7 -CI -Channel 'stable' }
-- ps: if ($env:Purpose -eq 'Linux') {./build.ps1 -build -name centos7 -CI -Channel 'preview' }
+# ubuntu builds
+- ps: if ($env:Purpose -eq 'Ubuntu') {./build.ps1 -build -name ubuntu14.04 -CI -Channel 'stable' }
+- ps: if ($env:Purpose -eq 'Ubuntu') {./build.ps1 -build -name ubuntu14.04 -CI -Channel 'preview' }
+- ps: if ($env:Purpose -eq 'Ubuntu') {./build.ps1 -build -name ubuntu16.04 -CI -Channel 'stable' }
+- ps: if ($env:Purpose -eq 'Ubuntu') {./build.ps1 -build -name ubuntu16.04 -CI -Channel 'preview' }
+# centos builds
+- ps: if ($env:Purpose -eq 'Centos') {./build.ps1 -build -name centos7 -CI -Channel 'stable' }
+- ps: if ($env:Purpose -eq 'Centos') {./build.ps1 -build -name centos7 -CI -Channel 'preview' }
+# Fedora builds
+- ps: if ($env:Purpose -eq 'Fedora') {./build.ps1 -build -name fedora27 -CI -Channel 'stable' }
+- ps: if ($env:Purpose -eq 'Fedora') {./build.ps1 -build -name fedora27 -CI -Channel 'preview' }
+- ps: if ($env:Purpose -eq 'Fedora') {./build.ps1 -build -name fedora28 -CI -Channel 'preview' }
