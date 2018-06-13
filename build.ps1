@@ -154,6 +154,7 @@ if (!$ShortTag) {
                         PowerShellVersion = $psversion
                         Namespace         = $Namespace.ToLowerInvariant()
                         ImageName         = $Name
+                        Channel           = $Channel
                     }
 
                     # the rest body expects the parameters as an encoded json.
