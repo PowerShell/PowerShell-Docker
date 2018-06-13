@@ -12,6 +12,9 @@ environment:
   - APPVEYOR_BUILD_WORKER_IMAGE: ubuntu
     Purpose: redhat-preview
 
+install:
+  - ps: Install-module pester
+
 build_script:
 # don't run CI for windows Preview because it takes too long
 - ps: if ($env:Purpose -eq 'Windows') {./build.ps1 -build -name nanoserver, windowsservercore -CI -Channel 'stable' }
