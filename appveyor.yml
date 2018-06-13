@@ -4,25 +4,23 @@ environment:
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     Purpose: Windows
   - APPVEYOR_BUILD_WORKER_IMAGE: ubuntu
-    Purpose: Ubuntu
+    Purpose: ubuntu-stable
   - APPVEYOR_BUILD_WORKER_IMAGE: ubuntu
-    Purpose: Centos
+    Purpose: ubuntu-preview
   - APPVEYOR_BUILD_WORKER_IMAGE: ubuntu
-    Purpose: Fedora
+    Purpose: redhat-stable
+  - APPVEYOR_BUILD_WORKER_IMAGE: ubuntu
+    Purpose: redhat-preview
 
 build_script:
 # don't run CI for windows Preview because it takes too long
-- ps: if ($env:Purpose -eq 'Windows') {./build.ps1 -build -name nanoserver -CI -Channel 'stable' }
-- ps: if ($env:Purpose -eq 'Windows') {./build.ps1 -build -name windowsservercore -CI -Channel 'stable' }
-# ubuntu builds
-- ps: if ($env:Purpose -eq 'Ubuntu') {./build.ps1 -build -name ubuntu14.04 -CI -Channel 'stable' }
-- ps: if ($env:Purpose -eq 'Ubuntu') {./build.ps1 -build -name ubuntu14.04 -CI -Channel 'preview' }
-- ps: if ($env:Purpose -eq 'Ubuntu') {./build.ps1 -build -name ubuntu16.04 -CI -Channel 'stable' }
-- ps: if ($env:Purpose -eq 'Ubuntu') {./build.ps1 -build -name ubuntu16.04 -CI -Channel 'preview' }
-# centos builds
-- ps: if ($env:Purpose -eq 'Centos') {./build.ps1 -build -name centos7 -CI -Channel 'stable' }
-- ps: if ($env:Purpose -eq 'Centos') {./build.ps1 -build -name centos7 -CI -Channel 'preview' }
-# Fedora builds
-- ps: if ($env:Purpose -eq 'Fedora') {./build.ps1 -build -name fedora27 -CI -Channel 'stable' }
-- ps: if ($env:Purpose -eq 'Fedora') {./build.ps1 -build -name fedora27 -CI -Channel 'preview' }
-- ps: if ($env:Purpose -eq 'Fedora') {./build.ps1 -build -name fedora28 -CI -Channel 'preview' }
+- ps: if ($env:Purpose -eq 'Windows') {./build.ps1 -build -name nanoserver, windowsservercore -CI -Channel 'stable' }
+# ubuntu stable builds
+- ps: if ($env:Purpose -eq 'ubuntu-stable') {./build.ps1 -build -name ubuntu14.04, ubuntu16.04 -CI -Channel 'stable' }
+# ubuntu stable builds
+- ps: if ($env:Purpose -eq 'ubuntu-preview') {./build.ps1 -build -name ubuntu14.04, ubuntu16.04 -CI -Channel 'preview' }
+# RedHat variants stable
+- ps: if ($env:Purpose -eq 'redhat-stable') {./build.ps1 -build -name centos7 fedora27 -CI -Channel 'stable' }
+# RedHat variants preview
+- ps: if ($env:Purpose -eq 'redhat-preview') {./build.ps1 -build -name centos7, fedora27, fedora28 -CI -Channel 'preview' }
+- ps: if (test-path ./testResults.xml) {Push-AppveyorArtifact ./testResults.xml}
