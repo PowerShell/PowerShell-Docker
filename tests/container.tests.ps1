@@ -4,8 +4,8 @@
 Import-module -Name "$PSScriptRoot\containerTestCommon.psm1" -Force
 $script:linuxContainerTests = Get-LinuxContainer
 $script:windowsContainerTests = Get-WindowsContainer
-$script:skipLinux = Test-SkipLinux
-$script:skipWindows = Test-SkipWindows
+$script:skipLinux = (Test-SkipLinux) -or !$script:linuxContainerTests
+$script:skipWindows = (Test-SkipWindows) -or !$script:windowsContainerTests
 
 Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
     BeforeAll {
