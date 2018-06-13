@@ -14,6 +14,8 @@ environment:
 
 install:
   - ps: Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck
+  - ps: Import-module ./tools/ps-docker-appveyor -verbose
+
 
 build_script:
 # don't run CI for windows Preview because it takes too long
@@ -26,4 +28,8 @@ build_script:
 - ps: if ($env:Purpose -eq 'redhat-stable') {./build.ps1 -build -name centos7, fedora27 -CI -Channel 'stable' }
 # RedHat variants preview
 - ps: if ($env:Purpose -eq 'redhat-preview') {./build.ps1 -build -name centos7, fedora27, fedora28 -CI -Channel 'preview' }
-- ps: if (test-path ./testResults.xml) {Push-AppveyorArtifact ./testResults.xml}
+- ps: |
+    if (test-path ./testResults.xml) {
+      Update-AppVeyorTestResults ./testResults.xml
+      Push-AppveyorArtifact ./testResults.xml
+    }
