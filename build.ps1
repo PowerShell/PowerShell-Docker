@@ -181,7 +181,7 @@ foreach($dockerFileName in $Name)
                         $null = Invoke-RestMethod -Method Post -ContentType application/json -Uri $buildsUrl -Body $restBodyJson -Headers $headers
                     }
                     elseif ($Build.IsPresent) {
-                        Write-Verbose -Message "building with fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
+                        Write-Verbose -Message "Adding the following to the list to be testing, fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
                         $contextPath = Join-Path -Path $imagePath -ChildPath 'docker'
                         $vcf_ref = git rev-parse --short HEAD
                         $fullName = "powershell.local:$actualTag"
@@ -232,6 +232,7 @@ if($testArgList.Count -gt 0)
     $testArgPath = Join-Path -Path $testsPath -ChildPath 'testArgs.json'
     $testArgList | ConvertTo-Json -Depth 2 | Out-File -FilePath $testArgPath
     $testArgList += $testArgs
+    Write-Verbose "Launching pester..." -Verbose
     $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml
     if(!$results -or $results.FailedCount -gt 0 -or !$results.PassedCount)
     {
