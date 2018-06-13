@@ -1,3 +1,4 @@
 [
-    "#psversion#-fedora-#tag#"
+    "#psversion#-fedora-#tag#",
+    "fedora-#tag#"
 ]

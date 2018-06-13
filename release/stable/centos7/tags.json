@@ -1,3 +1,4 @@
 [
-    "#psversion#-centos-#tag#"
+    "#psversion#-centos-#tag#",
+    "centos-#tag#"
 ]

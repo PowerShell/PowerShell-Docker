@@ -1,3 +1,4 @@
 [
-    "#psversion#-ubuntu-#tag#"
+    "#psversion#-ubuntu-#tag#",
+    "ubuntu-#tag#"
 ]
