@@ -68,40 +68,41 @@ function Invoke-Docker
 # Return a list of Linux Container Test Cases
 function Get-LinuxContainer
 {
-    foreach($os in 'centos7','ubuntu14.04','ubuntu16.04')
+    $testArgPath = Join-Path -Path $PSScriptRoot -ChildPath 'testArgs.json'
+    $testArgsList = Get-Content $testArgPath | ConvertFrom-Json
+
+    foreach($testArgs in $testArgsList)
     {
-        Write-Output @{
-            Name = $os
-            Path = "$psscriptroot/../release/$os"
+        if($testArgs.os -eq 'linux')
+        {
+            Write-Output @{
+                Name = $testArgs.Tag
+                Path = $testArgs.ContextPath
+                BuildArgs = $testArgs.BuildArgs
+                ExpectedVersion = $testArgs.ExpectedVersion
+            }
         }
     }
-
 }
 
 # Return a list of Windows Container Test Cases
 function Get-WindowsContainer
 {
-    foreach($os in 'windowsservercore','nanoserver')
+    $testArgPath = Join-Path -Path $PSScriptRoot -ChildPath 'testArgs.json'
+    $testArgsList = Get-Content $testArgPath | ConvertFrom-Json
+
+    foreach($testArgs in $testArgsList)
     {
-        Write-Output @{
-            Name = $os
-            Path = "$psscriptroot/../release/$os"
+        if($testArgs.os -eq 'windows')
+        {
+            Write-Output @{
+                Name = $testArgs.Tag
+                Path = $testArgs.ContextPath
+                BuildArgs = $testArgs.BuildArgs
+                ExpectedVersion = $testArgs.ExpectedVersion
+            }
         }
     }
-}
-
-$script:repoName = 'microsoft/powershell'
-function Get-RepoName
-{
-    return $script:repoName
-}
-
-function Set-RepoName
-{
-    param([string]$RepoName)
-
-    $script:repoName = $RepoName
-    $script:forcePull = $false
 }
 
 function Test-SkipWindows
@@ -170,11 +171,10 @@ function Get-ContainerPowerShellVersion
 {
     param(
         [HashTable] $TestContext,
-        [string] $RepoName,
         [string] $Name
     )
 
-    $imageTag = "${script:repoName}:${Name}"
+    $imageTag = ${Name}
 
     if($TestContext.ForcePull)
     {
