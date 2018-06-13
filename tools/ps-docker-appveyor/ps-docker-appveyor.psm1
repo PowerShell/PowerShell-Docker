@@ -7,7 +7,7 @@ function Update-AppVeyorTestResults
         [string] $resultsFile
     )
 
-    if($env:Appveyor)
+    if($env:APPVEYOR)
     {
         $retryCount = 0
         $pushedResults = $false
