@@ -23,7 +23,7 @@ build_script:
 # ubuntu stable builds
 - ps: if ($env:Purpose -eq 'ubuntu-preview') {./build.ps1 -build -name ubuntu14.04, ubuntu16.04 -CI -Channel 'preview' }
 # RedHat variants stable
-- ps: if ($env:Purpose -eq 'redhat-stable') {./build.ps1 -build -name centos7 fedora27 -CI -Channel 'stable' }
+- ps: if ($env:Purpose -eq 'redhat-stable') {./build.ps1 -build -name centos7, fedora27 -CI -Channel 'stable' }
 # RedHat variants preview
 - ps: if ($env:Purpose -eq 'redhat-preview') {./build.ps1 -build -name centos7, fedora27, fedora28 -CI -Channel 'preview' }
 - ps: if (test-path ./testResults.xml) {Push-AppveyorArtifact ./testResults.xml}
