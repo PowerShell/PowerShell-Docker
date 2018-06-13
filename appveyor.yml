@@ -13,7 +13,7 @@ environment:
     Purpose: redhat-preview
 
 install:
-  - ps: Install-module pester
+  - ps: Install-module pester -Scope CurrentUser -Force
 
 build_script:
 # don't run CI for windows Preview because it takes too long
