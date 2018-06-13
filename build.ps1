@@ -26,7 +26,7 @@ param(
     [switch]
     $GetTags,
     [Parameter(Mandatory)]
-    [string]
+    [string[]]
     $Name,
     [Parameter(Mandatory,ParameterSetName="VSTS")]
     [int]
@@ -91,7 +91,7 @@ function script:Start-NativeExecution
         }
     } finally {
         try {
-            $script:ErrorActionPreference = $backupEAP            
+            $script:ErrorActionPreference = $backupEAP
         }
         catch {
         }
@@ -101,15 +101,6 @@ function script:Start-NativeExecution
 # Calculate the paths
 $releasePath = Join-Path -Path $PSScriptRoot -ChildPath 'release'
 $channelPath = Join-Path -Path $releasePath -ChildPath $Channel
-$imagePath = Join-Path -Path $channelPath -ChildPath $Name
-$scriptPath = Join-Path -Path $imagePath -ChildPath 'getLatestTag.ps1'
-$tagsJsonPath = Join-Path -Path $imagePath -ChildPath 'tags.json'
-$psversionsJsonPath = Join-Path -Path $imagePath -ChildPath 'psVersions.json'
-$tagsTemplates = Get-Content -Path $tagsJsonPath | ConvertFrom-Json
-$psVersions = Get-Content -Path $psversionsJsonPath | ConvertFrom-Json
-
-# Get the tag data for the image
-$tagData = & $scriptPath -CI:$CI.IsPresent
 
 # Create the URL and header for the REST calls
 $headers = @{  Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN"  }
@@ -118,86 +109,139 @@ $buildsUrl = [string]::Format("{0}/_apis/build/builds?api-version=2.0", $baseUrl
 Write-Verbose "url: $buildsUrl"
 
 $localImageNames = @()
+$testArgList = @()
 
-if (!$ShortTag) {
-    foreach ($psversion in $psVersions) {
-        foreach ($tag in $tagData) {
-            foreach ($tagTemplate in $tagsTemplates) {
-                # replace the tag token with the tag
-                if ($tagTemplate -match '#tag#') {
-                    $actualTag = $tagTemplate -replace '#tag#', $tag.Tag
-                }
-                elseif ($tagTemplate -match '#shorttag#' -and $tag.Type -eq 'Short') {
-                    $actualTag = $tagTemplate -replace '#shorttag#', $tag.Tag
-                }
-                elseif ($tagTemplate -match '#fulltag#' -and $tag.Type -eq 'Full') {
-                    $actualTag = $tagTemplate -replace '#fulltag#', $tag.Tag
-                }
-                else {
-                    # skip if the type of tag token doesn't match the type of tag
-                    Write-Verbose -Message "Skipping $($tag.Tag) - $tagTemplate" -Verbose
-                    continue
-                }
+foreach($dockerFileName in $Name)
+{
+    $imagePath = Join-Path -Path $channelPath -ChildPath $dockerFileName
+    $scriptPath = Join-Path -Path $imagePath -ChildPath 'getLatestTag.ps1'
+    $tagsJsonPath = Join-Path -Path $imagePath -ChildPath 'tags.json'
+    $psversionsJsonPath = Join-Path -Path $imagePath -ChildPath 'psVersions.json'
+    $tagsTemplates = Get-Content -Path $tagsJsonPath | ConvertFrom-Json
+    $psVersions = Get-Content -Path $psversionsJsonPath | ConvertFrom-Json
 
-                # Replace the the psversion token with the powershell version in the tag
-                $actualTag = $actualTag -replace '#psversion#', $psversion
-                $actualTag = $actualTag -replace '~', '-'
-                $fromTag = $Tag.FromTag
+    # Get the tag data for the image
+    $tagData = & $scriptPath -CI:$CI.IsPresent
 
-                if($Vsts.IsPresent)
-                {
-                    Write-Verbose -Message "lauching build with fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
-                    # create the parameters object for the build
-                    $parameters = @{
-                        fromTag           = $fromTag
-                        imageTag          = $actualTag
-                        PowerShellVersion = $psversion
-                        Namespace         = $Namespace.ToLowerInvariant()
-                        ImageName         = $Name
-                        Channel           = $Channel
+    if (!$ShortTag) {
+        foreach ($psversion in $psVersions) {
+            foreach ($tag in $tagData) {
+                foreach ($tagTemplate in $tagsTemplates) {
+                    # replace the tag token with the tag
+                    if ($tagTemplate -match '#tag#') {
+                        $actualTag = $tagTemplate -replace '#tag#', $tag.Tag
+                    }
+                    elseif ($tagTemplate -match '#shorttag#' -and $tag.Type -eq 'Short') {
+                        $actualTag = $tagTemplate -replace '#shorttag#', $tag.Tag
+                    }
+                    elseif ($tagTemplate -match '#fulltag#' -and $tag.Type -eq 'Full') {
+                        $actualTag = $tagTemplate -replace '#fulltag#', $tag.Tag
+                    }
+                    else {
+                        # skip if the type of tag token doesn't match the type of tag
+                        Write-Verbose -Message "Skipping $($tag.Tag) - $tagTemplate" -Verbose
+                        continue
                     }
 
-                    # the rest body expects the parameters as an encoded json.
-                    # So, convert to JSON before producing the body object
-                    $parametersJson = $parameters | ConvertTo-Json
+                    # Replace the the psversion token with the powershell version in the tag
+                    $actualVersion = $psversion -replace '~', '-'
+                    $actualTag = $actualTag -replace '#psversion#', $actualVersion
+                    $fromTag = $Tag.FromTag
 
-                    # Create the body of the request to queue the build
-                    Write-Verbose -Message "paramJson: $parametersJson"
-                    $restBody = @{
-                        definition   = @{
-                            id = $BuildDefinitionId
+                    if($Vsts.IsPresent)
+                    {
+                        Write-Verbose -Message "lauching build with fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
+                        # create the parameters object for the build
+                        $parameters = @{
+                            fromTag           = $fromTag
+                            imageTag          = $actualTag
+                            PowerShellVersion = $psversion
+                            Namespace         = $Namespace.ToLowerInvariant()
+                            ImageName         = $dockerFileName
+                            Channel           = $Channel
                         }
-                        sourceBranch = $env:BUILD_SOURCEBRANCH
-                        parameters   = $parametersJson
-                    }
-                    $restBodyJson = ConvertTo-Json $restBody
-                    Write-Verbose -Message "restBody: $restBodyJson"
 
-                    # Queue the build
-                    $null = Invoke-RestMethod -Method Post -ContentType application/json -Uri $buildsUrl -Body $restBodyJson -Headers $headers
-                }
-                elseif ($Build.IsPresent) {
-                    Write-Verbose -Message "building with fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
-                    $contextPath = Join-Path -Path $imagePath -ChildPath 'docker'
-                    $vcf_ref = git rev-parse --short HEAD
-                    $fullName = "powershell.local:$actualTag"
-                    $script:ErrorActionPreference = 'stop'
-                    Start-NativeExecution {
-                        docker build -t $fullName --build-arg fromTag=$fromTag --build-arg PS_VERSION=$psversion --build-arg VCS_REF=$vcf_ref $contextPath
-                    } -VerboseOutputOnError
-                    $localImageNames += $fullName
-                }
-                elseif ($GetTags.IsPresent) {
-                    Write-Verbose "from: $fromTag actual: $actualTag" -Verbose                    
+                        # the rest body expects the parameters as an encoded json.
+                        # So, convert to JSON before producing the body object
+                        $parametersJson = $parameters | ConvertTo-Json
+
+                        # Create the body of the request to queue the build
+                        Write-Verbose -Message "paramJson: $parametersJson"
+                        $restBody = @{
+                            definition   = @{
+                                id = $BuildDefinitionId
+                            }
+                            sourceBranch = $env:BUILD_SOURCEBRANCH
+                            parameters   = $parametersJson
+                        }
+                        $restBodyJson = ConvertTo-Json $restBody
+                        Write-Verbose -Message "restBody: $restBodyJson"
+
+                        # Queue the build
+                        $null = Invoke-RestMethod -Method Post -ContentType application/json -Uri $buildsUrl -Body $restBodyJson -Headers $headers
+                    }
+                    elseif ($Build.IsPresent) {
+                        Write-Verbose -Message "building with fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
+                        $contextPath = Join-Path -Path $imagePath -ChildPath 'docker'
+                        $vcf_ref = git rev-parse --short HEAD
+                        $fullName = "powershell.local:$actualTag"
+                        $script:ErrorActionPreference = 'stop'
+                        $testsPath = Join-Path -Path $PSScriptRoot -ChildPath 'tests'
+                        Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
+                        if($dockerFileName -iin 'windowsservercore','nanoserver')
+                        {
+                            $os = 'windows'
+                        }
+                        else {
+                            $os = 'linux'
+                        }
+
+                        $testArgs = @{
+                            tag = $fullName
+                            BuildArgs = @{
+                                fromTag = $fromTag
+                                PS_VERSION = $psversion
+                                VCS_REF = $vcf_ref
+                            }
+                            ContextPath = $contextPath
+                            OS = $os
+                            ExpectedVersion = $actualVersion
+                        }
+                        
+
+                        #$testArgs | ConvertTo-Json -Depth 2 | Out-File -FilePath $testArgPath
+                        $testArgList += $testArgs
+                        #Invoke-Pester -Script $testsPath
+                        <#Start-NativeExecution {
+                            docker build --pull -t $fullName --build-arg fromTag=$fromTag --build-arg PS_VERSION=$psversion --build-arg VCS_REF=$vcf_ref $contextPath
+                        } -VerboseOutputOnError#>
+                        $localImageNames += $fullName
+                    }
+                    elseif ($GetTags.IsPresent) {
+                        Write-Verbose "from: $fromTag actual: $actualTag" -Verbose
+                    }
                 }
             }
         }
     }
 }
 
+if($testArgList.Count -gt 0)
+{
+    $logPath = Join-Path -Path $PSScriptRoot -ChildPath 'testResults.xml'
+    $testArgPath = Join-Path -Path $testsPath -ChildPath 'testArgs.json'
+    $testArgList | ConvertTo-Json -Depth 2 | Out-File -FilePath $testArgPath
+    $testArgList += $testArgs
+    $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru
+    if(!$results -or $results.FailedCount -gt 0 -or !$results.PassedCount)
+    {
+        throw "Build or tests failed.  Passed: $($results.PassedCount) Failed: $($results.FailedCount)"
+    }
+}
+
 # print local image names
 # used only with the -Build
-foreach($name in $localImageNames)
+foreach($fullName in $localImageNames)
 {
-    Write-Verbose "image name: $name" -Verbose
+    Write-Verbose "image name: $fullName" -Verbose
 }
