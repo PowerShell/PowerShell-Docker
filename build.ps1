@@ -232,7 +232,7 @@ if($testArgList.Count -gt 0)
     $testArgPath = Join-Path -Path $testsPath -ChildPath 'testArgs.json'
     $testArgList | ConvertTo-Json -Depth 2 | Out-File -FilePath $testArgPath
     $testArgList += $testArgs
-    $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru
+    $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml
     if(!$results -or $results.FailedCount -gt 0 -or !$results.PassedCount)
     {
         throw "Build or tests failed.  Passed: $($results.PassedCount) Failed: $($results.FailedCount)"
