@@ -123,6 +123,9 @@ function Test-SkipLinux
         '*Mac' {
             return $false
         }
+        'Ubuntu*' {
+            return $false
+        }
         # Docker for Windows means we are running the linux kernel
         'Docker for Windows' {
             return $false
