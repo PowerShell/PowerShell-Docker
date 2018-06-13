@@ -195,7 +195,13 @@ foreach($dockerFileName in $Name)
                         else {
                             $os = 'linux'
                         }
-
+                        $skipVerification = $false
+                        if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
+                        {
+                            # The version of nanoserver in CI doesn't have all the changes needed to verify the image
+                            $skipVerification = $true
+                        }
+    
                         $testArgs = @{
                             tag = $fullName
                             BuildArgs = @{
@@ -206,6 +212,7 @@ foreach($dockerFileName in $Name)
                             ContextPath = $contextPath
                             OS = $os
                             ExpectedVersion = $actualVersion
+                            SkipVerification = $skipVerification
                         }
                         
 

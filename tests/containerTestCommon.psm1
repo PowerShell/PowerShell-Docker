@@ -68,12 +68,21 @@ function Invoke-Docker
 # Return a list of Linux Container Test Cases
 function Get-LinuxContainer
 {
+    param(
+        [ValidateSet('Verification','Build','All')]
+        [String]
+        $Purpose
+    )
+
     $testArgPath = Join-Path -Path $PSScriptRoot -ChildPath 'testArgs.json'
     $testArgsList = Get-Content $testArgPath | ConvertFrom-Json
 
     foreach($testArgs in $testArgsList)
     {
-        if($testArgs.os -eq 'linux')
+        # Only return results where:
+        # OS eq linux
+        # not (purposed eq verification -and SkipVerification)
+        if($testArgs.os -eq 'linux' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification))
         {
             Write-Output @{
                 Name = $testArgs.Tag
@@ -93,7 +102,7 @@ function Get-WindowsContainer
 
     foreach($testArgs in $testArgsList)
     {
-        if($testArgs.os -eq 'windows')
+        if($testArgs.os -eq 'windows' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification))
         {
             Write-Output @{
                 Name = $testArgs.Tag
