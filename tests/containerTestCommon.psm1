@@ -97,6 +97,12 @@ function Get-LinuxContainer
 # Return a list of Windows Container Test Cases
 function Get-WindowsContainer
 {
+    param(
+        [ValidateSet('Verification','Build','All')]
+        [String]
+        $Purpose
+    )
+
     $testArgPath = Join-Path -Path $PSScriptRoot -ChildPath 'testArgs.json'
     $testArgsList = Get-Content $testArgPath | ConvertFrom-Json
 
