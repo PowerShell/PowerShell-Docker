@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-$script:forcePull = $true
+$script:forcePull = $false
 # Get docker Engine OS
 function Get-DockerEngineOs
 {
@@ -68,40 +68,56 @@ function Invoke-Docker
 # Return a list of Linux Container Test Cases
 function Get-LinuxContainer
 {
-    foreach($os in 'centos7','ubuntu14.04','ubuntu16.04')
+    param(
+        [ValidateSet('Verification','Build','All')]
+        [String]
+        $Purpose
+    )
+
+    $testArgPath = Join-Path -Path $PSScriptRoot -ChildPath 'testArgs.json'
+    $testArgsList = Get-Content $testArgPath | ConvertFrom-Json
+
+    foreach($testArgs in $testArgsList)
     {
-        Write-Output @{
-            Name = $os
-            Path = "$psscriptroot/../release/$os"
+        # Only return results where:
+        # OS eq linux
+        # not (purposed eq verification -and SkipVerification)
+        if($testArgs.os -eq 'linux' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification))
+        {
+            Write-Output @{
+                Name = $testArgs.Tag
+                Path = $testArgs.ContextPath
+                BuildArgs = $testArgs.BuildArgs
+                ExpectedVersion = $testArgs.ExpectedVersion
+            }
         }
     }
-
 }
 
 # Return a list of Windows Container Test Cases
 function Get-WindowsContainer
 {
-    foreach($os in 'windowsservercore','nanoserver')
+    param(
+        [ValidateSet('Verification','Build','All')]
+        [String]
+        $Purpose
+    )
+
+    $testArgPath = Join-Path -Path $PSScriptRoot -ChildPath 'testArgs.json'
+    $testArgsList = Get-Content $testArgPath | ConvertFrom-Json
+
+    foreach($testArgs in $testArgsList)
     {
-        Write-Output @{
-            Name = $os
-            Path = "$psscriptroot/../release/$os"
+        if($testArgs.os -eq 'windows' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification))
+        {
+            Write-Output @{
+                Name = $testArgs.Tag
+                Path = $testArgs.ContextPath
+                BuildArgs = $testArgs.BuildArgs
+                ExpectedVersion = $testArgs.ExpectedVersion
+            }
         }
     }
-}
-
-$script:repoName = 'microsoft/powershell'
-function Get-RepoName
-{
-    return $script:repoName
-}
-
-function Set-RepoName
-{
-    param([string]$RepoName)
-
-    $script:repoName = $RepoName
-    $script:forcePull = $false
 }
 
 function Test-SkipWindows
@@ -120,6 +136,9 @@ function Test-SkipLinux
             return $false
         }
         '*Mac' {
+            return $false
+        }
+        'Ubuntu*' {
             return $false
         }
         # Docker for Windows means we are running the linux kernel
@@ -170,11 +189,10 @@ function Get-ContainerPowerShellVersion
 {
     param(
         [HashTable] $TestContext,
-        [string] $RepoName,
         [string] $Name
     )
 
-    $imageTag = "${script:repoName}:${Name}"
+    $imageTag = ${Name}
 
     if($TestContext.ForcePull)
     {

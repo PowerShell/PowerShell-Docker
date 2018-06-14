@@ -52,7 +52,8 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     powershell-preview=${PS_VERSION}${PS_VERSION_POSTFIX} \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -sf /opt/microsoft/powershell/6-preview/pwsh /usr/bin/pwsh
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c

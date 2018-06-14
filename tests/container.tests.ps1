@@ -2,17 +2,20 @@
 # Licensed under the MIT License.
 
 Import-module -Name "$PSScriptRoot\containerTestCommon.psm1" -Force
-$script:linuxContainerTests = Get-LinuxContainer
-$script:windowsContainerTests = Get-WindowsContainer
-$script:skipLinux = Test-SkipLinux
-$script:skipWindows = Test-SkipWindows
+$script:linuxContainerBuildTests = Get-LinuxContainer -Purpose 'Build'
+$script:windowsContainerBuildTests = Get-WindowsContainer -Purpose 'Build'
+$script:linuxContainerRunTests = Get-LinuxContainer -Purpose 'Verification'
+$script:windowsContainerRunTests = Get-WindowsContainer -Purpose 'Verification'
+$script:skipLinux = (Test-SkipLinux) -or !$script:linuxContainerBuildTests
+$script:skipWindows = (Test-SkipWindows) -or !$script:windowsContainerBuildTests
+$script:skipLinuxRun = (Test-SkipLinux) -or !$script:linuxContainerRunTests
+$script:skipWindowsRun = (Test-SkipWindows) -or !$script:windowsContainerRunTests
 
 Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
     BeforeAll {
-        Set-RepoName 'pscontainertest'
     }
 
-    it "$(Get-RepoName):<Name> builds from '<path>'" -TestCases $script:linuxContainerTests -Skip:$script:skipLinux {
+    it "<Name> builds from '<path>'" -TestCases $script:linuxContainerBuildTests -Skip:$script:skipLinux {
         param(
             [Parameter(Mandatory=$true)]
             [string]
@@ -20,18 +23,42 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
 
             [Parameter(Mandatory=$true)]
             [string]
-            $path
+            $path,
+
+            [Parameter(Mandatory=$true)]
+            [object]
+            $BuildArgs,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $ExpectedVersion
         )
-        { Invoke-Docker -Command build -Params '--pull', '--quiet', '-t', "$(Get-RepoName):${Name}", $path -SuppressHostOutput} | should not throw
+
+        $buildArgNames = $BuildArgs | get-member -Type NoteProperty | Select-Object -ExpandProperty Name
+
+        $buildArgList = @()
+        foreach($argName in $buildArgNames)
+        {
+            $value = $BuildArgs.$argName
+            $buildArgList += @(
+                "--build-arg"
+                "$argName=$value"
+            )
+        }
+
+        { Invoke-Docker -Command build -Params @(
+                '--pull'
+                '--quiet'
+                '-t'
+                ${Name}
+                $buildArgList
+                $path 
+            ) -SuppressHostOutput} | should -not -throw
     }
 }
 
 Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
-    BeforeAll {
-        Set-RepoName 'pscontainertest'
-    }
-
-    it "$(Get-RepoName):<Name> builds from '<path>'" -TestCases $script:windowsContainerTests  -skip:$script:skipWindows {
+    it "<Name> builds from '<path>'" -TestCases $script:windowsContainerBuildTests  -skip:$script:skipWindows {
         param(
             [Parameter(Mandatory=$true)]
             [string]
@@ -39,16 +66,37 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
 
             [Parameter(Mandatory=$true)]
             [string]
-            $path
+            $path,
+
+            [Parameter(Mandatory=$true)]
+            [object]
+            $BuildArgs,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $ExpectedVersion
         )
 
+        $buildArgNames = $BuildArgs | get-member -Type NoteProperty | Select-Object -ExpandProperty Name
+
+        $buildArgList = @()
+        foreach($argName in $buildArgNames)
+        {
+            $value = $BuildArgs.$argName
+            $buildArgList += @(
+                "--build-arg"
+                "$argName=$value"
+            )
+        }
+
         { Invoke-Docker -Command build -Params @(
-            '--pull'
-            '--quiet'
-            '-t'
-            "$(Get-RepoName):${Name}"
-            $path
-        ) -SuppressHostOutput} | should not throw
+                '--pull'
+                '--quiet'
+                '-t'
+                ${Name}
+                $buildArgList
+                $path 
+            ) -SuppressHostOutput} | should -not -throw
     }
 }
 
@@ -65,7 +113,7 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
         Remove-Item $testContext.resolvedLogPath -ErrorAction SilentlyContinue
     }
 
-    it "Get PSVersion table from $(Get-RepoName):<Name>" -TestCases $script:linuxContainerTests -Skip:$script:skipLinux {
+    it "Get PSVersion table from <Name> should be <ExpectedVersion>" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
         param(
             [Parameter(Mandatory=$true)]
             [string]
@@ -73,10 +121,18 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
 
             [Parameter(Mandatory=$true)]
             [string]
-            $path
+            $path,
+
+            [Parameter(Mandatory=$true)]
+            [object]
+            $BuildArgs,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $ExpectedVersion
         )
 
-        Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name -RepoName (Get-RepoName)  | should be '6.0.2'
+        Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
     }
 }
 
@@ -89,7 +145,7 @@ Describe "Windows Containers run PowerShell" -Tags 'Behavior', 'Windows' {
         Remove-Item $testContext.resolvedLogPath -ErrorAction SilentlyContinue
     }
 
-    it "Get PSVersion table from $(Get-RepoName):<Name>" -TestCases $script:windowsContainerTests -skip:$script:skipWindows {
+    it "Get PSVersion table from <Name> should be <ExpectedVersion>" -TestCases $script:windowsContainerRunTests -skip:$script:skipWindowsRun {
         param(
             [Parameter(Mandatory=$true)]
             [string]
@@ -97,9 +153,17 @@ Describe "Windows Containers run PowerShell" -Tags 'Behavior', 'Windows' {
 
             [Parameter(Mandatory=$true)]
             [string]
-            $path
+            $path,
+
+            [Parameter(Mandatory=$true)]
+            [object]
+            $BuildArgs,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $ExpectedVersion
         )
 
-        Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name -RepoName (Get-RepoName)  | should be '6.0.2'
+        Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
     }
 }
