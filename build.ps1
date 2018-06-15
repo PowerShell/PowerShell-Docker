@@ -11,7 +11,7 @@
 #    - The tag of the produced image
 #  - PowerShellVersion
 #    - The version of powershell to put in the image
-#  - Namespace
+#  - DockerNamespace
 #    - `public` to build for public consumption.
 #    - `internal` to build for internal consumption.
 
@@ -34,7 +34,7 @@ param(
     [Parameter(Mandatory,ParameterSetName="VSTS")]
     [ValidateSet('public', 'internal')]
     [string]
-    $Namespace,
+    $DockerNamespace,
     [Parameter(ParameterSetName="localBuild")]
     [string]
     $ImageName = 'powershell.local',
@@ -156,7 +156,7 @@ foreach($dockerFileName in $Name)
                             fromTag           = $fromTag
                             imageTag          = $actualTag
                             PowerShellVersion = $psversion
-                            Namespace         = $Namespace.ToLowerInvariant()
+                            Namespace         = $DockerNamespace.ToLowerInvariant()
                             ImageName         = $dockerFileName
                             Channel           = $Channel
                         }
