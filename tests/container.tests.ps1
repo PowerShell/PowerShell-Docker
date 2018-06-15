@@ -100,6 +100,58 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
     }
 }
 
+Describe "Pull Linux Containers" -Tags 'Linux', 'Pull' {
+    It "<Name> pulls without error" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
+        param(
+            [Parameter(Mandatory=$true)]
+            [string]
+            $name,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $path,
+
+            [Parameter(Mandatory=$true)]
+            [object]
+            $BuildArgs,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $ExpectedVersion
+        )
+
+        { Invoke-Docker -Command pull -Params @(
+                ${Name}
+            ) -SuppressHostOutput} | should -not -throw
+    }
+}
+
+Describe "Pull Windows Containers" -Tags 'Windows', 'Pull' {
+    it "<Name> pulls without error" -TestCases $script:windowsContainerRunTests  -skip:$script:skipWindowsRun {
+        param(
+            [Parameter(Mandatory=$true)]
+            [string]
+            $name,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $path,
+
+            [Parameter(Mandatory=$true)]
+            [object]
+            $BuildArgs,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $ExpectedVersion
+        )
+
+        { Invoke-Docker -Command pull -Params @(
+            ${Name}
+        ) -SuppressHostOutput} | should -not -throw
+    }
+}
+
 Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
     BeforeAll{
         $testContext = Get-TestContext -type Linux

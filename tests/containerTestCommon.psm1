@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-$script:forcePull = $false
 # Get docker Engine OS
 function Get-DockerEngineOs
 {
@@ -181,7 +180,6 @@ function Get-TestContext
         ContainerXmlPath = Join-Path $containerTestDrive -ChildPath $resultFileName
         ContainerLogPath = Join-Path $containerTestDrive -ChildPath $logFileName
         Type = $Type
-        ForcePull = $script:forcePull
     }
 }
 
@@ -194,39 +192,16 @@ function Get-ContainerPowerShellVersion
 
     $imageTag = ${Name}
 
-    if($TestContext.ForcePull)
-    {
-        $null=Invoke-Docker -Command 'image', 'pull' -Params $imageTag -SuppressHostOutput
-    }
-
     $runParams = @()
-    $localVolumeName = $testContext.resolvedTestDrive
     $runParams += '--rm'
-    if($TestContext.Type -ne 'Windows' -and $isWindows)
-    {
-        # use a container volume on windows because host volumes are not automatic
-        $volumeName = "test-volume-" + (Get-Random -Minimum 100 -Maximum 999)
-
-        # using alpine because it's tiny
-        $null=Invoke-Docker -Command create -Params '-v', '/test', '--name', $volumeName, 'alpine' -SuppressHostOutput
-        $runParams += '--volumes-from'
-        $runParams += $volumeName
-    }
-    else {
-        $runParams += '-v'
-        $runParams += "${localVolumeName}:$($testContext.containerTestDrive)"
-    }
-
+ 
     $runParams += $imageTag
     $runParams += 'pwsh'
+    $runParams += '-nologo'
+    $runParams += '-noprofile'
     $runParams += '-c'
-    $runParams += ('$PSVersionTable.PSVersion.ToString() | out-string | out-file -encoding ascii -FilePath '+$testContext.containerLogPath)
+    $runParams += '$PSVersionTable.PSVersion.ToString()'
 
-    $null = Invoke-Docker -Command run -Params $runParams -SuppressHostOutput
-    if($TestContext.Type -ne 'Windows' -and $isWindows)
-    {
-        $null = Invoke-Docker -Command cp -Params "${volumeName}:$($testContext.containerLogPath)", $TestContext.ResolvedLogPath
-        $null = Invoke-Docker -Command container, rm -Params $volumeName, '--force' -SuppressHostOutput
-    }
-    return (Get-Content -Encoding Ascii $testContext.resolvedLogPath)[0]
+    $version = Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
+    return $version
 }
