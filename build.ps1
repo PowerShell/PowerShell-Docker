@@ -179,6 +179,7 @@ End {
                         # Replace the the psversion token with the powershell version in the tag
                         $actualVersion = $psversion -replace '~', '-'
                         $actualTag = $actualTag -replace '#psversion#', $actualVersion
+                        $actualTag = $actualTag.ToLowerInvariant()
                         $fromTag = $Tag.FromTag
 
                         if($Vsts.IsPresent)
