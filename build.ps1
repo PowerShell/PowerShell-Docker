@@ -20,6 +20,9 @@ param(
     [Parameter(Mandatory,ParameterSetName="VSTS")]
     [switch]
     $Vsts,
+    [Parameter(Mandatory,ParameterSetName="Test")]
+    [switch]
+    $Test,
     [Parameter(Mandatory,ParameterSetName="localBuild")]
     [switch]
     $Build,
@@ -210,11 +213,11 @@ End {
                             # Queue the build
                             $null = Invoke-RestMethod -Method Post -ContentType application/json -Uri $buildsUrl -Body $restBodyJson -Headers $headers
                         }
-                        elseif ($Build.IsPresent) {
+                        elseif ($Build.IsPresent -or $Test.IsPresent) {
                             Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
                             $contextPath = Join-Path -Path $imagePath -ChildPath 'docker'
                             $vcf_ref = git rev-parse --short HEAD
-                            $fullName = "powershell.local:$actualTag"
+                            $fullName = "${ImageName}:$actualTag"
                             $script:ErrorActionPreference = 'stop'
                             $testsPath = Join-Path -Path $PSScriptRoot -ChildPath 'tests'
                             Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
@@ -264,7 +267,13 @@ End {
         $testArgList | ConvertTo-Json -Depth 2 | Out-File -FilePath $testArgPath
         $testArgList += $testArgs
         Write-Verbose "Launching pester..." -Verbose
-        $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml
+        $extraParams = @{}
+        if($Test.IsPresent)
+        {
+            $extraParams.Add('Tags','Behavior')
+        }
+
+        $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml @extraParams
         if(!$results -or $results.FailedCount -gt 0 -or !$results.PassedCount)
         {
             throw "Build or tests failed.  Passed: $($results.PassedCount) Failed: $($results.FailedCount)"
