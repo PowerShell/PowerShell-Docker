@@ -23,6 +23,9 @@ param(
     [Parameter(Mandatory,ParameterSetName="Test")]
     [switch]
     $Test,
+    [Parameter(ParameterSetName="Test")]
+    [switch]
+    $Pull,
     [Parameter(Mandatory,ParameterSetName="localBuild")]
     [switch]
     $Build,
@@ -235,7 +238,7 @@ End {
                                 # The version of nanoserver in CI doesn't have all the changes needed to verify the image
                                 $skipVerification = $true
                             }
-        
+
                             $testArgs = @{
                                 tag = $fullName
                                 BuildArgs = @{
@@ -271,7 +274,16 @@ End {
         $extraParams = @{}
         if($Test.IsPresent)
         {
-            $extraParams.Add('Tags','Behavior')
+            $tags = @('Behavior')
+            if($Pull.IsPresent)
+            {
+                $tags += 'Pull'
+            }
+
+            $extraParams.Add('Tags',$tags)
+        }
+        else {
+            $extraParams.Add('Tags',@('Build','Behavior'))
         }
 
         $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml @extraParams
