@@ -235,6 +235,7 @@ End {
                             $skipVerification = $false
                             if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
                             {
+                                Write-Verbose -Message "Skipping verification of $fullName in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
                                 # The version of nanoserver in CI doesn't have all the changes needed to verify the image
                                 $skipVerification = $true
                             }
