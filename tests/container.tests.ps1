@@ -240,9 +240,9 @@ Describe "Push Linux Containers" -Tags 'Linux', 'Push' {
             $ExpectedVersion
         )
 
-        { Invoke-Docker -Command push -Params @(
+        Invoke-Docker -Command push -Params @(
                 ${Name}
-            ) -SuppressHostOutput} | should -not -throw
+            )
     }
 }
 
@@ -266,8 +266,8 @@ Describe "Push Windows Containers" -Tags 'Windows', 'Push' {
             $ExpectedVersion
         )
 
-        { Invoke-Docker -Command push -Params @(
+        Invoke-Docker -Command push -Params @(
             ${Name}
-        ) -SuppressHostOutput} | should -not -throw
+        )
     }
 }

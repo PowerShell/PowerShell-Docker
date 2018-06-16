@@ -29,6 +29,9 @@ param(
     [Parameter(Mandatory,ParameterSetName="localBuild")]
     [switch]
     $Build,
+    [Parameter(ParameterSetName="localBuild")]
+    [switch]
+    $Push,
     [Parameter(Mandatory,ParameterSetName="GetTags")]
     [switch]
     $GetTags,
@@ -284,7 +287,13 @@ End {
             $extraParams.Add('Tags',$tags)
         }
         else {
-            $extraParams.Add('Tags',@('Build','Behavior'))
+            $tags = @('Build','Behavior')
+            if($Push.IsPresent)
+            {
+                $tags += 'Push'
+            }
+            
+            $extraParams.Add('Tags', $tags)
         }
 
         $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml @extraParams
