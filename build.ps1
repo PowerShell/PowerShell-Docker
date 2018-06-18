@@ -156,6 +156,14 @@ End {
         $scriptPath = Join-Path -Path $imagePath -ChildPath 'getLatestTag.ps1'
         $tagsJsonPath = Join-Path -Path $imagePath -ChildPath 'tags.json'
         $psversionsJsonPath = Join-Path -Path $imagePath -ChildPath 'psVersions.json'
+
+        # skip an image if it doesn't exist
+        if(!(Test-Path $scriptPath))
+        {
+            Write-Warning "Channel: $Channel, Name: $dockerFileName does not existing.  Not every image exists in every channel.  Skipping."
+            continue
+        }
+
         $tagsTemplates = Get-Content -Path $tagsJsonPath | ConvertFrom-Json
         $psVersions = Get-Content -Path $psversionsJsonPath | ConvertFrom-Json
 
@@ -292,7 +300,7 @@ End {
             {
                 $tags += 'Push'
             }
-            
+
             $extraParams.Add('Tags', $tags)
         }
 
