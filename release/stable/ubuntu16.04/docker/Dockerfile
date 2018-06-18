@@ -1,7 +1,7 @@
 # Docker image file that describes an Ubuntu16.04 image with PowerShell installed from Microsoft APT Repo
-ARG FromTag=16.04
+ARG fromTag=16.04
 
-FROM ubuntu:${FromTag}
+FROM ubuntu:${fromTag}
 
 ARG PS_VERSION=6.0.2
 ARG PS_VERSION_POSTFIX=-1.ubuntu.16.04

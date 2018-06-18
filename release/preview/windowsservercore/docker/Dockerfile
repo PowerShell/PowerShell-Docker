@@ -1,7 +1,7 @@
 # escape=`
-ARG FromTag=latest
+ARG fromTag=latest
 
-FROM microsoft/windowsservercore:${FromTag}
+FROM microsoft/windowsservercore:${fromTag}
 
 ARG POWERSHELL_MSI=https://github.com/PowerShell/PowerShell/releases/download/v6.1.0-preview.3/PowerShell-6.1.0-preview.3-win-x64.msi
 ARG PS_VERSION=6.1.0-preview.3

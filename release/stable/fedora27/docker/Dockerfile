@@ -1,7 +1,7 @@
 # Docker image file that describes Fedora 27 image with PowerShell installed from Microsoft YUM Repo
-ARG FromTag=27
+ARG fromTag=27
 
-FROM fedora:${FromTag}
+FROM fedora:${fromTag}
 
 ARG VCS_REF="none"
 ARG PS_VERSION=6.0.2
