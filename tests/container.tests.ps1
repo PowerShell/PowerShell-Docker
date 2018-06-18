@@ -219,3 +219,55 @@ Describe "Windows Containers run PowerShell" -Tags 'Behavior', 'Windows' {
         Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
     }
 }
+
+Describe "Push Linux Containers" -Tags 'Linux', 'Push' {
+    It "<Name> pushes without error" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
+        param(
+            [Parameter(Mandatory=$true)]
+            [string]
+            $name,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $path,
+
+            [Parameter(Mandatory=$true)]
+            [object]
+            $BuildArgs,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $ExpectedVersion
+        )
+
+        Invoke-Docker -Command push -Params @(
+                ${Name}
+            )
+    }
+}
+
+Describe "Push Windows Containers" -Tags 'Windows', 'Push' {
+    it "<Name> Pushes without error" -TestCases $script:windowsContainerRunTests  -skip:$script:skipWindowsRun {
+        param(
+            [Parameter(Mandatory=$true)]
+            [string]
+            $name,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $path,
+
+            [Parameter(Mandatory=$true)]
+            [object]
+            $BuildArgs,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $ExpectedVersion
+        )
+
+        Invoke-Docker -Command push -Params @(
+            ${Name}
+        )
+    }
+}

@@ -29,6 +29,9 @@ param(
     [Parameter(Mandatory,ParameterSetName="localBuild")]
     [switch]
     $Build,
+    [Parameter(ParameterSetName="localBuild")]
+    [switch]
+    $Push,
     [Parameter(Mandatory,ParameterSetName="GetTags")]
     [switch]
     $GetTags,
@@ -153,6 +156,14 @@ End {
         $scriptPath = Join-Path -Path $imagePath -ChildPath 'getLatestTag.ps1'
         $tagsJsonPath = Join-Path -Path $imagePath -ChildPath 'tags.json'
         $psversionsJsonPath = Join-Path -Path $imagePath -ChildPath 'psVersions.json'
+
+        # skip an image if it doesn't exist
+        if(!(Test-Path $scriptPath))
+        {
+            Write-Warning "Channel: $Channel, Name: $dockerFileName does not existing.  Not every image exists in every channel.  Skipping."
+            continue
+        }
+
         $tagsTemplates = Get-Content -Path $tagsJsonPath | ConvertFrom-Json
         $psVersions = Get-Content -Path $psversionsJsonPath | ConvertFrom-Json
 
@@ -284,7 +295,13 @@ End {
             $extraParams.Add('Tags',$tags)
         }
         else {
-            $extraParams.Add('Tags',@('Build','Behavior'))
+            $tags = @('Build','Behavior')
+            if($Push.IsPresent)
+            {
+                $tags += 'Push'
+            }
+
+            $extraParams.Add('Tags', $tags)
         }
 
         $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml @extraParams
