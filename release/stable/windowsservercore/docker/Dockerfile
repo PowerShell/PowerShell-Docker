@@ -50,15 +50,6 @@ RUN $ErrorActionPreference='Stop'; `
       New-Item -Type SymbolicLink -Path $Env:ProgramFiles\PowerShell\ -Name latest -Value $psexe.DirectoryName `
     } else { throw 'Installation failed!  See c:\PowerShell-win-x64.msi.log' } ;
 
-# Verify New pwsh.exe runs
-SHELL ["C:\\Program Files\\PowerShell\\latest\\pwsh.exe", "-command"]
-RUN Start-Transcript -path C:\Dockerfile.log -append -IncludeInvocationHeader ; `
-    $ErrorActionPreference='Stop'; `
-    Write-Output $PSVersionTable ; `
-    If (-not($PSVersionTable.PSEdition -Match 'Core')) { `
-      Throw [String]$('['+$PSVersionTable.PSEdition+'] is not [Core]!') ; `
-    } ;
-
 # Persist %PSCORE% ENV variable for user convenience
 ENV PSCORE='"C:\Program Files\PowerShell\latest\pwsh.exe"'
 
