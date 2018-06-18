@@ -1,7 +1,7 @@
 # Docker image file that describes an Centos7 image with PowerShell installed from Microsoft YUM Repo
-ARG FromTag=7
+ARG fromTag=7
 
-FROM centos:${FromTag}
+FROM centos:${fromTag}
 
 ARG VCS_REF="none"
 ARG PS_VERSION=6.0.2
