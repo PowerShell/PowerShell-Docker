@@ -1,4 +1,7 @@
-# script to create the docker manifests
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+# script to create the docker manifest lists
 # Update Stable and Preview version
 param (
     [ValidateNotNullOrEmpty()]
