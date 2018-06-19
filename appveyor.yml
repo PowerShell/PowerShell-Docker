@@ -16,7 +16,6 @@ install:
   - ps: Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck
   - ps: Import-module ./tools/ps-docker-appveyor -verbose
 
-
 build_script:
 # don't run CI for windows Preview because it takes too long
 - ps: if ($env:Purpose -eq 'Windows') {./build.ps1 -build -name nanoserver, windowsservercore -CI -Channel 'stable' }
@@ -33,3 +32,7 @@ build_script:
       Update-AppVeyorTestResults ./testResults.xml
       Push-AppveyorArtifact ./testResults.xml
     }
+
+skip_commits:
+  files:
+    - '**/*.md'
