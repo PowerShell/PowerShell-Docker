@@ -61,6 +61,7 @@ else {
 Write-log -Message "--- processing images ---"
 
 $tags = Invoke-RestMethod https://mcr.microsoft.com/v2/powershell/tags/list
+$manifests = @()
 
 foreach ($tag in $tags.Tags) {
 
