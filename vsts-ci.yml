@@ -7,7 +7,11 @@ phases:
   queue:
     name: Hosted Linux Preview
   steps:
-  - powershell: ./build.ps1 -build -name ubuntu14.04, ubuntu16.04 -CI -Channel 'stable' 
+  - powershell:  Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck
+    displayName: Install Pester
+    condition: succeededOrFailed()
+
+  - powershell: ./build.ps1 -build -name ubuntu14.04, ubuntu16.04 -CI -Channel 'stable'
     displayName: Build Ubuntu Stable
     condition: succeededOrFailed()
 
@@ -30,6 +34,10 @@ phases:
   queue:
     name: Hosted VS2017
   steps:
+  - powershell:  Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck
+    displayName: Install Pester
+    condition: succeededOrFailed()
+
   - powershell: ./build.ps1 -build -name nanoserver, windowsservercore -CI -Channel 'stable'
     displayName: Build nanoserver Stable
     condition: succeededOrFailed()
