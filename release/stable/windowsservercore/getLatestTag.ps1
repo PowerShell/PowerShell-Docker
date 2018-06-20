@@ -23,5 +23,12 @@ if(!$CI.IsPresent)
 
 $shortTags = @('latest')
 
-# The \d{4,} part of the regex is because the API is returning tags which have been deleted, which are 3 digits
-Get-DockerTags -ShortTags $shortTags -Image "microsoft/windowsservercore" -FullTagFilter '10\.0\.14393\.\d{4,}$' -AlternativeShortTag 'ltsc2016' -SkipShortTagFilter
+# The \d{4,} part of the regex is because the API is returning tags which are 3 digits and older than the 4 digit tags
+$fullTagFilter = '10\.0\.14393\.\d{4,}$'
+if($env:APPVEYOR)
+{
+    # This image is already on the machine in AppVeyor, so it will be faster
+    $fullTagFilter = '10\.0\.14393\.2007$'
+}
+
+Get-DockerTags -ShortTags $shortTags -Image "microsoft/windowsservercore" -FullTagFilter $fullTagFilter -AlternativeShortTag 'ltsc2016' -SkipShortTagFilter
