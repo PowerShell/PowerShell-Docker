@@ -51,12 +51,6 @@ RUN $ErrorActionPreference='Stop'; `
 
 # Verify New pwsh.exe runs
 SHELL ["C:\\Program Files\\PowerShell\\latest\\pwsh.exe", "-command"]
-RUN Start-Transcript -path C:\Dockerfile.log -append -IncludeInvocationHeader ; `
-    $ErrorActionPreference='Stop'; `
-    Write-Output $PSVersionTable ; `
-    If (-not($PSVersionTable.PSEdition -Match 'Core')) { `
-      Throw [String]$('['+$PSVersionTable.PSEdition+'] is not [Core]!') ; `
-    } ;
 
 # Persist %PSCORE% ENV variable for user convenience
 ENV PSCORE='"C:\Program Files\PowerShell\latest\pwsh.exe"'
