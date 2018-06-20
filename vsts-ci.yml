@@ -15,17 +15,37 @@ phases:
     displayName: Build Ubuntu Stable
     condition: succeededOrFailed()
 
+  - task: PublishTestResults@2
+    displayName: Publish Ubuntu Stable Test Results **\TEST*.xml
+    inputs:
+      testRunner: NUnit
+
   - powershell: ./build.ps1 -build -name ubuntu14.04, ubuntu16.04 -CI -Channel 'preview'
     displayName: Build Ubuntu Preview
     condition: succeededOrFailed()
+
+  - task: PublishTestResults@2
+    displayName: Publish Ubuntu Preview Test Results **\TEST*.xml
+    inputs:
+      testRunner: NUnit
 
   - powershell: ./build.ps1 -build -name centos7, fedora27 -CI -Channel 'stable'
     displayName: RedHat Variants Stable
     condition: succeededOrFailed()
 
+  - task: PublishTestResults@2
+    displayName: Publish RedHat Variants Stable Test Results **\TEST*.xml
+    inputs:
+      testRunner: NUnit
+
   - powershell: ./build.ps1 -build -name centos7, fedora27, fedora28 -CI -Channel 'preview'
     displayName: RedHat Variants Preview
     condition: succeededOrFailed()
+
+  - task: PublishTestResults@2
+    displayName: Publish RedHat Variants Preview Test Results **\TEST*.xml
+    inputs:
+      testRunner: NUnit
 
 # Use CI switch to disable 1709 and 1803 builds because the VSTS hosted instances don't yet support 1709 or 1803
 # Skipping previews on windows due to how long it takes to build on windows
@@ -39,5 +59,10 @@ phases:
     condition: succeededOrFailed()
 
   - powershell: ./build.ps1 -build -name nanoserver, windowsservercore -CI -Channel 'stable'
-    displayName: Build nanoserver Stable
+    displayName: Build Windows Stable
     condition: succeededOrFailed()
+
+  - task: PublishTestResults@2
+    displayName: Publish Windows Stable Test Results **\TEST*.xml
+    inputs:
+      testRunner: NUnit
