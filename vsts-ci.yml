@@ -11,41 +11,28 @@ phases:
     displayName: Install Pester
     condition: succeededOrFailed()
 
-  - powershell: ./build.ps1 -build -name ubuntu14.04, ubuntu16.04 -CI -Channel 'stable'
+  - powershell: ./build.ps1 -build -name ubuntu14.04, ubuntu16.04 -CI -Channel 'stable' -TestLogPostfix UbuntuStable
     displayName: Build Ubuntu Stable
     condition: succeededOrFailed()
 
-  - task: PublishTestResults@2
-    displayName: Publish Ubuntu Stable Test Results **\TEST*.xml
-    inputs:
-      testRunner: NUnit
-
-  - powershell: ./build.ps1 -build -name ubuntu14.04, ubuntu16.04 -CI -Channel 'preview'
+  - powershell: ./build.ps1 -build -name ubuntu14.04, ubuntu16.04 -CI -Channel 'preview' -TestLogPostfix UbuntuPreview
     displayName: Build Ubuntu Preview
     condition: succeededOrFailed()
 
-  - task: PublishTestResults@2
-    displayName: Publish Ubuntu Preview Test Results **\TEST*.xml
-    inputs:
-      testRunner: NUnit
-
-  - powershell: ./build.ps1 -build -name centos7, fedora27 -CI -Channel 'stable'
+  - powershell: ./build.ps1 -build -name centos7, fedora27 -CI -Channel 'stable' -TestLogPostfix RedHatStable
     displayName: RedHat Variants Stable
     condition: succeededOrFailed()
 
-  - task: PublishTestResults@2
-    displayName: Publish RedHat Variants Stable Test Results **\TEST*.xml
-    inputs:
-      testRunner: NUnit
-
-  - powershell: ./build.ps1 -build -name centos7, fedora27, fedora28 -CI -Channel 'preview'
+  - powershell: ./build.ps1 -build -name centos7, fedora27, fedora28 -CI -Channel 'preview' -TestLogPostfix RedHatPreview
     displayName: RedHat Variants Preview
     condition: succeededOrFailed()
 
   - task: PublishTestResults@2
-    displayName: Publish RedHat Variants Preview Test Results **\TEST*.xml
+    condition: succeededOrFailed()
+    displayName: Publish Linux Test Results **\TEST*.xml
     inputs:
       testRunner: NUnit
+      testResultsFiles: '**\TEST*.xml'
 
 # Use CI switch to disable 1709 and 1803 builds because the VSTS hosted instances don't yet support 1709 or 1803
 # Skipping previews on windows due to how long it takes to build on windows
@@ -63,6 +50,8 @@ phases:
     condition: succeededOrFailed()
 
   - task: PublishTestResults@2
+    condition: succeededOrFailed()
     displayName: Publish Windows Stable Test Results **\TEST*.xml
     inputs:
       testRunner: NUnit
+      testResultsFiles: '**\TEST*.xml'
