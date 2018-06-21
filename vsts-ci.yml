@@ -21,10 +21,10 @@ phases:
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
-    displayName: Publish Ubuntu Test Results **\TEST*.xml
+    displayName: Publish Ubuntu Test Results **\test*.xml
     inputs:
       testRunner: NUnit
-      testResultsFiles: '**\TEST*.xml'
+      testResultsFiles: '**\test*.xml'
 
 - phase: RedHat_Variants_Build
 
@@ -45,10 +45,10 @@ phases:
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
-    displayName: Publish RedHat Variants Test Results **\TEST*.xml
+    displayName: Publish RedHat Variants Test Results **\test*.xml
     inputs:
       testRunner: NUnit
-      testResultsFiles: '**\TEST*.xml'
+      testResultsFiles: '**\test*.xml'
 
 # Use CI switch to disable 1709 and 1803 builds because the VSTS hosted instances don't yet support 1709 or 1803
 # Skipping previews on windows due to how long it takes to build on windows
