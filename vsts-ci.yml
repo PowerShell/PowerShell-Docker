@@ -2,7 +2,7 @@ resources:
 - repo: self
   clean: true
 phases:
-- phase: Linux_Build
+- phase: Ubuntu_Build
 
   queue:
     name: Hosted Linux Preview
@@ -19,6 +19,22 @@ phases:
     displayName: Build Ubuntu Preview
     condition: succeededOrFailed()
 
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    displayName: Publish Ubuntu Test Results **\TEST*.xml
+    inputs:
+      testRunner: NUnit
+      testResultsFiles: '**\TEST*.xml'
+
+- phase: RedHat_Variants_Build
+
+  queue:
+    name: Hosted Linux Preview
+  steps:
+  - powershell:  Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck
+    displayName: Install Pester
+    condition: succeededOrFailed()
+
   - powershell: ./build.ps1 -build -name centos7, fedora27 -CI -Channel 'stable' -TestLogPostfix RedHatStable
     displayName: RedHat Variants Stable
     condition: succeededOrFailed()
@@ -29,7 +45,7 @@ phases:
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
-    displayName: Publish Linux Test Results **\TEST*.xml
+    displayName: Publish RedHat Variants Test Results **\TEST*.xml
     inputs:
       testRunner: NUnit
       testResultsFiles: '**\TEST*.xml'
