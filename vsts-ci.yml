@@ -54,4 +54,4 @@ phases:
     displayName: Publish Windows Stable Test Results **\TEST*.xml
     inputs:
       testRunner: NUnit
-      testResultsFiles: '**\TEST*.xml'
+      testResultsFiles: '**\test*.xml'
