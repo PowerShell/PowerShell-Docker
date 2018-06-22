@@ -25,6 +25,8 @@ phases:
     inputs:
       testRunner: NUnit
       testResultsFiles: '**\test*.xml'
+      testRunTitle: Ubuntu
+      mergeTestResults: true
 
 - phase: RedHat_Variants_Build
 
@@ -49,6 +51,8 @@ phases:
     inputs:
       testRunner: NUnit
       testResultsFiles: '**\test*.xml'
+      testRunTitle: RedHat
+      mergeTestResults: true
 
 # Use CI switch to disable 1709 and 1803 builds because the VSTS hosted instances don't yet support 1709 or 1803
 # Skipping previews on windows due to how long it takes to build on windows
@@ -71,3 +75,5 @@ phases:
     inputs:
       testRunner: NUnit
       testResultsFiles: '**\test*.xml'
+      testRunTitle: Windows
+      mergeTestResults: true
