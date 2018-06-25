@@ -1,3 +1,4 @@
 [
-    "#psversion#-nanoserver-#tag#"
+    "#psversion#-nanoserver-#tag#",
+    "preview-nanoserver-#shorttag#"
 ]
