@@ -46,14 +46,14 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
             )
         }
 
-        { Invoke-Docker -Command build -Params @(
+        Invoke-Docker -Command build -Params @(
                 '--pull'
                 '--quiet'
                 '-t'
                 ${Name}
                 $buildArgList
                 $path 
-            ) -SuppressHostOutput} | should -not -throw
+            ) -SuppressHostOutput
     }
 }
 
@@ -89,14 +89,14 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
             )
         }
 
-        { Invoke-Docker -Command build -Params @(
+        Invoke-Docker -Command build -Params @(
                 '--pull'
                 '--quiet'
                 '-t'
                 ${Name}
                 $buildArgList
                 $path 
-            ) -SuppressHostOutput} | should -not -throw
+            ) -SuppressHostOutput
     }
 }
 

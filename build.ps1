@@ -46,6 +46,10 @@ param(
     [Parameter(ParameterSetName="localBuild")]
     [string]
     $ImageName = 'powershell.local',
+    [Parameter(ParameterSetName="Test")]
+    [Parameter(ParameterSetName="localBuild")]
+    [string]
+    $TestLogPostfix,
     [Parameter(ParameterSetName="GetTags")]
     [Parameter(ParameterSetName="localBuild")]
     [switch]
@@ -278,7 +282,7 @@ End {
 
     if($testArgList.Count -gt 0)
     {
-        $logPath = Join-Path -Path $PSScriptRoot -ChildPath 'testResults.xml'
+        $logPath = Join-Path -Path $PSScriptRoot -ChildPath "testResults$TestLogPostfix.xml"
         $testArgPath = Join-Path -Path $testsPath -ChildPath 'testArgs.json'
         $testArgList | ConvertTo-Json -Depth 2 | Out-File -FilePath $testArgPath
         $testArgList += $testArgs
@@ -304,6 +308,7 @@ End {
             $extraParams.Add('Tags', $tags)
         }
 
+        Write-Verbose -Message "logging to $logPath" -Verbose
         $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml @extraParams
         if(!$results -or $results.FailedCount -gt 0 -or !$results.PassedCount)
         {
