@@ -1,3 +1,4 @@
+name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
 resources:
 - repo: self
   clean: true
