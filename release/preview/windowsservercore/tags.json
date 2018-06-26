@@ -1,3 +1,4 @@
 [
-    "#psversion#-windowsservercore-#tag#"
+    "#psversion#-windowsservercore-#tag#",
+    "preview-windowsservercore-#shorttag#"
 ]
