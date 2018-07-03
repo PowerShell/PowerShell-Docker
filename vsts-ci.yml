@@ -62,6 +62,10 @@ phases:
   queue:
     name: Hosted VS2017
   steps:
+  - powershell:  Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhss"))"
+    displayName: Set Build Name for Non-PR
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+
   - powershell:  Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck
     displayName: Install Pester
     condition: succeededOrFailed()
