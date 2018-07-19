@@ -4,7 +4,7 @@ ARG fromTag=27
 FROM fedora:${fromTag}
 
 ARG VCS_REF="none"
-ARG PS_VERSION=6.0.2
+ARG PS_VERSION=6.0.3
 ARG IMAGE_NAME=microsoft/powershell:fedora27
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \

@@ -3,8 +3,8 @@ ARG fromTag=latest
 
 FROM microsoft/windowsservercore:${fromTag}
 
-ARG POWERSHELL_MSI=https://github.com/PowerShell/PowerShell/releases/download/v6.0.2/PowerShell-6.0.2-win-x64.msi
-ARG PS_VERSION=6.0.2
+ARG POWERSHELL_MSI=https://github.com/PowerShell/PowerShell/releases/download/v6.0.3/PowerShell-6.0.3-win-x64.msi
+ARG PS_VERSION=6.0.3
 ARG IMAGE_NAME=microsoft/powershell:windowsservercore
 ARG VCS_REF="none"
 

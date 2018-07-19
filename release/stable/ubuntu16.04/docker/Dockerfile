@@ -3,7 +3,7 @@ ARG fromTag=16.04
 
 FROM ubuntu:${fromTag}
 
-ARG PS_VERSION=6.0.2
+ARG PS_VERSION=6.0.3
 ARG PS_VERSION_POSTFIX=-1.ubuntu.16.04
 ARG IMAGE_NAME=microsoft/powershell:ubuntu16.04
 ARG VCS_REF="none"
