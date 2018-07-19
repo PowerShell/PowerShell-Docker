@@ -22,11 +22,11 @@
 
 ### Stable Linux amd64 tags
 
-* `ubuntu-16.04`, `6.0.2-ubuntu-16.04` [(/release/stable/ubuntu16.04/docker/Dockerfile)][ubuntu-16.04-stable]
+* `ubuntu-16.04`, `6.0.3-ubuntu-16.04` [(/release/stable/ubuntu16.04/docker/Dockerfile)][ubuntu-16.04-stable]
   * `docker pull mcr.microsoft.com/powershell:ubuntu-16.04`
-* `centos-7`, `6.0.2-centos-7` [(/release/stable/centos7/docker/Dockerfile)][centos-7-stable]
+* `centos-7`, `6.0.3-centos-7` [(/release/stable/centos7/docker/Dockerfile)][centos-7-stable]
   * `docker pull mcr.microsoft.com/powershell:centos-7`
-* `fedora-27`, `6.0.2-fedora-27` [(/release/stable/fedora27/docker/Dockerfile)][fedora-27-stable]
+* `fedora-27`, `6.0.3-fedora-27` [(/release/stable/fedora27/docker/Dockerfile)][fedora-27-stable]
   * `docker pull mcr.microsoft.com/powershell:fedora-27`
 
 [ubuntu-16.04-stable]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/ubuntu16.04/docker/Dockerfile
@@ -38,12 +38,12 @@
 * `nanoserver` : The latest stable nanoserver image.
   * Docker will detect your version of windows and select the most appropriate NanoServer image (1709 or 1803.)
   * `docker pull mcr.microsoft.com/powershell:nanoserver`
-* `6.0.2-nanoserver` : The latest `6.0.2` nanoserver image.
+* `6.0.3-nanoserver` : The latest `6.0.3` nanoserver image.
   * Docker will detect your version of windows and select the most appropriate NanoServer image (1709 or 1803.)
-  * `docker pull mcr.microsoft.com/powershell:6.0.2-nanoserver`
-* `windowsservercore`, `6.0.2-windowsservercore`, `6.1.0-preview.2-windowsservercore` [(release/stable/windowsservercore/docker/Dockerfile)][winsrvcore-stable]
+  * `docker pull mcr.microsoft.com/powershell:6.0.3-nanoserver`
+* `windowsservercore`, `6.0.3-windowsservercore`, `6.1.0-preview.4-windowsservercore` [(release/stable/windowsservercore/docker/Dockerfile)][winsrvcore-stable]
   * `docker pull mcr.microsoft.com/powershell:windowsservercore`
-* `6.0.2-nanoserver-1803`, `6.0.2-nanoserver-1709` [(release/stable/nanoserver/docker/Dockerfile)][nano-stable]
+* `6.0.3-nanoserver-1803`, `6.0.3-nanoserver-1709` [(release/stable/nanoserver/docker/Dockerfile)][nano-stable]
   * `docker pull mcr.microsoft.com/powershell:nanoserver`
 
 [winsrvcore-stable]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/windowsservercore/docker/Dockerfile
@@ -51,14 +51,14 @@
 
 ### Preview Linux amd64 tags
 
-* `6.1.0-preview.3-ubuntu-16.04` [(/release/preview/ubuntu16.04/docker/Dockerfile)][ubuntu-16.04-preview]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.3-ubuntu-16.04`
-* `6.1.0-preview.3-centos-7` [(/release/preview/centos7/docker/Dockerfile)][centos-7-preview]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.3-centos-7`
-* `6.1.0-preview.3-fedora-27` [(/release/preview/fedora27/docker/Dockerfile)][fedora-27-preview]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.3-fedora-27`
-* `6.1.0-preview.3-fedora-28` [(/release/preview/fedora27/docker/Dockerfile)][fedora-27-preview]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.3-fedora-28`
+* `6.1.0-preview.4-ubuntu-16.04` [(/release/preview/ubuntu16.04/docker/Dockerfile)][ubuntu-16.04-preview]
+  * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-ubuntu-16.04`
+* `6.1.0-preview.4-centos-7` [(/release/preview/centos7/docker/Dockerfile)][centos-7-preview]
+  * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-centos-7`
+* `6.1.0-preview.4-fedora-27` [(/release/preview/fedora27/docker/Dockerfile)][fedora-27-preview]
+  * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-fedora-27`
+* `6.1.0-preview.4-fedora-28` [(/release/preview/fedora27/docker/Dockerfile)][fedora-27-preview]
+  * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-fedora-28`
 
 [ubuntu-16.04-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/ubuntu16.04/docker/Dockerfile
 [centos-7-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/centos7/docker/Dockerfile
@@ -67,8 +67,8 @@
 
 ### Preview Windows amd64 tags
 
-* `6.1.0-preview.3-windowsservercore` [(release/preview/windowsservercore/docker/Dockerfile)][winsrvcore-preview]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.3-windowsservercore`
+* `6.1.0-preview.4-windowsservercore` [(release/preview/windowsservercore/docker/Dockerfile)][winsrvcore-preview]
+  * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-windowsservercore`
 
 **Note:** NanoServer has been broken in all  `6.1.0` builds.  See [PowerShell/PowerShell#6750](https://github.com/PowerShell/PowerShell/issues/6750).
 
