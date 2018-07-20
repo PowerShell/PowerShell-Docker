@@ -51,6 +51,8 @@
 
 ### Preview Linux amd64 tags
 
+* `6.1.0-preview.4-ubuntu-18.04` [(/release/preview/ubuntu18.04/docker/Dockerfile)][ubuntu-18.04-preview]
+  * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-ubuntu-18.04`
 * `6.1.0-preview.4-ubuntu-16.04` [(/release/preview/ubuntu16.04/docker/Dockerfile)][ubuntu-16.04-preview]
   * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-ubuntu-16.04`
 * `6.1.0-preview.4-centos-7` [(/release/preview/centos7/docker/Dockerfile)][centos-7-preview]
@@ -60,6 +62,7 @@
 * `6.1.0-preview.4-fedora-28` [(/release/preview/fedora27/docker/Dockerfile)][fedora-27-preview]
   * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-fedora-28`
 
+[ubuntu-18.04-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/ubuntu18.04/docker/Dockerfile
 [ubuntu-16.04-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/ubuntu16.04/docker/Dockerfile
 [centos-7-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/centos7/docker/Dockerfile
 [fedora-27-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/fedora27/docker/Dockerfile
