@@ -11,4 +11,4 @@ $repoRoot = Join-Path -path (Join-Path -Path $parent -ChildPath '..') -ChildPath
 $modulePath = Join-Path -Path $repoRoot -ChildPath 'tools\getDockerTags'
 Import-Module $modulePath
 
-Get-DockerTags -ShortTags $shortTags -Image "ubuntu" -FullTagFilter 'beaver-\d{8}[\.\d{1}]?' -AlternativeShortTag '18.04'
+Get-DockerTags -ShortTags $shortTags -Image "ubuntu" -FullTagFilter 'bionic-\d{8}[\.\d{1}]?' -AlternativeShortTag '18.04'
