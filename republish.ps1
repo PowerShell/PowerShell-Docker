@@ -3,8 +3,8 @@
 
 # Republishes images between mcr.microsoft.com and docker hub until docker hub redirects to mcr.microsoft.com
 param(
-    $stableVersion = '6.0.2',
-    $previewVersion = '6.1.0-preview.2',
+    $stableVersion = '6.0.3',
+    $previewVersion = '6.1.0-preview.4',
     [ValidateSet('windows', 'linux')]
     $Target,
     [switch]$Push,
