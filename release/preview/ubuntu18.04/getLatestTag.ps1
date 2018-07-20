@@ -4,7 +4,7 @@
 # return objects representing the tags we need to base the beaver image on
 
 # The versions of beaver we care about
-$shortTags = @('beaver')
+$shortTags = @('bionic')
 
 $parent = Join-Path -Path $PSScriptRoot -ChildPath '..'
 $repoRoot = Join-Path -path (Join-Path -Path $parent -ChildPath '..') -ChildPath '..'
