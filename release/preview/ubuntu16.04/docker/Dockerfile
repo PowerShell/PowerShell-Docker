@@ -41,11 +41,11 @@ ENV LANG en_US.UTF-8
 ENV LC_ALL $LANG
 RUN locale-gen $LANG && update-locale
 
-# Import the public repository GPG keys for Microsoft
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+# Download the Microsoft repository GPG keys
+RUN curl -L -O https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
 
-# Register the Microsoft Ubuntu 16.04 repository
-RUN curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | tee /etc/apt/sources.list.d/microsoft.list
+# Register the Microsoft repository GPG keys
+RUN dpkg -i packages-microsoft-prod.deb
 
 # Install powershell from Microsoft Repo
 RUN apt-get update \
