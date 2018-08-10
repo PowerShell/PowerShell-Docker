@@ -22,11 +22,11 @@
 
 ### Stable Linux amd64 tags
 
-* `ubuntu-16.04`, `6.0.3-ubuntu-16.04` [(/release/stable/ubuntu16.04/docker/Dockerfile)][ubuntu-16.04-stable]
+* `ubuntu-16.04`, `6.0.4-ubuntu-16.04` [(/release/stable/ubuntu16.04/docker/Dockerfile)][ubuntu-16.04-stable]
   * `docker pull mcr.microsoft.com/powershell:ubuntu-16.04`
-* `centos-7`, `6.0.3-centos-7` [(/release/stable/centos7/docker/Dockerfile)][centos-7-stable]
+* `centos-7`, `6.0.4-centos-7` [(/release/stable/centos7/docker/Dockerfile)][centos-7-stable]
   * `docker pull mcr.microsoft.com/powershell:centos-7`
-* `fedora-27`, `6.0.3-fedora-27` [(/release/stable/fedora27/docker/Dockerfile)][fedora-27-stable]
+* `fedora-27`, `6.0.4-fedora-27` [(/release/stable/fedora27/docker/Dockerfile)][fedora-27-stable]
   * `docker pull mcr.microsoft.com/powershell:fedora-27`
 
 [ubuntu-16.04-stable]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/ubuntu16.04/docker/Dockerfile
@@ -38,12 +38,12 @@
 * `nanoserver` : The latest stable nanoserver image.
   * Docker will detect your version of windows and select the most appropriate NanoServer image (1709 or 1803.)
   * `docker pull mcr.microsoft.com/powershell:nanoserver`
-* `6.0.3-nanoserver` : The latest `6.0.3` nanoserver image.
+* `6.0.4-nanoserver` : The latest `6.0.4` nanoserver image.
   * Docker will detect your version of windows and select the most appropriate NanoServer image (1709 or 1803.)
-  * `docker pull mcr.microsoft.com/powershell:6.0.3-nanoserver`
-* `windowsservercore`, `6.0.3-windowsservercore`, `6.1.0-preview.4-windowsservercore` [(release/stable/windowsservercore/docker/Dockerfile)][winsrvcore-stable]
+  * `docker pull mcr.microsoft.com/powershell:6.0.4-nanoserver`
+* `windowsservercore`, `6.0.4-windowsservercore`, `6.1.0-preview.4-windowsservercore` [(release/stable/windowsservercore/docker/Dockerfile)][winsrvcore-stable]
   * `docker pull mcr.microsoft.com/powershell:windowsservercore`
-* `6.0.3-nanoserver-1803`, `6.0.3-nanoserver-1709` [(release/stable/nanoserver/docker/Dockerfile)][nano-stable]
+* `6.0.4-nanoserver-1803`, `6.0.4-nanoserver-1709` [(release/stable/nanoserver/docker/Dockerfile)][nano-stable]
   * `docker pull mcr.microsoft.com/powershell:nanoserver`
 
 [winsrvcore-stable]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/windowsservercore/docker/Dockerfile
