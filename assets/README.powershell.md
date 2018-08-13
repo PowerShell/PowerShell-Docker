@@ -59,7 +59,7 @@
   * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-centos-7`
 * `6.1.0-preview.4-fedora-27` [(/release/preview/fedora27/docker/Dockerfile)][fedora-27-preview]
   * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-fedora-27`
-* `6.1.0-preview.4-fedora-28` [(/release/preview/fedora27/docker/Dockerfile)][fedora-27-preview]
+* `6.1.0-preview.4-fedora-28` [(/release/preview/fedora28/docker/Dockerfile)][fedora-28-preview]
   * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-fedora-28`
 
 [ubuntu-18.04-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/ubuntu18.04/docker/Dockerfile
