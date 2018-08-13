@@ -65,8 +65,8 @@
 [ubuntu-18.04-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/ubuntu18.04/docker/Dockerfile
 [ubuntu-16.04-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/ubuntu16.04/docker/Dockerfile
 [centos-7-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/centos7/docker/Dockerfile
-[fedora-27-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/fedora27/docker/Dockerfile
-[fedora-28-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/fedora28/docker/Dockerfile
+[fedora-27-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/fedora27/docker/Dockerfile
+[fedora-28-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/fedora28/docker/Dockerfile
 
 ### Preview Windows amd64 tags
 
