@@ -59,14 +59,14 @@
   * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-centos-7`
 * `6.1.0-preview.4-fedora-27` [(/release/preview/fedora27/docker/Dockerfile)][fedora-27-preview]
   * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-fedora-27`
-* `6.1.0-preview.4-fedora-28` [(/release/preview/fedora27/docker/Dockerfile)][fedora-27-preview]
+* `6.1.0-preview.4-fedora-28` [(/release/preview/fedora28/docker/Dockerfile)][fedora-28-preview]
   * `docker pull mcr.microsoft.com/powershell:6.1.0-preview.4-fedora-28`
 
 [ubuntu-18.04-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/ubuntu18.04/docker/Dockerfile
 [ubuntu-16.04-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/ubuntu16.04/docker/Dockerfile
 [centos-7-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/centos7/docker/Dockerfile
-[fedora-27-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/fedora27/docker/Dockerfile
-[fedora-28-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/fedora28/docker/Dockerfile
+[fedora-27-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/fedora27/docker/Dockerfile
+[fedora-28-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/fedora28/docker/Dockerfile
 
 ### Preview Windows amd64 tags
 
