@@ -17,7 +17,7 @@
 ### Preview
 
 * `preview`: The latest preview image.
-  * Ubuntu 16.04 for Linux and Windows Server Core for Windows
+  * Ubuntu 18.04 for Linux and Windows Server Core for Windows
   * `docker pull mcr.microsoft.com/powershell:preview`
 
 ### Stable Linux amd64 tags
