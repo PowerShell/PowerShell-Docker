@@ -3,8 +3,8 @@ ARG fromTag=latest
 
 FROM microsoft/windowsservercore:${fromTag}
 
-ARG POWERSHELL_MSI=https://github.com/PowerShell/PowerShell/releases/download/v6.1.0-preview.4/PowerShell-6.1.0-preview.4-win-x64.msi
-ARG PS_VERSION=6.1.0-preview.4
+ARG POWERSHELL_MSI=https://github.com/PowerShell/PowerShell/releases/download/v6.1.0-rc.1/PowerShell-6.1.0-rc.1-win-x64.msi
+ARG PS_VERSION=6.1.0-rc.1
 ARG IMAGE_NAME=microsoft/powershell:windowsservercore
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
@@ -12,7 +12,7 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
       description="This Dockerfile will install the latest release of PS." `
       org.label-schema.usage="https://github.com/PowerShell/PowerShell/tree/master/docker#run-the-docker-image-you-built" `
       org.label-schema.url="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" `
-      org.label-schema.vcs-url="https://github.com/PowerShell/PowerShell" `
+      org.label-schema.vcs-url="https://github.com/PowerShell/PowerShell-Docker" `
       org.label-schema.name="powershell" `
       org.label-schema.vendor="PowerShell" `
       org.label-schema.vcs-ref=${VCS_REF} `

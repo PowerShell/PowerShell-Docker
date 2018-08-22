@@ -5,7 +5,7 @@
 # This should be enabled now, but we will keep the script around until it proves reliable
 param(
     $stableVersion = '6.0.4',
-    $previewVersion = '6.1.0-preview.4',
+    $previewVersion = '6.1.0-rc.1',
     [ValidateSet('windows', 'linux')]
     $Target,
     [switch]$Push,

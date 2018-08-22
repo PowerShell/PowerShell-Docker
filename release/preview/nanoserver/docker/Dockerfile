@@ -10,7 +10,7 @@ ARG NanoServerRepo=microsoft/nanoserver
 FROM ${WindowsServerCoreRepo}:$WindowsServerCoreVersion  AS installer-env
 
 # Arguments for installing powershell, must be defined in the container they are used
-ARG PS_VERSION=6.1.0-preview.4
+ARG PS_VERSION=6.1.0-rc.1
 
 ENV PS_DOWNLOAD_URL https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
 
@@ -25,7 +25,7 @@ RUN Expand-Archive powershell.zip -DestinationPath \PowerShell
 FROM ${NanoServerRepo}:${fromTag}
 
 ARG VCS_REF="none"
-ARG PS_VERSION=6.1.0-preview.4
+ARG PS_VERSION=6.1.0-rc.1
 ARG IMAGE_NAME=microsoft/powershell
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
@@ -33,7 +33,7 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
       description="This Dockerfile will install the latest release of PS." `
       org.label-schema.usage="https://github.com/PowerShell/PowerShell/tree/master/docker#run-the-docker-image-you-built" `
       org.label-schema.url="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" `
-      org.label-schema.vcs-url="https://github.com/PowerShell/PowerShell" `
+      org.label-schema.vcs-url="https://github.com/PowerShell/PowerShell-Docker" `
       org.label-schema.name="powershell" `
       org.label-schema.vcs-ref=${VCS_REF} `
       org.label-schema.vendor="PowerShell" `
