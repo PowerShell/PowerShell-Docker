@@ -3,8 +3,8 @@ ARG fromTag=latest
 
 FROM microsoft/windowsservercore:${fromTag}
 
-ARG POWERSHELL_MSI=https://github.com/PowerShell/PowerShell/releases/download/v6.1.0-preview.4/PowerShell-6.1.0-preview.4-win-x64.msi
-ARG PS_VERSION=6.1.0-preview.4
+ARG POWERSHELL_MSI=https://github.com/PowerShell/PowerShell/releases/download/v6.1.0-rc.1/PowerShell-6.1.0-rc.1-win-x64.msi
+ARG PS_VERSION=6.1.0-rc.1
 ARG IMAGE_NAME=microsoft/powershell:windowsservercore
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `

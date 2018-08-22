@@ -4,7 +4,7 @@ ARG fromTag=7
 FROM centos:${fromTag}
 
 ARG VCS_REF="none"
-ARG PS_VERSION=6.1.0~preview.4
+ARG PS_VERSION=6.1.0~rc.1
 ARG IMAGE_NAME=microsoft/powershell:centos7
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
