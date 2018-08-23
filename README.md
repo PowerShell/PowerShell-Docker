@@ -139,7 +139,9 @@ PS > docker run -it microsoft/nanoserver-insider-powershell 'C:\program files\po
 
 ## Developing and Contributing
 
-Please see the [Contribution Guide][] for how to develop and contribute.
+Please see the [Contribution Guide][] for general information about how to develop and contribute.
+
+For information specific to `PowerShell-Docker` see [Development][development].
 
 If you have any problems, please consult the [known issues][], developer [FAQ][], and [GitHub issues][].
 If you do not see your problem captured, please file a [new issue][] and follow the provided template.
@@ -152,7 +154,7 @@ Also make sure to check out our [PowerShell-RFC repository](https://github.com/p
 [known issues]: https://github.com/PowerShell/PowerShell/tree/master/docs/KNOWNISSUES.md
 [GitHub issues]: https://github.com/PowerShell/PowerShell/issues
 [new issue]:https://github.com/PowerShell/PowerShell/issues/new
-
+[development]: https://github.com/PowerShell/PowerShell-Docker/tree/master/docs/development.md
 ## Legal and Licensing
 
 PowerShell is licensed under the [MIT license][].
