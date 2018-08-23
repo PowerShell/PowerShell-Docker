@@ -26,7 +26,7 @@ FROM ${NanoServerRepo}:${fromTag}
 
 ARG VCS_REF="none"
 ARG PS_VERSION=6.0.4
-ARG IMAGE_NAME=microsoft/powershell
+ARG IMAGE_NAME=mcr.microsoft.com/powershell
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" `
