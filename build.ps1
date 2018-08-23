@@ -17,65 +17,99 @@
 [CmdletBinding()]
 
 param(
-    [Parameter(Mandatory,ParameterSetName="VSTS")]
-    [switch]
-    $Vsts,
-    [Parameter(Mandatory,ParameterSetName="Test")]
+    [Parameter(Mandatory, ParameterSetName="TestByName")]
+    [Parameter(Mandatory, ParameterSetName="TestAll")]
     [switch]
     $Test,
-    [Parameter(ParameterSetName="Test")]
+
+    [Parameter(ParameterSetName="TestByName")]
+    [Parameter(ParameterSetName="TestAll")]
     [switch]
     $Pull,
-    [Parameter(Mandatory,ParameterSetName="localBuild")]
+
+    [Parameter(Mandatory, ParameterSetName="localBuildByName")]
+    [Parameter(Mandatory, ParameterSetName="localBuildAll")]
     [switch]
     $Build,
-    [Parameter(ParameterSetName="localBuild")]
+
+    [Parameter(ParameterSetName="localBuildByName")]
+    [Parameter(ParameterSetName="localBuildAll")]
     [switch]
     $Push,
-    [Parameter(Mandatory,ParameterSetName="GetTags")]
+
+    [Parameter(Mandatory, ParameterSetName="GetTagsByName")]
+    [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
     [switch]
     $GetTags,
-    [Parameter(Mandatory,ParameterSetName="VSTS")]
-    [int]
-    $BuildDefinitionId,
-    [Parameter(Mandatory,ParameterSetName="VSTS")]
-    [ValidateSet('public', 'internal')]
-    [string]
-    $DockerNamespace,
-    [Parameter(ParameterSetName="Test")]
-    [Parameter(ParameterSetName="localBuild")]
+
+    [Parameter(Mandatory, ParameterSetName="TestAll")]
+    [Parameter(Mandatory, ParameterSetName="localBuildAll")]
+    [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
+    [switch]
+    $All,
+
     [string]
     $ImageName = 'powershell.local',
-    [Parameter(ParameterSetName="Test")]
-    [Parameter(ParameterSetName="localBuild")]
+
     [string]
     $TestLogPostfix,
-    [Parameter(ParameterSetName="GetTags")]
-    [Parameter(ParameterSetName="localBuild")]
+
     [switch]
     $CI,
+
     [ValidateSet('stable','preview')]
+    [Parameter(Mandatory)]
     [string]
     $Channel='stable'
 )
 
 DynamicParam {
     # Add a dynamic parameter '-Name' which specifies the name(s) of the images to build or test
+    $buildHelperPath = Join-Path -Path $PSScriptRoot -ChildPath 'tools/buildHelper'
 
+    Import-Module $buildHelperPath -Force
+
+     
     # Get the names of the builds.
     $releasePath = Join-Path -Path $PSScriptRoot -ChildPath 'release'
-    $stablePath = Join-Path -Path $releasePath -ChildPath 'stable'
-    $previewPath = Join-Path -Path $releasePath -ChildPath 'preview'
+
+    switch ($Channel)
+    {
+        $null {
+            $imageChannel = 'all'
+        }
+
+        default {
+            $imageChannel = $Channel
+        }
+    }
 
     $dockerFileNames = @()
-    Get-ChildItem -Path $stablePath -Directory | Select-Object -ExpandProperty Name | ForEach-Object { $dockerFileNames += $_ }
-    Get-ChildItem -Path $previewPath -Directory | Select-Object -ExpandProperty Name | Where-Object { $dockerFileNames -notcontains $_ } | ForEach-Object { $dockerFileNames += $_ }
+    Get-ImageList -Channel $imageChannel | ForEach-Object { $dockerFileNames += $_ }
 
     # Create the parameter attributs
-    $ParameterAttr = New-Object "System.Management.Automation.ParameterAttribute"
-    $ValidateSetAttr = New-Object "System.Management.Automation.ValidateSetAttribute" -ArgumentList $dockerFileNames
     $Attributes = New-Object "System.Collections.ObjectModel.Collection``1[System.Attribute]"
-    $Attributes.Add($ParameterAttr) > $null
+
+    function Add-ParameterAttribute {
+        param(
+            [Parameter(Mandatory)]
+            [object]
+            $Attributes,
+            [Parameter(Mandatory)]
+            [string]
+            $ParameterSetName
+        )
+        $ParameterAttr = New-Object "System.Management.Automation.ParameterAttribute"
+        $ParameterAttr.ParameterSetName = $ParameterSetName
+        $ParameterAttr.Mandatory = $true
+        $Attributes.Add($ParameterAttr) > $null
+    }
+
+    Add-ParameterAttribute -ParameterSetName 'TestByName' -Attributes $Attributes
+    Add-ParameterAttribute -ParameterSetName 'localBuildByName' -Attributes $Attributes
+    Add-ParameterAttribute -ParameterSetName 'GetTagsByName' -Attributes $Attributes
+    
+    $ValidateSetAttr = New-Object "System.Management.Automation.ValidateSetAttribute" -ArgumentList $dockerFileNames
     $Attributes.Add($ValidateSetAttr) > $null
 
     # Create the parameter
@@ -86,10 +120,36 @@ DynamicParam {
 }
 
 Begin {
-    $Name = $PSBoundParameters['Name']
+    switch($Channel)
+    {
+        'preview' {
+            $windowsVersion = Get-PowerShellVersion -Preview
+            $linuxVersion = Get-PowerShellVersion -Linux -Preview
+        }
+        'stable' {
+            $windowsVersion = Get-PowerShellVersion
+            $linuxVersion = Get-PowerShellVersion -Linux
+        }
+        default {
+            throw "unknown channel: $Channel"
+        }
+    }
+    
+    if ($PSCmdlet.ParameterSetName -match '.*ByName')
+    {
+        # We are using the Name parameter, so assign the variable to that
+        $Name = $PSBoundParameters['Name']
+    }
+    else
+    {
+        # We are using all, so get the list off all images for the current channel
+        $Name = Get-ImageList -Channel $Channel
+    }
+    Write-Verbose "wv: $windowsVersion; lv: $linuxVersion" -Verbose
 }
 
 End {
+    
     # this function wraps native command Execution
     # for more information, read https://mnaoumov.wordpress.com/2015/01/11/execution-of-external-commands-in-powershell-done-right/
     function script:Start-NativeExecution
@@ -142,14 +202,7 @@ End {
     }
 
     # Calculate the paths
-    $releasePath = Join-Path -Path $PSScriptRoot -ChildPath 'release'
     $channelPath = Join-Path -Path $releasePath -ChildPath $Channel
-
-    # Create the URL and header for the REST calls
-    $headers = @{  Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN"  }
-    $baseUrl = "{0}{1}" -f $env:SYSTEM_TEAMFOUNDATIONCOLLECTIONURI, $env:SYSTEM_TEAMPROJECTID
-    $buildsUrl = [string]::Format("{0}/_apis/build/builds?api-version=2.0", $baseUrl)
-    Write-Verbose "url: $buildsUrl"
 
     $localImageNames = @()
     $testArgList = @()
@@ -159,7 +212,7 @@ End {
         $imagePath = Join-Path -Path $channelPath -ChildPath $dockerFileName
         $scriptPath = Join-Path -Path $imagePath -ChildPath 'getLatestTag.ps1'
         $tagsJsonPath = Join-Path -Path $imagePath -ChildPath 'tags.json'
-        $psversionsJsonPath = Join-Path -Path $imagePath -ChildPath 'psVersions.json'
+        $metaJsonPath = Join-Path -Path $imagePath -ChildPath 'meta.json'
 
         # skip an image if it doesn't exist
         if(!(Test-Path $scriptPath))
@@ -169,111 +222,91 @@ End {
         }
 
         $tagsTemplates = Get-Content -Path $tagsJsonPath | ConvertFrom-Json
-        $psVersions = Get-Content -Path $psversionsJsonPath | ConvertFrom-Json
+        $isContainerLinux = $false
+        if(Test-Path $metaJsonPath)
+        {
+            $meta = Get-Content -Path $metaJsonPath | ConvertFrom-Json
+            if($meta.IsLinux)
+            {
+                $isContainerLinux = [bool] $meta.IsLinux
+            }
+        }
+
+        $psversion = $windowsVersion
+        if($isContainerLinux)
+        {
+            $psversion = $linuxVersion
+        }
 
         # Get the tag data for the image
         $tagData = & $scriptPath -CI:$CI.IsPresent
 
         if (!$ShortTag) {
-            foreach ($psversion in $psVersions) {
-                foreach ($tag in $tagData) {
-                    foreach ($tagTemplate in $tagsTemplates) {
-                        # replace the tag token with the tag
-                        if ($tagTemplate -match '#tag#') {
-                            $actualTag = $tagTemplate -replace '#tag#', $tag.Tag
-                        }
-                        elseif ($tagTemplate -match '#shorttag#' -and $tag.Type -eq 'Short') {
-                            $actualTag = $tagTemplate -replace '#shorttag#', $tag.Tag
-                        }
-                        elseif ($tagTemplate -match '#fulltag#' -and $tag.Type -eq 'Full') {
-                            $actualTag = $tagTemplate -replace '#fulltag#', $tag.Tag
+            foreach ($tag in $tagData) {
+                foreach ($tagTemplate in $tagsTemplates) {
+                    # replace the tag token with the tag
+                    if ($tagTemplate -match '#tag#') {
+                        $actualTag = $tagTemplate -replace '#tag#', $tag.Tag
+                    }
+                    elseif ($tagTemplate -match '#shorttag#' -and $tag.Type -eq 'Short') {
+                        $actualTag = $tagTemplate -replace '#shorttag#', $tag.Tag
+                    }
+                    elseif ($tagTemplate -match '#fulltag#' -and $tag.Type -eq 'Full') {
+                        $actualTag = $tagTemplate -replace '#fulltag#', $tag.Tag
+                    }
+                    else {
+                        # skip if the type of tag token doesn't match the type of tag
+                        Write-Verbose -Message "Skipping $($tag.Tag) - $tagTemplate" -Verbose
+                        continue
+                    }
+
+                    # Replace the the psversion token with the powershell version in the tag
+                    $actualVersion = $windowsVersion
+                    $actualTag = $actualTag -replace '#psversion#', $actualVersion
+                    $actualTag = $actualTag.ToLowerInvariant()
+                    $fromTag = $Tag.FromTag
+
+                    if ($Build.IsPresent -or $Test.IsPresent) {
+                        Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
+                        $contextPath = Join-Path -Path $imagePath -ChildPath 'docker'
+                        $vcf_ref = git rev-parse --short HEAD
+                        $fullName = "${ImageName}:$actualTag"
+                        $script:ErrorActionPreference = 'stop'
+                        $testsPath = Join-Path -Path $PSScriptRoot -ChildPath 'tests'
+                        Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
+                        if ($isContainerLinux) {
+                            $os = 'linux'
                         }
                         else {
-                            # skip if the type of tag token doesn't match the type of tag
-                            Write-Verbose -Message "Skipping $($tag.Tag) - $tagTemplate" -Verbose
-                            continue
+                            $os = 'windows'
                         }
 
-                        # Replace the the psversion token with the powershell version in the tag
-                        $actualVersion = $psversion -replace '~', '-'
-                        $actualTag = $actualTag -replace '#psversion#', $actualVersion
-                        $actualTag = $actualTag.ToLowerInvariant()
-                        $fromTag = $Tag.FromTag
-
-                        if($Vsts.IsPresent)
+                        $skipVerification = $false
+                        if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
                         {
-                            Write-Verbose -Message "lauching build with fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
-                            # create the parameters object for the build
-                            $parameters = @{
-                                fromTag           = $fromTag
-                                imageTag          = $actualTag
-                                PowerShellVersion = $psversion
-                                Namespace         = $DockerNamespace.ToLowerInvariant()
-                                ImageName         = $dockerFileName
-                                Channel           = $Channel
-                            }
-
-                            # the rest body expects the parameters as an encoded json.
-                            # So, convert to JSON before producing the body object
-                            $parametersJson = $parameters | ConvertTo-Json
-
-                            # Create the body of the request to queue the build
-                            Write-Verbose -Message "paramJson: $parametersJson"
-                            $restBody = @{
-                                definition   = @{
-                                    id = $BuildDefinitionId
-                                }
-                                sourceBranch = $env:BUILD_SOURCEBRANCH
-                                parameters   = $parametersJson
-                            }
-                            $restBodyJson = ConvertTo-Json $restBody
-                            Write-Verbose -Message "restBody: $restBodyJson"
-
-                            # Queue the build
-                            $null = Invoke-RestMethod -Method Post -ContentType application/json -Uri $buildsUrl -Body $restBodyJson -Headers $headers
+                            Write-Verbose -Message "Skipping verification of $fullName in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
+                            # The version of nanoserver in CI doesn't have all the changes needed to verify the image
+                            $skipVerification = $true
                         }
-                        elseif ($Build.IsPresent -or $Test.IsPresent) {
-                            Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
-                            $contextPath = Join-Path -Path $imagePath -ChildPath 'docker'
-                            $vcf_ref = git rev-parse --short HEAD
-                            $fullName = "${ImageName}:$actualTag"
-                            $script:ErrorActionPreference = 'stop'
-                            $testsPath = Join-Path -Path $PSScriptRoot -ChildPath 'tests'
-                            Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
-                            if($dockerFileName -iin 'windowsservercore','nanoserver')
-                            {
-                                $os = 'windows'
-                            }
-                            else {
-                                $os = 'linux'
-                            }
-                            $skipVerification = $false
-                            if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
-                            {
-                                Write-Verbose -Message "Skipping verification of $fullName in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
-                                # The version of nanoserver in CI doesn't have all the changes needed to verify the image
-                                $skipVerification = $true
-                            }
 
-                            $testArgs = @{
-                                tag = $fullName
-                                BuildArgs = @{
-                                    fromTag = $fromTag
-                                    PS_VERSION = $psversion
-                                    VCS_REF = $vcf_ref
-                                }
-                                ContextPath = $contextPath
-                                OS = $os
-                                ExpectedVersion = $actualVersion
-                                SkipVerification = $skipVerification
+                        $testArgs = @{
+                            tag = $fullName
+                            BuildArgs = @{
+                                fromTag = $fromTag
+                                PS_VERSION = $psversion
+                                VCS_REF = $vcf_ref
                             }
+                            ContextPath = $contextPath
+                            OS = $os
+                            ExpectedVersion = $actualVersion
+                            SkipVerification = $skipVerification
+                        }
 
-                            $testArgList += $testArgs
-                            $localImageNames += $fullName
-                        }
-                        elseif ($GetTags.IsPresent) {
-                            Write-Verbose "from: $fromTag actual: $actualTag" -Verbose
-                        }
+                        $testArgList += $testArgs
+                        $localImageNames += $fullName
+                    }
+                    elseif ($GetTags.IsPresent) {
+                        Write-Verbose "from: $fromTag actual: $actualTag psversion: $psversion" -Verbose
                     }
                 }
             }

@@ -5,7 +5,7 @@ FROM ubuntu:${fromTag}
 
 ARG PS_VERSION=6.0.4
 ARG PS_VERSION_POSTFIX=-1.ubuntu.16.04
-ARG IMAGE_NAME=microsoft/powershell:ubuntu16.04
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:ubuntu16.04
 ARG VCS_REF="none"
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \

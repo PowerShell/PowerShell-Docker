@@ -5,7 +5,7 @@ FROM microsoft/windowsservercore:${fromTag}
 
 ARG POWERSHELL_MSI=https://github.com/PowerShell/PowerShell/releases/download/v6.1.0-rc.1/PowerShell-6.1.0-rc.1-win-x64.msi
 ARG PS_VERSION=6.1.0-rc.1
-ARG IMAGE_NAME=microsoft/powershell:windowsservercore
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:windowsservercore
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" `
