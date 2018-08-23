@@ -73,8 +73,6 @@
 * `6.1.0-rc.1-windowsservercore` [(release/preview/windowsservercore/docker/Dockerfile)][winsrvcore-preview]
   * `docker pull mcr.microsoft.com/powershell:6.1.0-rc.1-windowsservercore`
 
-**Note:** NanoServer has been broken in all  `6.1.0` builds.  See [PowerShell/PowerShell#6750](https://github.com/PowerShell/PowerShell/issues/6750).
-
 [winsrvcore-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/windowsservercore/docker/Dockerfile
 [nano-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/nanoserver/docker/Dockerfile
 
