@@ -48,6 +48,7 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
 
         Invoke-Docker -Command build -Params @(
                 '--pull'
+                '--squash'
                 '--quiet'
                 '-t'
                 ${Name}
@@ -91,6 +92,7 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
 
         Invoke-Docker -Command build -Params @(
                 '--pull'
+                '--squash'
                 '--quiet'
                 '-t'
                 ${Name}
