@@ -4,17 +4,82 @@
 # overlay the alpine tar.gz on top of it.
 # There are TODO's in the file on updates that should occure one the Alpine .tar.gz contains everything
 
-ARG fromTag=16.04
+# Define arg(s) needed for the From statement
+ARG fromTag=3.8
 
-FROM alpine:3.8
+FROM alpine:${fromTag} AS installer-env
 
+# Define Args for the needed to add the package
 ARG PS_VERSION=6.1.0-rc.1
-ARG PS_VERSION_POSTFIX=-1.ubuntu.16.04
 # TODO: once the official build produces a full package for alpine, update this to the full package
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
+ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
+ARG PS_INSTALL_VERSION=6-preview
+
+# downoad the Linux tar.gz and save it
+ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
+
+# define the folder we will be installing PowerShell to
+ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
+
+# Create the install folder
+RUN mkdir -p ${PS_INSTALL_FOLDER}
+
+# Unzip the Linux tar.gz
+RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
+
+# TODO: once the official build produces a full package for alpine, remove this overlay of the apline files
+# Download the apline powershell .tar.gz package
+ADD https://github.com/TravisEz13/PowerShell/releases/download/v6.1.0-rc.1/powershell-6.1.0-fixalpine-linux-musl-x64.tar.gz /tmp/alpine.tar.gz
+
+# Extract the alpine tar.gz
+RUN tar zxf /tmp/alpine.tar.gz -C ${PS_INSTALL_FOLDER}
+
+# Start a new stage so we loose all the tar.gz layers from the final image
+FROM alpine:${fromTag}
+
+
+# Copy only the files we need from the previous stag
+COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
+
+# Define Args and Env needed to create links
+ARG PS_INSTALL_VERSION=6-preview
+ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
+    \
+    # Define ENVs for Localization/Globalization
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8
+
+# Install dotnet dependencies and ca-certificates
+RUN apk add --no-cache \
+        ca-certificates \
+        \
+        # .NET Core dependencies
+        krb5-libs \
+        libgcc \
+        libintl \
+        libssl1.0 \
+        libstdc++ \
+        tzdata \
+        userspace-rcu \
+        zlib \
+        icu-libs \
+    && apk -X https://dl-cdn.alpinelinux.org/alpine/edge/main add --no-cache \
+        lttng-ust \
+        \
+    # Create the pwsh symbolic link that points to powershell
+    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    \
+    # Create the pwsh-preview symbolic link that points to powershell
+    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview
+
+
+# Define args needed only for the labels
+ARG PS_VERSION=6.1.0-rc.1
 ARG IMAGE_NAME=microsoft/powershell:ubuntu16.04
 ARG VCS_REF="none"
-
+# Add label last as it's just metadata and usere a lot a parameters
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
       description="This Dockerfile will install the latest release of PS." \
@@ -30,56 +95,5 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       org.label-schema.docker.cmd.devel="docker run ${IMAGE_NAME}" \
       org.label-schema.docker.cmd.test="docker run ${IMAGE_NAME} pwsh -c Invoke-Pester" \
       org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
-
-RUN apk add --no-cache \
-        ca-certificates \
-        \
-        # .NET Core dependencies
-        krb5-libs \
-        libgcc \
-        libintl \
-        libssl1.0 \
-        libstdc++ \
-        tzdata \
-        userspace-rcu \
-        zlib \
-    && apk -X https://dl-cdn.alpinelinux.org/alpine/edge/main add --no-cache \
-        lttng-ust
-
-RUN apk add --no-cache \
-        curl
-
-# Set the invariant mode since icu_libs isn't included (see https://github.com/dotnet/announcements/issues/20)
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=true
-
-# Get the InstallTarballPackage.sh script
-ADD https://raw.githubusercontent.com/PowerShell/PowerShell/master/docker/InstallTarballPackage.sh /InstallTarballPackage.sh
-
-# Add execution permission
-RUN chmod +x /InstallTarballPackage.sh
-
-# Install powershell from tarball package
-RUN /InstallTarballPackage.sh $PS_VERSION $PS_PACKAGE
-
-# Create the preview symbolic link that points to powershell
-# InstallTarballPackage creates the pwsh link
-RUN ln -s /opt/microsoft/powershell/$S_VERSION/pwsh /usr/bin/pwsh-preview
-
-# Remove the script
-RUN rm -f /InstallTarballPackage.sh
-
-# Begin region to overlay the alpine tag.gz
-# TODO: once the official build produces a full package for alpine, remove this region
-
-# Download the powershell .tar.gz package
-RUN curl -L -o /tmp/powershell.tar.gz https://github.com/TravisEz13/PowerShell/releases/download/v6.1.0-rc.1/powershell-6.1.0-fixalpine-linux-musl-x64.tar.gz
-
-# Expand powershell to the target folder
-RUN tar zxf /tmp/powershell.tar.gz -C /opt/microsoft/powershell/$PS_VERSION
-
-# remove tar.gz
-RUN rm -f /tmp/powershell.tar.gz
-
-# End region to overlay the alpine tag.gz
 
 CMD [ "pwsh" ]
