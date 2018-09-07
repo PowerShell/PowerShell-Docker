@@ -224,7 +224,7 @@ End {
         $meta = Get-DockerImageMetaData -Path $metaJsonPath
 
         $psversion = $windowsVersion
-        if($meta.UseLinuxVersion)
+        if($meta.ShouldUseLinuxVersion())
         {
             $psversion = $linuxVersion
         }

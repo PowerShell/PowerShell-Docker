@@ -57,8 +57,18 @@ function Get-ImageList
 class DockerImageMetaData {
     [Bool]
     $IsLinux = $false
-    [Bool]
-    $UseLinuxVersion = $IsLinuxContainer
+
+    [System.Nullable[Bool]]
+    $UseLinuxVersion = $null
+
+    [bool] ShouldUseLinuxVersion() {
+        if($this.UseLinuxVersion -is [bool])
+        {
+            return $this.UseLinuxVersion
+        }
+
+        return $this.IsLinux
+    }
 }
 
 Function Get-DockerImageMetaData
