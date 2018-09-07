@@ -38,7 +38,6 @@ RUN tar zxf /tmp/alpine.tar.gz -C ${PS_INSTALL_FOLDER}
 # Start a new stage so we loose all the tar.gz layers from the final image
 FROM alpine:${fromTag}
 
-
 # Copy only the files we need from the previous stag
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
@@ -73,7 +72,6 @@ RUN apk add --no-cache \
     \
     # Create the pwsh-preview symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview
-
 
 # Define args needed only for the labels
 ARG PS_VERSION=6.1.0-rc.1
