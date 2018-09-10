@@ -1,0 +1,38 @@
+parameters:
+  imagename: ''
+  queue: 'Hosted Ubuntu 1604'
+  stable: 'true'
+  servicing: 'true'
+  preview: 'true'
+
+phases:
+- phase: ${{ parameters.imagename }}
+  queue: ${{ parameters.queue }}
+  steps:
+  - powershell:  Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck
+    displayName: Install Pester
+    condition: succeededOrFailed()
+
+  - ${{ if eq(parameters.stable, 'true') }}:
+    - powershell: ./build.ps1 -build -name '${{ parameters.imagename }}' -CI -Channel 'stable' -TestLogPostfix '${{ parameters.imagename }}-stable'
+      displayName: ${{ parameters.imagename }} Stable
+      condition: succeededOrFailed()
+
+  - ${{ if eq(parameters.preview, 'true') }}:
+    - powershell: ./build.ps1 -build -name '${{ parameters.imagename }}' -CI -Channel 'preview' -TestLogPostfix '${{ parameters.imagename }}-preview'
+      displayName: ${{ parameters.imagename }} Preview
+      condition: succeededOrFailed()
+
+  - ${{ if eq(parameters.servicing, 'true') }}:
+    - powershell: ./build.ps1 -build -name '${{ parameters.imagename }}' -CI -Channel 'servicing' -TestLogPostfix '${{ parameters.imagename }}-servicing'
+      displayName: ${{ parameters.imagename }} Servicing
+      condition: succeededOrFailed()
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    displayName: Publish ${{ parameters.imagename }} Test Results **\test*.xml
+    inputs:
+      testRunner: NUnit
+      testResultsFiles: '**\test*.xml'
+      testRunTitle: ${{ parameters.imagename }}
+      mergeTestResults: true

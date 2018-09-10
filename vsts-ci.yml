@@ -3,82 +3,45 @@ resources:
 - repo: self
   clean: true
 phases:
-- phase: Ubuntu_Build
 
-  queue:
-    name: Hosted Linux Preview
-  steps:
-  - powershell:  Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck
-    displayName: Install Pester
-    condition: succeededOrFailed()
+- template: .vsts-ci/phase.yml
+  parameters:
+    imagename: ubuntu16.04
 
-  - powershell: ./build.ps1 -build -name ubuntu14.04, ubuntu16.04 -CI -Channel 'stable' -TestLogPostfix UbuntuStable
-    displayName: Build Ubuntu Stable
-    condition: succeededOrFailed()
+- template: .vsts-ci/phase.yml
+  parameters:
+    imagename: ubuntu14.04
 
-  - powershell: ./build.ps1 -build -name ubuntu14.04, ubuntu16.04, ubuntu18.04 -CI -Channel 'preview' -TestLogPostfix UbuntuPreview
-    displayName: Build Ubuntu Preview
-    condition: succeededOrFailed()
+- template: .vsts-ci/phase.yml
+  parameters:
+    imagename: ubuntu18.04
+    stable: false
+    servicing: false
 
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    displayName: Publish Ubuntu Test Results **\test*.xml
-    inputs:
-      testRunner: NUnit
-      testResultsFiles: '**\test*.xml'
-      testRunTitle: Ubuntu
-      mergeTestResults: true
+- template: .vsts-ci/phase.yml
+  parameters:
+    imagename: centos7
 
-- phase: RedHat_Variants_Build
+- template: .vsts-ci/phase.yml
+  parameters:
+    imagename: fedora27
 
-  queue:
-    name: Hosted Linux Preview
-  steps:
-  - powershell:  Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck
-    displayName: Install Pester
-    condition: succeededOrFailed()
+- template: .vsts-ci/phase.yml
+  parameters:
+    imagename: fedora28
+    stable: false
+    servicing: false
 
-  - powershell: ./build.ps1 -build -name centos7, fedora27 -CI -Channel 'stable' -TestLogPostfix RedHatStable
-    displayName: RedHat Variants Stable
-    condition: succeededOrFailed()
-
-  - powershell: ./build.ps1 -build -name centos7, fedora27, fedora28 -CI -Channel 'preview' -TestLogPostfix RedHatPreview
-    displayName: RedHat Variants Preview
-    condition: succeededOrFailed()
-
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    displayName: Publish RedHat Variants Test Results **\test*.xml
-    inputs:
-      testRunner: NUnit
-      testResultsFiles: '**\test*.xml'
-      testRunTitle: RedHat
-      mergeTestResults: true
+- template: .vsts-ci/phase.yml
+  parameters:
+    imagename: nanoserver
+    servicing: false
+    preview: false
 
 # Use CI switch to disable 1709 and 1803 builds because the VSTS hosted instances don't yet support 1709 or 1803
 # Skipping previews on windows due to how long it takes to build on windows
-- phase: Windows_Build
-
-  queue:
-    name: Hosted VS2017
-  steps:
-  - powershell:  Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhss"))"
-    displayName: Set Build Name for Non-PR
-    condition: ne(variables['Build.Reason'], 'PullRequest')
-
-  - powershell:  Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck
-    displayName: Install Pester
-    condition: succeededOrFailed()
-
-  - powershell: ./build.ps1 -build -name nanoserver, windowsservercore -CI -Channel 'stable'
-    displayName: Build Windows Stable
-    condition: succeededOrFailed()
-
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    displayName: Publish Windows Stable Test Results **\TEST*.xml
-    inputs:
-      testRunner: NUnit
-      testResultsFiles: '**\test*.xml'
-      testRunTitle: Windows
-      mergeTestResults: true
+- template: .vsts-ci/phase.yml
+  parameters:
+    imagename: windowsservercore
+    servicing: false
+    preview: false
