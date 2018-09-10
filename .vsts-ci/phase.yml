@@ -1,4 +1,5 @@
 parameters:
+  name: ''
   imagename: ''
   queue: 'Hosted Ubuntu 1604'
   stable: 'true'
@@ -6,7 +7,7 @@ parameters:
   preview: 'true'
 
 phases:
-- phase: ${{ parameters.imagename }}
+- phase: ${{ parameters.name }}
   queue: ${{ parameters.queue }}
   steps:
   - powershell:  Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck
