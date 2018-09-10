@@ -4,19 +4,24 @@
 # Gets the Current version of PowerShell from the PowerShell repo
 function Get-PowerShellVersion
 {
+    [CmdletBinding(DefaultParameterSetName='Default')]
     param(
-        [Parameter(HelpMessage="Gets the preview version.  Without this it gets the current stable version.")]
+        [Parameter(ParameterSetName='Preview', HelpMessage="Gets the preview version.  Without this it gets the current stable version.")]
         [switch] $Preview,
+        [Parameter(ParameterSetName='Servicing', HelpMessage="Gets the servicing version.  Without this it gets the current stable version.")]
+        [switch] $Servicing,
         [Parameter(HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
         [switch] $Linux
     )
 
     $metaData = Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json'
 
-    $releaseTag = if($Preview.IsPresent) {
-        $metaData.NextReleaseTag
-    } else {
-        $metaData.ReleaseTag
+    $releaseTag = if ($Preview.IsPresent) {
+        $metaData.PreviewReleaseTag
+    } elseif ($Servicing.IsPresent) {
+        $metaData.ServicingReleaseTag
+    }else {
+        $metaData.StableReleaseTag
     }
 
     $version = $releaseTag -replace '^v', ''
@@ -33,7 +38,7 @@ function Get-ImageList
 {
     param(
         [Parameter(HelpMessage="Filters returned list to stable or preview images.  Default to all images.")]
-        [ValidateSet('stable','preview','all')]
+        [ValidateSet('stable','preview','servicing','all')]
         [string]
         $Channel='all'
     )
@@ -42,8 +47,14 @@ function Get-ImageList
     $releasePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\release'
     $stablePath = Join-Path -Path $releasePath -ChildPath 'stable'
     $previewPath = Join-Path -Path $releasePath -ChildPath 'preview'
+    $servicingPath = Join-Path -Path $releasePath -ChildPath 'servicing'
 
     if ($Channel -in 'stable', 'all')
+    {
+        Get-ChildItem -Path $stablePath -Directory | Select-Object -ExpandProperty Name | Write-Output
+    }
+
+    if ($Channel -in 'servicing', 'all')
     {
         Get-ChildItem -Path $stablePath -Directory | Select-Object -ExpandProperty Name | Write-Output
     }
