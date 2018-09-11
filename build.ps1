@@ -57,7 +57,7 @@ param(
     [switch]
     $CI,
 
-    [ValidateSet('stable','preview')]
+    [ValidateSet('stable','preview','servicing')]
     [Parameter(Mandatory)]
     [string]
     $Channel='stable'
@@ -122,6 +122,10 @@ DynamicParam {
 Begin {
     switch($Channel)
     {
+        'servicing' {
+            $windowsVersion = Get-PowerShellVersion -Servicing
+            $linuxVersion = Get-PowerShellVersion -Linux -Servicing
+        }
         'preview' {
             $windowsVersion = Get-PowerShellVersion -Preview
             $linuxVersion = Get-PowerShellVersion -Linux -Preview

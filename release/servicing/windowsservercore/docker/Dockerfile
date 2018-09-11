@@ -3,9 +3,10 @@ ARG fromTag=latest
 
 FROM microsoft/windowsservercore:${fromTag}
 
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=6.0.4
 ARG POWERSHELL_MSI=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/PowerShell-${PS_VERSION}-win-x64.msi
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:windowsservercore
+ARG VCS_REF="none"
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" `
@@ -48,9 +49,6 @@ RUN $ErrorActionPreference='Stop'; `
       $psexe=Get-Item -Path $Env:ProgramFiles\PowerShell\*\pwsh.exe ; `
       New-Item -Type SymbolicLink -Path $Env:ProgramFiles\PowerShell\ -Name latest -Value $psexe.DirectoryName `
     } else { throw 'Installation failed!  See c:\PowerShell-win-x64.msi.log' } ;
-
-# Verify New pwsh.exe runs
-SHELL ["C:\\Program Files\\PowerShell\\latest\\pwsh.exe", "-command"]
 
 # Persist %PSCORE% ENV variable for user convenience
 ENV PSCORE='"C:\Program Files\PowerShell\latest\pwsh.exe"'

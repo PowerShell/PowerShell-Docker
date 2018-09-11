@@ -1,11 +1,11 @@
-# Docker image file that describes an Ubuntu16.04 image with PowerShell installed from Microsoft APT Repo
-ARG fromTag=16.04
+# Docker image file that describes an Ubuntu18.04 image with PowerShell installed from Microsoft APT Repo
+ARG fromTag=18.04
 
 FROM ubuntu:${fromTag}
 
 ARG PS_VERSION=6.1.0
-ARG PS_VERSION_POSTFIX=-1.ubuntu.16.04
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:ubuntu16.04
+ARG PS_VERSION_POSTFIX=-1.ubuntu.18.04
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:ubuntu18.04
 ARG VCS_REF="none"
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
@@ -24,6 +24,9 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       org.label-schema.docker.cmd.test="docker run ${IMAGE_NAME} pwsh -c Invoke-Pester" \
       org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
 
+# setup terminal
+ENV TERM xterm
+
 # Install dependencies and clean up
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -32,6 +35,7 @@ RUN apt-get update \
         curl \
         apt-transport-https \
         locales \
+        gnupg2 \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -42,7 +46,7 @@ ENV LC_ALL $LANG
 RUN locale-gen $LANG && update-locale
 
 # Download the Microsoft repository GPG keys
-RUN curl -L -O https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
+RUN curl -L -O https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb
 
 # Register the Microsoft repository GPG keys
 RUN dpkg -i packages-microsoft-prod.deb

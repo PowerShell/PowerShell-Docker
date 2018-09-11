@@ -1,4 +1,4 @@
 [
     "#psversion#-windowsservercore-#tag#",
-    "windowsservercore-#tag#"
+    "windowsservercore-#shorttag#"
 ]

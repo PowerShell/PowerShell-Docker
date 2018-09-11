@@ -5,6 +5,13 @@
 
 # The versions of trusty we care about
 $shortTags = @('trusty')
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+# return objects representing the tags we need to base the trusty image on
+
+# The versions of trusty we care about
+$shortTags = @('trusty')
 
 $parent = Join-Path -Path $PSScriptRoot -ChildPath '..'
 $repoRoot = Join-Path -path (Join-Path -Path $parent -ChildPath '..') -ChildPath '..'
