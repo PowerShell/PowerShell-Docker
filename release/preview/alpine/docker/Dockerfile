@@ -2,7 +2,7 @@
 # NOTE: the alpine tar.gz when this was written doesn't contain the modules.  For that we need a container with modules.
 # To accomplish this, we will get the modules from the full linux tar.gz package, then
 # overlay the alpine tar.gz on top of it.
-# There are TODO's in the file on updates that should occure one the Alpine .tar.gz contains everything
+# There are TODO's in the file on updates that should occur one the Alpine .tar.gz contains everything
 
 # Define arg(s) needed for the From statement
 ARG fromTag=3.8
@@ -11,7 +11,7 @@ FROM alpine:${fromTag} AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=6.1.0-rc.1
-# TODO: once the official build produces a full package for alpine, update this to the full package
+# TODO: once the official build produces a full package for alpine, update this to the full apline package
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6-preview
