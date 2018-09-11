@@ -8,6 +8,9 @@ parameters:
 
 phases:
 - phase: ${{ parameters.name }}
+  variables:
+    ImageName: ${{ parameters.imagename }}
+
   queue: ${{ parameters.queue }}
   steps:
   - powershell:  Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck
@@ -15,25 +18,25 @@ phases:
     condition: succeededOrFailed()
 
   - ${{ if eq(parameters.stable, 'true') }}:
-    - powershell: ./build.ps1 -build -name '${{ parameters.imagename }}' -CI -Channel 'stable' -TestLogPostfix '${{ parameters.imagename }}-stable'
-      displayName: ${{ parameters.imagename }} Stable
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'stable' -TestLogPostfix '$(ImageName)-stable'
+      displayName: $(ImageName) Stable
       condition: succeededOrFailed()
 
   - ${{ if eq(parameters.preview, 'true') }}:
-    - powershell: ./build.ps1 -build -name '${{ parameters.imagename }}' -CI -Channel 'preview' -TestLogPostfix '${{ parameters.imagename }}-preview'
-      displayName: ${{ parameters.imagename }} Preview
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'preview' -TestLogPostfix '$(ImageName)-preview'
+      displayName: $(ImageName) Preview
       condition: succeededOrFailed()
 
   - ${{ if eq(parameters.servicing, 'true') }}:
-    - powershell: ./build.ps1 -build -name '${{ parameters.imagename }}' -CI -Channel 'servicing' -TestLogPostfix '${{ parameters.imagename }}-servicing'
-      displayName: ${{ parameters.imagename }} Servicing
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'servicing' -TestLogPostfix '$(ImageName)-servicing'
+      displayName: $(ImageName) Servicing
       condition: succeededOrFailed()
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
-    displayName: Publish ${{ parameters.imagename }} Test Results **\test*.xml
+    displayName: Publish $(ImageName) Test Results **\test*.xml
     inputs:
       testRunner: NUnit
       testResultsFiles: '**\test*.xml'
-      testRunTitle: ${{ parameters.imagename }}
+      testRunTitle: $(ImageName)
       mergeTestResults: true
