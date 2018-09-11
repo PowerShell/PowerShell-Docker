@@ -64,3 +64,36 @@ function Get-ImageList
         Get-ChildItem -Path $previewPath -Directory | Select-Object -ExpandProperty Name | Where-Object { $dockerFileNames -notcontains $_ } | Write-Output
     }
 }
+
+class DockerImageMetaData {
+    [Bool]
+    $IsLinux = $false
+
+    [System.Nullable[Bool]]
+    $UseLinuxVersion = $null
+
+    [bool] ShouldUseLinuxVersion() {
+        if($this.UseLinuxVersion -is [bool])
+        {
+            return $this.UseLinuxVersion
+        }
+
+        return $this.IsLinux
+    }
+}
+
+Function Get-DockerImageMetaData
+{
+    param(
+        [parameter(Mandatory)]
+        $Path
+    )
+
+    if (Test-Path $Path)
+    {
+        $meta = Get-Content -Path $Path | ConvertFrom-Json
+        return [DockerImageMetaData] $meta
+    }
+    
+    return [DockerImageMetaData]::new()
+}

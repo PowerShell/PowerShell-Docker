@@ -149,7 +149,6 @@ Begin {
         # We are using all, so get the list off all images for the current channel
         $Name = Get-ImageList -Channel $Channel
     }
-    Write-Verbose "wv: $windowsVersion; lv: $linuxVersion" -Verbose
 }
 
 End {
@@ -226,18 +225,10 @@ End {
         }
 
         $tagsTemplates = Get-Content -Path $tagsJsonPath | ConvertFrom-Json
-        $isContainerLinux = $false
-        if(Test-Path $metaJsonPath)
-        {
-            $meta = Get-Content -Path $metaJsonPath | ConvertFrom-Json
-            if($meta.IsLinux)
-            {
-                $isContainerLinux = [bool] $meta.IsLinux
-            }
-        }
+        $meta = Get-DockerImageMetaData -Path $metaJsonPath
 
         $psversion = $windowsVersion
-        if($isContainerLinux)
+        if($meta.ShouldUseLinuxVersion())
         {
             $psversion = $linuxVersion
         }
@@ -278,7 +269,7 @@ End {
                         $script:ErrorActionPreference = 'stop'
                         $testsPath = Join-Path -Path $PSScriptRoot -ChildPath 'tests'
                         Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
-                        if ($isContainerLinux) {
+                        if ($meta.IsLinux) {
                             $os = 'linux'
                         }
                         else {

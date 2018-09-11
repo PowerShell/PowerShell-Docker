@@ -1,0 +1,4 @@
+[
+    "#psversion#-alpine-#tag#",
+    "preview-alpine-#shorttag#"
+]
