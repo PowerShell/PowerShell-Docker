@@ -23,7 +23,7 @@
 ### Stable Linux amd64 tags
 
 * `ubuntu-18.04`, `6.1.0-ubuntu-18.04` [(/release/stable/ubuntu18.04/docker/Dockerfile)][ubuntu-18.04-stable]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-rc.1-ubuntu-18.04`
+  * `docker pull mcr.microsoft.com/powershell:6.1.0-ubuntu-18.04`
 * `ubuntu-16.04`, `6.1.0-ubuntu-16.04` [(/release/stable/ubuntu16.04/docker/Dockerfile)][ubuntu-16.04-stable]
   * `docker pull mcr.microsoft.com/powershell:ubuntu-16.04`
 * `centos-7`, `6.1.0-centos-7` [(/release/stable/centos7/docker/Dockerfile)][centos-7-stable]
@@ -31,7 +31,7 @@
 * `fedora-27`, `6.1.0-fedora-27` [(/release/stable/fedora27/docker/Dockerfile)][fedora-27-stable]
   * `docker pull mcr.microsoft.com/powershell:fedora-27`
 * `fedora-28`, `6.1.0-fedora-28` [(/release/stable/fedora28/docker/Dockerfile)][fedora-28-stable]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-rc.1-fedora-28`
+  * `docker pull mcr.microsoft.com/powershell:6.1.0-fedora-28`
 
 [ubuntu-16.04-stable]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/ubuntu16.04/docker/Dockerfile
 [centos-7-stable]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/centos7/docker/Dockerfile
