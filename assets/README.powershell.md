@@ -68,7 +68,7 @@
 * `6.1.0-rc.1-fedora-28` [(/release/preview/fedora28/docker/Dockerfile)][fedora-28-preview]
   * `docker pull mcr.microsoft.com/powershell:6.1.0-rc.1-fedora-28`
 * `6.1.0-rc.1-alpine-3.8` [(/release/preview/alpine/docker/Dockerfile)][alpine-preview]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-rc.1-fedora-28`
+  * `docker pull mcr.microsoft.com/powershell:6.1.0-rc.1-alpine-3.8`
 
 [ubuntu-18.04-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/ubuntu18.04/docker/Dockerfile
 [ubuntu-16.04-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/ubuntu16.04/docker/Dockerfile
