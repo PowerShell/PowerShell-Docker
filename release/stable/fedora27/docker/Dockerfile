@@ -40,9 +40,9 @@ RUN set -o pipefail \
     && curl https://packages.microsoft.com/config/rhel/7/prod.repo | tee /etc/yum.repos.d/microsoft.repo
 
 # Install latest powershell from Microsoft YUM Repo
-RUN yum install -y \
+RUN dnf install -y \
         powershell-${PS_VERSION} \
-    && yum clean all
+    && dnf clean all
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
