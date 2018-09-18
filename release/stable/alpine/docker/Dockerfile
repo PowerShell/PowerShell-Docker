@@ -82,7 +82,7 @@ ARG VCS_REF="none"
 # Add label last as it's just metadata and usere a lot a parameters
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
-      description="This Dockerfile will install the latest release of PS." \
+      description="This Dockerfile will install the latest release of PowerShell." \
       org.label-schema.usage="https://github.com/PowerShell/PowerShell/tree/master/docker#run-the-docker-image-you-built" \
       org.label-schema.url="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
       org.label-schema.vcs-url="https://github.com/PowerShell/PowerShell-Docker" \
