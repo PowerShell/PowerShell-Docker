@@ -52,21 +52,24 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 
 # Install dotnet dependencies and ca-certificates
 RUN apk add --no-cache \
-        ca-certificates \
-        \
-        # .NET Core dependencies
-        krb5-libs \
-        libgcc \
-        libintl \
-        libssl1.0 \
-        libstdc++ \
-        tzdata \
-        userspace-rcu \
-        zlib \
-        icu-libs \
+    ca-certificates \
+    \
+    # PSReadline/console dependencies
+    ncurses-terminfo-base \
+    \
+    # .NET Core dependencies
+    krb5-libs \
+    libgcc \
+    libintl \
+    libssl1.0 \
+    libstdc++ \
+    tzdata \
+    userspace-rcu \
+    zlib \
+    icu-libs \
     && apk -X https://dl-cdn.alpinelinux.org/alpine/edge/main add --no-cache \
-        lttng-ust \
-        \
+    lttng-ust \
+    \
     # Create the pwsh symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
     \
@@ -75,23 +78,23 @@ RUN apk add --no-cache \
 
 # Define args needed only for the labels
 ARG PS_VERSION=6.1.0-rc.1
-ARG IMAGE_NAME=microsoft/powershell:ubuntu16.04
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:preview-alpine-3.8
 ARG VCS_REF="none"
 # Add label last as it's just metadata and usere a lot a parameters
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
-      readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
-      description="This Dockerfile will install the latest release of PS." \
-      org.label-schema.usage="https://github.com/PowerShell/PowerShell/tree/master/docker#run-the-docker-image-you-built" \
-      org.label-schema.url="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
-      org.label-schema.vcs-url="https://github.com/PowerShell/PowerShell-Docker" \
-      org.label-schema.name="powershell" \
-      org.label-schema.vendor="PowerShell" \
-      org.label-schema.vcs-ref=${VCS_REF} \
-      org.label-schema.version=${PS_VERSION} \
-      org.label-schema.schema-version="1.0" \
-      org.label-schema.docker.cmd="docker run ${IMAGE_NAME} pwsh -c '$psversiontable'" \
-      org.label-schema.docker.cmd.devel="docker run ${IMAGE_NAME}" \
-      org.label-schema.docker.cmd.test="docker run ${IMAGE_NAME} pwsh -c Invoke-Pester" \
-      org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
+    readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
+    description="This Dockerfile will install the latest release of PS." \
+    org.label-schema.usage="https://github.com/PowerShell/PowerShell/tree/master/docker#run-the-docker-image-you-built" \
+    org.label-schema.url="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
+    org.label-schema.vcs-url="https://github.com/PowerShell/PowerShell-Docker" \
+    org.label-schema.name="powershell" \
+    org.label-schema.vendor="PowerShell" \
+    org.label-schema.vcs-ref=${VCS_REF} \
+    org.label-schema.version=${PS_VERSION} \
+    org.label-schema.schema-version="1.0" \
+    org.label-schema.docker.cmd="docker run ${IMAGE_NAME} pwsh -c '$psversiontable'" \
+    org.label-schema.docker.cmd.devel="docker run ${IMAGE_NAME}" \
+    org.label-schema.docker.cmd.test="docker run ${IMAGE_NAME} pwsh -c Invoke-Pester" \
+    org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
 
 CMD [ "pwsh" ]
