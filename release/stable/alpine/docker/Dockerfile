@@ -10,11 +10,13 @@ ARG fromTag=3.8
 FROM alpine:${fromTag} AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=6.1.0-rc.1
+ARG PS_VERSION=6.1.0
 # TODO: once the official build produces a full package for Alpine, update this to the full Alpine package
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=6-preview
+ARG PS_PACKAGE_MUSL=powershell-${PS_VERSION}-linux-musl-x64.tar.gz
+ARG PS_PACKAGE_MUSL_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE_MUSL}
+ARG PS_INSTALL_VERSION=6
 
 # downoad the Linux tar.gz and save it
 ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
@@ -30,7 +32,7 @@ RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
 # TODO: once the official build produces a full package for Alpine, remove this overlay of the apline files
 # Download the apline powershell .tar.gz package
-ADD https://github.com/TravisEz13/PowerShell/releases/download/v6.1.0-rc.1/powershell-6.1.0-fixalpine-linux-musl-x64.tar.gz /tmp/alpine.tar.gz
+ADD ${PS_PACKAGE_MUSL_URL} /tmp/alpine.tar.gz
 
 # Extract the Alpine tar.gz
 RUN tar zxf /tmp/alpine.tar.gz -C ${PS_INSTALL_FOLDER}
@@ -42,7 +44,7 @@ FROM alpine:${fromTag}
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links
-ARG PS_INSTALL_VERSION=6-preview
+ARG PS_INSTALL_VERSION=6
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
     # Define ENVs for Localization/Globalization
@@ -52,49 +54,46 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 
 # Install dotnet dependencies and ca-certificates
 RUN apk add --no-cache \
-    ca-certificates \
-    \
-    # PSReadline/console dependencies
-    ncurses-terminfo-base \
-    \
-    # .NET Core dependencies
-    krb5-libs \
-    libgcc \
-    libintl \
-    libssl1.0 \
-    libstdc++ \
-    tzdata \
-    userspace-rcu \
-    zlib \
-    icu-libs \
+        ca-certificates \
+        \
+        # PSReadline/console dependencies
+        ncurses-terminfo-base \
+        \
+        # .NET Core dependencies
+        krb5-libs \
+        libgcc \
+        libintl \
+        libssl1.0 \
+        libstdc++ \
+        tzdata \
+        userspace-rcu \
+        zlib \
+        icu-libs \
     && apk -X https://dl-cdn.alpinelinux.org/alpine/edge/main add --no-cache \
-    lttng-ust \
-    \
+        lttng-ust \
+        \
     # Create the pwsh symbolic link that points to powershell
-    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
-    \
-    # Create the pwsh-preview symbolic link that points to powershell
-    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview
+    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh
 
 # Define args needed only for the labels
-ARG PS_VERSION=6.1.0-rc.1
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:preview-alpine-3.8
+ARG PS_VERSION=6.1.0
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:alpine-3.8
 ARG VCS_REF="none"
 # Add label last as it's just metadata and usere a lot a parameters
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
-    readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
-    description="This Dockerfile will install the latest release of PowerShell." \
-    org.label-schema.usage="https://github.com/PowerShell/PowerShell/tree/master/docker#run-the-docker-image-you-built" \
-    org.label-schema.url="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
-    org.label-schema.vcs-url="https://github.com/PowerShell/PowerShell-Docker" \
-    org.label-schema.name="powershell" \
-    org.label-schema.vendor="PowerShell" \
-    org.label-schema.vcs-ref=${VCS_REF} \
-    org.label-schema.version=${PS_VERSION} \
-    org.label-schema.schema-version="1.0" \
-    org.label-schema.docker.cmd="docker run ${IMAGE_NAME} pwsh -c '$psversiontable'" \
-    org.label-schema.docker.cmd.devel="docker run ${IMAGE_NAME}" \
-    org.label-schema.docker.cmd.test="docker run ${IMAGE_NAME} pwsh -c Invoke-Pester" \
-    org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
+      readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
+      description="This Dockerfile will install the latest release of PowerShell." \
+      org.label-schema.usage="https://github.com/PowerShell/PowerShell/tree/master/docker#run-the-docker-image-you-built" \
+      org.label-schema.url="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
+      org.label-schema.vcs-url="https://github.com/PowerShell/PowerShell-Docker" \
+      org.label-schema.name="powershell" \
+      org.label-schema.vendor="PowerShell" \
+      org.label-schema.vcs-ref=${VCS_REF} \
+      org.label-schema.version=${PS_VERSION} \
+      org.label-schema.schema-version="1.0" \
+      org.label-schema.docker.cmd="docker run ${IMAGE_NAME} pwsh -c '$psversiontable'" \
+      org.label-schema.docker.cmd.devel="docker run ${IMAGE_NAME}" \
+      org.label-schema.docker.cmd.test="docker run ${IMAGE_NAME} pwsh -c Invoke-Pester" \
+      org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
 
 CMD [ "pwsh" ]

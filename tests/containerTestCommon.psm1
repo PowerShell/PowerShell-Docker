@@ -205,3 +205,26 @@ function Get-ContainerPowerShellVersion
     $version = Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
     return $version
 }
+
+function Get-MetadataUsingContainer
+{
+    param(
+        [string] $Name,
+        [ValidateSet('StableReleaseTag','PreviewReleaseTag','ServicingReleaseTag')]
+        [string] $Property = "StableReleaseTag"
+    )
+
+    $imageTag = ${Name}
+
+    $runParams = @()
+    $runParams += '--rm'
+ 
+    $runParams += $imageTag
+    $runParams += 'pwsh'
+    $runParams += '-nologo'
+    $runParams += '-noprofile'
+    $runParams += '-c'
+    $runParams += '(Invoke-WebRequest -Uri "https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json").Content'
+
+    return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
+}
