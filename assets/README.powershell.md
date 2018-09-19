@@ -11,7 +11,7 @@
 ### Latest
 
 * `latest`: The latest stable image.
-  * Ubuntu 16.04 for Linux and Windows Server Core for Windows
+  * Ubuntu 18.04 for Linux and Windows Server Core for Windows
   * `docker pull mcr.microsoft.com/powershell` or `docker pull mcr.microsoft.com/powershell:latest`
 
 ### Preview
