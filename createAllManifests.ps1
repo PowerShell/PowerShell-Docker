@@ -11,7 +11,7 @@ param (
 $createScriptPath = Join-Path -Path $PSScriptRoot -ChildPath 'createManifest.ps1'
 
 
-$latestStableUbuntu   = "ubuntu-xenial"
+$latestStableUbuntu   = "ubuntu-bionic"
 $latestStableWsc1709  = "windowsservercore-1709"
 $latestStableWscLtsc  = "windowsservercore-latest"
 $latestStableWsc1803  = "windowsservercore-1803"
