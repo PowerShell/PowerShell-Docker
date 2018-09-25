@@ -43,7 +43,7 @@ function Invoke-Docker
     $dockerExitCode = $LASTEXITCODE
     if($PassThru.IsPresent)
     {
-        Write-Verbose "passing through docker result$($result.length)..." -Verbose
+        Write-Verbose "passing through docker results of length: $($result.length)..." -Verbose
         return $result
     }
     elseif($dockerExitCode -ne 0 -and $FailureAction -eq 'error')
@@ -225,6 +225,27 @@ function Get-MetadataUsingContainer
     $runParams += '-noprofile'
     $runParams += '-c'
     $runParams += '(Invoke-WebRequest -Uri "https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json").Content'
+
+    return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
+}
+
+function Get-UICultureUsingContainer
+{
+    param(
+        [string] $Name
+    )
+
+    $imageTag = ${Name}
+
+    $runParams = @()
+    $runParams += '--rm'
+ 
+    $runParams += $imageTag
+    $runParams += 'pwsh'
+    $runParams += '-nologo'
+    $runParams += '-noprofile'
+    $runParams += '-c'
+    $runParams += '(Get-UICulture).Name'
 
     return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
 }
