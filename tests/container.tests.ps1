@@ -22,6 +22,10 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
             $name,
 
             [Parameter(Mandatory=$true)]
+            [string[]]
+            $Tags,
+
+            [Parameter(Mandatory=$true)]
             [string]
             $path,
 
@@ -46,11 +50,17 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
             )
         }
 
+        foreach($tag in $Tags)
+        {
+            $buildArgList += @(
+                "-t"
+                $tag
+            )
+        }
+
         Invoke-Docker -Command build -Params @(
                 '--pull'
                 '--quiet'
-                '-t'
-                ${Name}
                 $buildArgList
                 $path 
             ) -SuppressHostOutput
@@ -65,6 +75,10 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
             $name,
 
             [Parameter(Mandatory=$true)]
+            [string[]]
+            $Tags,
+
+            [Parameter(Mandatory=$true)]
             [string]
             $path,
 
@@ -89,11 +103,17 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
             )
         }
 
+        foreach($tag in $Tags)
+        {
+            $buildArgList += @(
+                "-t"
+                $tag
+            )
+        }
+
         Invoke-Docker -Command build -Params @(
                 '--pull'
                 '--quiet'
-                '-t'
-                ${Name}
                 $buildArgList
                 $path 
             ) -SuppressHostOutput
@@ -108,6 +128,10 @@ Describe "Pull Linux Containers" -Tags 'Linux', 'Pull' {
             $name,
 
             [Parameter(Mandatory=$true)]
+            [string[]]
+            $Tags,
+
+            [Parameter(Mandatory=$true)]
             [string]
             $path,
 
@@ -120,9 +144,11 @@ Describe "Pull Linux Containers" -Tags 'Linux', 'Pull' {
             $ExpectedVersion
         )
 
-        { Invoke-Docker -Command pull -Params @(
-                ${Name}
-            ) -SuppressHostOutput} | should -not -throw
+        foreach($tag in $tags) {
+            Invoke-Docker -Command pull -Params @(
+                    ${tag}
+                ) -SuppressHostOutput
+        }
     }
 }
 
@@ -134,6 +160,10 @@ Describe "Pull Windows Containers" -Tags 'Windows', 'Pull' {
             $name,
 
             [Parameter(Mandatory=$true)]
+            [string[]]
+            $Tags,
+
+            [Parameter(Mandatory=$true)]
             [string]
             $path,
 
@@ -146,9 +176,11 @@ Describe "Pull Windows Containers" -Tags 'Windows', 'Pull' {
             $ExpectedVersion
         )
 
-        { Invoke-Docker -Command pull -Params @(
-            ${Name}
-        ) -SuppressHostOutput} | should -not -throw
+        foreach($tag in $tags) {
+            Invoke-Docker -Command pull -Params @(
+                    ${tag}
+                ) -SuppressHostOutput
+        }
     }
 }
 
@@ -172,6 +204,10 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
             $name,
 
             [Parameter(Mandatory=$true)]
+            [string[]]
+            $Tags,
+
+            [Parameter(Mandatory=$true)]
             [string]
             $path,
 
@@ -192,6 +228,10 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
             [Parameter(Mandatory=$true)]
             [string]
             $name,
+
+            [Parameter(Mandatory=$true)]
+            [string[]]
+            $Tags,
 
             [Parameter(Mandatory=$true)]
             [string]
@@ -217,6 +257,10 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
             [Parameter(Mandatory=$true)]
             [string]
             $name,
+
+            [Parameter(Mandatory=$true)]
+            [string[]]
+            $Tags,
 
             [Parameter(Mandatory=$true)]
             [string]
@@ -253,6 +297,10 @@ Describe "Windows Containers run PowerShell" -Tags 'Behavior', 'Windows' {
             $name,
 
             [Parameter(Mandatory=$true)]
+            [string[]]
+            $Tags,
+
+            [Parameter(Mandatory=$true)]
             [string]
             $path,
 
@@ -273,6 +321,10 @@ Describe "Windows Containers run PowerShell" -Tags 'Behavior', 'Windows' {
             [Parameter(Mandatory=$true)]
             [string]
             $name,
+
+            [Parameter(Mandatory=$true)]
+            [string[]]
+            $Tags,
 
             [Parameter(Mandatory=$true)]
             [string]
@@ -314,9 +366,11 @@ Describe "Push Linux Containers" -Tags 'Linux', 'Push' {
             $ExpectedVersion
         )
 
-        Invoke-Docker -Command push -Params @(
-                ${Name}
-            )
+        foreach($tag in $tags) {
+            Invoke-Docker -Command push -Params @(
+                    ${tag}
+                ) -SuppressHostOutput
+        }
     }
 }
 
@@ -340,8 +394,10 @@ Describe "Push Windows Containers" -Tags 'Windows', 'Push' {
             $ExpectedVersion
         )
 
-        Invoke-Docker -Command push -Params @(
-            ${Name}
-        )
+        foreach($tag in $tags) {
+            Invoke-Docker -Command push -Params @(
+                    ${tag}
+                ) -SuppressHostOutput
+        }
     }
 }

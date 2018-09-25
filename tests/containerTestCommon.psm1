@@ -84,7 +84,8 @@ function Get-LinuxContainer
         if($testArgs.os -eq 'linux' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification))
         {
             Write-Output @{
-                Name = $testArgs.Tag
+                Name = $testArgs.Tags[0]
+                Tags = $testArgs.Tags
                 Path = $testArgs.ContextPath
                 BuildArgs = $testArgs.BuildArgs
                 ExpectedVersion = $testArgs.ExpectedVersion
@@ -110,7 +111,8 @@ function Get-WindowsContainer
         if($testArgs.os -eq 'windows' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification))
         {
             Write-Output @{
-                Name = $testArgs.Tag
+                Name = $testArgs.Tags[0]
+                Tags = $testArgs.Tags
                 Path = $testArgs.ContextPath
                 BuildArgs = $testArgs.BuildArgs
                 ExpectedVersion = $testArgs.ExpectedVersion
