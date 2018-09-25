@@ -4,7 +4,7 @@
 # effectively removing the tar.gz and packages that are not needed from the final image.
 
 # Define arg(s) needed for the From statement
-ARG fromTag=42.2
+ARG fromTag=42.3
 
 FROM opensuse:${fromTag} AS installer-env
 
@@ -67,7 +67,8 @@ RUN localedef --charmap=UTF-8 --inputfile=en_US $LANG \
 ARG PS_VERSION=6.1.0
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:opensuse-42.3
 ARG VCS_REF="none"
-# Add label last as it's just metadata and usere a lot a parameters
+
+# Add label last as it's just metadata and uses a lot of parameters
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
       description="This Dockerfile will install the latest release of PowerShell." \
@@ -85,4 +86,3 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
 
 CMD [ "pwsh" ]
-

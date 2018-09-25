@@ -79,7 +79,8 @@ RUN apk add --no-cache \
 ARG PS_VERSION=6.1.0
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:alpine-3.8
 ARG VCS_REF="none"
-# Add label last as it's just metadata and usere a lot a parameters
+
+# Add label last as it's just metadata and uses a lot of parameters
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
       description="This Dockerfile will install the latest release of PowerShell." \
