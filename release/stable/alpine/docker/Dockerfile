@@ -30,8 +30,8 @@ RUN mkdir -p ${PS_INSTALL_FOLDER}
 # Unzip the Linux tar.gz
 RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
-# TODO: once the official build produces a full package for Alpine, remove this overlay of the apline files
-# Download the apline powershell .tar.gz package
+# TODO: once the official build produces a full package for Alpine, remove this overlay of the Alpine files
+# Download the Alpine powershell .tar.gz package
 ADD ${PS_PACKAGE_MUSL_URL} /tmp/alpine.tar.gz
 
 # Extract the Alpine tar.gz

@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# return objects representing the tags we need to base the xenial image on
+# return objects representing the tags we need to base the centos image on docker
 
-# The versions of xenial we care about
+# The versions of centos we care about
 $shortTags = @('7')
 
 $parent = Join-Path -Path $PSScriptRoot -ChildPath '..'
