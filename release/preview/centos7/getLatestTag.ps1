@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# return objects representing the tags we need to base the xenial image on
+# return objects representing the tags we need to base the xenial image on Docker
 
 # The versions of xenial we care about
 $shortTags = @('7')

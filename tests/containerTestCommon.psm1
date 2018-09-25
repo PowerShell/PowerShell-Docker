@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# Get docker Engine OS
+# Get Docker Engine OS
 function Get-DockerEngineOs
 {
     docker info --format '{{ .OperatingSystem }}'
@@ -29,7 +29,7 @@ function Invoke-Docker
 
     $ErrorActionPreference = 'Continue'
 
-    # Log how we are running docker for troubleshooting issues
+    # Log how we are running Docker for troubleshooting issues
     Write-Verbose "Running docker $command $params" -Verbose
     if($SuppressHostOutput.IsPresent)
     {

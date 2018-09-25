@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# Republishes images between mcr.microsoft.com and docker hub until mcr.microsoft.com automatically republishes to docker hub
+# Republishes images between mcr.microsoft.com and Docker hub until mcr.microsoft.com automatically republishes to Docker hub
 # This should be enabled now, but we will keep the script around until it proves reliable
 param(
     $stableVersion = '6.0.4',

@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# return objects representing the tags we need to base the debian image on docker
+# return objects representing the tags we need to base the debian image on Docker
 
 # The versions of debian we care about
 $shortTags = @('stretch')
