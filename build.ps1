@@ -237,72 +237,77 @@ End {
         $tagData = & $scriptPath -CI:$CI.IsPresent
 
         if (!$ShortTag) {
-            foreach ($tag in $tagData) {
-                foreach ($tagTemplate in $tagsTemplates) {
-                    # replace the tag token with the tag
-                    if ($tagTemplate -match '#tag#') {
-                        $actualTag = $tagTemplate -replace '#tag#', $tag.Tag
-                    }
-                    elseif ($tagTemplate -match '#shorttag#' -and $tag.Type -eq 'Short') {
-                        $actualTag = $tagTemplate -replace '#shorttag#', $tag.Tag
-                    }
-                    elseif ($tagTemplate -match '#fulltag#' -and $tag.Type -eq 'Full') {
-                        $actualTag = $tagTemplate -replace '#fulltag#', $tag.Tag
-                    }
-                    else {
-                        # skip if the type of tag token doesn't match the type of tag
-                        Write-Verbose -Message "Skipping $($tag.Tag) - $tagTemplate" -Verbose
-                        continue
-                    }
-
-                    # Replace the the psversion token with the powershell version in the tag
-                    $actualVersion = $windowsVersion
-                    $actualTag = $actualTag -replace '#psversion#', $actualVersion
-                    $actualTag = $actualTag.ToLowerInvariant()
-                    $fromTag = $Tag.FromTag
-
-                    if ($Build.IsPresent -or $Test.IsPresent) {
-                        Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
-                        $contextPath = Join-Path -Path $imagePath -ChildPath 'docker'
-                        $vcf_ref = git rev-parse --short HEAD
-                        $fullName = "${ImageName}:$actualTag"
-                        $script:ErrorActionPreference = 'stop'
-                        $testsPath = Join-Path -Path $PSScriptRoot -ChildPath 'tests'
-                        Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
-                        if ($meta.IsLinux) {
-                            $os = 'linux'
+            foreach ($tagGroup in ($tagData | Group-Object -Property 'FromTag')) {
+                $actualTags = @()
+                foreach($tag in $tagGroup.Group) {
+                    foreach ($tagTemplate in $tagsTemplates) {
+                        # replace the tag token with the tag
+                        if ($tagTemplate -match '#tag#') {
+                            $actualTag = $tagTemplate -replace '#tag#', $tag.Tag
+                        }
+                        elseif ($tagTemplate -match '#shorttag#' -and $tag.Type -eq 'Short') {
+                            $actualTag = $tagTemplate -replace '#shorttag#', $tag.Tag
+                        }
+                        elseif ($tagTemplate -match '#fulltag#' -and $tag.Type -eq 'Full') {
+                            $actualTag = $tagTemplate -replace '#fulltag#', $tag.Tag
                         }
                         else {
-                            $os = 'windows'
+                            # skip if the type of tag token doesn't match the type of tag
+                            Write-Verbose -Message "Skipping $($tag.Tag) - $tagTemplate" -Verbose
+                            continue
                         }
-
-                        $skipVerification = $false
-                        if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
-                        {
-                            Write-Verbose -Message "Skipping verification of $fullName in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
-                            # The version of nanoserver in CI doesn't have all the changes needed to verify the image
-                            $skipVerification = $true
-                        }
-
-                        $testArgs = @{
-                            tag = $fullName
-                            BuildArgs = @{
-                                fromTag = $fromTag
-                                PS_VERSION = $psversion
-                                VCS_REF = $vcf_ref
-                            }
-                            ContextPath = $contextPath
-                            OS = $os
-                            ExpectedVersion = $actualVersion
-                            SkipVerification = $skipVerification
-                        }
-
-                        $testArgList += $testArgs
-                        $localImageNames += $fullName
+                    
+                        # Replace the the psversion token with the powershell version in the tag
+                        $actualVersion = $windowsVersion
+                        $actualTag = $actualTag -replace '#psversion#', $actualVersion
+                        $actualTag = $actualTag.ToLowerInvariant()
+                        $actualTags += "${ImageName}:$actualTag"
+                        $fromTag = $Tag.FromTag
                     }
-                    elseif ($GetTags.IsPresent) {
-                        Write-Verbose "from: $fromTag actual: $actualTag psversion: $psversion" -Verbose
+                }
+
+
+                if ($Build.IsPresent -or $Test.IsPresent) {
+                    Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
+                    $contextPath = Join-Path -Path $imagePath -ChildPath 'docker'
+                    $vcf_ref = git rev-parse --short HEAD
+                    $script:ErrorActionPreference = 'stop'
+                    $testsPath = Join-Path -Path $PSScriptRoot -ChildPath 'tests'
+                    Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
+                    if ($meta.IsLinux) {
+                        $os = 'linux'
                     }
+                    else {
+                        $os = 'windows'
+                    }
+
+                    $firstActualTag = $actualTags[0]
+                    $skipVerification = $false
+                    if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
+                    {
+                        Write-Verbose -Message "Skipping verification of $firstActualTag in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
+                        # The version of nanoserver in CI doesn't have all the changes needed to verify the image
+                        $skipVerification = $true
+                    }
+
+                    $testArgs = @{
+                        tags = $actualTags
+                        BuildArgs = @{
+                            fromTag = $fromTag
+                            PS_VERSION = $psversion
+                            VCS_REF = $vcf_ref
+                        }
+                        ContextPath = $contextPath
+                        OS = $os
+                        ExpectedVersion = $actualVersion
+                        SkipVerification = $skipVerification
+                    }
+
+                    $testArgList += $testArgs
+                    $localImageNames += $firstActualTag
+                }
+                elseif ($GetTags.IsPresent) {
+                    Write-Verbose "from: $fromTag actual: $($actualTags -join ', ') psversion: $psversion" -Verbose
                 }
             }
         }
