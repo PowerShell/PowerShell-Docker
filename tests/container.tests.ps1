@@ -208,9 +208,32 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
 
         $metadataString = Get-MetadataUsingContainer -Name $Name
         $metadataString | Should -Not -BeNullOrEmpty
-        #$metadataString | should -BeExactly "nastohue"
         $metadataJson = $metadataString | ConvertFrom-Json -ErrorAction Stop
         $metadataJson | Select-Object -ExpandProperty StableReleaseTag | Should -Match '^v\d+\.\d+\.\d+.*$'
+    }
+
+    it "Get-UICulture from <Name> should return en-US" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
+        param(
+            [Parameter(Mandatory=$true)]
+            [string]
+            $name,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $path,
+
+            [Parameter(Mandatory=$true)]
+            [object]
+            $BuildArgs,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $ExpectedVersion
+        )
+
+        $culture = Get-UICultureUsingContainer -Name $Name
+        $culture | Should -Not -BeNullOrEmpty
+        $culture | Should -BeExactly 'en-US'
     }
 }
 
@@ -243,6 +266,31 @@ Describe "Windows Containers run PowerShell" -Tags 'Behavior', 'Windows' {
         )
 
         Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
+    }
+
+    it "Invoke-WebRequest from <Name> should not fail" -TestCases $script:windowsContainerRunTests -skip:$script:skipWindowsRun {
+        param(
+            [Parameter(Mandatory=$true)]
+            [string]
+            $name,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $path,
+
+            [Parameter(Mandatory=$true)]
+            [object]
+            $BuildArgs,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $ExpectedVersion
+        )
+
+        $metadataString = Get-MetadataUsingContainer -Name $Name
+        $metadataString | Should -Not -BeNullOrEmpty
+        $metadataJson = $metadataString | ConvertFrom-Json -ErrorAction Stop
+        $metadataJson | Select-Object -ExpandProperty StableReleaseTag | Should -Match '^v\d+\.\d+\.\d+.*$'
     }
 }
 

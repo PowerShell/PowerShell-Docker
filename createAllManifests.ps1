@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# script to create the docker manifest lists
+# script to create the Docker manifest lists
 param (
     [ValidateNotNullOrEmpty()]
     [string]

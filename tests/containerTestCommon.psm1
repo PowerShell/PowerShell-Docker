@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# Get docker Engine OS
+# Get Docker Engine OS
 function Get-DockerEngineOs
 {
     docker info --format '{{ .OperatingSystem }}'
@@ -29,7 +29,7 @@ function Invoke-Docker
 
     $ErrorActionPreference = 'Continue'
 
-    # Log how we are running docker for troubleshooting issues
+    # Log how we are running Docker for troubleshooting issues
     Write-Verbose "Running docker $command $params" -Verbose
     if($SuppressHostOutput.IsPresent)
     {
@@ -43,7 +43,7 @@ function Invoke-Docker
     $dockerExitCode = $LASTEXITCODE
     if($PassThru.IsPresent)
     {
-        Write-Verbose "passing through docker result$($result.length)..." -Verbose
+        Write-Verbose "passing through docker results of length: $($result.length)..." -Verbose
         return $result
     }
     elseif($dockerExitCode -ne 0 -and $FailureAction -eq 'error')
@@ -225,6 +225,27 @@ function Get-MetadataUsingContainer
     $runParams += '-noprofile'
     $runParams += '-c'
     $runParams += '(Invoke-WebRequest -Uri "https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json").Content'
+
+    return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
+}
+
+function Get-UICultureUsingContainer
+{
+    param(
+        [string] $Name
+    )
+
+    $imageTag = ${Name}
+
+    $runParams = @()
+    $runParams += '--rm'
+ 
+    $runParams += $imageTag
+    $runParams += 'pwsh'
+    $runParams += '-nologo'
+    $runParams += '-noprofile'
+    $runParams += '-c'
+    $runParams += '(Get-UICulture).Name'
 
     return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
 }

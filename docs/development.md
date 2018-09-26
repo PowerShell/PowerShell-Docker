@@ -1,6 +1,6 @@
 # Development
 
-## Adding new docker image
+## Adding new Docker image
 
 ### Folder structure
 

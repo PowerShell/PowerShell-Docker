@@ -1,0 +1,4 @@
+[
+    "#psversion#-debian-#tag#",
+    "debian-#shorttag#"
+]
