@@ -309,7 +309,6 @@ End {
                 elseif ($GetTags.IsPresent) {
                     Write-Verbose "from: $fromTag actual: $($actualTags -join ', ') psversion: $psversion" -Verbose
                 }
-
             }
         }
     }
