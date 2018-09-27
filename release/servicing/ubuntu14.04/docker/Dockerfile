@@ -34,14 +34,13 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         apt-utils \
         ca-certificates \
-        curl \
         apt-transport-https \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Download the Microsoft repository GPG keys
-RUN curl -L -O https://packages.microsoft.com/config/ubuntu/14.04/packages-microsoft-prod.deb
+ADD https://packages.microsoft.com/config/ubuntu/14.04/packages-microsoft-prod.deb .
 
 # Register the Microsoft repository GPG keys
 RUN dpkg -i packages-microsoft-prod.deb
