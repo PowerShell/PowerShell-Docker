@@ -29,7 +29,6 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         apt-utils \
         ca-certificates \
-        curl \
         apt-transport-https \
         locales \
     && apt-get dist-upgrade -y \
@@ -42,7 +41,7 @@ ENV LC_ALL $LANG
 RUN locale-gen $LANG && update-locale
 
 # Download the Microsoft repository GPG keys
-RUN curl -L -O https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
+ADD https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb .
 
 # Register the Microsoft repository GPG keys
 RUN dpkg -i packages-microsoft-prod.deb
