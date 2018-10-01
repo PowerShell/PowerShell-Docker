@@ -23,21 +23,36 @@ function Invoke-Docker
 
         [switch]
         $PassThru,
+
+        [switch]
+        $UseAcr,
+
         [switch]
         $SuppressHostOutput
     )
 
     $ErrorActionPreference = 'Continue'
 
+    $cliCommand = @()
+    if($UseAcr)
+    {
+        $cli = @('az')
+        $cliCommand += 'acr'
+    }
+    else {
+        $cli = @('docker')
+    }
+
     # Log how we are running Docker for troubleshooting issues
-    Write-Verbose "Running docker $command $params" -Verbose
+    Write-Verbose "Running $cli $cliCommand $command $params" -Verbose
+
     if($SuppressHostOutput.IsPresent)
     {
-        $result = docker $command $params 2>&1
+        $result = &$cli $cliCommand $command $params 2>&1
     }
     else
     {
-        &'docker' $command $params 2>&1 | Tee-Object -Variable result -ErrorAction SilentlyContinue | Out-String -Stream -ErrorAction SilentlyContinue | Write-Host -ErrorAction SilentlyContinue
+        &$cli $cliCommand $command $params 2>&1 | Tee-Object -Variable result -ErrorAction SilentlyContinue | Out-String -Stream -ErrorAction SilentlyContinue | Write-Host -ErrorAction SilentlyContinue
     }
 
     $dockerExitCode = $LASTEXITCODE
@@ -68,6 +83,7 @@ function Invoke-Docker
 function Get-LinuxContainer
 {
     param(
+        [Parameter(Mandatory=$true)]
         [ValidateSet('Verification','Build','All')]
         [String]
         $Purpose
@@ -80,7 +96,7 @@ function Get-LinuxContainer
     {
         # Only return results where:
         # OS eq linux
-        # not (purposed eq verification -and SkipVerification)
+        # not (purpose eq verification -and SkipVerification)
         if($testArgs.os -eq 'linux' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification))
         {
             Write-Output @{
@@ -98,6 +114,7 @@ function Get-LinuxContainer
 function Get-WindowsContainer
 {
     param(
+        [Parameter(Mandatory=$true)]
         [ValidateSet('Verification','Build','All')]
         [String]
         $Purpose
@@ -123,12 +140,36 @@ function Get-WindowsContainer
 
 function Test-SkipWindows
 {
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateSet('Verification','Build','All')]
+        [String]
+        $Purpose
+    )
+
+    if($env:ACR_NAME -and $Purpose -eq 'Build')
+    {
+        return $false
+    }
+
     [bool] $canRunWindows = (Get-DockerEngineOs) -like 'Windows*'
     return ($IsLinux -or $IsMacOS -or !$canRunWindows)
 }
 
 function Test-SkipLinux
 {
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateSet('Verification','Build','All')]
+        [String]
+        $Purpose
+    )
+
+    if($env:ACR_NAME -and $Purpose -eq 'Build')
+    {
+        return $false
+    }
+
     $os = Get-DockerEngineOs
 
     switch -wildcard ($os)
@@ -196,7 +237,7 @@ function Get-ContainerPowerShellVersion
 
     $runParams = @()
     $runParams += '--rm'
- 
+
     $runParams += $imageTag
     $runParams += 'pwsh'
     $runParams += '-nologo'
@@ -220,7 +261,7 @@ function Get-MetadataUsingContainer
 
     $runParams = @()
     $runParams += '--rm'
- 
+
     $runParams += $imageTag
     $runParams += 'pwsh'
     $runParams += '-nologo'
@@ -241,7 +282,7 @@ function Get-UICultureUsingContainer
 
     $runParams = @()
     $runParams += '--rm'
- 
+
     $runParams += $imageTag
     $runParams += 'pwsh'
     $runParams += '-nologo'
@@ -250,4 +291,70 @@ function Get-UICultureUsingContainer
     $runParams += '(Get-UICulture).Name'
 
     return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
+}
+
+# Builds a docker image
+function Invoke-DockerBuild
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string[]]
+        $Tags,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Path,
+
+        [Parameter(Mandatory=$true)]
+        [object]
+        $BuildArgs,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateSet('windows','linux')]
+        [string]
+        $OSType
+    )
+
+
+    $buildArgNames = $BuildArgs | Get-Member -Type NoteProperty | Select-Object -ExpandProperty Name
+
+    $buildArgList = @()
+
+    $extraParams = @{}
+    if($env:ACR_NAME)
+    {
+        $extraParams.Add('UseAcr',$true)
+        $buildArgList += @(
+            '-r'
+            $env:ACR_NAME
+            '--os'
+            $OSType
+        )
+    }
+    else {
+        $buildArgList += '--pull'
+        $buildArgList += '--quiet'
+    }
+
+    foreach($argName in $buildArgNames)
+    {
+        $value = $BuildArgs.$argName
+        $buildArgList += @(
+            "--build-arg"
+            "$argName=$value"
+        )
+    }
+
+    foreach($tag in $Tags)
+    {
+        $buildArgList += @(
+            "-t"
+            $tag
+        )
+    }
+
+    Invoke-Docker -Command build -Params @(
+            $buildArgList
+            $path
+        ) -SuppressHostOutput @extraParams
 }

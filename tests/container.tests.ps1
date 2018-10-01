@@ -6,10 +6,10 @@ $script:linuxContainerBuildTests = Get-LinuxContainer -Purpose 'Build'
 $script:windowsContainerBuildTests = Get-WindowsContainer -Purpose 'Build'
 $script:linuxContainerRunTests = Get-LinuxContainer -Purpose 'Verification'
 $script:windowsContainerRunTests = Get-WindowsContainer -Purpose 'Verification'
-$script:skipLinux = (Test-SkipLinux) -or !$script:linuxContainerBuildTests
-$script:skipWindows = (Test-SkipWindows) -or !$script:windowsContainerBuildTests
-$script:skipLinuxRun = (Test-SkipLinux) -or !$script:linuxContainerRunTests
-$script:skipWindowsRun = (Test-SkipWindows) -or !$script:windowsContainerRunTests
+$script:skipLinux = (Test-SkipLinux -Purpose 'Build') -or !$script:linuxContainerBuildTests
+$script:skipWindows = (Test-SkipWindows -Purpose 'Build') -or !$script:windowsContainerBuildTests
+$script:skipLinuxRun = (Test-SkipLinux -Purpose 'Verification') -or !$script:linuxContainerRunTests
+$script:skipWindowsRun = (Test-SkipWindows -Purpose 'Verification') -or !$script:windowsContainerRunTests
 
 Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
     BeforeAll {
@@ -27,7 +27,7 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
 
             [Parameter(Mandatory=$true)]
             [string]
-            $path,
+            $Path,
 
             [Parameter(Mandatory=$true)]
             [object]
@@ -38,32 +38,7 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
             $ExpectedVersion
         )
 
-        $buildArgNames = $BuildArgs | get-member -Type NoteProperty | Select-Object -ExpandProperty Name
-
-        $buildArgList = @()
-        foreach($argName in $buildArgNames)
-        {
-            $value = $BuildArgs.$argName
-            $buildArgList += @(
-                "--build-arg"
-                "$argName=$value"
-            )
-        }
-
-        foreach($tag in $Tags)
-        {
-            $buildArgList += @(
-                "-t"
-                $tag
-            )
-        }
-
-        Invoke-Docker -Command build -Params @(
-                '--pull'
-                '--quiet'
-                $buildArgList
-                $path 
-            ) -SuppressHostOutput
+        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType linux
     }
 }
 
@@ -80,7 +55,7 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
 
             [Parameter(Mandatory=$true)]
             [string]
-            $path,
+            $Path,
 
             [Parameter(Mandatory=$true)]
             [object]
@@ -91,32 +66,7 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
             $ExpectedVersion
         )
 
-        $buildArgNames = $BuildArgs | get-member -Type NoteProperty | Select-Object -ExpandProperty Name
-
-        $buildArgList = @()
-        foreach($argName in $buildArgNames)
-        {
-            $value = $BuildArgs.$argName
-            $buildArgList += @(
-                "--build-arg"
-                "$argName=$value"
-            )
-        }
-
-        foreach($tag in $Tags)
-        {
-            $buildArgList += @(
-                "-t"
-                $tag
-            )
-        }
-
-        Invoke-Docker -Command build -Params @(
-                '--pull'
-                '--quiet'
-                $buildArgList
-                $path 
-            ) -SuppressHostOutput
+        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType windows
     }
 }
 

@@ -338,6 +338,11 @@ End {
                 $tags += 'Push'
             }
 
+            if($env:ACR_NAME)
+            {
+                $tags += 'Pull'
+            }
+
             $extraParams.Add('Tags', $tags)
         }
 
