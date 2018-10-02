@@ -34,7 +34,7 @@ ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
 RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
 # ------ Second stage ------
-# Start a new stage so we loose all the tar.gz layers from the final image
+# Start a new stage so we lose all the tar.gz layers from the final image
 FROM opensuse:${fromTag}
 
 # Install dependencies

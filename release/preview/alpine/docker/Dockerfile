@@ -35,7 +35,7 @@ ADD https://github.com/TravisEz13/PowerShell/releases/download/v6.1.0-rc.1/power
 # Extract the Alpine tar.gz
 RUN tar zxf /tmp/alpine.tar.gz -C ${PS_INSTALL_FOLDER}
 
-# Start a new stage so we loose all the tar.gz layers from the final image
+# Start a new stage so we lose all the tar.gz layers from the final image
 FROM alpine:${fromTag}
 
 # Copy only the files we need from the previous stag
