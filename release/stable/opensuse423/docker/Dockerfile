@@ -47,7 +47,7 @@ RUN zypper --non-interactive update --skip-interactive \
         openssl \
         less
 
-# Copy only the files we need from the previous stag
+# Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links
