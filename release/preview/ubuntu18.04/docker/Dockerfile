@@ -35,6 +35,7 @@ RUN apt-get update \
         apt-transport-https \
         locales \
         gnupg2 \
+        less \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

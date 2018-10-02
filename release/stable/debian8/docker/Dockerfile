@@ -15,7 +15,8 @@ RUN apt-get update \
         ca-certificates \
         curl \
         apt-transport-https \
-        locales
+        locales \
+        less
 
 # Setup the locale
 ENV LANG en_US.UTF-8

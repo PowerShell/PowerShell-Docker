@@ -31,6 +31,7 @@ RUN localedef --charmap=UTF-8 --inputfile=en_US $LANG
 # Install dependencies and clean up
 RUN yum install -y \
         curl \
+        less \
     && yum clean all
 
 # Download and configure Microsoft Repository config file
