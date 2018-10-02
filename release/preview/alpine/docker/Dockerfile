@@ -53,6 +53,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 # Install dotnet dependencies and ca-certificates
 RUN apk add --no-cache \
     ca-certificates \
+    less \
     \
     # PSReadline/console dependencies
     ncurses-terminfo-base \

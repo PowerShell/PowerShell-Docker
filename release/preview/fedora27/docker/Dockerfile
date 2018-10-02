@@ -27,6 +27,7 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
 RUN dnf install -y \
         glibc-locale-source \
         compat-openssl10 \
+        less \
    && dnf upgrade-minimal -y --security \
    && dnf clean all
 

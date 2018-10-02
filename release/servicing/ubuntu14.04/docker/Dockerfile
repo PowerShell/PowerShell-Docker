@@ -35,6 +35,7 @@ RUN apt-get update \
         apt-utils \
         ca-certificates \
         apt-transport-https \
+        less \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

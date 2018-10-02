@@ -44,7 +44,8 @@ RUN zypper --non-interactive update --skip-interactive \
         glibc-i18ndata \
         libunwind \
         libicu \
-        openssl
+        openssl \
+        less
 
 # Copy only the files we need from the previous stag
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]

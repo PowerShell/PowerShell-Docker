@@ -27,6 +27,7 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
 RUN dnf install -y \
         glibc-locale-source \
         compat-openssl10 \
+        less \
         \
         # Added to workaround a dnf database corruption issue without this
         libunwind \
