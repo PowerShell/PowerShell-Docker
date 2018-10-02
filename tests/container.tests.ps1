@@ -254,7 +254,6 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
                 ExpectedValue = "docker run $($_.Name)"
                 Expectation = 'BeExactly'
             }
-            
         }
 
         it "Image <Name> should have label: <Label>, with value: <ExpectedValue>" -TestCases $labelTestCases -Skip:$script:skipLinuxRun {
