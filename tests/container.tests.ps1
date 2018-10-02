@@ -238,17 +238,21 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
             $labelTestCases += @{
                 Name = $_.Name
                 Label = 'org.label-schema.version'
-                ExpectedValue = $_.ExpectedVersion
+                # The expected value is the version, but replace - or ~ with the regex for - or ~
+                ExpectedValue = $_.ExpectedVersion  -replace '[\-~]', '[\-~]'
+                Expectation = 'Match'
             }
             $labelTestCases += @{
                 Name = $_.Name
                 Label = 'org.label-schema.vcs-ref'
                 ExpectedValue = &git rev-parse --short HEAD
+                Expectation = 'BeExactly'
             }
             $labelTestCases += @{
                 Name = $_.Name
                 Label = 'org.label-schema.docker.cmd.devel'
                 ExpectedValue = "docker run $($_.Name)"
+                Expectation = 'BeExactly'
             }
             
         }
@@ -265,12 +269,29 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $ExpectedValue
+                $ExpectedValue,
+
+                [Parameter(Mandatory=$true)]
+                [ValidateSet('Match','BeExactly')]
+                [string]
+                $Expectation
             )
 
             $labelValue = Get-DockerImageLabel -Name $Name -Label $Label
             $labelValue | Should -Not -BeNullOrEmpty
-            $labelValue | Should -BeExactly "'$ExpectedValue'"
+
+            switch($Expectation)
+            {
+                'Match' {
+                    $labelValue | Should -Match "'$ExpectedValue'"
+                }
+                'BeExactly' {
+                    $labelValue | Should -BeExactly "'$ExpectedValue'"
+                }
+                default {
+                    throw "Unexpected expactation '$Expectation'"
+                }
+            }
         }
     }
 }
