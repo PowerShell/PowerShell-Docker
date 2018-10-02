@@ -293,6 +293,24 @@ function Get-UICultureUsingContainer
     return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
 }
 
+function Get-DockerImageLabel
+{
+    param(
+        [string] $Name,
+        [String] $Label
+    )
+
+    $imageTag = ${Name}
+
+    $runParams = @()
+    $runParams += '--format'
+
+    $runParams += "'{{ index .Config.Labels \`"$Label\`"}}'"
+    $runParams += $imageTag
+
+    return Invoke-Docker -Command inspect -Params $runParams -SuppressHostOutput -PassThru
+}
+
 # Builds a docker image
 function Invoke-DockerBuild
 {

@@ -37,10 +37,10 @@ ADD ${PS_PACKAGE_MUSL_URL} /tmp/alpine.tar.gz
 # Extract the Alpine tar.gz
 RUN tar zxf /tmp/alpine.tar.gz -C ${PS_INSTALL_FOLDER}
 
-# Start a new stage so we loose all the tar.gz layers from the final image
+# Start a new stage so we lose all the tar.gz layers from the final image
 FROM alpine:${fromTag}
 
-# Copy only the files we need from the previous stag
+# Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links

@@ -296,6 +296,7 @@ End {
                             fromTag = $fromTag
                             PS_VERSION = $psversion
                             VCS_REF = $vcf_ref
+                            IMAGE_NAME = $firstActualTag
                         }
                         ContextPath = $contextPath
                         OS = $os

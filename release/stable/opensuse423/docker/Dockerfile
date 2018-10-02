@@ -34,7 +34,7 @@ ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
 RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
 # ------ Second stage ------
-# Start a new stage so we loose all the tar.gz layers from the final image
+# Start a new stage so we lose all the tar.gz layers from the final image
 FROM opensuse:${fromTag}
 
 # Install dependencies
@@ -47,7 +47,7 @@ RUN zypper --non-interactive update --skip-interactive \
         openssl \
         less
 
-# Copy only the files we need from the previous stag
+# Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links

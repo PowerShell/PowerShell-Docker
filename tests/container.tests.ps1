@@ -147,87 +147,151 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
         Remove-Item $testContext.resolvedLogPath -ErrorAction SilentlyContinue
     }
 
-    it "Get PSVersion table from <Name> should be <ExpectedVersion>" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
-        param(
-            [Parameter(Mandatory=$true)]
-            [string]
-            $name,
+    Context "Run Powershell" {
+        it "Get PSVersion table from <Name> should be <ExpectedVersion>" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
 
-            [Parameter(Mandatory=$true)]
-            [string[]]
-            $Tags,
+                [Parameter(Mandatory=$true)]
+                [string[]]
+                $Tags,
 
-            [Parameter(Mandatory=$true)]
-            [string]
-            $path,
+                [Parameter(Mandatory=$true)]
+                [string]
+                $path,
 
-            [Parameter(Mandatory=$true)]
-            [object]
-            $BuildArgs,
+                [Parameter(Mandatory=$true)]
+                [object]
+                $BuildArgs,
 
-            [Parameter(Mandatory=$true)]
-            [string]
-            $ExpectedVersion
-        )
+                [Parameter(Mandatory=$true)]
+                [string]
+                $ExpectedVersion
+            )
 
-        Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
+            Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
+        }
+
+        it "Invoke-WebRequest from <Name> should not fail" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string[]]
+                $Tags,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $path,
+
+                [Parameter(Mandatory=$true)]
+                [object]
+                $BuildArgs,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $ExpectedVersion
+            )
+
+            $metadataString = Get-MetadataUsingContainer -Name $Name
+            $metadataString | Should -Not -BeNullOrEmpty
+            $metadataJson = $metadataString | ConvertFrom-Json -ErrorAction Stop
+            $metadataJson | Select-Object -ExpandProperty StableReleaseTag | Should -Match '^v\d+\.\d+\.\d+.*$'
+        }
+
+        it "Get-UICulture from <Name> should return en-US" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string[]]
+                $Tags,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $path,
+
+                [Parameter(Mandatory=$true)]
+                [object]
+                $BuildArgs,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $ExpectedVersion
+            )
+
+            $culture = Get-UICultureUsingContainer -Name $Name
+            $culture | Should -Not -BeNullOrEmpty
+            $culture | Should -BeExactly 'en-US'
+        }
     }
 
-    it "Invoke-WebRequest from <Name> should not fail" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
-        param(
-            [Parameter(Mandatory=$true)]
-            [string]
-            $name,
+    Context "Labels" {
+        $labelTestCases = @()
+        $script:linuxContainerRunTests | ForEach-Object {
+            $labelTestCases += @{
+                Name = $_.Name
+                Label = 'org.label-schema.version'
+                # The expected value is the version, but replace - or ~ with the regex for - or ~
+                ExpectedValue = $_.ExpectedVersion  -replace '[\-~]', '[\-~]'
+                Expectation = 'Match'
+            }
+            $labelTestCases += @{
+                Name = $_.Name
+                Label = 'org.label-schema.vcs-ref'
+                ExpectedValue = &git rev-parse --short HEAD
+                Expectation = 'BeExactly'
+            }
+            $labelTestCases += @{
+                Name = $_.Name
+                Label = 'org.label-schema.docker.cmd.devel'
+                ExpectedValue = "docker run $($_.Name)"
+                Expectation = 'BeExactly'
+            }
+        }
 
-            [Parameter(Mandatory=$true)]
-            [string[]]
-            $Tags,
+        it "Image <Name> should have label: <Label>, with value: <ExpectedValue>" -TestCases $labelTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
 
-            [Parameter(Mandatory=$true)]
-            [string]
-            $path,
+                [Parameter(Mandatory=$true)]
+                [string[]]
+                $Label,
 
-            [Parameter(Mandatory=$true)]
-            [object]
-            $BuildArgs,
+                [Parameter(Mandatory=$true)]
+                [string]
+                $ExpectedValue,
 
-            [Parameter(Mandatory=$true)]
-            [string]
-            $ExpectedVersion
-        )
+                [Parameter(Mandatory=$true)]
+                [ValidateSet('Match','BeExactly')]
+                [string]
+                $Expectation
+            )
 
-        $metadataString = Get-MetadataUsingContainer -Name $Name
-        $metadataString | Should -Not -BeNullOrEmpty
-        $metadataJson = $metadataString | ConvertFrom-Json -ErrorAction Stop
-        $metadataJson | Select-Object -ExpandProperty StableReleaseTag | Should -Match '^v\d+\.\d+\.\d+.*$'
-    }
+            $labelValue = Get-DockerImageLabel -Name $Name -Label $Label
+            $labelValue | Should -Not -BeNullOrEmpty
 
-    it "Get-UICulture from <Name> should return en-US" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
-        param(
-            [Parameter(Mandatory=$true)]
-            [string]
-            $name,
-
-            [Parameter(Mandatory=$true)]
-            [string[]]
-            $Tags,
-
-            [Parameter(Mandatory=$true)]
-            [string]
-            $path,
-
-            [Parameter(Mandatory=$true)]
-            [object]
-            $BuildArgs,
-
-            [Parameter(Mandatory=$true)]
-            [string]
-            $ExpectedVersion
-        )
-
-        $culture = Get-UICultureUsingContainer -Name $Name
-        $culture | Should -Not -BeNullOrEmpty
-        $culture | Should -BeExactly 'en-US'
+            switch($Expectation)
+            {
+                'Match' {
+                    $labelValue | Should -Match "'$ExpectedValue'"
+                }
+                'BeExactly' {
+                    $labelValue | Should -BeExactly "'$ExpectedValue'"
+                }
+                default {
+                    throw "Unexpected expactation '$Expectation'"
+                }
+            }
+        }
     }
 }
 
