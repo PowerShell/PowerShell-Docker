@@ -63,7 +63,25 @@ function Invoke-Docker
     }
     elseif($dockerExitCode -ne 0 -and $FailureAction -eq 'error')
     {
-        Write-Error "docker $command failed with: $result" -ErrorAction Stop
+        if($result.length -gt 80) 
+        {
+            $filename = [System.io.path]::GetTempFileName()
+            $result | Out-File -FilePath $filename
+            if($env:TF_BUILD)
+            {
+                if($env:BUILD_REASON -ne 'PullRequest')
+                {
+                    Write-Host "##vso[artifact.upload containerfolder=errorLogs;artifactname=errorLogs]$filename"
+                }
+            }
+        
+            Write-Error "docker $command failed, see $filename ($($result.length))" -ErrorAction Stop
+        }
+        else 
+        {
+            Write-Error "docker $command failed with: $($result -join [Environment]::NewLine)  ($($result.length))" -ErrorAction Stop    
+        }
+
         return $false
     }
     elseif($dockerExitCode -ne 0 -and $FailureAction -eq 'warning')
