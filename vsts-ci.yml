@@ -27,7 +27,7 @@ phases:
   parameters:
     name: ubuntu1804
     imagename: ubuntu18.04
-    stable: false
+    stable: true
     servicing: false
 
 - template: .vsts-ci/phase.yml
@@ -44,7 +44,7 @@ phases:
   parameters:
     name: fedora28
     imagename: fedora28
-    stable: false
+    stable: true
     servicing: false
 
 - template: .vsts-ci/phase.yml
