@@ -1,4 +1,5 @@
 {
     "IsLinux" : true,
-    "UseLinuxVersion": false
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-musl-x64.tar.gz"
 }
