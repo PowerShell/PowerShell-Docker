@@ -2,35 +2,57 @@
 # Licensed under the MIT License.
 
 # Gets the Current version of PowerShell from the PowerShell repo
+# or formats the version based on the parameters
 function Get-PowerShellVersion
 {
     [CmdletBinding(DefaultParameterSetName='Default')]
     param(
-        [Parameter(ParameterSetName='Preview', HelpMessage="Gets the preview version.  Without this it gets the current stable version.")]
+        [Parameter(Mandatory, ParameterSetName="explicitVersionPreview", HelpMessage="Gets the preview version.  Without this it gets the current stable version.")]
+        [Parameter(Mandatory, ParameterSetName='Preview', HelpMessage="Gets the preview version.  Without this it gets the current stable version.")]
         [switch] $Preview,
-        [Parameter(ParameterSetName='Servicing', HelpMessage="Gets the servicing version.  Without this it gets the current stable version.")]
+
+        [Parameter(Mandatory, ParameterSetName="explicitVersionServicing", HelpMessage="Gets the preview version.  Without this it gets the current stable version.")]
+        [Parameter(Mandatory, ParameterSetName='Servicing', HelpMessage="Gets the servicing version.  Without this it gets the current stable version.")]
         [switch] $Servicing,
-        [Parameter(HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
-        [switch] $Linux
+
+        [Parameter(ParameterSetName="lookupVersion",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
+        [Parameter(ParameterSetName="explicitVersion",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
+        [Parameter(ParameterSetName="explicitVersionPreview",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
+        [Parameter(ParameterSetName="explicitVersionServicing",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
+        [switch] $Linux,
+
+        [Parameter(Mandatory,ParameterSetName="explicitVersion", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
+        [Parameter(Mandatory,ParameterSetName="explicitVersionServicing", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
+        [Parameter(Mandatory,ParameterSetName="explicitVersionPreview", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
+        [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
+        [string]
+        $Version
     )
 
-    $metaData = Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json'
+    if ($PSCmdlet.ParameterSetName -notlike 'explicitVersion*') {
+        $metaData = Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json'
 
-    $releaseTag = if ($Preview.IsPresent) {
-        $metaData.PreviewReleaseTag
-    } elseif ($Servicing.IsPresent) {
-        $metaData.ServicingReleaseTag
-    }else {
-        $metaData.StableReleaseTag
+        $releaseTag = if ($Preview.IsPresent) {
+            $metaData.PreviewReleaseTag
+        }
+        elseif ($Servicing.IsPresent) {
+            $metaData.ServicingReleaseTag
+        }
+        else {
+            $metaData.StableReleaseTag
+        }
+
+        $retVersion = $releaseTag -replace '^v', ''
     }
-
-    $version = $releaseTag -replace '^v', ''
+    else {
+        $retVersion = $Version
+    }
 
     if ($Linux.IsPresent) {
-        $version = $version -replace '\-', '~'
+        $retVersion = $retVersion -replace '\-', '~'
     }
     
-    return $version
+    return $retVersion
 }
 
 # Gets list of images names

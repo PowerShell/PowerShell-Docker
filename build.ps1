@@ -66,7 +66,13 @@ param(
     [Parameter(ParameterSetName="localBuildAll")]
     [ValidatePattern('https://[\w\.]+/\?(\w+=[\d\w-:%]*&?){8}')]
     [string]
-    $SasUrl
+    $SasUrl,
+
+    [Parameter(ParameterSetName="localBuildByName")]
+    [Parameter(ParameterSetName="localBuildAll")]
+    [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
+    [string]
+    $Version
 )
 
 DynamicParam {
@@ -126,19 +132,24 @@ DynamicParam {
 }
 
 Begin {
+    $versionExtraParams = @{}
+    if($Version){
+        $versionExtraParams.Add('Version', $Version)
+    }
+
     switch($Channel)
     {
         'servicing' {
-            $windowsVersion = Get-PowerShellVersion -Servicing
-            $linuxVersion = Get-PowerShellVersion -Linux -Servicing
+            $windowsVersion = Get-PowerShellVersion -Servicing @versionExtraParams
+            $linuxVersion = Get-PowerShellVersion -Linux -Servicing @versionExtraParams
         }
         'preview' {
-            $windowsVersion = Get-PowerShellVersion -Preview
-            $linuxVersion = Get-PowerShellVersion -Linux -Preview
+            $windowsVersion = Get-PowerShellVersion -Preview @versionExtraParams
+            $linuxVersion = Get-PowerShellVersion -Linux -Preview @versionExtraParams
         }
         'stable' {
-            $windowsVersion = Get-PowerShellVersion
-            $linuxVersion = Get-PowerShellVersion -Linux
+            $windowsVersion = Get-PowerShellVersion @versionExtraParams
+            $linuxVersion = Get-PowerShellVersion -Linux @versionExtraParams
         }
         default {
             throw "unknown channel: $Channel"
