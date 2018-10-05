@@ -18,7 +18,7 @@ ARG PS_PACKAGE_MUSL=powershell-${PS_VERSION}-linux-musl-x64.tar.gz
 ARG PS_PACKAGE_MUSL_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE_MUSL}
 ARG PS_INSTALL_VERSION=6
 
-# downoad the Linux tar.gz and save it
+# Download the Linux tar.gz and save it
 ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
 
 # define the folder we will be installing PowerShell to

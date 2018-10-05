@@ -9,7 +9,7 @@ ARG PS_PACKAGE=powershell_${PS_VERSION}-1.ubuntu.14.04_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 RUN echo ${PS_PACKAGE_URL}
-# downoad the Linux package and save it
+# Download the Linux package and save it
 ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
 
 # Define ENVs for Localization/Globalization
