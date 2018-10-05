@@ -80,6 +80,9 @@ class DockerImageMetaData {
 
         return $this.IsLinux
     }
+
+    [string]
+    $PackageFormat = "undefined"
 }
 
 Function Get-DockerImageMetaData

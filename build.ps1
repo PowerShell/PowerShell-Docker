@@ -60,7 +60,13 @@ param(
     [ValidateSet('stable','preview','servicing')]
     [Parameter(Mandatory)]
     [string]
-    $Channel='stable'
+    $Channel='stable',
+
+    [Parameter(ParameterSetName="localBuildByName")]
+    [Parameter(ParameterSetName="localBuildAll")]
+    [ValidatePattern('https://[\w\.]+/\?(\w+=[\d\w-:%]*&?){8}')]
+    [string]
+    $SasUrl
 )
 
 DynamicParam {
@@ -148,6 +154,11 @@ Begin {
     {
         # We are using all, so get the list off all images for the current channel
         $Name = Get-ImageList -Channel $Channel
+    }
+
+    if($SasUrl)
+    {
+        $sasParts = $SasUrl -split '\?'
     }
 }
 
@@ -289,15 +300,25 @@ End {
                         # The version of nanoserver in CI doesn't have all the changes needed to verify the image
                         $skipVerification = $true
                     }
+                    $buildArgs =  @{
+                        fromTag = $fromTag
+                        PS_VERSION = $psversion
+                        VCS_REF = $vcf_ref
+                        IMAGE_NAME = $firstActualTag
+                    }
+
+                    if($SasUrl)
+                    {
+                        $sasParts = $SasUrl -split '\?'
+                        $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $psversion
+                        $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
+                        $packageUrl = $sasParts[0] + $containerName + '/' + $packageName + '?' + $sasParts[1]
+                        $buildArgs.Add('PS_PACKAGE_URL', $packageUrl)
+                    }
 
                     $testArgs = @{
                         tags = $actualTags
-                        BuildArgs = @{
-                            fromTag = $fromTag
-                            PS_VERSION = $psversion
-                            VCS_REF = $vcf_ref
-                            IMAGE_NAME = $firstActualTag
-                        }
+                        BuildArgs = $buildArgs
                         ContextPath = $contextPath
                         OS = $os
                         ExpectedVersion = $actualVersion
