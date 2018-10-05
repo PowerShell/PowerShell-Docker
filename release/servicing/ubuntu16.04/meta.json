@@ -1,3 +1,4 @@
 {
-    "IsLinux" : true
+    "IsLinux" : true,
+    "PackageFormat": "powershell_${PS_VERSION}-1.ubuntu.16.04_amd64.deb"
 }
