@@ -63,10 +63,11 @@ function Invoke-Docker
     }
     elseif($dockerExitCode -ne 0 -and $FailureAction -eq 'error')
     {
+        $resultString = $result | out-string -Width 9999
         if($result.length -gt 80) 
         {
             $filename = [System.io.path]::GetTempFileName()
-            $result | Out-File -FilePath $filename
+            $resultString | Out-File -FilePath $filename
             if($env:TF_BUILD)
             {
                 if($env:BUILD_REASON -ne 'PullRequest')
@@ -79,7 +80,7 @@ function Invoke-Docker
         }
         else 
         {
-            Write-Error "docker $command failed with: $($result -join [Environment]::NewLine)  ($($result.length))" -ErrorAction Stop    
+            Write-Error "docker $command failed with: $resultString  ($($result.length))" -ErrorAction Stop    
         }
 
         return $false
