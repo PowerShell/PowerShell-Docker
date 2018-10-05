@@ -27,7 +27,7 @@ RUN zypper --non-interactive update --skip-interactive
 RUN zypper --non-interactive install \
         tar
 
-# downoad the Linux tar.gz and save it
+# Download the Linux tar.gz and save it
 ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
 
 # Unzip the Linux tar.gz

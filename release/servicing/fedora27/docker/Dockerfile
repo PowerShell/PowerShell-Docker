@@ -9,7 +9,7 @@ ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 
-# downoad the Linux package and save it
+# Download the Linux package and save it
 ADD ${PS_PACKAGE_URL} /tmp/powershell.rpm
 
 # Define ENVs for Localization/Globalization
