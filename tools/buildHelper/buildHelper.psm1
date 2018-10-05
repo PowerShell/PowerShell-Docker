@@ -19,6 +19,8 @@ function Get-PowerShellVersion
         [Parameter(ParameterSetName="explicitVersion",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
         [Parameter(ParameterSetName="explicitVersionPreview",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
         [Parameter(ParameterSetName="explicitVersionServicing",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
+        [Parameter(ParameterSetName='Servicing', HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
+        [Parameter(ParameterSetName='Preview', HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
         [switch] $Linux,
 
         [Parameter(Mandatory,ParameterSetName="explicitVersion", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
