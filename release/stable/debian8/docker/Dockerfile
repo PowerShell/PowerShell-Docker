@@ -1,40 +1,54 @@
 # Docker image file that describes an Debian 8 image with PowerShell installed from Microsoft APT Repo
 ARG fromTag=jessie
+ARG imageRepo=debian
 
-FROM debian:${fromTag}
+
+FROM ${imageRepo}:${fromTag} AS installer-env
 
 ARG PS_VERSION=6.1.0
-ARG PS_VERSION_POSTFIX=-1.debian.8
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:debian-jessie
-ARG VCS_REF="none"
+ARG PS_PACKAGE=powershell_${PS_VERSION}-1.debian.8_amd64.deb
+ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
-# Install dependencies
+RUN echo ${PS_PACKAGE_URL}
+# Download the Linux package and save it
+ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
+
+# Define ENVs for Localization/Globalization
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8 \
+    # required to remove gdebi on debian 8
+    SUDO_FORCE_REMOVE=yes
+
+# Install dependencies and clean up
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        apt-utils \
-        ca-certificates \
-        curl \
-        apt-transport-https \
+    && apt-get install -y \
+    # less is required for help in powershell
+        less \
+    # requied to setup the locale
         locales \
-        less
-
-# Setup the locale
-ENV LANG en_US.UTF-8
-ENV LC_ALL $LANG
-RUN locale-gen $LANG && update-locale
-
-# Import the public repository GPG keys
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-
-# Register the Microsoft Product feed
-RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-jessie-prod jessie main" > /etc/apt/sources.list.d/microsoft.list
-
-# Install powershell from Microsoft Repo
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-	powershell=${PS_VERSION}${PS_VERSION_POSTFIX} \
+    # required for SSL
+        ca-certificates \
+    # simplifies deb file install
+        gdebi \
+    && gdebi --n /tmp/powershell.deb \
+    # gdebi isn't needed anymore remove it
+    && apt-get purge -y gdebi \
+    # remove any unused dependecies
+    && apt-get autoremove -y \
+    # upgrade all packages
+    && apt-get dist-upgrade -y \
+    # clean the cache
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    # generate the locales
+    && locale-gen $LANG && update-locale \
+    # remove powershell package
+    && rm /tmp/powershell.deb
+
+# Define args needed only for the labels
+ARG VCS_REF="none"
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:debian-8
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
