@@ -42,7 +42,7 @@ Environment data
 
 ```
 
-<!-- provide the output of $PSVersionTable -->
+<!-- provide the output of $PSVersionTable from powershell in the docker container -->
 
 ```powershell
 > $PSVersionTable
