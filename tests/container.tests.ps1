@@ -361,23 +361,25 @@ Describe "Windows Containers run PowerShell" -Tags 'Behavior', 'Windows' {
 }
 
 Describe "Push Linux Containers" -Tags 'Linux', 'Push' {
-    It "<Name> pushes without error" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
+    BeforeAll{
+        $pushTestCases = @()
+        $script:linuxContainerRunTests | ForEach-Object {
+            $pushTestCases += @{
+                Tags = $_.Tags
+                Name = $_.Name
+            }
+        }
+    }
+
+    It "<Name> pushes without error" -TestCases $pushTestCases -Skip:$script:skipLinuxRun {
         param(
             [Parameter(Mandatory=$true)]
             [string]
-            $name,
+            $Name,
 
             [Parameter(Mandatory=$true)]
-            [string]
-            $path,
-
-            [Parameter(Mandatory=$true)]
-            [object]
-            $BuildArgs,
-
-            [Parameter(Mandatory=$true)]
-            [string]
-            $ExpectedVersion
+            [string[]]
+            $Tags
         )
 
         foreach($tag in $tags) {
@@ -389,23 +391,25 @@ Describe "Push Linux Containers" -Tags 'Linux', 'Push' {
 }
 
 Describe "Push Windows Containers" -Tags 'Windows', 'Push' {
-    it "<Name> Pushes without error" -TestCases $script:windowsContainerRunTests  -skip:$script:skipWindowsRun {
+    BeforeAll{
+        $pushTestCases = @()
+        $script:windowsContainerRunTests | ForEach-Object {
+            $pushTestCases += @{
+                Tags = $_.Tags
+                Name = $_.Name
+            }
+        }
+    }
+
+    it "<Name> Pushes without error" -TestCases $pushTestCases  -skip:$script:skipWindowsRun {
         param(
             [Parameter(Mandatory=$true)]
             [string]
-            $name,
+            $Name,
 
             [Parameter(Mandatory=$true)]
-            [string]
-            $path,
-
-            [Parameter(Mandatory=$true)]
-            [object]
-            $BuildArgs,
-
-            [Parameter(Mandatory=$true)]
-            [string]
-            $ExpectedVersion
+            [string[]]
+            $Tags
         )
 
         foreach($tag in $tags) {
