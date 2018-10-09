@@ -169,7 +169,9 @@ Begin {
 
     if($SasUrl)
     {
-        $sasParts = $SasUrl -split '\?'
+        $sasUri = [uri]$SasUrl
+        $sasBase = $sasUri.GetComponents([System.UriComponents]::Path -bor [System.UriComponents]::Scheme -bor [System.UriComponents]::Host ,[System.UriFormat]::Unescaped)
+        $sasQuery = $sasUri.Query
     }
 }
 
@@ -320,11 +322,12 @@ End {
 
                     if($SasUrl)
                     {
-                        $sasParts = $SasUrl -split '\?'
+                        $packageUrl = [System.UriBuilder]::new($sasBase)
                         $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $psversion
                         $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
-                        $packageUrl = $sasParts[0] + $containerName + '/' + $packageName + '?' + $sasParts[1]
-                        $buildArgs.Add('PS_PACKAGE_URL', $packageUrl)
+                        $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName 
+                        $packageUrl.Query = $sasQuery
+                        $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
                     }
 
                     $testArgs = @{
