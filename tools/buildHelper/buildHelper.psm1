@@ -7,31 +7,31 @@ function Get-PowerShellVersion
 {
     [CmdletBinding(DefaultParameterSetName='Default')]
     param(
-        [Parameter(Mandatory, ParameterSetName="explicitVersionPreview", HelpMessage="Gets the preview version.  Without this it gets the current stable version.")]
+        [Parameter(Mandatory, ParameterSetName="ExplicitVersionPreview", HelpMessage="Gets the preview version.  Without this it gets the current stable version.")]
         [Parameter(Mandatory, ParameterSetName='Preview', HelpMessage="Gets the preview version.  Without this it gets the current stable version.")]
         [switch] $Preview,
 
-        [Parameter(Mandatory, ParameterSetName="explicitVersionServicing", HelpMessage="Gets the preview version.  Without this it gets the current stable version.")]
+        [Parameter(Mandatory, ParameterSetName="ExplicitVersionServicing", HelpMessage="Gets the preview version.  Without this it gets the current stable version.")]
         [Parameter(Mandatory, ParameterSetName='Servicing', HelpMessage="Gets the servicing version.  Without this it gets the current stable version.")]
         [switch] $Servicing,
 
-        [Parameter(ParameterSetName="lookupVersion",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
-        [Parameter(ParameterSetName="explicitVersion",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
-        [Parameter(ParameterSetName="explicitVersionPreview",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
-        [Parameter(ParameterSetName="explicitVersionServicing",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
+        [Parameter(ParameterSetName="LookupVersion",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
+        [Parameter(ParameterSetName="ExplicitVersion",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
+        [Parameter(ParameterSetName="ExplicitVersionPreview",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
+        [Parameter(ParameterSetName="ExplicitVersionServicing",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
         [Parameter(ParameterSetName='Servicing', HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
         [Parameter(ParameterSetName='Preview', HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
         [switch] $Linux,
 
-        [Parameter(Mandatory,ParameterSetName="explicitVersion", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
-        [Parameter(Mandatory,ParameterSetName="explicitVersionServicing", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
-        [Parameter(Mandatory,ParameterSetName="explicitVersionPreview", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
+        [Parameter(Mandatory,ParameterSetName="ExplicitVersion", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
+        [Parameter(Mandatory,ParameterSetName="ExplicitVersionServicing", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
+        [Parameter(Mandatory,ParameterSetName="ExplicitVersionPreview", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
         [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
         [string]
         $Version
     )
 
-    if ($PSCmdlet.ParameterSetName -notlike 'explicitVersion*') {
+    if ($PSCmdlet.ParameterSetName -notlike 'ExplicitVersion*') {
         $metaData = Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json'
 
         $releaseTag = if ($Preview.IsPresent) {
