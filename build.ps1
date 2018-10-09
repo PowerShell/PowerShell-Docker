@@ -60,7 +60,19 @@ param(
     [ValidateSet('stable','preview','servicing')]
     [Parameter(Mandatory)]
     [string]
-    $Channel='stable'
+    $Channel='stable',
+
+    [Parameter(ParameterSetName="localBuildByName")]
+    [Parameter(ParameterSetName="localBuildAll")]
+    [ValidatePattern('https://[\w\.]+/\?(\w+=[\d\w-:%]*&?){8}')]
+    [string]
+    $SasUrl,
+
+    [Parameter(ParameterSetName="localBuildByName")]
+    [Parameter(ParameterSetName="localBuildAll")]
+    [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
+    [string]
+    $Version
 )
 
 DynamicParam {
@@ -120,19 +132,24 @@ DynamicParam {
 }
 
 Begin {
+    $versionExtraParams = @{}
+    if($Version){
+        $versionExtraParams.Add('Version', $Version)
+    }
+
     switch($Channel)
     {
         'servicing' {
-            $windowsVersion = Get-PowerShellVersion -Servicing
-            $linuxVersion = Get-PowerShellVersion -Linux -Servicing
+            $windowsVersion = Get-PowerShellVersion -Servicing @versionExtraParams
+            $linuxVersion = Get-PowerShellVersion -Linux -Servicing @versionExtraParams
         }
         'preview' {
-            $windowsVersion = Get-PowerShellVersion -Preview
-            $linuxVersion = Get-PowerShellVersion -Linux -Preview
+            $windowsVersion = Get-PowerShellVersion -Preview @versionExtraParams
+            $linuxVersion = Get-PowerShellVersion -Linux -Preview @versionExtraParams
         }
         'stable' {
-            $windowsVersion = Get-PowerShellVersion
-            $linuxVersion = Get-PowerShellVersion -Linux
+            $windowsVersion = Get-PowerShellVersion @versionExtraParams
+            $linuxVersion = Get-PowerShellVersion -Linux @versionExtraParams
         }
         default {
             throw "unknown channel: $Channel"
@@ -148,6 +165,13 @@ Begin {
     {
         # We are using all, so get the list off all images for the current channel
         $Name = Get-ImageList -Channel $Channel
+    }
+
+    if($SasUrl)
+    {
+        $sasUri = [uri]$SasUrl
+        $sasBase = $sasUri.GetComponents([System.UriComponents]::Path -bor [System.UriComponents]::Scheme -bor [System.UriComponents]::Host ,[System.UriFormat]::Unescaped)
+        $sasQuery = $sasUri.Query
     }
 }
 
@@ -289,15 +313,26 @@ End {
                         # The version of nanoserver in CI doesn't have all the changes needed to verify the image
                         $skipVerification = $true
                     }
+                    $buildArgs =  @{
+                        fromTag = $fromTag
+                        PS_VERSION = $psversion
+                        VCS_REF = $vcf_ref
+                        IMAGE_NAME = $firstActualTag
+                    }
+
+                    if($SasUrl)
+                    {
+                        $packageUrl = [System.UriBuilder]::new($sasBase)
+                        $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $psversion
+                        $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
+                        $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName 
+                        $packageUrl.Query = $sasQuery
+                        $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+                    }
 
                     $testArgs = @{
                         tags = $actualTags
-                        BuildArgs = @{
-                            fromTag = $fromTag
-                            PS_VERSION = $psversion
-                            VCS_REF = $vcf_ref
-                            IMAGE_NAME = $firstActualTag
-                        }
+                        BuildArgs = $buildArgs
                         ContextPath = $contextPath
                         OS = $os
                         ExpectedVersion = $actualVersion

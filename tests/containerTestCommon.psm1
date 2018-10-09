@@ -376,6 +376,12 @@ function Invoke-DockerBuild
     foreach($argName in $buildArgNames)
     {
         $value = $BuildArgs.$argName
+        if($env:ACR_NAME)
+        {
+            # & must be escaped in ACR
+            $value = $value -replace '&', '\&'
+        }
+
         $buildArgList += @(
             "--build-arg"
             "$argName=$value"

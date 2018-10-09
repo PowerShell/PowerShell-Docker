@@ -1,3 +1,5 @@
 {
-    "IsLinux" : true
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz"
 }
