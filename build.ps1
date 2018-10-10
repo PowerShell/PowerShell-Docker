@@ -313,11 +313,12 @@ End {
                         # The version of nanoserver in CI doesn't have all the changes needed to verify the image
                         $skipVerification = $true
                     }
+
                     $buildArgs =  @{
                         fromTag = $fromTag
                         PS_VERSION = $psversion
                         VCS_REF = $vcf_ref
-                        IMAGE_NAME = $firstActualTag
+                        IMAGE_NAME = 'mcr.microsoft.com/powershell:' + ($firstActualTag -split ':')[1]
                     }
 
                     if($SasUrl)
