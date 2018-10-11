@@ -1,0 +1,42 @@
+parameters:
+  queue: 'Hosted Ubuntu 1604'
+  channel: 'stable'
+
+jobs:
+- job: ${{ parameters.channel }}
+  variables:
+    dockerImage: 'powershell'
+    ImageName: ${{ parameters.imagename }}
+    Channel: ${{ parameters.channel }}
+
+  pool: ${{ parameters.queue }}
+  timeoutInMinutes: 135
+
+  displayName: ${{ parameters.channel }}
+
+  #condition: eq(variables['${{ parameters.channel }}'], 'true')
+
+  steps:
+  - powershell: 'dir env:' 
+    displayName: 'Capture Environment'
+
+  - powershell: 'docker login $(dockerHost) -u $(dockerUserName) -p $(dockerKey)' 
+    displayName: 'docker login'
+
+  - powershell: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)' 
+    displayName: 'az acr login'
+
+  - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck' 
+    displayName: 'Install Pester'
+
+  - powershell: './build.ps1 -Build -ImageName $(dockerHost)/$(dockerNamespace)/$(dockerImage) -All -Channel $(channel) -Push' 
+    displayName: 'Build All $(Channel)'
+    condition: eq(variables['stable'], 'true')
+
+  - powershell: 'docker logout $(dockerHost)' 
+    displayName: 'docker logout'
+    condition: always()
+
+  - powershell: 'az logout' 
+    displayName: 'az logout'
+    condition: always()
