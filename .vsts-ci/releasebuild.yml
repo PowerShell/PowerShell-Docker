@@ -25,7 +25,7 @@ jobs:
   steps:
   - powershell: |  
        $dockerConfigFolder = "$env:userprofile/.docker"
-       if(!(Test-Path $dockerConfigFolder)){ new-item -Type Directory -Path $dockerConfigFolder}
+       if(!(Test-Path $dockerConfigFolder)){ $null = new-item -Type Directory -Path $dockerConfigFolder}
        $dockerCliConfig = "$env:userprofile/.docker/config.json"
        $dockerCliBackup = "$env:userprofile/.docker/config-backup.json"
        if(Test-Path $dockerCliConfig) { copy-item $dockerCliConfig $dockerCliBackup -force}
