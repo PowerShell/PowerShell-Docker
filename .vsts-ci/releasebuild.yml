@@ -59,7 +59,7 @@ jobs:
     displayName: 'docker login'
 
   - powershell: |
-      ./createAllManifests.ps1 -Registry $(dockerHost)/$(dockerNamespace)'
+      ./createAllManifests.ps1 -Registry '$(dockerHost)/$(dockerNamespace)'
     displayName: 'Create Manifest Lists'
 
   - powershell: 'docker logout $(dockerHost)' 
