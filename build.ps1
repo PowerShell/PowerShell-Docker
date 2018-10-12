@@ -229,7 +229,7 @@ End {
     }
 
     # Calculate the paths
-    $channelPath = Join-Path -Path $releasePath -ChildPath $Channel
+    $channelPath = Join-Path -Path $releasePath -ChildPath $Channel.ToLowerInvariant()
 
     $localImageNames = @()
     $testArgList = @()
