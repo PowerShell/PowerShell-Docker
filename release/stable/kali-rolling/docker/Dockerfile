@@ -57,7 +57,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     LANG=en_US.UTF-8
 
 # Define args needed only for the labels
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:opensuse-42.3
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:kali-rolling
 ARG VCS_REF="none"
 
 # Add label last as it's just metadata and uses a lot of parameters
