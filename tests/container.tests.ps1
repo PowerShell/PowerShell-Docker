@@ -171,6 +171,12 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
                 $ExpectedVersion
             )
 
+            if($Name -match '6\.1\.0\-rc\.1\-alpine')
+            {
+                # 6.1.0-rc.1-apline was published with 6.1.0-fixalpine as the version
+                $ExpectedVersion = '6.1.0-fixalpine'
+            }
+
             Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
         }
 
@@ -245,13 +251,13 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
             $labelTestCases += @{
                 Name = $_.Name
                 Label = 'org.label-schema.vcs-ref'
-                ExpectedValue = &git rev-parse --short HEAD
-                Expectation = 'BeExactly'
+                ExpectedValue = '[0-9a-f]{7}'
+                Expectation = 'match'
             }
             $labelTestCases += @{
                 Name = $_.Name
                 Label = 'org.label-schema.docker.cmd.devel'
-                ExpectedValue = "docker run $($_.Name)"
+                ExpectedValue = "docker run $('mcr.microsoft.com/powershell:' + ($_.Name -split ':')[1])"
                 Expectation = 'BeExactly'
             }
         }

@@ -22,6 +22,8 @@ param(
     [switch]
     $Test,
 
+    [Parameter(ParameterSetName="localBuildByName")]
+    [Parameter(ParameterSetName="localBuildAll")]
     [Parameter(ParameterSetName="TestByName")]
     [Parameter(ParameterSetName="TestAll")]
     [switch]
@@ -36,6 +38,11 @@ param(
     [Parameter(ParameterSetName="localBuildAll")]
     [switch]
     $Push,
+
+    [Parameter(ParameterSetName="localBuildByName")]
+    [Parameter(ParameterSetName="localBuildAll")]
+    [switch]
+    $SkipTest,
 
     [Parameter(Mandatory, ParameterSetName="GetTagsByName")]
     [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
@@ -229,7 +236,7 @@ End {
     }
 
     # Calculate the paths
-    $channelPath = Join-Path -Path $releasePath -ChildPath $Channel
+    $channelPath = Join-Path -Path $releasePath -ChildPath $Channel.ToLowerInvariant()
 
     $localImageNames = @()
     $testArgList = @()
@@ -313,11 +320,12 @@ End {
                         # The version of nanoserver in CI doesn't have all the changes needed to verify the image
                         $skipVerification = $true
                     }
+
                     $buildArgs =  @{
                         fromTag = $fromTag
                         PS_VERSION = $psversion
                         VCS_REF = $vcf_ref
-                        IMAGE_NAME = $firstActualTag
+                        IMAGE_NAME = 'mcr.microsoft.com/powershell:' + ($firstActualTag -split ':')[1]
                     }
 
                     if($SasUrl)
@@ -368,15 +376,20 @@ End {
             $extraParams.Add('Tags',$tags)
         }
         else {
-            $tags = @('Build','Behavior')
+            $tags = @('Build')
+            if(!$SkipTest.IsPresent)
+            {
+                $tags += 'Behavior'
+            }
+
+            if($Pull.IsPresent)
+            {
+                $tags += 'Pull'
+            }
+
             if($Push.IsPresent)
             {
                 $tags += 'Push'
-            }
-
-            if($env:ACR_NAME)
-            {
-                $tags += 'Pull'
             }
 
             $extraParams.Add('Tags', $tags)

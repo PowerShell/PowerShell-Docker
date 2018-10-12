@@ -166,11 +166,6 @@ function Test-SkipWindows
         $Purpose
     )
 
-    if($env:ACR_NAME -and $Purpose -eq 'Build')
-    {
-        return $false
-    }
-
     [bool] $canRunWindows = (Get-DockerEngineOs) -like 'Windows*'
     return ($IsLinux -or $IsMacOS -or !$canRunWindows)
 }
@@ -183,11 +178,6 @@ function Test-SkipLinux
         [String]
         $Purpose
     )
-
-    if($env:ACR_NAME -and $Purpose -eq 'Build')
-    {
-        return $false
-    }
 
     $os = Get-DockerEngineOs
 
@@ -232,6 +222,7 @@ function Get-TestContext
     {
         $ContainerTestDrive = 'C:\test'
     }
+
     $resolvedTestDrive = (Resolve-Path "Testdrive:\").providerPath
 
     return @{

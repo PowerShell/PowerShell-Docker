@@ -1,0 +1,67 @@
+parameters:
+  pool: 'Hosted Ubuntu 1604'
+  channel: 'stable'
+  jobName: 'none'
+  ACR: 'no'
+
+jobs:
+- job: ${{ parameters.jobName }}
+  variables:
+    dockerImage: 'powershell'
+    Channel: ${{ parameters.channel }}
+    ACR: ${{ parameters.ACR }}
+
+  pool: ${{ parameters.pool }}
+  timeoutInMinutes: 135
+
+  displayName: ${{ parameters.jobName }}
+
+  steps:
+  - powershell: |
+      Write-Host "##vso[task.setvariable variable=ACR_NAME;]$env:ACR_NAME_VAR"
+    displayName: 'Enable ACR'
+    condition: ne(variables['ACR'], 'no')
+
+  - powershell: 'Get-ChildItem env:' 
+    displayName: 'Capture Environment'
+
+  - powershell: 'docker login $(dockerHost) -u $(dockerUserName) -p $(dockerKey)' 
+    displayName: 'docker login'
+
+  - powershell: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)' 
+    displayName: 'az acr login'
+    condition: and(succeeded(),ne(variables['ACR'], 'no'))
+
+  - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck' 
+    displayName: 'Install Pester'
+
+  - powershell: |
+      $extraParams = @{}
+      if($env:ACR -eq 'no')
+      {
+        Write-Host 'Not in ACR, will push...'
+        $extraParams.Add('Push',$true)
+      }
+      else
+      {
+        Write-Host 'Using ACR, will NOT test behavior...'
+        $extraParams.Add('SkipTest',$true)
+      }
+
+      if($env:$(Channel) -eq 'true')
+      {
+        ./build.ps1 -Build -ImageName $(dockerHost)/$(dockerNamespace)/$(dockerImage) -All -Channel $(channel) @extraParams
+      }
+      else
+      {
+        Write-Host 'Current channel disabled, skipping ...'
+      }
+    displayName: 'Build All $(Channel)'
+
+  - powershell: 'docker logout $(dockerHost)' 
+    displayName: 'docker logout'
+    condition: always()
+
+  - powershell: 'az logout' 
+    displayName: 'az logout'
+    condition: ne(variables['ACR'], 'no')
