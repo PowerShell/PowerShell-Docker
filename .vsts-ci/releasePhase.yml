@@ -8,7 +8,6 @@ jobs:
 - job: ${{ parameters.jobName }}
   variables:
     dockerImage: 'powershell'
-    ImageName: ${{ parameters.imagename }}
     Channel: ${{ parameters.channel }}
     ACR: ${{ parameters.ACR }}
 
@@ -31,7 +30,7 @@ jobs:
 
   - powershell: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)' 
     displayName: 'az acr login'
-    condition: and(succeeded(),ne(variables['ARC'], 'no'))
+    condition: and(succeeded(),ne(variables['ACR'], 'no'))
 
   - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck' 
     displayName: 'Install Pester'
@@ -65,4 +64,4 @@ jobs:
 
   - powershell: 'az logout' 
     displayName: 'az logout'
-    condition: ne(variables['ARC'], 'no')
+    condition: ne(variables['ACR'], 'no')
