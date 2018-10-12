@@ -1,15 +1,18 @@
 parameters:
-  queue: 'Hosted Ubuntu 1604'
+  pool: 'Hosted Ubuntu 1604'
   channel: 'stable'
+  nameSuffix: 'none'
+  ACR: 'no'
 
 jobs:
-- job: ${{ parameters.channel }}
+- job: ${{ parameters.channel }}${{ parameters.nameSuffix }}
   variables:
     dockerImage: 'powershell'
     ImageName: ${{ parameters.imagename }}
     Channel: ${{ parameters.channel }}
+    ACR: ${{ parameters.ACR }}
 
-  pool: ${{ parameters.queue }}
+  pool: ${{ parameters.pool }}
   timeoutInMinutes: 135
 
   displayName: ${{ parameters.channel }}
@@ -17,6 +20,11 @@ jobs:
   condition: eq(variables['${{ parameters.channel }}'], 'true')
 
   steps:
+  - powershell: |
+      Write-Host "##vso[task.setvariable variable=ACR_NAME;]$env:ACR_NAME_VAR"
+    displayName: 'Enable ACR'
+    condition: ne(variables['ARC'], 'no')
+
   - powershell: 'Get-ChildItem env:' 
     displayName: 'Capture Environment'
 
@@ -25,6 +33,7 @@ jobs:
 
   - powershell: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)' 
     displayName: 'az acr login'
+    condition: and(succeeded(),ne(variables['ARC'], 'no'))
 
   - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck' 
     displayName: 'Install Pester'
@@ -39,4 +48,4 @@ jobs:
 
   - powershell: 'az logout' 
     displayName: 'az logout'
-    condition: always()
+    condition: ne(variables['ARC'], 'no')
