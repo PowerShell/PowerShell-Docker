@@ -22,6 +22,8 @@ param(
     [switch]
     $Test,
 
+    [Parameter(ParameterSetName="localBuildByName")]
+    [Parameter(ParameterSetName="localBuildAll")]
     [Parameter(ParameterSetName="TestByName")]
     [Parameter(ParameterSetName="TestAll")]
     [switch]
@@ -36,6 +38,11 @@ param(
     [Parameter(ParameterSetName="localBuildAll")]
     [switch]
     $Push,
+
+    [Parameter(ParameterSetName="localBuildByName")]
+    [Parameter(ParameterSetName="localBuildAll")]
+    [switch]
+    $SkipTest,
 
     [Parameter(Mandatory, ParameterSetName="GetTagsByName")]
     [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
@@ -369,7 +376,17 @@ End {
             $extraParams.Add('Tags',$tags)
         }
         else {
-            $tags = @('Build','Behavior')
+            $tags = @('Build')
+            if(!$SkipTest.IsPresent)
+            {
+                $tags += 'Behavior'
+            }
+
+            if($Pull.IsPresent)
+            {
+                $tags += 'Pull'
+            }
+
             if($Push.IsPresent)
             {
                 $tags += 'Push'

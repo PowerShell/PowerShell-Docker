@@ -38,11 +38,17 @@ jobs:
 
   - powershell: |
       $extraParams = @{}
-      if(!$env:ACR)
+      if($env:ACR -eq 'no')
       {
         Write-Host 'Not in ACR, will push...'
         $extraParams.Add('Push',$true)
       }
+      else
+      {
+        Write-Host 'Using ACR, will NOT test behavior...'
+        $extraParams.Add('SkipTest',$true)
+      }
+
       if($env:$(Channel) -eq 'true')
       {
         ./build.ps1 -Build -ImageName $(dockerHost)/$(dockerNamespace)/$(dockerImage) -All -Channel $(channel) @extraParams
