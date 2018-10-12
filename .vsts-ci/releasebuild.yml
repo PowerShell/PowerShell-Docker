@@ -5,18 +5,40 @@ jobs:
 
 - template: releasePhase.yml
   parameters:
-    channel: stable
+    channel: STABLE
+    jobName: stableLinux
+    pool: Hosted Ubuntu 1604
+    ACR: no
 
 - template: releasePhase.yml
   parameters:
-    channel: preview
+    channel: PREVIEW
+    jobName: previewLinux
+    pool: Hosted Ubuntu 1604
+    ACR: no
+
+- template: releasePhase.yml
+  parameters:
+    channel: STABLE
+    jobName: stableWindows
+    pool: Hosted VS2017
+    ACR: yes
+
+- template: releasePhase.yml
+  parameters:
+    channel: PREVIEW
+    jobName: previewWindows
+    pool: Hosted VS2017
+    ACR: yes
 
 - job: ManifestPhase
   displayName: Create Manifest Lists
 
   dependsOn: 
-   - stable
-   - preview
+   - stableLinux
+   - previewLinux
+   - stableWindows
+   - previewWindows
   condition: succeeded()
   pool:
     name: PowerShell

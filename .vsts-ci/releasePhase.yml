@@ -1,11 +1,11 @@
 parameters:
   pool: 'Hosted Ubuntu 1604'
   channel: 'stable'
-  nameSuffix: 'none'
+  jobName: 'none'
   ACR: 'no'
 
 jobs:
-- job: ${{ parameters.channel }}${{ parameters.nameSuffix }}
+- job: ${{ parameters.jobName }}
   variables:
     dockerImage: 'powershell'
     ImageName: ${{ parameters.imagename }}
@@ -15,15 +15,13 @@ jobs:
   pool: ${{ parameters.pool }}
   timeoutInMinutes: 135
 
-  displayName: ${{ parameters.channel }}
-
-  condition: eq(variables['${{ parameters.channel }}'], 'true')
+  displayName: ${{ parameters.jobName }}
 
   steps:
   - powershell: |
       Write-Host "##vso[task.setvariable variable=ACR_NAME;]$env:ACR_NAME_VAR"
     displayName: 'Enable ACR'
-    condition: ne(variables['ARC'], 'no')
+    condition: ne(variables['ACR'], 'no')
 
   - powershell: 'Get-ChildItem env:' 
     displayName: 'Capture Environment'
@@ -38,9 +36,22 @@ jobs:
   - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck' 
     displayName: 'Install Pester'
 
-  - powershell: './build.ps1 -Build -ImageName $(dockerHost)/$(dockerNamespace)/$(dockerImage) -All -Channel $(channel) -Push' 
+  - powershell: |
+      $extraParams = @{}
+      if(!$env:ACR)
+      {
+        Write-Host 'Not in ACR, will push...'
+        $extraParams.Add('Push',$true)
+      }
+      if($env:$(Channel) -eq 'true')
+      {
+        ./build.ps1 -Build -ImageName $(dockerHost)/$(dockerNamespace)/$(dockerImage) -All -Channel $(channel) @extraParams
+      }
+      else
+      {
+        Write-Host 'Current channel disabled, skipping ...'
+      }
     displayName: 'Build All $(Channel)'
-    condition: eq(variables['stable'], 'true')
 
   - powershell: 'docker logout $(dockerHost)' 
     displayName: 'docker logout'
