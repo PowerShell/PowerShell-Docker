@@ -52,7 +52,8 @@ RUN \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && locale-gen $LANG && update-locale \
+    && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
+    && locale-gen && update-locale \
     # remove powershell package
     && rm -f /tmp/powershell.deb
 
