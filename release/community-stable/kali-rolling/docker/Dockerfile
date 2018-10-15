@@ -16,6 +16,14 @@ ARG PS_PACKAGE=powershell_${PS_VERSION}-1.debian.9_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
 
+# Define Args and Env needed to create links
+ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
+    \
+    # Define ENVs for Localization/Globalization
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8
+
 # Download the Debian9 PowerShell package and save it
 ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
 
@@ -49,22 +57,13 @@ RUN \
       # required for SSL
         ca-certificates \
     && apt-get install -y /tmp/powershell.deb \
+    && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
+    && locale-gen && update-locale \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
-    && locale-gen && update-locale \
     # remove powershell package
     && rm -f /tmp/powershell.deb
-
-# Define Args and Env needed to create links
-ARG PS_INSTALL_VERSION=6
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
-    \
-    # Define ENVs for Localization/Globalization
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8
 
 # Define args needed only for the labels
 ARG IMAGE_NAME=openatmicrosoft/powershell:kali-rolling
