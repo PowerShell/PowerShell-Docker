@@ -44,7 +44,7 @@ RUN \
     && apt-get install -y \
       # less is required for help in powershell
         less \
-      # requied to setup the locale
+      # required to setup the locale
         locales \
       # required for SSL
         ca-certificates \
