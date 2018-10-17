@@ -171,10 +171,16 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
                 $ExpectedVersion
             )
 
-            if($Name -match '6\.1\.0\-rc\.1\-alpine')
+            switch -Regex ($Name)
             {
-                # 6.1.0-rc.1-apline was published with 6.1.0-fixalpine as the version
-                $ExpectedVersion = '6.1.0-fixalpine'
+                '6\.1\.0\-rc\.1\-alpine' {
+                    # 6.1.0-rc.1-alpine was published with 6.1.0-fixalpine as the version
+                    $ExpectedVersion = '6.1.0-fixalpine'
+                }
+                '6\.2\.0\-preview\.1\-alpine' {
+                    # 6.2.0-preview.1-alpine was published with 6.1.0 as the version
+                    $ExpectedVersion = '6.1.0'
+                }
             }
 
             Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
