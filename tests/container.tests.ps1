@@ -171,19 +171,18 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
                 $ExpectedVersion
             )
 
+            $actualVersion = Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name
             switch -Regex ($Name)
             {
-                '6\.1\.0\-rc\.1\-alpine' {
+                '6\.\d\.0\-\w+\.1\-alpine' {
                     # 6.1.0-rc.1-alpine was published with 6.1.0-fixalpine as the version
-                    $ExpectedVersion = '6.1.0-fixalpine'
-                }
-                '6\.2\.0\-preview\.1\-alpine' {
                     # 6.2.0-preview.1-alpine was published with 6.1.0 as the version
-                    $ExpectedVersion = '6.1.0'
+                    $actualVersion | Should -Match '^6\.1\.0(\-fixalpine)?$'
+                }
+                default {
+                    $actualVersion | should -be $ExpectedVersion
                 }
             }
-
-            Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
         }
 
         it "Invoke-WebRequest from <Name> should not fail" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
