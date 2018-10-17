@@ -53,7 +53,7 @@ phases:
     imagename: alpine
     stable: true
     servicing: false
-    preview: false
+    preview: true
 
 - template: .vsts-ci/phase.yml
   parameters:
