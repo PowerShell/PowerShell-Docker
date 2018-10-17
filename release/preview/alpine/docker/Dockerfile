@@ -30,7 +30,7 @@ RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
 # TODO: once the official build produces a full package for Alpine, remove this overlay of the apline files
 # Download the apline powershell .tar.gz package
-ADD https://github.com/TravisEz13/PowerShell/releases/download/v6.1.0-rc.1/powershell-6.1.0-fixalpine-linux-musl-x64.tar.gz /tmp/alpine.tar.gz
+ADD https://github.com/PowerShell/PowerShell/releases/download/v6.1.0/powershell-6.1.0-linux-musl-x64.tar.gz /tmp/alpine.tar.gz
 
 # Extract the Alpine tar.gz
 RUN tar zxf /tmp/alpine.tar.gz -C ${PS_INSTALL_FOLDER}
