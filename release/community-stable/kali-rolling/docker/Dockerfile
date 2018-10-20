@@ -16,14 +16,6 @@ ARG PS_PACKAGE=powershell_${PS_VERSION}-1.debian.9_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
 
-# Define Args and Env needed to create links
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
-    \
-    # Define ENVs for Localization/Globalization
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8
-
 # Download the Debian9 PowerShell package and save it
 ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
 
@@ -39,34 +31,51 @@ ARG DEBIAN_PACKAGE_URL=http://ftp.us.debian.org/debian/pool/main/i/icu/libicu57_
 # Download the libicu57 Debian package and save it
 ADD ${DEBIAN_PACKAGE_URL} /tmp/libicu57_57.1-9_amd64.deb
 
-# Install dependencies
+# Installation
 RUN \
-    # renew kali repository expired certificate in container image
-    apt-get install /tmp/kali-archive-keyring_2018.1_all.deb \ 
+    # install kali package to renew kali repository expired certificate in container image
+    apt-get install /tmp/kali-archive-keyring_2018.1_all.deb \
+    # remove kali package
     && rm -f /tmp/kali-archive-keyring_2018.1_all.deb \
-    && \
     # install required libicu57 package
-    dpkg -i /tmp/libicu57_57.1-9_amd64.deb \
+    && dpkg -i /tmp/libicu57_57.1-9_amd64.deb \
+    # remove libicu57 package
     && rm -f /tmp/libicu57_57.1-9_amd64.deb \
+    # update package list
     && apt-get update \
+    # install dependencies
     && apt-get install -y \
-      # less is required for help in powershell
-        less \
-      # required to setup the locale
-        locales \
       # required for SSL
-        ca-certificates \
-    && apt-get install -y /tmp/powershell.deb \
+      ca-certificates \
+      # less is required for help in powershell
+      less \
+      # required to setup the locale
+      locales \
+    # enable en_US.UTF-8 locale
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
+    # generate locale
     && locale-gen && update-locale \
-    && apt-get dist-upgrade -y \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
+    # install powershell package
+    && apt-get install -y /tmp/powershell.deb \
     # remove powershell package
-    && rm -f /tmp/powershell.deb
+    && rm -f /tmp/powershell.deb \
+    # upgrade distro
+    && apt-get dist-upgrade -y \
+    # clean downloaded packages
+    && apt-get clean \
+    # remove package list
+    && rm -rf /var/lib/apt/lists/*
+
+# Define Args and Env needed to create links
+ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
+    \
+    # Define ENVs for Localization/Globalization
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8
 
 # Define args needed only for the labels
-ARG IMAGE_NAME=openatmicrosoft/powershell:kali-rolling
+ARG IMAGE_NAME=pshorg/powershellcommunity:kali-rolling
 ARG VCS_REF="none"
 
 # Add label last as it's just metadata and uses a lot of parameters
