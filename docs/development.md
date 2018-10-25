@@ -45,6 +45,22 @@ In this folder, there are 4 items:
 
 The Dockerfile should follow certain standards:
 
+* The following comments should be applied at the beginning of the dockerfile to all images:
+
+  * Copyright notice
+  * Software license
+  * A brief Docker image file description should be applied to describe the image after a new line.
+
+   For example:
+
+```dockerfile
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+#
+# Docker image file that describes a brief description of the image to describe
+# this image
+```
+
 * All arguments should be defaulted if needed to successfully build without specifying the argument
 
 * The `FROM` statement should use an argument.
