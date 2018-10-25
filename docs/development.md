@@ -48,18 +48,20 @@ The Dockerfile should follow certain standards:
 * All arguments should be defaulted if needed to successfully build without specifying the argument
 
 * The `FROM` statement should use an argument.
+  
   For example:
 
-```docker
+```dockerfile
 ARG fromTag=16.04
 
 FROM ubuntu:${fromTag}
 ```
 
 * A `PS_VERSION` argument should be defined, and used wherever the version is needed.
+  
   For example:
 
-```docker
+```dockerfile
 ARG PS_VERSION=6.0.4
 ```
 
@@ -67,7 +69,7 @@ ARG PS_VERSION=6.0.4
 
   For example:
 
-```docker
+```dockerfile
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:ubuntu16.04
 ```
 
@@ -75,13 +77,13 @@ ARG IMAGE_NAME=mcr.microsoft.com/powershell:ubuntu16.04
 
   For example:
 
-```docker
+```dockerfile
 ARG VCS_REF="none"
 ```
 
 * The following labels should be applied to all images:
 
-```docker
+```dockerfile
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
       description="This Dockerfile will install the latest release of PowerShell." \
