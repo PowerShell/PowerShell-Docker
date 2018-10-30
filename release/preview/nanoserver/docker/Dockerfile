@@ -9,7 +9,7 @@ ARG NanoServerRepo=microsoft/nanoserver
 # As this is a multi-stage build, this stage will eventually be thrown away
 FROM ${WindowsServerCoreRepo}:$WindowsServerCoreVersion  AS installer-env
 
-# Arguments for installing powershell, must be defined in the container they are used
+# Arguments for installing PowerShell, must be defined in the container they are used
 ARG PS_VERSION=6.1.0-rc.1
 
 ENV PS_DOWNLOAD_URL https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
@@ -44,7 +44,7 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
       org.label-schema.docker.cmd.test="docker run ${IMAGE_NAME} pwsh -c Invoke-Pester" `
       org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
 
-# Copy Powershell Core from the installer containter
+# Copy PowerShell Core from the installer container
 ENV ProgramFiles C:\Program Files
 COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell"]
 
