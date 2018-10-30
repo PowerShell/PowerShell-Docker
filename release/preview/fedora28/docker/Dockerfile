@@ -1,10 +1,40 @@
 # Docker image file that describes Fedora 28 image with PowerShell installed from Microsoft YUM Repo
 ARG fromTag=28
+ARG imageRepo=fedora
 
-FROM fedora:${fromTag}
+FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG VCS_REF="none"
 ARG PS_VERSION=6.1.0~rc.1
+ARG PS_PACKAGE=powershell-preview-${PS_VERSION}-1.rhel.7.x86_64.rpm
+ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
+
+
+# Download the Linux package and save it
+ADD ${PS_PACKAGE_URL} /tmp/powershell.rpm
+
+# Define ENVs for Localization/Globalization
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8
+
+# Install dependencies and clean up
+RUN dnf install -y /tmp/powershell.rpm \
+    && dnf install -y \
+	# less is needed for help
+	less \
+    # Needed to run localdef
+        glibc-locale-source \
+    # Invoke-WebRequest doesn't work correctly without this
+        compat-openssl10 \
+    && dnf upgrade-minimal -y --security \
+    && dnf clean all \
+    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
+    # remove powershell package
+    && rm /tmp/powershell.rpm \
+    && ln -sf /opt/microsoft/powershell/6-preview/pwsh /usr/bin/pwsh
+
+# Define args needed only for the labels
+ARG VCS_REF="none"
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:fedora28
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
@@ -22,29 +52,6 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       org.label-schema.docker.cmd.devel="docker run ${IMAGE_NAME}" \
       org.label-schema.docker.cmd.test="docker run ${IMAGE_NAME} pwsh -c Invoke-Pester" \
       org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
-
-# Install dependencies and clean up
-RUN dnf install -y \
-        glibc-locale-source \
-        compat-openssl10 \
-        less \
-   && dnf upgrade-minimal -y --security \
-   && dnf clean all
-
-# Setup the locale
-ENV LANG en_US.UTF-8
-ENV LC_ALL $LANG
-RUN localedef --charmap=UTF-8 --inputfile=en_US $LANG
-
-# Download and configure Microsoft Repository config file
-RUN set -o pipefail \
-    && curl https://packages.microsoft.com/config/rhel/7/prod.repo | tee /etc/yum.repos.d/microsoft.repo
-
-# Install latest powershell from Microsoft YUM Repo
-RUN dnf install -y \
-        powershell-preview-${PS_VERSION} \
-    && dnf clean all \
-    && ln -sf /opt/microsoft/powershell/6-preview/pwsh /usr/bin/pwsh
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
