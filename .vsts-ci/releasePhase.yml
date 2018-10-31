@@ -2,6 +2,7 @@ parameters:
   pool: 'Hosted Ubuntu 1604'
   channel: 'stable'
   jobName: 'none'
+  releaseTag: ''
   ACR: 'no'
 
 jobs:
@@ -10,6 +11,7 @@ jobs:
     dockerImage: 'powershell'
     Channel: ${{ parameters.channel }}
     ACR: ${{ parameters.ACR }}
+    releaseTag: ${{ parameters.releaseTag }}
 
   pool: ${{ parameters.pool }}
   timeoutInMinutes: 135
@@ -21,6 +23,16 @@ jobs:
       Write-Host "##vso[task.setvariable variable=ACR_NAME;]$env:ACR_NAME_VAR"
     displayName: 'Enable ACR'
     condition: ne(variables['ACR'], 'no')
+
+  - powershell: |
+      $version = '$(releaseTag)' -replace '^v', ''
+      Write-Host "##vso[task.setvariable variable=Version;]$version"
+    displayName: 'Set Version'
+
+  - powershell: |
+      $namespace = '$(releaseTag)'.ToLowerInvariant()
+      Write-Host "##vso[task.setvariable variable=dockerNamespace;]$namespace"
+    displayName: 'Set dockerNamespace'
 
   - powershell: 'Get-ChildItem env:' 
     displayName: 'Capture Environment'
@@ -50,7 +62,7 @@ jobs:
 
       if($env:$(Channel) -eq 'true')
       {
-        ./build.ps1 -Build -ImageName $(dockerHost)/$(dockerNamespace)/$(dockerImage) -All -Channel $(channel) @extraParams
+        ./build.ps1 -Build -ImageName $(dockerHost)/$(dockerNamespace)/$(dockerImage) -All -Channel $(channel) @extraParams -version '$(Version)'
       }
       else
       {
