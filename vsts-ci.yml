@@ -81,7 +81,7 @@ phases:
 
 - template: .vsts-ci/phase.yml
   parameters:
-    name: kali-rolling
+    name: kaliRolling
     imagename: kali-rolling
     stable: false
     servicing: false
