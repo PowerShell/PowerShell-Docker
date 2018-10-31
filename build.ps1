@@ -64,7 +64,7 @@ param(
     [switch]
     $CI,
 
-    [ValidateSet('stable','preview','servicing')]
+    [ValidateSet('stable','preview','servicing','community-stable','community-preview','community-servicing')]
     [Parameter(Mandatory)]
     [string]
     $Channel='stable',
@@ -144,17 +144,17 @@ Begin {
         $versionExtraParams.Add('Version', $Version)
     }
 
-    switch($Channel)
+    switch -RegEx ($Channel)
     {
-        'servicing' {
+        'servicing$' {
             $windowsVersion = Get-PowerShellVersion -Servicing @versionExtraParams
             $linuxVersion = Get-PowerShellVersion -Linux -Servicing @versionExtraParams
         }
-        'preview' {
+        'preview$' {
             $windowsVersion = Get-PowerShellVersion -Preview @versionExtraParams
             $linuxVersion = Get-PowerShellVersion -Linux -Preview @versionExtraParams
         }
-        'stable' {
+        'stable$' {
             $windowsVersion = Get-PowerShellVersion @versionExtraParams
             $linuxVersion = Get-PowerShellVersion -Linux @versionExtraParams
         }
@@ -321,11 +321,19 @@ End {
                         $skipVerification = $true
                     }
 
+                    # for the image name label, always use the official image name
+                    $imageNameParam = 'mcr.microsoft.com/powershell:' + ($firstActualTag -split ':')[1]
+                    if($Channel -like 'community-*')
+                    {
+                        # use the image name for pshorg for community images
+                        $imageNameParam = 'pshorg/powershellcommunity:' + ($firstActualTag -split ':')[1]
+                    }
+
                     $buildArgs =  @{
                         fromTag = $fromTag
                         PS_VERSION = $psversion
                         VCS_REF = $vcf_ref
-                        IMAGE_NAME = 'mcr.microsoft.com/powershell:' + ($firstActualTag -split ':')[1]
+                        IMAGE_NAME = $imageNameParam
                     }
 
                     if($SasUrl)
