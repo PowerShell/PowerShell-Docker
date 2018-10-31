@@ -155,6 +155,7 @@ function Get-WindowsContainer
                 BuildArgs = $testArgs.BuildArgs
                 ExpectedVersion = $testArgs.ExpectedVersion
                 SkipWebCmdletTests = $testArgs.SkipWebCmdletTests
+                ImageName = $testArgs.BuildArgs.IMAGE_NAME
             }
         }
     }
