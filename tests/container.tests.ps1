@@ -247,7 +247,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             $labelTestCases += @{
                 Name = $_.Name
                 Label = 'org.label-schema.docker.cmd.devel'
-                ExpectedValue = "docker run $('mcr.microsoft.com/powershell:' + ($_.Name -split ':')[1])"
+                ExpectedValue = "docker run $($_.ImageName)"
                 Expectation = 'BeExactly'
             }
         }
@@ -362,7 +362,7 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
             $labelTestCases += @{
                 Name = $_.Name
                 Label = 'org.label-schema.docker.cmd.devel'
-                ExpectedValue = "docker run $('mcr.microsoft.com/powershell:' + ($_.Name -split ':')[1])"
+                ExpectedValue = "docker run $($_.ImageName)"
                 Expectation = 'BeExactly'
             }
         }
