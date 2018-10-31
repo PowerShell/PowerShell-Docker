@@ -13,9 +13,18 @@ $script:skipWindowsRun = (Test-SkipWindows -Purpose 'Verification') -or !$script
 
 Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
     BeforeAll {
+        $buildTestCases = @()
+        $script:linuxContainerBuildTests | ForEach-Object {
+            $buildTestCases += @{
+                Name = $_.Name
+                Tags = $_.Tags
+                Path = $_.Path
+                BuildArgs = $_.BuildArgs
+            }
+        }
     }
 
-    it "<Name> builds from '<path>'" -TestCases $script:linuxContainerBuildTests -Skip:$script:skipLinux {
+    it "<Name> builds from '<path>'" -TestCases $buildTestCases -Skip:$script:skipLinux {
         param(
             [Parameter(Mandatory=$true)]
             [string]
@@ -31,11 +40,7 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
 
             [Parameter(Mandatory=$true)]
             [object]
-            $BuildArgs,
-
-            [Parameter(Mandatory=$true)]
-            [string]
-            $ExpectedVersion
+            $BuildArgs
         )
 
         Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType linux
@@ -43,7 +48,19 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
 }
 
 Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
-    it "<Name> builds from '<path>'" -TestCases $script:windowsContainerBuildTests  -skip:$script:skipWindows {
+    BeforeAll {
+        $buildTestCases = @()
+        $script:windowsContainerBuildTests | ForEach-Object {
+            $buildTestCases += @{
+                Name = $_.Name
+                Tags = $_.Tags
+                Path = $_.Path
+                BuildArgs = $_.BuildArgs
+            }
+        }
+    }
+
+    it "<Name> builds from '<path>'" -TestCases $buildTestCases -skip:$script:skipWindows {
         param(
             [Parameter(Mandatory=$true)]
             [string]
@@ -59,11 +76,7 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
 
             [Parameter(Mandatory=$true)]
             [object]
-            $BuildArgs,
-
-            [Parameter(Mandatory=$true)]
-            [string]
-            $ExpectedVersion
+            $BuildArgs
         )
 
         Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType windows
@@ -71,7 +84,17 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
 }
 
 Describe "Pull Linux Containers" -Tags 'Linux', 'Pull' {
-    It "<Name> pulls without error" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
+    BeforeAll {
+        $pullTestCases = @()
+        $script:linuxContainerRunTests | ForEach-Object {
+            $pullTestCases += @{
+                Name = $_.Name
+                Tags = $_.Tags
+            }
+        }
+    }
+
+    It "<Name> pulls without error" -TestCases $pullTestCases -Skip:$script:skipLinuxRun {
         param(
             [Parameter(Mandatory=$true)]
             [string]
@@ -79,19 +102,7 @@ Describe "Pull Linux Containers" -Tags 'Linux', 'Pull' {
 
             [Parameter(Mandatory=$true)]
             [string[]]
-            $Tags,
-
-            [Parameter(Mandatory=$true)]
-            [string]
-            $path,
-
-            [Parameter(Mandatory=$true)]
-            [object]
-            $BuildArgs,
-
-            [Parameter(Mandatory=$true)]
-            [string]
-            $ExpectedVersion
+            $Tags
         )
 
         foreach($tag in $tags) {
@@ -134,9 +145,23 @@ Describe "Pull Windows Containers" -Tags 'Windows', 'Pull' {
     }
 }
 
-Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
+Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
     BeforeAll{
         $testContext = Get-TestContext -type Linux
+        $runTestCases = @()
+        $script:linuxContainerRunTests | ForEach-Object {
+            $runTestCases += @{
+                Name = $_.Name
+                ExpectedVersion = $_.ExpectedVersion
+            }
+        }
+
+        $webTestCases = @()
+        $script:linuxContainerRunTests | Where-Object {$_.SkipWebCmdletTests -ne $true} | ForEach-Object {
+            $webTestCases += @{
+                Name = $_.Name
+            }
+        }
     }
     AfterAll{
         # prune unused volumes
@@ -148,23 +173,11 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
     }
 
     Context "Run Powershell" {
-        it "Get PSVersion table from <Name> should be <ExpectedVersion>" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
+        it "Get PSVersion table from <Name> should be <ExpectedVersion>" -TestCases $runTestCases -Skip:$script:skipLinuxRun {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
                 $name,
-
-                [Parameter(Mandatory=$true)]
-                [string[]]
-                $Tags,
-
-                [Parameter(Mandatory=$true)]
-                [string]
-                $path,
-
-                [Parameter(Mandatory=$true)]
-                [object]
-                $BuildArgs,
 
                 [Parameter(Mandatory=$true)]
                 [string]
@@ -185,27 +198,11 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
             }
         }
 
-        it "Invoke-WebRequest from <Name> should not fail" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
+        it "Invoke-WebRequest from <Name> should not fail" -TestCases $webTestCases -Skip:($script:skipLinuxRun -or $webTestCases.count -eq 0) {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
-                $name,
-
-                [Parameter(Mandatory=$true)]
-                [string[]]
-                $Tags,
-
-                [Parameter(Mandatory=$true)]
-                [string]
-                $path,
-
-                [Parameter(Mandatory=$true)]
-                [object]
-                $BuildArgs,
-
-                [Parameter(Mandatory=$true)]
-                [string]
-                $ExpectedVersion
+                $name
             )
 
             $metadataString = Get-MetadataUsingContainer -Name $Name
@@ -214,23 +211,11 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
             $metadataJson | Select-Object -ExpandProperty StableReleaseTag | Should -Match '^v\d+\.\d+\.\d+.*$'
         }
 
-        it "Get-UICulture from <Name> should return en-US" -TestCases $script:linuxContainerRunTests -Skip:$script:skipLinuxRun {
+        it "Get-UICulture from <Name> should return en-US" -TestCases $runTestCases -Skip:$script:skipLinuxRun {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
                 $name,
-
-                [Parameter(Mandatory=$true)]
-                [string[]]
-                $Tags,
-
-                [Parameter(Mandatory=$true)]
-                [string]
-                $path,
-
-                [Parameter(Mandatory=$true)]
-                [object]
-                $BuildArgs,
 
                 [Parameter(Mandatory=$true)]
                 [string]
@@ -306,68 +291,118 @@ Describe "Linux Containers run PowerShell" -Tags 'Behavior', 'Linux' {
     }
 }
 
-Describe "Windows Containers run PowerShell" -Tags 'Behavior', 'Windows' {
+Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
     BeforeAll{
         $testContext = Get-TestContext -type Windows
+        $runTestCases = @()
+        $script:windowsContainerRunTests | ForEach-Object {
+            $runTestCases += @{
+                Name = $_.Name
+                ExpectedVersion = $_.ExpectedVersion
+            }
+        }
+
+        $webTestCases = @()
+        $script:windowsContainerRunTests | Where-Object {$_.SkipWebCmdletTests -ne $true} | ForEach-Object {
+            $webTestCases += @{
+                Name = $_.Name
+            }
+        }
     }
     BeforeEach {
         Remove-Item $testContext.resolvedXmlPath -ErrorAction SilentlyContinue
         Remove-Item $testContext.resolvedLogPath -ErrorAction SilentlyContinue
     }
 
-    it "Get PSVersion table from <Name> should be <ExpectedVersion>" -TestCases $script:windowsContainerRunTests -skip:$script:skipWindowsRun {
-        param(
-            [Parameter(Mandatory=$true)]
-            [string]
-            $name,
+    Context "Run Powershell" {
+        it "Get PSVersion table from <Name> should be <ExpectedVersion>" -TestCases $runTestCases -skip:$script:skipWindowsRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
 
-            [Parameter(Mandatory=$true)]
-            [string[]]
-            $Tags,
+                [Parameter(Mandatory=$true)]
+                [string]
+                $ExpectedVersion
+            )
 
-            [Parameter(Mandatory=$true)]
-            [string]
-            $path,
+            Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
+        }
 
-            [Parameter(Mandatory=$true)]
-            [object]
-            $BuildArgs,
+        it "Invoke-WebRequest from <Name> should not fail" -TestCases $webTestCases -skip:$script:skipWindowsRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name
+            )
 
-            [Parameter(Mandatory=$true)]
-            [string]
-            $ExpectedVersion
-        )
-
-        Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
+            $metadataString = Get-MetadataUsingContainer -Name $Name
+            $metadataString | Should -Not -BeNullOrEmpty
+            $metadataJson = $metadataString | ConvertFrom-Json -ErrorAction Stop
+            $metadataJson | Select-Object -ExpandProperty StableReleaseTag | Should -Match '^v\d+\.\d+\.\d+.*$'
+        }
     }
 
-    it "Invoke-WebRequest from <Name> should not fail" -TestCases $script:windowsContainerRunTests -skip:$script:skipWindowsRun {
-        param(
-            [Parameter(Mandatory=$true)]
-            [string]
-            $name,
+    Context "Labels" {
+        $labelTestCases = @()
+        $script:windowsContainerRunTests | ForEach-Object {
+            $labelTestCases += @{
+                Name = $_.Name
+                Label = 'org.label-schema.version'
+                # The expected value is the version, but replace - or ~ with the regex for - or ~
+                ExpectedValue = $_.ExpectedVersion  -replace '[\-~]', '[\-~]'
+                Expectation = 'Match'
+            }
+            $labelTestCases += @{
+                Name = $_.Name
+                Label = 'org.label-schema.vcs-ref'
+                ExpectedValue = '[0-9a-f]{7}'
+                Expectation = 'match'
+            }
+            $labelTestCases += @{
+                Name = $_.Name
+                Label = 'org.label-schema.docker.cmd.devel'
+                ExpectedValue = "docker run $('mcr.microsoft.com/powershell:' + ($_.Name -split ':')[1])"
+                Expectation = 'BeExactly'
+            }
+        }
 
-            [Parameter(Mandatory=$true)]
-            [string[]]
-            $Tags,
+        it "Image <Name> should have label: <Label>, with value: <ExpectedValue>" -TestCases $labelTestCases -Skip:$script:skipWindowsRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
 
-            [Parameter(Mandatory=$true)]
-            [string]
-            $path,
+                [Parameter(Mandatory=$true)]
+                [string[]]
+                $Label,
 
-            [Parameter(Mandatory=$true)]
-            [object]
-            $BuildArgs,
+                [Parameter(Mandatory=$true)]
+                [string]
+                $ExpectedValue,
 
-            [Parameter(Mandatory=$true)]
-            [string]
-            $ExpectedVersion
-        )
+                [Parameter(Mandatory=$true)]
+                [ValidateSet('Match','BeExactly')]
+                [string]
+                $Expectation
+            )
 
-        $metadataString = Get-MetadataUsingContainer -Name $Name
-        $metadataString | Should -Not -BeNullOrEmpty
-        $metadataJson = $metadataString | ConvertFrom-Json -ErrorAction Stop
-        $metadataJson | Select-Object -ExpandProperty StableReleaseTag | Should -Match '^v\d+\.\d+\.\d+.*$'
+            $labelValue = Get-DockerImageLabel -Name $Name -Label $Label
+            $labelValue | Should -Not -BeNullOrEmpty
+
+            switch($Expectation)
+            {
+                'Match' {
+                    $labelValue | Should -Match "'$ExpectedValue'"
+                }
+                'BeExactly' {
+                    $labelValue | Should -BeExactly "'$ExpectedValue'"
+                }
+                default {
+                    throw "Unexpected expactation '$Expectation'"
+                }
+            }
+        }
     }
 }
 

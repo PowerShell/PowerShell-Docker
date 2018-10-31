@@ -345,6 +345,7 @@ End {
                         OS = $os
                         ExpectedVersion = $actualVersion
                         SkipVerification = $skipVerification
+                        SkipWebCmdletTests = $meta.SkipWebCmdletTests
                     }
 
                     $testArgList += $testArgs

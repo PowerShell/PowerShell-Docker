@@ -107,6 +107,9 @@ class DockerImageMetaData {
 
     [string]
     $PackageFormat = "undefined"
+
+    [bool]
+    $SkipWebCmdletTests = $false
 }
 
 Function Get-DockerImageMetaData

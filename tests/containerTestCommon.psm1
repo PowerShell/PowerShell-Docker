@@ -124,6 +124,7 @@ function Get-LinuxContainer
                 Path = $testArgs.ContextPath
                 BuildArgs = $testArgs.BuildArgs
                 ExpectedVersion = $testArgs.ExpectedVersion
+                SkipWebCmdletTests = $testArgs.SkipWebCmdletTests
             }
         }
     }
@@ -152,6 +153,7 @@ function Get-WindowsContainer
                 Path = $testArgs.ContextPath
                 BuildArgs = $testArgs.BuildArgs
                 ExpectedVersion = $testArgs.ExpectedVersion
+                SkipWebCmdletTests = $testArgs.SkipWebCmdletTests
             }
         }
     }
