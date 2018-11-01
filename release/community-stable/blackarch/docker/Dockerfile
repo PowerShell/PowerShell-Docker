@@ -32,7 +32,12 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8
+    LANG=en_US.UTF-8 \
+    # Opt out of SocketsHttpHandler in DotNet Core 2.1 to use HttpClientHandler
+    # with installed libcurl4 package to resolve 
+    # Invoke-WebRequest : Authentication failed" issue when executing using
+    # docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [Invoke-WebRequest] [-Uri <HTTPS URL>]
+    DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0
 
 # Installation
 RUN \
