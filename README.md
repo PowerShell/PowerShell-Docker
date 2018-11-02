@@ -116,7 +116,7 @@ and [Build and run an application with or without .NET Core 2.0 or PowerShell Co
 Due to [known issues with the nano-server-insider](https://github.com/Microsoft/Virtualization-Documentation/blob/live/virtualization/windowscontainers/quick-start/Insider-Known-Issues.md#build-16237),
 you must specify `-Scope CurrentUser` when using `Install-Module`.  Example:
 
-```PowerShell
+```powershell
 Install-Module <ModuleName> -Scope CurrentUser
 ```
 
@@ -127,13 +127,13 @@ Install-Module <ModuleName> -Scope CurrentUser
 Due to [an issue with the container not picking up the path](https://github.com/Microsoft/Virtualization-Documentation/blob/live/virtualization/windowscontainers/quick-start/Insider-Known-Issues.md#build-16237), you must specify the path
 when running a command on the command line.  For example, you would expect to be able to run:
 
-```PowerShell
+```powershell
 PS > docker run -it microsoft/nanoserver-insider-powershell powershell -c '$psversiontable'
 ```
 
 but, in `nanoserver-insider-powershell` you must run:
 
-```PowerShell
+```powershell
 PS > docker run -it microsoft/nanoserver-insider-powershell 'C:\program files\powershell\powershell' -c '$psversiontable'
 ```
 

@@ -5,7 +5,12 @@
 param (
     [ValidateNotNullOrEmpty()]
     [string]
-    $Registry = 'microsoft'
+    $Registry = 'microsoft',
+
+    [ValidateSet('stable','preview','servicing')]
+    [Parameter(Mandatory)]
+    [string]
+    $Channel='stable'
 )
 
 $createScriptPath = Join-Path -Path $PSScriptRoot -ChildPath 'createManifest.ps1'
@@ -23,6 +28,14 @@ $latestPreviewWsc1709  = "preview-windowsservercore-1709"
 $latestPreviewWscLtsc  = "preview-windowsservercore-latest"
 $latestPreviewWsc1803  = "preview-windowsservercore-1803"
 
-&$createScriptPath -ContainerRegistry $Registry -taglist $latestPreviewUbuntu, $latestPreviewWsc1709, $latestPreviewWscLtsc, $latestPreviewWsc1803  -ManifestTag 'preview'
-&$createScriptPath -ContainerRegistry $Registry -taglist $latestStableUbuntu, $latestStableWsc1709, $latestStableWscLtsc, $latestStableWsc1803  -ManifestTag 'latest'
-&$createScriptPath -ContainerRegistry $Registry -taglist $latestStableNano1709, $latestStableNano1803  -ManifestTag 'nanoserver'
+switch ($Channel)
+{
+    'preview' {
+        &$createScriptPath -ContainerRegistry $Registry -taglist $latestPreviewUbuntu, $latestPreviewWsc1709, $latestPreviewWscLtsc, $latestPreviewWsc1803  -ManifestTag 'preview'
+    }
+
+    'stable' {
+        &$createScriptPath -ContainerRegistry $Registry -taglist $latestStableUbuntu, $latestStableWsc1709, $latestStableWscLtsc, $latestStableWsc1803  -ManifestTag 'latest'
+        &$createScriptPath -ContainerRegistry $Registry -taglist $latestStableNano1709, $latestStableNano1803  -ManifestTag 'nanoserver'
+    }
+}

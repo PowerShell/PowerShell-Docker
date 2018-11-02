@@ -7,6 +7,7 @@ jobs:
   parameters:
     channel: STABLE
     jobName: stableLinux
+    releaseTag: $(stableReleaseTag)
     pool: Hosted Ubuntu 1604
     ACR: no
 
@@ -14,6 +15,7 @@ jobs:
   parameters:
     channel: PREVIEW
     jobName: previewLinux
+    releaseTag: $(previewReleaseTag)
     pool: Hosted Ubuntu 1604
     ACR: no
 
@@ -21,6 +23,7 @@ jobs:
   parameters:
     channel: STABLE
     jobName: stableWindows
+    releaseTag: $(stableReleaseTag)
     pool: Hosted VS2017
     ACR: yes
 
@@ -28,16 +31,19 @@ jobs:
   parameters:
     channel: PREVIEW
     jobName: previewWindows
+    releaseTag: $(previewReleaseTag)
     pool: Hosted VS2017
     ACR: yes
 
-- job: ManifestPhase
-  displayName: Create Manifest Lists
+- job: PreviewManifestPhase
+  variables: 
+    releaseTag: $(previewReleaseTag)
+    channel: PREVIEW
+
+  displayName: Create Preview Manifest Lists
 
   dependsOn: 
-   - stableLinux
    - previewLinux
-   - stableWindows
    - previewWindows
   condition: succeeded()
   pool:
@@ -45,23 +51,22 @@ jobs:
     timeoutInMinutes: 30
 
   steps:
-  - powershell: |  
-       $dockerConfigFolder = "$env:userprofile/.docker"
-       if(!(Test-Path $dockerConfigFolder)){ $null = new-item -Type Directory -Path $dockerConfigFolder}
-       $dockerCliConfig = "$env:userprofile/.docker/config.json"
-       $dockerCliBackup = "$env:userprofile/.docker/config-backup.json"
-       if(Test-Path $dockerCliConfig) { copy-item $dockerCliConfig $dockerCliBackup -force}
-       @{experimental='enabled'}|ConvertTo-Json | Out-File -Encoding ascii -FilePath $dockerCliConfig
-        
-    displayName: 'enable docker cli experimental features'
+  - template: manifestSteps.yml
 
-  - powershell: 'docker login $(dockerHost) -u $(dockerUserName) -p $(dockerKey)' 
-    displayName: 'docker login'
+- job: StableManifestPhase
+  variables: 
+    releaseTag: $(stableReleaseTag)
+    channel: STABLE
 
-  - powershell: |
-      ./createAllManifests.ps1 -Registry '$(dockerHost)/$(dockerNamespace)'
-    displayName: 'Create Manifest Lists'
+  displayName: Create Stable Manifest Lists
 
-  - powershell: 'docker logout $(dockerHost)' 
-    displayName: 'docker logout'
-    condition: always()
+  dependsOn: 
+   - stableWindows
+   - stableLinux
+  condition: succeeded()
+  pool:
+    name: PowerShell
+    timeoutInMinutes: 30
+
+  steps:
+  - template: manifestSteps.yml

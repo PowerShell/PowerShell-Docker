@@ -6,7 +6,7 @@ The tests must be run separately on the Windows and Linux docker daemons. You ca
 
 ## To building and basic behavior of the containers
 
-```PowerShell
+```powershell
 Invoke-Pester
 ```
 
@@ -14,12 +14,12 @@ Note: be sure to do this using both the Windows and Linux docker daemon, as the 
 
 ## To test the productions containers
 
-```PowerShell
+```powershell
 Invoke-Pester -Tag Behavior
 ```
 
 ## To test only building the containers
 
-```PowerShell
+```powershell
 Invoke-Pester -Tag Build
 ```
