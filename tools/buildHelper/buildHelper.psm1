@@ -62,7 +62,7 @@ function Get-ImageList
 {
     param(
         [Parameter(HelpMessage="Filters returned list to stable or preview images.  Default to all images.")]
-        [ValidateSet('stable','preview','servicing','all')]
+        [ValidateSet('stable','preview','servicing','all','community-stable','community-preview','community-servicing')]
         [string]
         $Channel='all'
     )
@@ -72,6 +72,9 @@ function Get-ImageList
     $stablePath = Join-Path -Path $releasePath -ChildPath 'stable'
     $previewPath = Join-Path -Path $releasePath -ChildPath 'preview'
     $servicingPath = Join-Path -Path $releasePath -ChildPath 'servicing'
+    $communityStablePath = Join-Path -Path $releasePath -ChildPath 'community-stable'
+    $communityPreviewPath = Join-Path -Path $releasePath -ChildPath 'community-preview'
+    $communityServicingPath = Join-Path -Path $releasePath -ChildPath 'community-ervicing'
 
     if ($Channel -in 'stable', 'all')
     {
@@ -86,6 +89,21 @@ function Get-ImageList
     if ($Channel -in 'preview', 'all')
     {
         Get-ChildItem -Path $previewPath -Directory | Select-Object -ExpandProperty Name | Where-Object { $dockerFileNames -notcontains $_ } | Write-Output
+    }
+
+    if ($Channel -in 'community-stable', 'all')
+    {
+        Get-ChildItem -Path $communityStablePath -Directory | Select-Object -ExpandProperty Name | Write-Output
+    }
+
+    if ($Channel -in 'community-servicing', 'all')
+    {
+        Get-ChildItem -Path $communityServicingPath -Directory | Select-Object -ExpandProperty Name | Write-Output
+    }
+
+    if ($Channel -in 'community-preview', 'all')
+    {
+        Get-ChildItem -Path $communityPreviewPath -Directory | Select-Object -ExpandProperty Name | Where-Object { $dockerFileNames -notcontains $_ } | Write-Output
     }
 }
 
@@ -107,6 +125,9 @@ class DockerImageMetaData {
 
     [string]
     $PackageFormat = "undefined"
+
+    [bool]
+    $SkipWebCmdletTests = $false
 }
 
 Function Get-DockerImageMetaData
