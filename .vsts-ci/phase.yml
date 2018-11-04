@@ -5,6 +5,9 @@ parameters:
   stable: 'true'
   servicing: 'true'
   preview: 'true'
+  communityStable: 'false'
+  communityPreview: 'false'
+  communityServicing: 'false'
 
 phases:
 - phase: ${{ parameters.name }}
@@ -29,6 +32,21 @@ phases:
 
   - ${{ if eq(parameters.servicing, 'true') }}:
     - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'servicing' -TestLogPostfix '$(ImageName)-servicing'
+      displayName: $(ImageName) Servicing
+      condition: succeededOrFailed()
+
+  - ${{ if eq(parameters.communityStable, 'true') }}:
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'community-stable' -TestLogPostfix '$(ImageName)-servicing'
+      displayName: $(ImageName) Servicing
+      condition: succeededOrFailed()
+
+  - ${{ if eq(parameters.communityPreview, 'true') }}:
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'community-preview' -TestLogPostfix '$(ImageName)-servicing'
+      displayName: $(ImageName) Servicing
+      condition: succeededOrFailed()
+
+  - ${{ if eq(parameters.communityServicing, 'true') }}:
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'community-servicing' -TestLogPostfix '$(ImageName)-servicing'
       displayName: $(ImageName) Servicing
       condition: succeededOrFailed()
 

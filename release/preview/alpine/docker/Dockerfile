@@ -28,8 +28,8 @@ RUN mkdir -p ${PS_INSTALL_FOLDER}
 # Unzip the Linux tar.gz
 RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
-# TODO: once the official build produces a full package for Alpine, remove this overlay of the apline files
-# Download the apline powershell .tar.gz package
+# TODO: once the official build produces a full package for Alpine, remove this overlay of the Alpine files
+# Download the Alpine powershell .tar.gz package
 ADD https://github.com/PowerShell/PowerShell/releases/download/v6.1.0/powershell-6.1.0-linux-musl-x64.tar.gz /tmp/alpine.tar.gz
 
 # Extract the Alpine tar.gz
@@ -38,7 +38,7 @@ RUN tar zxf /tmp/alpine.tar.gz -C ${PS_INSTALL_FOLDER}
 # Start a new stage so we lose all the tar.gz layers from the final image
 FROM alpine:${fromTag}
 
-# Copy only the files we need from the previous stag
+# Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links
@@ -81,7 +81,7 @@ RUN apk add --no-cache \
 ARG PS_VERSION=6.1.0-rc.1
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:preview-alpine-3.8
 ARG VCS_REF="none"
-# Add label last as it's just metadata and usere a lot a parameters
+# Add label last as it's just metadata and uses a lot of parameters
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
     readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
     description="This Dockerfile will install the latest release of PowerShell." \

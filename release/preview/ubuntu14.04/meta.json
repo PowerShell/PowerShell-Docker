@@ -1,4 +1,5 @@
 {
     "IsLinux" : true,
+    "UseLinuxVersion": false,
     "PackageFormat": "powershell-preview_${PS_VERSION}-1.ubuntu.14.04_amd64.deb"
 }

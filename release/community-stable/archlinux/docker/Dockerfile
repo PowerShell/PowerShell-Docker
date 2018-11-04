@@ -1,72 +1,23 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 #
-# Docker image file that describes an Kali Rolling image with PowerShell
-# installed from Debian9 PowerShell package
+# Docker image file that describes an Arch Linux image with PowerShell
+# installed from full PowerShell linux tar.gz package
 
 # Define arg(s) needed for the From statement
-ARG fromTag=kali-rolling
-ARG imageRepo=kalilinux/kali-linux-docker
+ARG fromTag=2018.10.01
+ARG imageRepo=base/archlinux
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=6.1.0
-ARG PS_PACKAGE=powershell_${PS_VERSION}-1.debian.9_amd64.deb
+ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
 
-# Download the Debian9 PowerShell package and save it
-ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
-
-# Define Args for the needed to add the package
-ARG KALI_REPO_KEY_PACKAGE_URL=https://http.kali.org/kali/pool/main/k/kali-archive-keyring/kali-archive-keyring_2018.1_all.deb
-
-# Download the Kali repository package and save it
-ADD ${KALI_REPO_KEY_PACKAGE_URL} /tmp/kali-archive-keyring_2018.1_all.deb
-
-# Define Args for the needed to add the package
-ARG DEBIAN_PACKAGE_URL=http://ftp.us.debian.org/debian/pool/main/i/icu/libicu57_57.1-9_amd64.deb
-
-# Download the libicu57 Debian package and save it
-ADD ${DEBIAN_PACKAGE_URL} /tmp/libicu57_57.1-9_amd64.deb
-
-# Installation
-RUN \
-    # install kali package to renew kali repository expired certificate in container image
-    apt-get install /tmp/kali-archive-keyring_2018.1_all.deb \
-    # remove kali package
-    && rm -f /tmp/kali-archive-keyring_2018.1_all.deb \
-    # install required libicu57 package
-    && dpkg -i /tmp/libicu57_57.1-9_amd64.deb \
-    # remove libicu57 package
-    && rm -f /tmp/libicu57_57.1-9_amd64.deb \
-    # update package list
-    && apt-get update \
-    # install dependencies
-    && apt-get install -y \
-      # required for HttpClientHandler
-      libcurl4 \
-      # required for SSL
-      ca-certificates \
-      # required for help in powershell
-      less \
-      # required to setup the locale
-      locales \
-    # enable en_US.UTF-8 locale
-    && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
-    # generate locale
-    && locale-gen && update-locale \
-    # install powershell package
-    && apt-get install -y /tmp/powershell.deb \
-    # remove powershell package
-    && rm -f /tmp/powershell.deb \
-    # upgrade distro
-    && apt-get dist-upgrade -y \
-    # clean downloaded packages
-    && apt-get clean \
-    # remove package list
-    && rm -rf /var/lib/apt/lists/*
+# Download the Linux tar.gz and save it
+ADD ${PS_PACKAGE_URL} /tmp/powershell-linux.tar.gz
 
 # Define Args and Env needed to create links
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
@@ -81,8 +32,35 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [Invoke-WebRequest] [-Uri <HTTPS URL>]
     DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0
 
+# Installation
+RUN \
+    # enable en_US.UTF-8 locale
+    echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
+    # generate locale
+    && locale-gen \
+    # update package database
+    && pacman -Syy \
+    # install dependencies
+    && pacman -S --noconfirm \
+      # required for International Components for Unicode
+      core/icu \
+      # required for SSL
+      openssl-1.0 \
+    # create powershell folder
+    && mkdir -p ${PS_INSTALL_FOLDER} \
+    # uncompress powershell linux tar file
+    && tar zxf /tmp/powershell-linux.tar.gz -C ${PS_INSTALL_FOLDER} \
+    # remove powershell linux tar file
+    && rm -f /tmp/powershell-linux.tar.gz \
+    # Create the pwsh symbolic link that points to powershell
+    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    # upgrade distro
+    && pacman -Syyu --noconfirm \
+    # clean downloaded packages
+    && yes | pacman -Scc
+
 # Define args needed only for the labels
-ARG IMAGE_NAME=pshorg/powershellcommunity:kali-rolling
+ARG IMAGE_NAME=pshorg/powershellcommunity:archlinux
 ARG VCS_REF="none"
 
 # Add label last as it's just metadata and uses a lot of parameters
