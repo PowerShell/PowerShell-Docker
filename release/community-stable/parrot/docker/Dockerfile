@@ -10,7 +10,8 @@ ARG imageRepo=parrotsec/parrot-core
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-SHELL ["/bin/sh", "-c"]
+# Clear the entrypoint in parrotsec/parrot-core image
+ENTRYPOINT [ ]
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=6.1.0
