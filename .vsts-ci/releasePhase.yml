@@ -41,8 +41,13 @@ jobs:
     displayName: 'docker login'
 
   - powershell: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
-    displayName: 'az acr login'
-    condition: and(succeeded(),ne(variables['ACR'], 'no'))
+    displayName: 'az login'
+
+  - powershell: |
+      $querystring = az storage account generate-sas --account-name $(storageAccountName) --services b --resource-types o --expiry ((get-date).AddDays(1).ToString("yyyy-MM-dd")) --permission r --https-only | convertfrom-json
+      $url = "https://$(storageAccountName).blob.core.windows.net/?$querystring"
+      Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
+    displayName: 'Set SasUrl variable'
 
   - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
     displayName: 'Install Pester'
@@ -82,4 +87,3 @@ jobs:
 
   - powershell: 'az logout'
     displayName: 'az logout'
-    condition: ne(variables['ACR'], 'no')
