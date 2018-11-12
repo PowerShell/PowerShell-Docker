@@ -64,7 +64,7 @@ function Invoke-Docker
     elseif($dockerExitCode -ne 0 -and $FailureAction -eq 'error')
     {
         $resultString = $result | out-string -Width 9999
-        if($result.length -gt 80) 
+        if($result.length -gt 80)
         {
             $filename = [System.io.path]::GetTempFileName()
             $resultString | Out-File -FilePath $filename
@@ -75,12 +75,12 @@ function Invoke-Docker
                     Write-Host "##vso[artifact.upload containerfolder=errorLogs;artifactname=errorLogs]$filename"
                 }
             }
-        
+
             Write-Error "docker $command failed, see $filename ($($result.length))" -ErrorAction Stop
         }
-        else 
+        else
         {
-            Write-Error "docker $command failed with: $resultString  ($($result.length))" -ErrorAction Stop    
+            Write-Error "docker $command failed with: $resultString  ($($result.length))" -ErrorAction Stop
         }
 
         return $false
@@ -374,12 +374,18 @@ function Invoke-DockerBuild
         if($env:ACR_NAME)
         {
             # & must be escaped in ACR
-            $value = $value -replace '&', '\&'
+            $value = $value -replace '&', '%26'
         }
 
         $buildArgList += @(
             "--build-arg"
-            "$argName=$value"
+            if($env:ACR_NAME)
+            {
+                "'$argName=$value'"
+            }
+            else {
+                "$argName=$value"
+            }
         )
     }
 
