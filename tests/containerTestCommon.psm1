@@ -381,6 +381,11 @@ function Invoke-DockerBuild
             "--build-arg"
             if($env:ACR_NAME)
             {
+                # Adding quotes to make sure this makes it through the multiple levels of parsing in ACR3
+                # This might have to be removed in the future, if ACR is smarter about this.
+                # Docker will not function correctly if it recieves the quotes.
+                # 1st: the ACR cmdline
+                # 2nd: ACR sends it to docker in BASH
                 "'$argName=$value'"
             }
             else {
