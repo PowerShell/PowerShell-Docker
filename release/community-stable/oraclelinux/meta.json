@@ -1,0 +1,4 @@
+{
+    "IsLinux" : true,
+    "PackageFormat": "powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm"
+}
