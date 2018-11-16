@@ -329,9 +329,19 @@ End {
                         $imageNameParam = 'pshorg/powershellcommunity:' + ($firstActualTag -split ':')[1]
                     }
 
+                    $packageVersion = $psversion
+
+                    # if the package name ends with rpm
+                    # then replace the - in the filename with _ as fpm creates the packages this way.
+                    if($meta.PackageFormat -match 'rpm$')
+                    {
+                        $packageVersion = $packageVersion -replace '-', '_'
+                    }
+
                     $buildArgs =  @{
                         fromTag = $fromTag
-                        PS_VERSION = $psversion
+                        PS_VERSION = $psVersion
+                        PACKAGE_VERSION = $packageVersion
                         VCS_REF = $vcf_ref
                         IMAGE_NAME = $imageNameParam
                     }
@@ -339,14 +349,6 @@ End {
                     if($SasUrl)
                     {
                         $packageUrl = [System.UriBuilder]::new($sasBase)
-                        $packageVersion = $psversion
-
-                        # if the package name ends with rpm
-                        # then replace the - in the filename with _ as fpm creates the packages this way.
-                        if($meta.PackageFormat -match 'rpm$')
-                        {
-                            $packageVersion = $packageVersion -replace '-', '_'
-                        }
 
                         $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
                         $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
