@@ -34,17 +34,22 @@ jobs:
       Write-Host "##vso[task.setvariable variable=dockerNamespace;]$namespace"
     displayName: 'Set dockerNamespace'
 
-  - powershell: 'Get-ChildItem env:' 
+  - powershell: 'Get-ChildItem env:'
     displayName: 'Capture Environment'
 
-  - powershell: 'docker login $(dockerHost) -u $(dockerUserName) -p $(dockerKey)' 
+  - powershell: 'docker login $(dockerHost) -u $(dockerUserName) -p $(dockerKey)'
     displayName: 'docker login'
 
-  - powershell: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)' 
-    displayName: 'az acr login'
-    condition: and(succeeded(),ne(variables['ACR'], 'no'))
+  - powershell: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
+    displayName: 'az login'
 
-  - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck' 
+  - powershell: |
+      $querystring = az storage account generate-sas --account-name $(storageAccountName) --services b --resource-types o --expiry ((get-date).AddDays(2).ToString("yyyy-MM-dd")) --permission r --https-only | convertfrom-json
+      $url = "https://$(storageAccountName).blob.core.windows.net/?$querystring"
+      Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
+    displayName: 'Set SasUrl variable'
+
+  - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
     displayName: 'Install Pester'
 
   - powershell: |
@@ -60,6 +65,12 @@ jobs:
         $extraParams.Add('SkipTest',$true)
       }
 
+      if($env:SASURL)
+      {
+        Write-Host 'Using SasUrl...'
+        $extraParams.Add('SasUrl',$env:SASURL)
+      }
+
       if($env:$(Channel) -eq 'true')
       {
         ./build.ps1 -Build -ImageName $(dockerHost)/$(dockerNamespace)/$(dockerImage) -All -Channel $(channel) @extraParams -version '$(Version)'
@@ -70,10 +81,9 @@ jobs:
       }
     displayName: 'Build All $(Channel)'
 
-  - powershell: 'docker logout $(dockerHost)' 
+  - powershell: 'docker logout $(dockerHost)'
     displayName: 'docker logout'
     condition: always()
 
-  - powershell: 'az logout' 
+  - powershell: 'az logout'
     displayName: 'az logout'
-    condition: ne(variables['ACR'], 'no')
