@@ -339,7 +339,16 @@ End {
                     if($SasUrl)
                     {
                         $packageUrl = [System.UriBuilder]::new($sasBase)
-                        $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $psversion
+                        $packageVersion = $psversion
+
+                        # if the package name ends with rpm
+                        # then replace the - in the filename with _ as fpm creates the packages this way.
+                        if($meta.PackageFormat -match 'rpm$')
+                        {
+                            $packageVersion = $packageVersion -replace '-', '_'
+                        }
+
+                        $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
                         $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
                         $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
                         $packageUrl.Query = $sasQuery
