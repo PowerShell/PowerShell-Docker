@@ -36,16 +36,16 @@ jobs:
     ACR: yes
 
 - job: PreviewManifestPhase
-  variables: 
+  variables:
     releaseTag: $(previewReleaseTag)
     channel: PREVIEW
 
   displayName: Create Preview Manifest Lists
 
-  dependsOn: 
+  dependsOn:
    - previewLinux
    - previewWindows
-  condition: succeeded()
+  condition: always()
   pool:
     name: PowerShell
     timeoutInMinutes: 30
@@ -54,16 +54,16 @@ jobs:
   - template: manifestSteps.yml
 
 - job: StableManifestPhase
-  variables: 
+  variables:
     releaseTag: $(stableReleaseTag)
     channel: STABLE
 
   displayName: Create Stable Manifest Lists
 
-  dependsOn: 
+  dependsOn:
    - stableWindows
    - stableLinux
-  condition: succeeded()
+  condition: always()
   pool:
     name: PowerShell
     timeoutInMinutes: 30

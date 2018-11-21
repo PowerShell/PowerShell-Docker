@@ -71,7 +71,7 @@ param(
 
     [Parameter(ParameterSetName="localBuildByName")]
     [Parameter(ParameterSetName="localBuildAll")]
-    [ValidatePattern('https://[\w\.]+/\?(\w+=[\d\w-:%]*&?){8}')]
+    [ValidateScript({([uri]$_).Scheme -eq 'https'})]
     [string]
     $SasUrl,
 
@@ -88,7 +88,7 @@ DynamicParam {
 
     Import-Module $buildHelperPath -Force
 
-     
+
     # Get the names of the builds.
     $releasePath = Join-Path -Path $PSScriptRoot -ChildPath 'release'
 
@@ -127,7 +127,7 @@ DynamicParam {
     Add-ParameterAttribute -ParameterSetName 'TestByName' -Attributes $Attributes
     Add-ParameterAttribute -ParameterSetName 'localBuildByName' -Attributes $Attributes
     Add-ParameterAttribute -ParameterSetName 'GetTagsByName' -Attributes $Attributes
-    
+
     $ValidateSetAttr = New-Object "System.Management.Automation.ValidateSetAttribute" -ArgumentList $dockerFileNames
     $Attributes.Add($ValidateSetAttr) > $null
 
@@ -162,7 +162,7 @@ Begin {
             throw "unknown channel: $Channel"
         }
     }
-    
+
     if ($PSCmdlet.ParameterSetName -match '.*ByName')
     {
         # We are using the Name parameter, so assign the variable to that
@@ -183,7 +183,7 @@ Begin {
 }
 
 End {
-    
+
     # this function wraps native command Execution
     # for more information, read https://mnaoumov.wordpress.com/2015/01/11/execution-of-external-commands-in-powershell-done-right/
     function script:Start-NativeExecution
@@ -287,7 +287,7 @@ End {
                             Write-Verbose -Message "Skipping $($tag.Tag) - $tagTemplate" -Verbose
                             continue
                         }
-                    
+
                         # Replace the the psversion token with the powershell version in the tag
                         $actualVersion = $windowsVersion
                         $actualTag = $actualTag -replace '#psversion#', $actualVersion
@@ -329,9 +329,19 @@ End {
                         $imageNameParam = 'pshorg/powershellcommunity:' + ($firstActualTag -split ':')[1]
                     }
 
+                    $packageVersion = $psversion
+
+                    # if the package name ends with rpm
+                    # then replace the - in the filename with _ as fpm creates the packages this way.
+                    if($meta.PackageFormat -match 'rpm$')
+                    {
+                        $packageVersion = $packageVersion -replace '-', '_'
+                    }
+
                     $buildArgs =  @{
                         fromTag = $fromTag
-                        PS_VERSION = $psversion
+                        PS_VERSION = $psVersion
+                        PACKAGE_VERSION = $packageVersion
                         VCS_REF = $vcf_ref
                         IMAGE_NAME = $imageNameParam
                     }
@@ -339,9 +349,10 @@ End {
                     if($SasUrl)
                     {
                         $packageUrl = [System.UriBuilder]::new($sasBase)
-                        $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $psversion
+
+                        $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
                         $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
-                        $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName 
+                        $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
                         $packageUrl.Query = $sasQuery
                         $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
                     }

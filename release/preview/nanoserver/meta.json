@@ -1,4 +1,4 @@
 {
     "IsLinux" : false,
-    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.msi"
+    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip"
 }
