@@ -11,7 +11,7 @@ ARG imageRepo=clearlinux
 FROM ${imageRepo}:${fromTag} AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=6.1.1
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
