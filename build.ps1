@@ -265,7 +265,7 @@ End {
         }
 
         # Get the tag data for the image
-        $tagData = & $scriptPath -CI:$CI.IsPresent
+        $tagData = @(& $scriptPath -CI:$CI.IsPresent | Where-Object {$_.FromTag})
 
         if (!$ShortTag) {
             foreach ($tagGroup in ($tagData | Group-Object -Property 'FromTag')) {
