@@ -100,7 +100,7 @@ phases:
 - template: .vsts-ci/phase.yml
   parameters:
     name: blackArch
-    imagename: blackArch
+    imagename: blackarch
     stable: false
     servicing: false
     preview: false
@@ -127,7 +127,16 @@ phases:
 - template: .vsts-ci/phase.yml
   parameters:
     name: oracleLinux
-    imagename: oracleLinux
+    imagename: oraclelinux
+    stable: false
+    servicing: false
+    preview: false
+    communityStable: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: clearLinux
+    imagename: clearlinux
     stable: false
     servicing: false
     preview: false
