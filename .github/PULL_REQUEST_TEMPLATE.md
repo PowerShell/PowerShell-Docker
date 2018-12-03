@@ -15,4 +15,5 @@
   - [ ] Not Applicable
 - **OR**
   - [ ] Update [README.powershell.md](https://github.com/PowerShell/PowerShell-Docker/blob/master/assets/README.powershell.md)
+  - [ ] Update [README.powershellcommunity.md](https://github.com/PowerShell/PowerShell-Docker/blob/master/assets/README.powershellcommunity.md)
   - [ ] Update [vsts-ci.yml](https://github.com/PowerShell/PowerShell-Docker/blob/master/vsts-ci.yml)
