@@ -74,7 +74,7 @@ If you are new to PowerShell and want to learn more, see the [getting started][]
 
 ## How to use this image
 
-See our [Docker examples](https://github.com/PowerShell/PowerShell/tree/master/docker#examples).
+See our [Docker examples](https://github.com/PowerShell/PowerShell-Docker#examples).
 
 ## Issues
 
