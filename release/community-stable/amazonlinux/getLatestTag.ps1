@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# return objects representing the tags we need to base the kali image on
+# return objects representing the tags we need to base the amazon linux image on
 
-# The versions of photon we care about
+# The versions of amazon linux we care about
 $shortTags = @('2.0')
 
 $parent = Join-Path -Path $PSScriptRoot -ChildPath '..'
