@@ -54,4 +54,17 @@ ENV PSCORE="$ProgramFiles\PowerShell\pwsh.exe"
 # Set the path
 RUN setx PATH "%PATH%;%ProgramFiles%\PowerShell"
 
+# Set pwsh as the shell
+SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+# Set the Module Analysis Cache Path
+ENV PSModuleAnalysisCachePath=/PSModuleAnalysisCache/ModuleAnalysisCache
+
+# Initialize Module Cache
+RUN while(!(Test-Path $env:PSModuleAnalysisCachePath)) { `
+            Write-Host "waiting for $env:PSModuleAnalysisCachePath"; `
+            # Cache takes at least 10 seconds
+            start-sleep -seconds 6 `
+    }
+
 CMD ["pwsh.exe"]
