@@ -251,7 +251,13 @@ End {
         # skip an image if it doesn't exist
         if(!(Test-Path $scriptPath))
         {
-            Write-Warning "Channel: $Channel, Name: $dockerFileName does not existing.  Not every image exists in every channel.  Skipping."
+            $message = "Channel: $Channel, Name: $dockerFileName does not existing.  Not every image exists in every channel.  Skipping."
+            if($CI.IsPresent)
+            {
+                throw $message
+            }
+
+            Write-Warning $message
             continue
         }
 
