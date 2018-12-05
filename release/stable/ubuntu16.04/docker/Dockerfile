@@ -34,6 +34,17 @@ RUN apt-get update \
     # remove powershell package
     && rm /tmp/powershell.deb
 
+# Set pwsh as the shell
+SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+ENV PSModuleAnalysisCachePath=/PSModuleAnalysisCache/ModuleAnalysisCache
+# Initialize Module Cache
+RUN while(!(Test-Path $env:PSModuleAnalysisCachePath)) { \
+            Write-Host "waiting for $env:PSModuleAnalysisCachePath"; \
+            # Cache takes at least 10 seconds \
+            start-sleep -seconds 6 \
+    }
+
 # Define args needed only for the labels
 ARG VCS_REF="none"
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:ubuntu16.04

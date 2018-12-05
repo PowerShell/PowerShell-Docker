@@ -1,0 +1,25 @@
+resources:
+- repo: self
+  clean: true
+queue:
+  name: Hosted Ubuntu 1604
+
+# This pipeline references a variable named ‘dockerHost’. This should be 'docker.io'
+# This pipeline references a variable named ‘dockerUserName’. This should be the username to login to the dockerHost
+# This pipeline references a variable named ‘dockerKey’. This should be the password or key to login to the docker Host
+# This pipeline references a variable named ‘dockerNamespace’. Thish should be 'pshorg'
+# This pipeline references a variable named ‘dockerImage’. This should be 'powershellcommunity'
+
+steps:
+- powershell: 'docker login $(dockerHost) -u $(dockerUserName) -p "$(dockerKey)"'
+  displayName: 'docker login'
+
+- powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
+  displayName: 'Install Pester'
+
+- powershell: './build.ps1 -Build -ImageName $(dockerHost)/$(dockerNamespace)/$(dockerImage) -All -Channel community-stable -push'
+  displayName: Build
+
+- powershell: 'docker logout $(dockerHost)'
+  displayName: 'docker logout'
+  condition: always()

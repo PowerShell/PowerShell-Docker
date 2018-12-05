@@ -118,7 +118,7 @@ phases:
 - template: .vsts-ci/phase.yml
   parameters:
     name: amazonLinux
-    imagename: amazonLinux
+    imagename: amazonlinux
     stable: false
     servicing: false
     preview: false
