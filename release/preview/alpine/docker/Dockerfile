@@ -1,5 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+
 # Docker image file that describes an Alpine3.8 image with PowerShell installed from .tar.gz file(s)
 
 # Define arg(s) needed for the From statement
