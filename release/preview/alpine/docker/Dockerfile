@@ -1,8 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
 # Docker image file that describes an Alpine3.8 image with PowerShell installed from .tar.gz file(s)
-# NOTE: the Alpine tar.gz when this was written doesn't contain the modules.  For that we need a container with modules.
-# To accomplish this, we will get the modules from the full linux tar.gz package, then
-# overlay the Alpine tar.gz on top of it.
-# There are TODO's in the file on updates that should occur one the Alpine .tar.gz contains everything
 
 # Define arg(s) needed for the From statement
 ARG fromTag=3.8
