@@ -1,18 +1,17 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 # Docker image file that describes an Alpine3.8 image with PowerShell installed from .tar.gz file(s)
-# NOTE: the Alpine tar.gz when this was written doesn't contain the modules.  For that we need a container with modules.
-# To accomplish this, we will get the modules from the full linux tar.gz package, then
-# overlay the Alpine tar.gz on top of it.
-# There are TODO's in the file on updates that should occur one the Alpine .tar.gz contains everything
 
 # Define arg(s) needed for the From statement
 ARG fromTag=3.8
+ARG imageRepo=alpine
 
-FROM alpine:${fromTag} AS installer-env
+FROM ${imageRepo}:${fromTag} AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=6.1.0-rc.1
-# TODO: once the official build produces a full package for Alpine, update this to the full Alpine package
-ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
+ARG PS_VERSION=6.2.0-preview.2
+ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-alpine-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6-preview
 
@@ -28,15 +27,8 @@ RUN mkdir -p ${PS_INSTALL_FOLDER}
 # Unzip the Linux tar.gz
 RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
-# TODO: once the official build produces a full package for Alpine, remove this overlay of the Alpine files
-# Download the Alpine powershell .tar.gz package
-ADD https://github.com/PowerShell/PowerShell/releases/download/v6.1.0/powershell-6.1.0-linux-musl-x64.tar.gz /tmp/alpine.tar.gz
-
-# Extract the Alpine tar.gz
-RUN tar zxf /tmp/alpine.tar.gz -C ${PS_INSTALL_FOLDER}
-
 # Start a new stage so we lose all the tar.gz layers from the final image
-FROM alpine:${fromTag}
+FROM ${imageRepo}:${fromTag}
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
@@ -78,7 +70,7 @@ RUN apk add --no-cache \
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview
 
 # Define args needed only for the labels
-ARG PS_VERSION=6.1.0-rc.1
+ARG PS_VERSION=6.2.0-preview.2
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:preview-alpine-3.8
 ARG VCS_REF="none"
 # Add label last as it's just metadata and uses a lot of parameters
