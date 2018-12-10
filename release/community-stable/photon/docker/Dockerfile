@@ -83,7 +83,7 @@ RUN \
     && pwsh \
         -NoLogo \
         -NoProfile \
-        -Command $" \
+        -Command " \
           \$ErrorActionPreference = 'Stop' ; \
           \$ProgressPreference = 'SilentlyContinue' ; \
           while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
