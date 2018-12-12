@@ -485,30 +485,3 @@ End {
         }
     }
 }
-
-<#endregion
-repos:
-  #
-  # windows Server Core
-  #
-  - repoName: public/windows/servercore
-    tagGroups:
-    - tags: [ltsc2016, latest]
-      osVersion: Windows Server LTSC 2016
-      architecture: amd64
-      os: windows
-    - tags: [1803]
-      osVersion: windows Server, version 1803
-      architecture: amd64
-      os: windows
-    - tags: [ltsc2019, 1809]
-      osVersion: windows Server LTSC 2019
-      architecture: amd64
-      os: windows
-  - repoName: public/windows/servercore/insider
-    tagGroups:
-    - tags: [latest]
-      osVersion: windows Server Insider
-      architecture: amd64
-      os: windows
-#>
