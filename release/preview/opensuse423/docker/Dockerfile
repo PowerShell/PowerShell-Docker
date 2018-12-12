@@ -10,7 +10,7 @@ FROM opensuse:${fromTag} AS installer-env
 
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=6.2.0-powershell.3
+ARG PS_VERSION=6.2.0-preview.3
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
