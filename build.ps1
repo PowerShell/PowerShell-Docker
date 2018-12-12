@@ -29,6 +29,11 @@ param(
     [switch]
     $Pull,
 
+
+    [Parameter(Mandatory, ParameterSetName="GenerateTagsYaml")]
+    [switch]
+    $GenerateTagsYaml,
+
     [Parameter(Mandatory, ParameterSetName="localBuildByName")]
     [Parameter(Mandatory, ParameterSetName="localBuildAll")]
     [switch]
@@ -64,10 +69,10 @@ param(
     [switch]
     $CI,
 
-    [ValidateSet('stable','preview','servicing','community-stable','community-preview','community-servicing')]
+    <#[ValidateSet('stable','preview','servicing','community-stable','community-preview','community-servicing')]
     [Parameter(Mandatory)]
     [string]
-    $Channel='stable',
+    $Channel='stable',#>
 
     [Parameter(ParameterSetName="localBuildByName")]
     [Parameter(ParameterSetName="localBuildAll")]
@@ -106,8 +111,6 @@ DynamicParam {
     $dockerFileNames = @()
     Get-ImageList -Channel $imageChannel | ForEach-Object { $dockerFileNames += $_ }
 
-    # Create the parameter attributs
-    $Attributes = New-Object "System.Collections.ObjectModel.Collection``1[System.Attribute]"
 
     function Add-ParameterAttribute {
         param(
@@ -124,6 +127,9 @@ DynamicParam {
         $Attributes.Add($ParameterAttr) > $null
     }
 
+    # Create the parameter attributs
+    $Attributes = New-Object "System.Collections.ObjectModel.Collection``1[System.Attribute]"
+
     Add-ParameterAttribute -ParameterSetName 'TestByName' -Attributes $Attributes
     Add-ParameterAttribute -ParameterSetName 'localBuildByName' -Attributes $Attributes
     Add-ParameterAttribute -ParameterSetName 'GetTagsByName' -Attributes $Attributes
@@ -133,8 +139,37 @@ DynamicParam {
 
     # Create the parameter
     $Parameter = New-Object "System.Management.Automation.RuntimeDefinedParameter" -ArgumentList ("Name", [string[]], $Attributes)
+
+    # Create the parameter attributs
+    $channelAttributes = New-Object "System.Collections.ObjectModel.Collection``1[System.Attribute]"
+    $channelArrayAttributes = New-Object "System.Collections.ObjectModel.Collection``1[System.Attribute]"
+
+
+    Add-ParameterAttribute -ParameterSetName 'GenerateTagsYaml' -Attributes $channelArrayAttributes
+
+    foreach($parameterSetName in 'TestByName' , 'TestAll', 'localBuildByName', 'localBuildAll', 'GetTagsByName', 'GetTagsAll' )
+    {
+        Add-ParameterAttribute -ParameterSetName $parameterSetName -Attributes $channelAttributes
+    }
+
+    $ValidateSetAttr = New-Object "System.Management.Automation.ValidateSetAttribute" -ArgumentList 'stable','preview','servicing','community-stable','community-preview','community-servicing'
+    $channelAttributes.Add($ValidateSetAttr) > $null
+    $channelArrayAttributes.Add($ValidateSetAttr) > $null
+
+    # Create the parameter
+    $arrayParameter = New-Object "System.Management.Automation.RuntimeDefinedParameter" -ArgumentList ("YamlChannels", [string[]], $channelArrayAttributes)
+
+    # Create the parameter
+    $scalarParameter = New-Object "System.Management.Automation.RuntimeDefinedParameter" -ArgumentList ("Channel", [string], $channelAttributes)
+
+    # Return parameters dictionaly
     $Dict = New-Object "System.Management.Automation.RuntimeDefinedParameterDictionary"
     $Dict.Add("Name", $Parameter) > $null
+    Write-Verbose "adding ca" -Verbose
+    $Dict.Add("YamlChannels", $arrayParameter) > $null
+    Write-Verbose "adding cs" -Verbose
+    $Dict.Add("Channel", $scalarParameter) > $null
+    Write-Verbose "returning" -Verbose
     return $Dict
 }
 
@@ -143,6 +178,16 @@ Begin {
     if($Version){
         $versionExtraParams.Add('Version', $Version)
     }
+
+    if ($PSCmdlet.ParameterSetName -ne 'GenerateTagsYaml')
+    {
+        # We are using the Channel parameter, so assign the variable to that
+        $Channel = $PSBoundParameters['Channel']
+    }
+    else {
+        $Channel = $PSBoundParameters['YamlChannels']
+    }
+
 
     switch -RegEx ($Channel)
     {
@@ -183,63 +228,12 @@ Begin {
 }
 
 End {
-
-    # this function wraps native command Execution
-    # for more information, read https://mnaoumov.wordpress.com/2015/01/11/execution-of-external-commands-in-powershell-done-right/
-    function script:Start-NativeExecution
-    {
-        param(
-            [scriptblock]$sb,
-            [switch]$IgnoreExitcode,
-            [switch]$VerboseOutputOnError
-        )
-        $backupEAP = $script:ErrorActionPreference
-        $script:ErrorActionPreference = "Continue"
-        try {
-            if($VerboseOutputOnError.IsPresent)
-            {
-                $output = & $sb 2>&1
-            }
-            else
-            {
-                & $sb
-            }
-
-            # note, if $sb doesn't have a native invocation, $LASTEXITCODE will
-            # point to the obsolete value
-            if ($LASTEXITCODE -ne 0 -and -not $IgnoreExitcode) {
-                if($VerboseOutputOnError.IsPresent -and $output)
-                {
-                    $output | Out-String | Write-Verbose -Verbose
-                }
-
-                # Get caller location for easier debugging
-                $caller = Get-PSCallStack -ErrorAction SilentlyContinue
-                if($caller)
-                {
-                    $callerLocationParts = $caller[1].Location -split ":\s*line\s*"
-                    $callerFile = $callerLocationParts[0]
-                    $callerLine = $callerLocationParts[1]
-
-                    $errorMessage = "Execution of {$sb} by ${callerFile}: line $callerLine failed with exit code $LASTEXITCODE"
-                    throw $errorMessage
-                }
-                throw "Execution of {$sb} failed with exit code $LASTEXITCODE"
-            }
-        } finally {
-            try {
-                $script:ErrorActionPreference = $backupEAP
-            }
-            catch {
-            }
-        }
-    }
-
     # Calculate the paths
     $channelPath = Join-Path -Path $releasePath -ChildPath $Channel.ToLowerInvariant()
 
     $localImageNames = @()
     $testArgList = @()
+    $tagGroups = @{}
 
     foreach($dockerFileName in $Name)
     {
@@ -276,6 +270,7 @@ End {
         if (!$ShortTag) {
             foreach ($tagGroup in ($tagData | Group-Object -Property 'FromTag')) {
                 $actualTags = @()
+                $tagList = @()
                 foreach($tag in $tagGroup.Group) {
                     foreach ($tagTemplate in $tagsTemplates) {
                         # replace the tag token with the tag
@@ -299,12 +294,13 @@ End {
                         $actualTag = $actualTag -replace '#psversion#', $actualVersion
                         $actualTag = $actualTag.ToLowerInvariant()
                         $actualTags += "${ImageName}:$actualTag"
+                        $tagList += $actualTag
                         $fromTag = $Tag.FromTag
                     }
                 }
 
-
-                if ($Build.IsPresent -or $Test.IsPresent) {
+                if ($Build.IsPresent -or $Test.IsPresent)
+                {
                     Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
                     $contextPath = Join-Path -Path $imagePath -ChildPath 'docker'
                     $vcf_ref = git rev-parse --short HEAD
@@ -345,18 +341,25 @@ End {
                     }
 
                     $buildArgs =  @{
-                        fromTag = $fromTag
-                        PS_VERSION = $psVersion
-                        PACKAGE_VERSION = $packageVersion
-                        VCS_REF = $vcf_ref
-                        IMAGE_NAME = $imageNameParam
-                    }
+                            fromTag = $fromTag
+                            PS_VERSION = $psVersion
+                            PACKAGE_VERSION = $packageVersion
+                            VCS_REF = $vcf_ref
+                            IMAGE_NAME = $imageNameParam
+                        }
 
                     if($SasUrl)
                     {
                         $packageUrl = [System.UriBuilder]::new($sasBase)
 
                         $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+                        $previewTag = ''
+                        if($Channel -like '*preview*')
+                        {
+                            $previewTag = '-preview'
+                        }
+
+                        $packageName = $meta.PackageFormat -replace '\${previewTag}', $previewTag
                         $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
                         $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
                         $packageUrl.Query = $sasQuery
@@ -378,6 +381,32 @@ End {
                 }
                 elseif ($GetTags.IsPresent) {
                     Write-Verbose "from: $fromTag actual: $($actualTags -join ', ') psversion: $psversion" -Verbose
+                }
+                elseif ($GenerateTagsYaml.IsPresent) {
+                    $tagGroup = 'public/powershell'
+                    $os = 'windows'
+                    if($meta.IsLinux)
+                    {
+                        $os = 'linux'
+                    }
+                    $architecture = 'amd64'
+
+                    $osVersion = $meta.osVersion
+                    $osVersion = $osVersion.replace('${fromTag}',$fromTag)
+
+                    if(!$tagGroups.ContainsKey($tagGroup))
+                    {
+                        $tags = @()
+                        $tagGroups[$tagGroup] = $tags
+                    }
+                    $tag = [PSCustomObject]@{
+                        Architecture = $architecture
+                        OsVersion = $osVersion
+                        Os = $os
+                        Tags = $tagList
+                    }
+
+                    $tagGroups[$tagGroup] += $tag
                 }
             }
         }
@@ -435,4 +464,48 @@ End {
     {
         Write-Verbose "image name: $fullName" -Verbose
     }
+
+    if($GenerateTagsYaml.IsPresent)
+    {
+        Write-Output "repos:"
+        foreach($repo in $tagGroups.Keys)
+        {
+            Write-Output "  - repoName: $repo"
+            Write-Output "    tagGroups:"
+            foreach($tag in $tagGroups.$repo)
+            {
+                Write-Output "    - tags: [$($tag.Tags -join ', ')]"
+                Write-Output "      osVersion: $($tag.osVersion)"
+                Write-Output "      architecture: $($tag.architecture)"
+                Write-Output "      os: $($tag.os)"
+            }
+        }
+    }
 }
+
+<#endregion
+repos:
+  #
+  # windows Server Core
+  #
+  - repoName: public/windows/servercore
+    tagGroups:
+    - tags: [ltsc2016, latest]
+      osVersion: Windows Server LTSC 2016
+      architecture: amd64
+      os: windows
+    - tags: [1803]
+      osVersion: windows Server, version 1803
+      architecture: amd64
+      os: windows
+    - tags: [ltsc2019, 1809]
+      osVersion: windows Server LTSC 2019
+      architecture: amd64
+      os: windows
+  - repoName: public/windows/servercore/insider
+    tagGroups:
+    - tags: [latest]
+      osVersion: windows Server Insider
+      architecture: amd64
+      os: windows
+#>
