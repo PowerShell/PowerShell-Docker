@@ -40,7 +40,9 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8
+    LANG=en_US.UTF-8 \
+    # set a fixed location for the Module analysis cache
+    PSModuleAnalysisCachePath=/PSModuleAnalysisCache/ModuleAnalysisCache
 
 # Install dotnet dependencies and ca-certificates
 RUN apk add --no-cache \
@@ -67,12 +69,24 @@ RUN apk add --no-cache \
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
     \
     # Create the pwsh-preview symbolic link that points to powershell
-    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview
+    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
+    # intialize powershell module cache
+    && pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          \$ErrorActionPreference = 'Stop' ; \
+          \$ProgressPreference = 'SilentlyContinue' ; \
+          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+            Start-Sleep -Seconds 6 ; \
+          }"
 
 # Define args needed only for the labels
 ARG PS_VERSION=6.2.0-preview.2
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:preview-alpine-3.8
 ARG VCS_REF="none"
+
 # Add label last as it's just metadata and uses a lot of parameters
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
     readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \

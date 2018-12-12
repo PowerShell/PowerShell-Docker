@@ -18,7 +18,9 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     # required to remove gdebi on debian 8
-    SUDO_FORCE_REMOVE=yes
+    SUDO_FORCE_REMOVE=yes \
+    # set a fixed location for the Module analysis cache
+    PSModuleAnalysisCachePath=/PSModuleAnalysisCache/ModuleAnalysisCache
 
 # Install dependencies and clean up
 RUN apt-get update \
@@ -41,11 +43,24 @@ RUN apt-get update \
     # clean the cache
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    # generate the locales
-    && locale-gen $LANG && update-locale \
+    # enable en_US.UTF-8 locale
+    && sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
+    # generate locale
+    && locale-gen && update-locale \
     # remove powershell package
     && rm /tmp/powershell.deb \
-    && ln -sf /opt/microsoft/powershell/6-preview/pwsh /usr/bin/pwsh
+    && ln -sf /opt/microsoft/powershell/6-preview/pwsh /usr/bin/pwsh \
+    # intialize powershell module cache
+    && pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          \$ErrorActionPreference = 'Stop' ; \
+          \$ProgressPreference = 'SilentlyContinue' ; \
+          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+            Start-Sleep -Seconds 6 ; \
+          }"
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
