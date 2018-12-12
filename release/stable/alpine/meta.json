@@ -2,6 +2,5 @@
     "IsLinux" : true,
     "UseLinuxVersion": false,
     "PackageFormat": "powershell-${PS_VERSION}-linux-musl-x64.tar.gz",
-
     "osVersion": "Alpine 3.8"
 }

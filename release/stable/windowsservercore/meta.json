@@ -1,6 +1,5 @@
 {
     "IsLinux": false,
     "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.msi",
-
     "osVersion": "Windows Server Core, version ${fromTag}"
 }
