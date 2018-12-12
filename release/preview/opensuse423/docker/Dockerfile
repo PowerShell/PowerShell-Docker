@@ -5,9 +5,9 @@
 
 # Define arg(s) needed for the From statement
 ARG fromTag=42.3
+ARG imageRepo=opensuse
 
-FROM opensuse:${fromTag} AS installer-env
-
+FROM ${imageRepo}:${fromTag} AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=6.2.0-preview.3
@@ -35,17 +35,7 @@ RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
 # ------ Second stage ------
 # Start a new stage so we lose all the tar.gz layers from the final image
-FROM opensuse:${fromTag}
-
-# Install dependencies
-RUN zypper --non-interactive update --skip-interactive \
-    && zypper --non-interactive install \
-        glibc-locale \
-        glibc-i18ndata \
-        libunwind \
-        libicu \
-        openssl \
-        less
+FROM ${imageRepo}:${fromTag}
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
@@ -61,11 +51,23 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/PSModuleAnalysisCache/ModuleAnalysisCache
 
-RUN localedef --charmap=UTF-8 --inputfile=en_US $LANG \
-    \
+
+# Install dependencies
+RUN zypper --non-interactive update --skip-interactive \
+    && zypper --non-interactive install \
+        glibc-locale \
+        glibc-i18ndata \
+        libicu \
+        openssl \
+        less \
+    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # Create the pwsh symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
     && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
+    # clean package manager cache
+    && zypper clean -a \
+    # remove package manager log file
+    && rm -f /var/log/zypp/history /var/log/zypper.log \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
