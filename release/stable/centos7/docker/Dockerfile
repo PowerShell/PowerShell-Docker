@@ -4,8 +4,9 @@ ARG imageRepo=centos
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=6.1.0
-ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm
+ARG PS_VERSION=6.1.1
+ARG PACKAGE_VERSION=6.1.1
+ARG PS_PACKAGE=powershell-preview-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 # Download the Linux package and save it
@@ -14,7 +15,9 @@ ADD ${PS_PACKAGE_URL} /tmp/powershell.rpm
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8
+    LANG=en_US.UTF-8 \
+    # set a fixed location for the Module analysis cache
+    PSModuleAnalysisCachePath=/PSModuleAnalysisCache/ModuleAnalysisCache
 
 # Install dependencies and clean up
 RUN yum install -y /tmp/powershell.rpm \
@@ -25,7 +28,18 @@ RUN yum install -y /tmp/powershell.rpm \
     && yum clean all \
     && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # remove powershell package
-    && rm /tmp/powershell.rpm
+    && rm /tmp/powershell.rpm \
+    # intialize powershell module cache
+    && pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          \$ErrorActionPreference = 'Stop' ; \
+          \$ProgressPreference = 'SilentlyContinue' ; \
+          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+            Start-Sleep -Seconds 6 ; \
+          }"
 
 # Define args needed only for the labels
 ARG VCS_REF="none"

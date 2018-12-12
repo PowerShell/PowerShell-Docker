@@ -1,6 +1,6 @@
 # Docker image file that describes an OpenSuse 42.3 image with PowerShell installed from tar.gz
 # Implemented in two stages, one that downloads and uncompresses the tar.gz
-# The next stage simply copies the files from the first stage, 
+# The next stage simply copies the files from the first stage,
 # effectively removing the tar.gz and packages that are not needed from the final image.
 
 # Define arg(s) needed for the From statement
@@ -57,12 +57,25 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8
+    LANG=en_US.UTF-8 \
+    # set a fixed location for the Module analysis cache
+    PSModuleAnalysisCachePath=/PSModuleAnalysisCache/ModuleAnalysisCache
 
 RUN localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     \
     # Create the pwsh symbolic link that points to powershell
-    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh
+    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    # intialize powershell module cache
+    && pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          \$ErrorActionPreference = 'Stop' ; \
+          \$ProgressPreference = 'SilentlyContinue' ; \
+          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+            Start-Sleep -Seconds 6 ; \
+          }"
 
 # Define args needed only for the labels
 ARG PS_VERSION=6.1.0
