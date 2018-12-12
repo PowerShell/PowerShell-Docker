@@ -145,8 +145,13 @@ Function Get-DockerImageMetaData
 
     if (Test-Path $Path)
     {
-        $meta = Get-Content -Path $Path | ConvertFrom-Json
-        return [DockerImageMetaData] $meta
+        try {
+            $meta = Get-Content -Path $Path | ConvertFrom-Json
+            return [DockerImageMetaData] $meta
+        }
+        catch {
+            throw "$_ converting $Path"
+        }
     }
 
     return [DockerImageMetaData]::new()
