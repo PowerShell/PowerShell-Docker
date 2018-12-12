@@ -79,7 +79,7 @@ RUN localedef --charmap=UTF-8 --inputfile=en_US $LANG \
           }"
 
 # Define args needed only for the labels
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=6.2.0-preview.3
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:opensuse-42.3
 ARG VCS_REF="none"
 
