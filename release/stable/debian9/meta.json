@@ -1,6 +1,6 @@
 {
     "IsLinux" : true,
-    "PackageFormat": "powershell_${PS_VERSION}-1.debian.9_amd64.deb",
+    "PackageFormat": "powershell${previewTag}_${PS_VERSION}-1.debian.9_amd64.deb",
 
     "osVersion": "Debian 9"
 }

@@ -1,6 +1,6 @@
 {
     "IsLinux" : true,
     "PackageFormat": "powershell_${PS_VERSION}-1.ubuntu.18.04_amd64.deb",
-
+    "PackageFormat": "powershell${previewTag}_${PS_VERSION}-1.ubuntu.18.04_amd64.deb",
     "osVersion": "Ubuntu 18.04"
 }
