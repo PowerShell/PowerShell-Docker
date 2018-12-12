@@ -83,7 +83,7 @@ function Get-ImageList
 
     if ($Channel -in 'servicing', 'all')
     {
-        Get-ChildItem -Path $stablePath -Directory | Select-Object -ExpandProperty Name | Write-Output
+        Get-ChildItem -Path $servicingPath -Directory | Select-Object -ExpandProperty Name | Write-Output
     }
 
     if ($Channel -in 'preview', 'all')
