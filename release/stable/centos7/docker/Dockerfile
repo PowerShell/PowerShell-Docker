@@ -6,7 +6,7 @@ FROM ${imageRepo}:${fromTag} AS installer-env
 
 ARG PS_VERSION=6.1.1
 ARG PACKAGE_VERSION=6.1.1
-ARG PS_PACKAGE=powershell-preview-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
+ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 # Download the Linux package and save it
