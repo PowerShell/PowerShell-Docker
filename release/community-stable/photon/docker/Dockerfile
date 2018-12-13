@@ -1,11 +1,12 @@
-# Docker image file that describes an OpenSuse 42.3 image with PowerShell installed from tar.gz
-# Implemented in two stages, one that downloads and uncompresses the tar.gz
-# The next stage simply copies the files from the first stage,
-# effectively removing the tar.gz and packages that are not needed from the final image.
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+#
+# Docker image file that describes an VMware Photon image with PowerShell
+# installed from full PowerShell linux tar.gz package
 
 # Define arg(s) needed for the From statement
-ARG fromTag=42.3
-ARG imageRepo=opensuse
+ARG fromTag=2.0-20181017
+ARG imageRepo=photon
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
@@ -15,25 +16,25 @@ ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
 
-# define the folder we will be installing PowerShell to
+# Define Args and Env needed to create links
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 
-# Create the install folder
-RUN mkdir -p ${PS_INSTALL_FOLDER}
-
-# Install dependencies
-RUN zypper --non-interactive update --skip-interactive
-
-RUN zypper --non-interactive install \
-        tar
-
 # Download the Linux tar.gz and save it
-ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
+ADD ${PS_PACKAGE_URL} /tmp/powershell-linux.tar.gz
 
-# Unzip the Linux tar.gz
-RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
+# Installation of packages to uncompress downloaded package
+RUN \
+  # update package list
+    tdnf -y distro-sync \
+    # install dependencies
+    && tdnf -y install \
+      gzip \
+      tar \
+    # create powershell folder
+    && mkdir -p ${PS_INSTALL_FOLDER} \
+    # uncompress powershell linux tar file
+    && tar zxf /tmp/powershell-linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
-# ------ Second stage ------
 # Start a new stage so we lose all the tar.gz layers from the final image
 FROM ${imageRepo}:${fromTag}
 
@@ -41,6 +42,7 @@ FROM ${imageRepo}:${fromTag}
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links
+ARG PS_VERSION=6.1.0
 ARG PS_INSTALL_VERSION=6
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
@@ -48,25 +50,35 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
-    # set a fixed location for the Module analysis cache
-    PSModuleAnalysisCachePath=/PSModuleAnalysisCache/ModuleAnalysisCache
+    # Set up PowerShell module analysis cache path
+    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
+    # Opt out of SocketsHttpHandler in DotNet Core 2.1 to use HttpClientHandler
+    # with installed libcurl4 package to resolve 
+    # Invoke-WebRequest : Authentication failed" issue when executing using
+    # docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [Invoke-WebRequest] [-Uri <HTTPS URL>]
+    DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0 \
+    # Set terminal to linux because there is no xterm library in Photon image
+    # when docker allocate pseudo-tty
+    TERM=linux
 
-
-# Install dependencies
-RUN zypper --non-interactive update --skip-interactive \
-    && zypper --non-interactive install \
-        glibc-locale \
-        glibc-i18ndata \
-        libicu \
-        openssl \
-        less \
-    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
-    # Create the pwsh symbolic link that points to powershell
+# Installation
+RUN \
+    # update package list
+    tdnf -y distro-sync \
+    # install dependencies
+    && tdnf -y install \
+      # required for locales
+      glibc-i18n \
+      # required for uncompressing locale files in /usr/share/i18n/charmaps/
+      gzip \
+      # required for International Components for Unicode
+      icu \
+      # required for help in powershell
+      less \
+    # generate locale
+    && locale-gen.sh \
+    # create the pwsh symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
-    # clean package manager cache
-    && zypper clean -a \
-    # remove package manager log file
-    && rm -f /var/log/zypp/history /var/log/zypper.log \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
@@ -77,11 +89,14 @@ RUN zypper --non-interactive update --skip-interactive \
           while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
             Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
             Start-Sleep -Seconds 6 ; \
-          }"
+          }" \
+    # upgrade packages
+    && tdnf -y upgrade \
+    # clean cached data
+    && tdnf clean all
 
 # Define args needed only for the labels
-ARG PS_VERSION=6.1.0
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:opensuse-42.3
+ARG IMAGE_NAME=pshorg/powershellcommunity:photon-2.0
 ARG VCS_REF="none"
 
 # Add label last as it's just metadata and uses a lot of parameters

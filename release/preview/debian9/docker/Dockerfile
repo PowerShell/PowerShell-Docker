@@ -1,11 +1,12 @@
-# Docker image file that describes an Ubuntu16.04 image with PowerShell installed from Microsoft APT Repo
-ARG fromTag=16.04
-ARG imageRepo=ubuntu
+# Docker image file that describes an Debian 9 image with PowerShell installed from Microsoft APT Repo
+ARG fromTag=stretch
+ARG imageRepo=debian
+
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=6.1.0
-ARG PS_PACKAGE=powershell_${PS_VERSION}-1.ubuntu.16.04_amd64.deb
+ARG PS_VERSION=6.2.0-preview.3
+ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.debian.9_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 RUN echo ${PS_PACKAGE_URL}
@@ -32,9 +33,13 @@ RUN apt-get update \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && locale-gen $LANG && update-locale \
+    # enable en_US.UTF-8 locale
+    && sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
+    # generate locale
+    && locale-gen && update-locale \
     # remove powershell package
     && rm /tmp/powershell.deb \
+    && ln -sf /opt/microsoft/powershell/6-preview/pwsh /usr/bin/pwsh \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
@@ -49,7 +54,7 @@ RUN apt-get update \
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:ubuntu16.04
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:debian-9
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \

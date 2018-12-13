@@ -1,11 +1,12 @@
-# Docker image file that describes an Ubuntu16.04 image with PowerShell installed from Microsoft APT Repo
-ARG fromTag=16.04
-ARG imageRepo=ubuntu
+# Docker image file that describes an Debian 8 image with PowerShell installed from Microsoft APT Repo
+ARG fromTag=jessie
+ARG imageRepo=debian
+
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=6.1.0
-ARG PS_PACKAGE=powershell_${PS_VERSION}-1.ubuntu.16.04_amd64.deb
+ARG PS_VERSION=6.2.0-preview.3
+ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.debian.8_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 RUN echo ${PS_PACKAGE_URL}
@@ -16,12 +17,13 @@ ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
+    # required to remove gdebi on debian 8
+    SUDO_FORCE_REMOVE=yes \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/PSModuleAnalysisCache/ModuleAnalysisCache
 
 # Install dependencies and clean up
 RUN apt-get update \
-    && apt install -y /tmp/powershell.deb \
     && apt-get install -y \
     # less is required for help in powershell
         less \
@@ -29,12 +31,25 @@ RUN apt-get update \
         locales \
     # required for SSL
         ca-certificates \
+    # simplifies deb file install
+        gdebi \
+    && gdebi --n /tmp/powershell.deb \
+    # gdebi isn't needed anymore remove it
+    && apt-get purge -y gdebi \
+    # remove any unused dependecies
+    && apt-get autoremove -y \
+    # upgrade all packages
     && apt-get dist-upgrade -y \
+    # clean the cache
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && locale-gen $LANG && update-locale \
+    # enable en_US.UTF-8 locale
+    && sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
+    # generate locale
+    && locale-gen && update-locale \
     # remove powershell package
     && rm /tmp/powershell.deb \
+    && ln -sf /opt/microsoft/powershell/6-preview/pwsh /usr/bin/pwsh \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
@@ -49,7 +64,7 @@ RUN apt-get update \
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:ubuntu16.04
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:debian-8
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
