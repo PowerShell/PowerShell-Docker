@@ -1,4 +1,5 @@
 {
     "IsLinux" : false,
-    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip"
+    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip",
+    "osVersion": "Nano Server, version ${fromTag}"
 }
