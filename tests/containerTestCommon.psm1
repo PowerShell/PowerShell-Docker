@@ -70,10 +70,7 @@ function Invoke-Docker
             $resultString | Out-File -FilePath $filename
             if($env:TF_BUILD)
             {
-                if($env:BUILD_REASON -ne 'PullRequest')
-                {
-                    Write-Host "##vso[artifact.upload containerfolder=errorLogs;artifactname=errorLogs]$filename"
-                }
+                Write-Host "##vso[artifact.upload containerfolder=errorLogs;artifactname=errorLogs]$filename"
             }
 
             Write-Error "docker $command failed, see $filename ($($result.length))" -ErrorAction Stop

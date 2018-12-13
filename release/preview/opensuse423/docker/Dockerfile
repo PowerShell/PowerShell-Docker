@@ -10,7 +10,7 @@ ARG imageRepo=opensuse
 FROM ${imageRepo}:${fromTag} AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=6.2.0-preview.3
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
@@ -63,6 +63,7 @@ RUN zypper --non-interactive update --skip-interactive \
     && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # Create the pwsh symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
     # clean package manager cache
     && zypper clean -a \
     # remove package manager log file
@@ -80,7 +81,7 @@ RUN zypper --non-interactive update --skip-interactive \
           }"
 
 # Define args needed only for the labels
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=6.2.0-preview.3
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:opensuse-42.3
 ARG VCS_REF="none"
 

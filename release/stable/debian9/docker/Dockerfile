@@ -16,7 +16,9 @@ ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8
+    LANG=en_US.UTF-8 \
+    # set a fixed location for the Module analysis cache
+    PSModuleAnalysisCachePath=/PSModuleAnalysisCache/ModuleAnalysisCache
 
 # Install dependencies and clean up
 RUN apt-get update \
@@ -31,9 +33,23 @@ RUN apt-get update \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && locale-gen $LANG && update-locale \
+    # enable en_US.UTF-8 locale
+    && sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
+    # generate locale
+    && locale-gen && update-locale \
     # remove powershell package
-    && rm /tmp/powershell.deb
+    && rm /tmp/powershell.deb \
+    # intialize powershell module cache
+    && pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          \$ErrorActionPreference = 'Stop' ; \
+          \$ProgressPreference = 'SilentlyContinue' ; \
+          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+            Start-Sleep -Seconds 6 ; \
+          }"
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
