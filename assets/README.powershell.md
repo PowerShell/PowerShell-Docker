@@ -1,12 +1,6 @@
-# ![logo][] PowerShell
+# PowerShell
 
-[logo]: https://raw.githubusercontent.com/PowerShell/PowerShell/master/assets/ps_black_64.svg?sanitize=true
-
-## Docker pull command
-
-`docker pull mcr.microsoft.com/powershell`
-
-## Tags
+## Featured Tags
 
 ### Latest
 
@@ -20,85 +14,7 @@
   * Ubuntu 18.04 for Linux and Windows Server Core for Windows
   * `docker pull mcr.microsoft.com/powershell:preview`
 
-### Stable Linux amd64 tags
-
-* `ubuntu-18.04`, `6.1.0-ubuntu-18.04` [(/release/stable/ubuntu18.04/docker/Dockerfile)][ubuntu-18.04-stable]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-ubuntu-18.04`
-* `ubuntu-16.04`, `6.1.0-ubuntu-16.04` [(/release/stable/ubuntu16.04/docker/Dockerfile)][ubuntu-16.04-stable]
-  * `docker pull mcr.microsoft.com/powershell:ubuntu-16.04`
-* `centos-7`, `6.1.0-centos-7` [(/release/stable/centos7/docker/Dockerfile)][centos-7-stable]
-  * `docker pull mcr.microsoft.com/powershell:centos-7`
-* `fedora-27`, `6.1.0-fedora-27` [(/release/stable/fedora27/docker/Dockerfile)][fedora-27-stable]
-  * `docker pull mcr.microsoft.com/powershell:fedora-27`
-* `fedora-28`, `6.1.0-fedora-28` [(/release/stable/fedora28/docker/Dockerfile)][fedora-28-stable]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-fedora-28`
-
-[ubuntu-16.04-stable]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/ubuntu16.04/docker/Dockerfile
-[centos-7-stable]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/centos7/docker/Dockerfile
-[fedora-27-stable]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/fedora27/docker/Dockerfile
-[ubuntu-18.04-stable]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/ubuntu18.04/docker/Dockerfile
-[fedora-28-stable]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/fedora28/docker/Dockerfile
-
-### Stable Windows amd64 tags
-
-* `nanoserver` : The latest stable nanoserver image.
-  * Docker will detect your version of windows and select the most appropriate NanoServer image (1709 or 1803.)
-  * `docker pull mcr.microsoft.com/powershell:nanoserver`
-* `6.1.0-nanoserver` : The latest `6.1.0` nanoserver image.
-  * Docker will detect your version of windows and select the most appropriate NanoServer image (1709 or 1803.)
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-nanoserver`
-* `windowsservercore`, `6.1.0-windowsservercore` [(release/stable/windowsservercore/docker/Dockerfile)][winsrvcore-stable]
-  * `docker pull mcr.microsoft.com/powershell:windowsservercore`
-* `6.1.0-nanoserver-1803`, `6.1.0-nanoserver-1709` [(release/stable/nanoserver/docker/Dockerfile)][nano-stable]
-  * `docker pull mcr.microsoft.com/powershell:nanoserver`
-
-[winsrvcore-stable]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/windowsservercore/docker/Dockerfile
-[nano-stable]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/stable/nanoserver/docker/Dockerfile
-
-### Preview Linux amd64 tags
-
-* `6.1.0-rc.1-ubuntu-18.04` [(/release/preview/ubuntu18.04/docker/Dockerfile)][ubuntu-18.04-preview]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-rc.1-ubuntu-18.04`
-* `6.1.0-rc.1-ubuntu-16.04` [(/release/preview/ubuntu16.04/docker/Dockerfile)][ubuntu-16.04-preview]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-rc.1-ubuntu-16.04`
-* `6.1.0-rc.1-centos-7` [(/release/preview/centos7/docker/Dockerfile)][centos-7-preview]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-rc.1-centos-7`
-* `6.1.0-rc.1-fedora-27` [(/release/preview/fedora27/docker/Dockerfile)][fedora-27-preview]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-rc.1-fedora-27`
-* `6.1.0-rc.1-fedora-28` [(/release/preview/fedora28/docker/Dockerfile)][fedora-28-preview]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-rc.1-fedora-28`
-* `6.1.0-rc.1-alpine-3.8` [(/release/preview/alpine/docker/Dockerfile)][alpine-preview]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-rc.1-alpine-3.8`
-
-[ubuntu-18.04-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/ubuntu18.04/docker/Dockerfile
-[ubuntu-16.04-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/ubuntu16.04/docker/Dockerfile
-[centos-7-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/centos7/docker/Dockerfile
-[fedora-27-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/fedora27/docker/Dockerfile
-[fedora-28-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/fedora28/docker/Dockerfile
-[alpine-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/alpine/docker/Dockerfile
-
-### Preview Windows amd64 tags
-
-* `6.1.0-rc.1-windowsservercore` [(release/preview/windowsservercore/docker/Dockerfile)][winsrvcore-preview]
-  * `docker pull mcr.microsoft.com/powershell:6.1.0-rc.1-windowsservercore`
-
-[winsrvcore-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/windowsservercore/docker/Dockerfile
-[nano-preview]:https://github.com/PowerShell/PowerShell-Docker/blob/master/release/preview/nanoserver/docker/Dockerfile
-
-## Legal and licensing
-
-PowerShell is licensed under the [MIT license][].
-
-[MIT license]: https://github.com/PowerShell/PowerShell/tree/master/LICENSE.txt
-
-By requesting and using the Container OS image for Windows containers, you acknowledge, understand, and consent to the Supplemental License Terms available on Docker Hub:
-
-* [Window Server Core](https://hub.docker.com/r/microsoft/windowsservercore/)
-* [Nano Server](https://hub.docker.com/r/microsoft/nanoserver/)
-
-[Third-Party Software Notices and Information](https://github.com/PowerShell/PowerShell/blob/master/ThirdPartyNotices.txt)
-
-## About the image
+## About This Image
 
 PowerShell Core is a cross-platform (Windows, Linux, and macOS) automation and configuration tool/framework. It works well with your existing tools and is optimized
 for dealing with structured data (for example, JSON, CSV, and XML), REST APIs, and object models.
@@ -108,6 +24,47 @@ If you are new to PowerShell and want to learn more, see the [getting started][]
 
 [getting started]: https://github.com/PowerShell/PowerShell/tree/master/docs/learning-powershell
 
-## How to use this image
+## How to Use This Image
 
 See our [Docker examples](https://github.com/PowerShell/PowerShell/tree/master/docker#examples).
+
+## Configuration
+
+See our [Docker examples](https://github.com/PowerShell/PowerShell/tree/master/docker#examples).
+
+## Full Tag Listing
+
+Tags go here.
+
+## Support
+
+For our support policy see [PowerShell Core Support Lifecycle](https://docs.microsoft.com/en-us/powershell/scripting/powershell-core-support)
+
+## Feedback
+
+* Please file issues for PowerShell Core in self at [PowerShell/Powershell](https://github.com/PowerShell/PowerShell/issues/new/choose)
+* Please file issues for how the images are built at [PowerShell/PowerShell-Docker](https://github.com/PowerShell/PowerShell-Docker/issues/new/choose)
+
+## License
+
+PowerShell is licensed under the [MIT license][].
+
+[MIT license]: https://github.com/PowerShell/PowerShell/tree/master/LICENSE.txt
+
+By requesting and using the Container OS image for Windows containers, you acknowledge, understand, and consent to the Supplemental License Terms available on Docker Hub:
+
+* [Window Server Core](https://store.docker.com/_/windowsservercore)
+* [Nano Server](https://store.docker.com/_/nanoserver)
+
+[Third-Party Software Notices and Information](https://github.com/PowerShell/PowerShell/blob/master/ThirdPartyNotices.txt)
+
+**ADDITIONAL LICENSING REQUIREMENTS AND/OR USE RIGHTS**
+Your use of the Supplement as specified in the preceding paragraph may result in the creation or modification of a container image (“Container Image”) that includes certain Supplement components. For clarity, a Container Image is separate and distinct from a virtual machine or virtual appliance image. Pursuant to these license terms, we grant you a restricted right to redistribute such Supplement components under the following conditions:
+(i) you may use the Supplement components only as used in, and as a part of, your Container Image,
+(ii) you may use such Supplement components in your Container Image as long as you have significant primary functionality in your Container Image that is materially separate and distinct from the Supplement; and
+(iii) you agree to include these license terms (or similar terms required by us or a hoster) with your Container Image to properly license the possible use of the Supplement components by your end-users.
+We reserve all other rights not expressly granted herein.
+
+**By using this Supplement, you accept these terms. If you do not accept them, do not use this Supplement.**
+
+As part of the Supplemental License Terms for this Container OS Image for Windows containers, you are also subject to the underlying Windows Server host software license terms, which are located at https://www.microsoft.com/en-us/useterms.
