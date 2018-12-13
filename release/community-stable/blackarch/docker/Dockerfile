@@ -23,7 +23,7 @@ ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
 
-# Download the Linux tar.gz and save it
+# Download the PowerShell Core Linux tar.gz and save it
 ADD ${PS_PACKAGE_URL} /tmp/powershell-linux.tar.gz
 
 # Define Args and Env needed to create links
@@ -33,6 +33,8 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
+    # Set up PowerShell module analysis cache path
+    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     # Opt out of SocketsHttpHandler in DotNet Core 2.1 to use HttpClientHandler
     # with installed libcurl4 package to resolve 
     # Invoke-WebRequest : Authentication failed" issue when executing using
@@ -67,6 +69,17 @@ RUN \
     && rm -f /tmp/powershell-linux.tar.gz \
     # Create the pwsh symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    # intialize powershell module cache
+    && pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          \$ErrorActionPreference = 'Stop' ; \
+          \$ProgressPreference = 'SilentlyContinue' ; \
+          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+            Start-Sleep -Seconds 6 ; \
+          }" \
     # upgrade distro
     && pacman -Syyu --noconfirm \
     # clean downloaded packages
