@@ -386,6 +386,7 @@ End {
                             $os = 'linux'
                         }
                         $architecture = 'amd64'
+                        $dockerfile = "https://github.com/PowerShell/PowerShell-Docker/blob/master/release/$actualChannel/$dockerFileName/docker/Dockerfile"
 
                         $osVersion = $meta.osVersion
                         if($osVersion)
@@ -402,6 +403,7 @@ End {
                                 OsVersion = $osVersion
                                 Os = $os
                                 Tags = $tagList
+                                Dockerfile = $dockerfile
                             }
 
                             $tagGroups[$tagGroup] += $tag
@@ -481,6 +483,7 @@ End {
                 Write-Output "      osVersion: $($tag.osVersion)"
                 Write-Output "      architecture: $($tag.architecture)"
                 Write-Output "      os: $($tag.os)"
+                Write-Output "      dockerfile: $($tag.dockerfile)"
             }
         }
     }
