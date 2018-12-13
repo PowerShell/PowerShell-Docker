@@ -1,5 +1,4 @@
 {
     "IsLinux" : true,
-    "SkipWebCmdletTests": true,
     "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz"
 }
