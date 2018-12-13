@@ -73,7 +73,7 @@ RUN \
     && yes | pacman -Scc
 
 # Define args needed only for the labels
-ARG IMAGE_NAME=pshorg/powershellcommunity:archlinux
+ARG IMAGE_NAME=pshorg/powershellcommunity:archlinux-2018.10.01
 ARG VCS_REF="none"
 
 # Add label last as it's just metadata and uses a lot of parameters
