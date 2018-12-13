@@ -38,6 +38,10 @@
   * Tags: `parrot-4.2.2` , `6.1.1-parrot-4.2.2`
   * Dockerfile: [/release/community-stable/parrot/docker/Dockerfile][parrotsec-linux-stable-dockerfile]
   * Example: `docker pull pshorg/powershellcommunity:parrot-4.2.2`
+* **[Photon Linux][parrotsec-linux-uri]**
+  * Tags: `photon-2.0` , `6.1.1-photon-2.0`
+  * Dockerfile: [/release/community-stable/photon/docker/Dockerfile][photon-linux-stable-dockerfile]
+  * Example: `docker pull pshorg/powershellcommunity:photon-2.0`
 
 [amazon-linux-stable-dockerfile]: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/community-stable/amazonlinux/docker/Dockerfile
 [arch-linux-stable-dockerfile]: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/community-stable/archlinux/docker/Dockerfile
@@ -46,6 +50,7 @@
 [kali-linux-stable-dockerfile]: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/community-stable/kali-rolling/docker/Dockerfile
 [oracle-linux-stable-dockerfile]: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/community-stable/oraclelinux/docker/Dockerfile
 [parrotsec-linux-stable-dockerfile]: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/community-stable/parrot/docker/Dockerfile
+[photon-linux-stable-dockerfile]: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/community-stable/photon/docker/Dockerfile
 
 [amazon-linux-uri]: https://aws.amazon.com/amazon-linux-2/
 [arch-linux-uri]: https://www.archlinux.org/
@@ -54,6 +59,7 @@
 [kali-linux-uri]: https://www.kali.org/
 [oracle-linux-uri]: https://www.oracle.com/linux/
 [parrotsec-linux-uri]: https://www.parrotsec.org/
+[photon-linux-uri]: https://vmware.github.io/photon/
 
 ## Legal and licensing
 
