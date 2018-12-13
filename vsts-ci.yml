@@ -142,6 +142,15 @@ phases:
     preview: false
     communityStable: true
 
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: photon
+    imagename: photon
+    stable: false
+    servicing: false
+    preview: false
+    communityStable: true
+    
 # Use CI switch to disable 1709 and 1803 builds because the VSTS hosted instances don't yet support 1709 or 1803
 # Skipping previews on windows due to how long it takes to build on windows
 - template: .vsts-ci/phase.yml
