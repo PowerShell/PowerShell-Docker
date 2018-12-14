@@ -36,13 +36,13 @@ phases:
       condition: succeededOrFailed()
 
   - ${{ if eq(parameters.communityStable, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'community-stable' -TestLogPostfix '$(ImageName)-servicing'
-      displayName: $(ImageName) Servicing
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'community-stable' -TestLogPostfix '$(ImageName)-stable'
+      displayName: $(ImageName) Stable
       condition: succeededOrFailed()
 
   - ${{ if eq(parameters.communityPreview, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'community-preview' -TestLogPostfix '$(ImageName)-servicing'
-      displayName: $(ImageName) Servicing
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'community-preview' -TestLogPostfix '$(ImageName)-preview'
+      displayName: $(ImageName) Preview
       condition: succeededOrFailed()
 
   - ${{ if eq(parameters.communityServicing, 'true') }}:
