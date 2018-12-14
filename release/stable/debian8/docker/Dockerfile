@@ -20,7 +20,7 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     # required to remove gdebi on debian 8
     SUDO_FORCE_REMOVE=yes \
     # set a fixed location for the Module analysis cache
-    PSModuleAnalysisCachePath=/PSModuleAnalysisCache/ModuleAnalysisCache
+    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
 
 # Install dependencies and clean up
 RUN apt-get update \
