@@ -19,7 +19,7 @@ ARG PS_INSTALL_VERSION=6
 # Define Args and Env needed to create links
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 
-# Download the Linux package and save it
+# Download the RHEL7 PowerShell Core package and save it
 ADD ${PS_PACKAGE_URL} /tmp/powershell-linux.rpm
 
 # Define Args and Env needed to create links
@@ -28,7 +28,9 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 
+    LANG=en_US.UTF-8 \
+    # Set up PowerShell module analysis cache path
+    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
 
 # Installation
 RUN \
@@ -40,6 +42,17 @@ RUN \
     && yum install -y /tmp/powershell-linux.rpm \
     # remove powershell package
     && rm -f /tmp/powershell-linux.rpm \
+    # intialize powershell module cache
+    && pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          \$ErrorActionPreference = 'Stop' ; \
+          \$ProgressPreference = 'SilentlyContinue' ; \
+          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+            Start-Sleep -Seconds 6 ; \
+          }" \
     # upgrade packages
     && yum upgrade -y \
     # clean cached data
@@ -48,7 +61,7 @@ RUN \
     && rm -rf /var/cache/yum
 
 # Define args needed only for the labels
-ARG IMAGE_NAME=pshorg/powershellcommunity:oraclelinux
+ARG IMAGE_NAME=pshorg/powershellcommunity:oraclelinux-7.5
 ARG VCS_REF="none"
 
 # Add label last as it's just metadata and uses a lot of parameters

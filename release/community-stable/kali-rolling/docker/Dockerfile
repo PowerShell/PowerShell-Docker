@@ -16,7 +16,7 @@ ARG PS_PACKAGE=powershell_${PS_VERSION}-1.debian.9_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
 
-# Download the Debian9 PowerShell package and save it
+# Download the Debian9 PowerShell Core package and save it
 ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
 
 # Define Args for the needed to add the package
@@ -30,6 +30,21 @@ ARG DEBIAN_PACKAGE_URL=http://ftp.us.debian.org/debian/pool/main/i/icu/libicu57_
 
 # Download the libicu57 Debian package and save it
 ADD ${DEBIAN_PACKAGE_URL} /tmp/libicu57_57.1-9_amd64.deb
+
+# Define Args and Env needed to create links
+ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
+    \
+    # Define ENVs for Localization/Globalization
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8 \
+    # Set up PowerShell module analysis cache path
+    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
+    # Opt out of SocketsHttpHandler in DotNet Core 2.1 to use HttpClientHandler
+    # with installed libcurl4 package to resolve 
+    # Invoke-WebRequest : Authentication failed" issue when executing using
+    # docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [Invoke-WebRequest] [-Uri <HTTPS URL>]
+    DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0
 
 # Installation
 RUN \
@@ -61,6 +76,17 @@ RUN \
     && apt-get install -y /tmp/powershell.deb \
     # remove powershell package
     && rm -f /tmp/powershell.deb \
+    # intialize powershell module cache
+    && pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          \$ErrorActionPreference = 'Stop' ; \
+          \$ProgressPreference = 'SilentlyContinue' ; \
+          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+            Start-Sleep -Seconds 6 ; \
+          }" \
     # upgrade distro
     && apt-get dist-upgrade -y \
     # clean downloaded packages
@@ -68,21 +94,8 @@ RUN \
     # remove package list
     && rm -rf /var/lib/apt/lists/*
 
-# Define Args and Env needed to create links
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
-    \
-    # Define ENVs for Localization/Globalization
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    # Opt out of SocketsHttpHandler in DotNet Core 2.1 to use HttpClientHandler
-    # with installed libcurl4 package to resolve 
-    # Invoke-WebRequest : Authentication failed" issue when executing using
-    # docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [Invoke-WebRequest] [-Uri <HTTPS URL>]
-    DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0
-
 # Define args needed only for the labels
-ARG IMAGE_NAME=pshorg/powershellcommunity:kali-rolling
+ARG IMAGE_NAME=pshorg/powershellcommunity:kali-kali-rolling
 ARG VCS_REF="none"
 
 # Add label last as it's just metadata and uses a lot of parameters

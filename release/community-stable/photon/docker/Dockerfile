@@ -19,7 +19,7 @@ ARG PS_INSTALL_VERSION=6
 # Define Args and Env needed to create links
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 
-# Download the Linux tar.gz and save it
+# Download the PowerShell Core Linux tar.gz and save it
 ADD ${PS_PACKAGE_URL} /tmp/powershell-linux.tar.gz
 
 # Installation of packages to uncompress downloaded package

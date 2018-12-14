@@ -16,12 +16,14 @@ ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
 
+# Download the PowerShell Core Linux tar.gz and save it
+ADD ${PS_PACKAGE_URL} /tmp/powershell-linux.tar.gz
+
+# Define Args for the needed to add the package
 ARG GNU_LINUX_LESS_PACKAGE_URL=https://ftp.gnu.org/gnu/less/less-530.tar.gz
 
+# Download the less tar.gz and save it
 ADD ${GNU_LINUX_LESS_PACKAGE_URL} /tmp/less.tar.gz
-
-# Download the Linux tar.gz and save it
-ADD ${PS_PACKAGE_URL} /tmp/powershell-linux.tar.gz
 
 # Define Args and Env needed to create links
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
@@ -54,7 +56,6 @@ FROM ${imageRepo}:${fromTag}
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/usr/bin/less", "/usr/bin/less"]
-
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links
@@ -66,6 +67,8 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
+    # Set up PowerShell module analysis cache path
+    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     # Opt out of SocketsHttpHandler in DotNet Core 2.1 to use HttpClientHandler
     DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0
 
@@ -76,13 +79,29 @@ RUN \
       runtime-libs-boost \
     # Create the pwsh symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    # intialize powershell module cache
+    && pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          \$ErrorActionPreference = 'Stop' ; \
+          \$ProgressPreference = 'SilentlyContinue' ; \
+          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+            Start-Sleep -Seconds 6 ; \
+          }" \
     # upgrade distro
     && swupd update \
     # clean downloaded packages
     && swupd clean --all
 
+# Copy only the files we need from the previous stage after distro upgrade
+# These files are required to resolve SSL issue with Invoke-WebRequest
+COPY --from=installer-env ["/usr/lib64/libcrypto.so.1.0.0", "/usr/lib64/libcrypto.so.1.0.0"]
+COPY --from=installer-env ["/usr/lib64/libssl.so.1.0.0", "/usr/lib64/libssl.so.1.0.0"]
+
 # Define args needed only for the labels
-ARG IMAGE_NAME=pshorg/powershellcommunity:clearlinux
+ARG IMAGE_NAME=pshorg/powershellcommunity:clearlinux-base
 ARG VCS_REF="none"
 
 # Add label last as it's just metadata and uses a lot of parameters
