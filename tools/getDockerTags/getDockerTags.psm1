@@ -25,7 +25,10 @@ function Get-DockerTags
         $OnlyShortTags,
 
         [Switch]
-        $SkipShortTagFilter
+        $SkipShortTagFilter,
+
+        [switch]
+        $Mcr
     )
 
     if($ShortTags.Count -gt 1 -and $AlternativeShortTag)
@@ -37,7 +40,14 @@ function Get-DockerTags
     $results = @()
 
     # Get all the tage
-    $tags = Invoke-RestMethod "https://registry.hub.docker.com/v1/repositories/$Image/tags"
+    if($Mcr.IsPresent)
+    {
+        $tags = Invoke-RestMethod "https://mcr.microsoft.com/v2/$Image/tags/list" | select-object -ExpandProperty tags
+    }
+    else {
+        $tags = Invoke-RestMethod "https://registry.hub.docker.com/v1/repositories/$Image/tags" | Select-Object -ExpandProperty name
+    }
+
     if(!$tags)
     {
         throw 'no results'
@@ -49,10 +59,10 @@ function Get-DockerTags
         # then, to full tags
         # then get the newest tag
         $fullTag = $tags |
-            Where-Object{$SkipShortTagFilter.IsPresent -or $_.name -like "${shortTag}*"} |
-                Where-Object{$_.name -match $FullTagFilter} |
-                    Sort-Object -Descending -Property name |
-                        Select-Object -ExpandProperty name -First 1
+            Where-Object{$SkipShortTagFilter.IsPresent -or $_ -like "${shortTag}*"} |
+                Where-Object{$_ -match $FullTagFilter} |
+                    Sort-Object -Descending |
+                        Select-Object -First 1
 
         # Return the short form of the tag
         $results += [PSCustomObject] @{
@@ -85,6 +95,6 @@ function Get-DockerTags
     return $results
 }
 
-Export-ModuleMember -Function @( 
+Export-ModuleMember -Function @(
     'Get-DockerTags'
 )
