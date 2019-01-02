@@ -1,7 +1,7 @@
 # escape=`
 ARG fromTag=latest
 
-FROM microsoft/windowsservercore:${fromTag}
+FROM mcr.microsoft.com/windowsservercore:${fromTag}
 
 ARG PS_VERSION=6.1.0
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/PowerShell-${PS_VERSION}-win-x64.msi

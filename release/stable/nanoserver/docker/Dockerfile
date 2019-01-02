@@ -2,8 +2,8 @@
 # Args used by from statements must be defined here:
 ARG fromTag=1709
 ARG WindowsServerCoreVersion=latest
-ARG WindowsServerCoreRepo=microsoft/windowsservercore
-ARG NanoServerRepo=microsoft/nanoserver
+ARG WindowsServerCoreRepo=mcr.microsoft.com/windowsservercore
+ARG NanoServerRepo=mcr.microsoft.com/nanoserver
 
 # Use server core as an installer container to extract PowerShell,
 # As this is a multi-stage build, this stage will eventually be thrown away
