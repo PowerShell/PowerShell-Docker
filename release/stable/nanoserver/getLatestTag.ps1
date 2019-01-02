@@ -15,7 +15,7 @@ $modulePath = Join-Path -Path $repoRoot -ChildPath 'tools\getDockerTags'
 Import-Module $modulePath
 
 # The versions of nanoserver we care about
-$shortTags = @('1709','1803')
+$shortTags = @('1709','1803','1809')
 
 if(!$CI.IsPresent)
 {

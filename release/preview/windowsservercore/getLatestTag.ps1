@@ -16,7 +16,7 @@ Import-Module $modulePath -Force
 if(!$CI.IsPresent)
 {
     # The versions of nanoserver we care about
-    $shortTags = @('1709','1803')
+    $shortTags = @('1709','1803','1809')
 
     Get-DockerTags -ShortTags $shortTags -Image "microsoft/windowsservercore" -FullTagFilter '\d{4}_KB\d{7}' -Mcr
 }
