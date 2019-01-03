@@ -79,7 +79,16 @@ function Get-DockerTags
         $tags = Get-DockerTagsList "https://mcr.microsoft.com/v2/$mcrImage/tags/list" -PropertyName tags
     }
     else {
-        $tags = Get-DockerTagsList "https://registry.hub.docker.com/v2/repositories/library/$Image/tags/" -PropertyName name
+        if($image -match '/')
+        {
+            $dockerImage = $Image
+        }
+        else
+        {
+            $dockerImage = "library/$Image"
+        }
+
+        $tags = Get-DockerTagsList "https://registry.hub.docker.com/v2/repositories/$dockerImage/tags/" -PropertyName name
     }
 
     if(!$tags)
