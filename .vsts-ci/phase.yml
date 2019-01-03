@@ -8,11 +8,13 @@ parameters:
   communityStable: 'false'
   communityPreview: 'false'
   communityServicing: 'false'
+  continueonerror: 'false'
 
 phases:
 - phase: ${{ parameters.name }}
   variables:
     ImageName: ${{ parameters.imagename }}
+    ContinueOnError: ${{ parameters.continueonerror }}
 
   queue: ${{ parameters.queue }}
   steps:
@@ -24,35 +26,42 @@ phases:
     - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'stable' -TestLogPostfix '$(ImageName)-stable'
       displayName: $(ImageName) Stable
       condition: succeededOrFailed()
+      continueOnError: $(ContinueOnError)
 
   - ${{ if eq(parameters.preview, 'true') }}:
     - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'preview' -TestLogPostfix '$(ImageName)-preview'
       displayName: $(ImageName) Preview
       condition: succeededOrFailed()
+      continueOnError: $(ContinueOnError)
 
   - ${{ if eq(parameters.servicing, 'true') }}:
     - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'servicing' -TestLogPostfix '$(ImageName)-servicing'
       displayName: $(ImageName) Servicing
       condition: succeededOrFailed()
+      continueOnError: $(ContinueOnError)
 
   - ${{ if eq(parameters.communityStable, 'true') }}:
     - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'community-stable' -TestLogPostfix '$(ImageName)-stable'
       displayName: $(ImageName) Stable
       condition: succeededOrFailed()
+      continueOnError: $(ContinueOnError)
 
   - ${{ if eq(parameters.communityPreview, 'true') }}:
     - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'community-preview' -TestLogPostfix '$(ImageName)-preview'
       displayName: $(ImageName) Preview
       condition: succeededOrFailed()
+      continueOnError: $(ContinueOnError)
 
   - ${{ if eq(parameters.communityServicing, 'true') }}:
     - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -Channel 'community-servicing' -TestLogPostfix '$(ImageName)-servicing'
       displayName: $(ImageName) Servicing
       condition: succeededOrFailed()
+      continueOnError: $(ContinueOnError)
 
   - task: PublishTestResults@2
     condition: succeededOrFailed()
     displayName: Publish $(ImageName) Test Results **\test*.xml
+    continueOnError: $(ContinueOnError)
     inputs:
       testRunner: NUnit
       testResultsFiles: '**\test*.xml'
