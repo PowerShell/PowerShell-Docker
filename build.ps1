@@ -160,9 +160,7 @@ DynamicParam {
     # Return parameters dictionaly
     $Dict = New-Object "System.Management.Automation.RuntimeDefinedParameterDictionary"
     $Dict.Add("Name", $Parameter) > $null
-    Write-Verbose "adding ca" -Verbose
     $Dict.Add("YamlChannels", $arrayParameter) > $null
-    Write-Verbose "returning" -Verbose
     return $Dict
 }
 
