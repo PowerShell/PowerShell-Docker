@@ -72,7 +72,7 @@ function Get-DockerTags
     # The versions of nanoserver we care about
     $results = @()
 
-    # Get all the tage
+    # Get all the tags
     if($Mcr.IsPresent)
     {
         $mcrImage = $Image -replace 'mcr\.microsoft\.com', ''
