@@ -64,7 +64,7 @@ function Invoke-Docker
     elseif($dockerExitCode -ne 0 -and $FailureAction -eq 'error')
     {
         $resultString = $result | out-string -Width 9999
-        if($result.length -gt 80)
+        if($result.length -gt 50)
         {
             $filename = [System.io.path]::GetTempFileName() + ".txt"
             $resultString | Out-File -FilePath $filename
@@ -72,6 +72,10 @@ function Invoke-Docker
             {
                 Write-Host "##vso[artifact.upload containerfolder=errorLogs;artifactname=errorLogs]$filename"
             }
+            $errorTail = Get-Content -Tail 40 -Path $filename
+
+            Write-Warning "*** Last 80 lines of log:"
+            $errorTail | ForEach-Object { Write-Warning -Message $_}
 
             Write-Error "docker $command failed, see $filename ($($result.length))" -ErrorAction Stop
         }
