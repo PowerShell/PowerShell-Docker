@@ -1,6 +1,39 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+# function to deal with pagination
+# which does not happen according to spec'ed behavior
+function Get-DockerTagsList
+{
+    param(
+        [string] $Url,
+        [ValidateSet('name', 'tags')]
+        [string] $PropertyName
+    )
+
+    try{
+        $nextUrl = $Url
+        while($nextUrl)
+        {
+            $results = Invoke-RestMethod $nextUrl
+            if($results.results)
+            {
+                $results.results.$PropertyName | ForEach-Object {Write-Output $_}
+                $nextUrl=$results.next
+            }
+            elseif($results.$PropertyName)
+            {
+                $results.$propertyName | ForEach-Object {Write-Output $_}
+                $nextUrl = $null
+            }
+        }
+    }
+    catch
+    {
+        throw "$_ retrieving '$Url'; nextUrl = $nextUrl"
+    }
+}
+
 # return objects representing the tags we need for a given Image
 function Get-DockerTags
 {
@@ -42,10 +75,11 @@ function Get-DockerTags
     # Get all the tage
     if($Mcr.IsPresent)
     {
-        $tags = Invoke-RestMethod "https://mcr.microsoft.com/v2/$Image/tags/list" | select-object -ExpandProperty tags
+        $mcrImage = $Image -replace 'mcr\.microsoft\.com', ''
+        $tags = Get-DockerTagsList "https://mcr.microsoft.com/v2/$mcrImage/tags/list" -PropertyName tags
     }
     else {
-        $tags = Invoke-RestMethod "https://registry.hub.docker.com/v1/repositories/$Image/tags" | Select-Object -ExpandProperty name
+        $tags = Get-DockerTagsList "https://registry.hub.docker.com/v2/repositories/library/$Image/tags/" -PropertyName name
     }
 
     if(!$tags)
