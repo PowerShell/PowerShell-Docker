@@ -66,7 +66,7 @@ function Invoke-Docker
         $resultString = $result | out-string -Width 9999
         if($result.length -gt 80)
         {
-            $filename = [System.io.path]::GetTempFileName()
+            $filename = [System.io.path]::GetTempFileName() + ".txt"
             $resultString | Out-File -FilePath $filename
             if($env:TF_BUILD)
             {
