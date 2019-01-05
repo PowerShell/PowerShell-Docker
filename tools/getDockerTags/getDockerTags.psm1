@@ -1,6 +1,39 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+# function to deal with pagination
+# which does not happen according to spec'ed behavior
+function Get-DockerTagsList
+{
+    param(
+        [string] $Url,
+        [ValidateSet('name', 'tags')]
+        [string] $PropertyName
+    )
+
+    try{
+        $nextUrl = $Url
+        while($nextUrl)
+        {
+            $results = Invoke-RestMethod $nextUrl
+            if($results.results)
+            {
+                $results.results.$PropertyName | ForEach-Object {Write-Output $_}
+                $nextUrl=$results.next
+            }
+            elseif($results.$PropertyName)
+            {
+                $results.$propertyName | ForEach-Object {Write-Output $_}
+                $nextUrl = $null
+            }
+        }
+    }
+    catch
+    {
+        throw "$_ retrieving '$Url'; nextUrl = $nextUrl"
+    }
+}
+
 # return objects representing the tags we need for a given Image
 function Get-DockerTags
 {
@@ -25,7 +58,10 @@ function Get-DockerTags
         $OnlyShortTags,
 
         [Switch]
-        $SkipShortTagFilter
+        $SkipShortTagFilter,
+
+        [switch]
+        $Mcr
     )
 
     if($ShortTags.Count -gt 1 -and $AlternativeShortTag)
@@ -36,8 +72,25 @@ function Get-DockerTags
     # The versions of nanoserver we care about
     $results = @()
 
-    # Get all the tage
-    $tags = Invoke-RestMethod "https://registry.hub.docker.com/v1/repositories/$Image/tags"
+    # Get all the tags
+    if($Mcr.IsPresent)
+    {
+        $mcrImage = $Image -replace 'mcr\.microsoft\.com', ''
+        $tags = Get-DockerTagsList "https://mcr.microsoft.com/v2/$mcrImage/tags/list" -PropertyName tags
+    }
+    else {
+        if($image -match '/')
+        {
+            $dockerImage = $Image
+        }
+        else
+        {
+            $dockerImage = "library/$Image"
+        }
+
+        $tags = Get-DockerTagsList "https://registry.hub.docker.com/v2/repositories/$dockerImage/tags/" -PropertyName name
+    }
+
     if(!$tags)
     {
         throw 'no results'
@@ -49,10 +102,10 @@ function Get-DockerTags
         # then, to full tags
         # then get the newest tag
         $fullTag = $tags |
-            Where-Object{$SkipShortTagFilter.IsPresent -or $_.name -like "${shortTag}*"} |
-                Where-Object{$_.name -match $FullTagFilter} |
-                    Sort-Object -Descending -Property name |
-                        Select-Object -ExpandProperty name -First 1
+            Where-Object{$SkipShortTagFilter.IsPresent -or $_ -like "${shortTag}*"} |
+                Where-Object{$_ -match $FullTagFilter} |
+                    Sort-Object -Descending |
+                        Select-Object -First 1
 
         # Return the short form of the tag
         $results += [PSCustomObject] @{
@@ -85,6 +138,6 @@ function Get-DockerTags
     return $results
 }
 
-Export-ModuleMember -Function @( 
+Export-ModuleMember -Function @(
     'Get-DockerTags'
 )

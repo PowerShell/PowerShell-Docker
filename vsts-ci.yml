@@ -96,15 +96,18 @@ phases:
     servicing: false
     preview: false
     communityStable: true
+    continueonerror: true
 
 - template: .vsts-ci/phase.yml
   parameters:
     name: blackArch
-    imagename: blackArch
+    imagename: blackarch
     stable: false
     servicing: false
     preview: false
     communityStable: true
+    continueonerror: true
+
 
 - template: .vsts-ci/phase.yml
   parameters:
@@ -118,7 +121,35 @@ phases:
 - template: .vsts-ci/phase.yml
   parameters:
     name: amazonLinux
-    imagename: amazonLinux
+    imagename: amazonlinux
+    stable: false
+    servicing: false
+    preview: false
+    communityStable: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: oracleLinux
+    imagename: oraclelinux
+    stable: false
+    servicing: false
+    preview: false
+    communityStable: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: clearLinux
+    imagename: clearlinux
+    stable: false
+    servicing: false
+    preview: false
+    communityStable: true
+    continueonerror: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: photon
+    imagename: photon
     stable: false
     servicing: false
     preview: false

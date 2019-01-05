@@ -1,10 +1,10 @@
 # escape=`
 ARG fromTag=latest
 
-FROM microsoft/windowsservercore:${fromTag}
+FROM mcr.microsoft.com/windows/servercore:${fromTag}
 
 ARG PS_VERSION=6.0.4
-ARG POWERSHELL_MSI=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/PowerShell-${PS_VERSION}-win-x64.msi
+ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/PowerShell-${PS_VERSION}-win-x64.msi
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:windowsservercore
 ARG VCS_REF="none"
 
@@ -29,7 +29,7 @@ RUN setx /M PATH "%ProgramFiles%\PowerShell\latest;%PATH%"
 # TODO switch to using zip files
 # Setup PowerShell - Log-to > C:\Docker.log
 SHELL ["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "-command"]
-ADD $POWERSHELL_MSI /PowerShell-win-x64.msi
+ADD ${PS_PACKAGE_URL} /PowerShell-win-x64.msi
 
 # Install PowerShell package and clean up
 RUN $ErrorActionPreference='Stop'; `

@@ -53,7 +53,7 @@ function Get-PowerShellVersion
     if ($Linux.IsPresent) {
         $retVersion = $retVersion -replace '\-', '~'
     }
-    
+
     return $retVersion
 }
 
@@ -63,7 +63,7 @@ function Get-ImageList
     param(
         [Parameter(HelpMessage="Filters returned list to stable or preview images.  Default to all images.")]
         [ValidateSet('stable','preview','servicing','all','community-stable','community-preview','community-servicing')]
-        [string]
+        [string[]]
         $Channel='all'
     )
 
@@ -83,7 +83,7 @@ function Get-ImageList
 
     if ($Channel -in 'servicing', 'all')
     {
-        Get-ChildItem -Path $stablePath -Directory | Select-Object -ExpandProperty Name | Write-Output
+        Get-ChildItem -Path $servicingPath -Directory | Select-Object -ExpandProperty Name | Write-Output
     }
 
     if ($Channel -in 'preview', 'all')
@@ -98,12 +98,12 @@ function Get-ImageList
 
     if ($Channel -in 'community-servicing', 'all')
     {
-        Get-ChildItem -Path $communityServicingPath -Directory | Select-Object -ExpandProperty Name | Write-Output
+        Get-ChildItem -Path $communityServicingPath -Directory -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name | Write-Output
     }
 
     if ($Channel -in 'community-preview', 'all')
     {
-        Get-ChildItem -Path $communityPreviewPath -Directory | Select-Object -ExpandProperty Name | Where-Object { $dockerFileNames -notcontains $_ } | Write-Output
+        Get-ChildItem -Path $communityPreviewPath -Directory -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name | Where-Object { $dockerFileNames -notcontains $_ } | Write-Output
     }
 }
 
@@ -128,6 +128,12 @@ class DockerImageMetaData {
 
     [bool]
     $SkipWebCmdletTests = $false
+
+    [string]
+    $OsVersion
+
+    [string]
+    $TagGroup = 'Linux'
 }
 
 Function Get-DockerImageMetaData
@@ -139,9 +145,65 @@ Function Get-DockerImageMetaData
 
     if (Test-Path $Path)
     {
-        $meta = Get-Content -Path $Path | ConvertFrom-Json
-        return [DockerImageMetaData] $meta
+        try {
+            $meta = Get-Content -Path $Path | ConvertFrom-Json
+            return [DockerImageMetaData] $meta
+        }
+        catch {
+            throw "$_ converting $Path"
+        }
     }
-    
+
     return [DockerImageMetaData]::new()
+}
+
+# this function wraps native command Execution
+# for more information, read https://mnaoumov.wordpress.com/2015/01/11/execution-of-external-commands-in-powershell-done-right/
+function script:Start-NativeExecution
+{
+    param(
+        [scriptblock]$sb,
+        [switch]$IgnoreExitcode,
+        [switch]$VerboseOutputOnError
+    )
+    $backupEAP = $script:ErrorActionPreference
+    $script:ErrorActionPreference = "Continue"
+    try {
+        if($VerboseOutputOnError.IsPresent)
+        {
+            $output = & $sb 2>&1
+        }
+        else
+        {
+            & $sb
+        }
+
+        # note, if $sb doesn't have a native invocation, $LASTEXITCODE will
+        # point to the obsolete value
+        if ($LASTEXITCODE -ne 0 -and -not $IgnoreExitcode) {
+            if($VerboseOutputOnError.IsPresent -and $output)
+            {
+                $output | Out-String | Write-Verbose -Verbose
+            }
+
+            # Get caller location for easier debugging
+            $caller = Get-PSCallStack -ErrorAction SilentlyContinue
+            if($caller)
+            {
+                $callerLocationParts = $caller[1].Location -split ":\s*line\s*"
+                $callerFile = $callerLocationParts[0]
+                $callerLine = $callerLocationParts[1]
+
+                $errorMessage = "Execution of {$sb} by ${callerFile}: line $callerLine failed with exit code $LASTEXITCODE"
+                throw $errorMessage
+            }
+            throw "Execution of {$sb} failed with exit code $LASTEXITCODE"
+        }
+    } finally {
+        try {
+            $script:ErrorActionPreference = $backupEAP
+        }
+        catch {
+        }
+    }
 }

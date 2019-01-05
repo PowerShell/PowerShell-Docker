@@ -2,8 +2,8 @@
 # Args used by from statements must be defined here:
 ARG fromTag=1709
 ARG WindowsServerCoreVersion=latest
-ARG WindowsServerCoreRepo=microsoft/windowsservercore
-ARG NanoServerRepo=microsoft/nanoserver
+ARG WindowsServerCoreRepo=mcr.microsoft.com/windows/servercore
+ARG NanoServerRepo=mcr.microsoft.com/windows/nanoserver
 
 # Use server core as an installer container to extract PowerShell,
 # As this is a multi-stage build, this stage will eventually be thrown away
@@ -12,12 +12,12 @@ FROM ${WindowsServerCoreRepo}:$WindowsServerCoreVersion  AS installer-env
 # Arguments for installing PowerShell, must be defined in the container they are used
 ARG PS_VERSION=6.1.0
 
-ENV PS_DOWNLOAD_URL https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
+ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 RUN if (!($env:PS_VERSION -match '^\d+\.\d+\.\d+(-\w+(\.\d+)?)?$' )) {throw ('PS_Version ({0}) must match the regex "^\d+\.\d+\.\d+(-\w+(\.\d+)?)?$"' -f $env:PS_VERSION)}
-ADD $PS_DOWNLOAD_URL /powershell.zip
+ADD ${PS_PACKAGE_URL} /powershell.zip
 
 RUN Expand-Archive powershell.zip -DestinationPath \PowerShell
 
