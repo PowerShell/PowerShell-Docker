@@ -96,7 +96,7 @@ phases:
     servicing: false
     preview: false
     communityStable: true
-    continueonerror: true
+    continueonerror: false
 
 - template: .vsts-ci/phase.yml
   parameters:
@@ -106,7 +106,7 @@ phases:
     servicing: false
     preview: false
     communityStable: true
-    continueonerror: true
+    continueonerror: false
 
 
 - template: .vsts-ci/phase.yml
