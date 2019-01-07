@@ -57,6 +57,8 @@ RUN \
     && pacman -Syy \
     # install dependencies
     && pacman -S --noconfirm \
+      # required for updating Arch Linux keyring
+      archlinux-keyring \
       # required for International Components for Unicode
       core/icu \
       # required for SSL
