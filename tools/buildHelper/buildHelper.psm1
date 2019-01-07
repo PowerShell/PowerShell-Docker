@@ -134,6 +134,17 @@ class DockerImageMetaData {
 
     [string]
     $TagGroup = 'Linux'
+
+    [ShortTagMetaData[]]
+    $ShortTags
+
+    [string[]]
+    $tagTemplates
+}
+
+class ShortTagMetaData {
+    [string] $Tag
+    [Bool] $KnownIssue
 }
 
 Function Get-DockerImageMetaData
