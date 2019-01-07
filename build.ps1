@@ -346,14 +346,14 @@ End {
                         {
                             $packageUrl = [System.UriBuilder]::new($sasBase)
 
-                            $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
                             $previewTag = ''
                             if($actualChannel -like '*preview*')
                             {
                                 $previewTag = '-preview'
                             }
 
-                            $packageName = $meta.PackageFormat -replace '\${previewTag}', $previewTag
+                            $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+                            $packageName = $packageName -replace '\${previewTag}', $previewTag
                             $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
                             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
                             $packageUrl.Query = $sasQuery
