@@ -19,7 +19,7 @@ $shortTags = @('1709','1803','1809')
 
 if(!$CI.IsPresent)
 {
-    Get-DockerTags -ShortTags $shortTags -Image "mcr.microsoft.com/windows/nanoserver" -FullTagFilter '\d{4}_KB\d{7}' -Mcr
+    Get-DockerTags -ShortTags $shortTags -Image "mcr.microsoft.com/windows/nanoserver" -FullTagFilter '\d{4}_KB\d{7}(_amd64)?$' -Mcr
 }
 else {
     # This is not supported for nanoserver so don't build in production but try building it as a CI test for the Dockerfile
