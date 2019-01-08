@@ -10,7 +10,7 @@ ARG NanoServerRepo=mcr.microsoft.com/windows/nanoserver
 FROM ${WindowsServerCoreRepo}:$WindowsServerCoreVersion  AS installer-env
 
 # Arguments for installing PowerShell, must be defined in the container they are used
-ARG PS_VERSION=6.0.4
+ARG PS_VERSION=6.1.0
 
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
 
@@ -25,7 +25,7 @@ RUN Expand-Archive powershell.zip -DestinationPath \PowerShell
 FROM ${NanoServerRepo}:${fromTag}
 
 ARG VCS_REF="none"
-ARG PS_VERSION=6.0.4
+ARG PS_VERSION=6.1.0
 ARG IMAGE_NAME=mcr.microsoft.com/powershell
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
@@ -50,8 +50,7 @@ COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell"]
 
 # Persist %PSCORE% ENV variable for user convenience
 ENV PSCORE="$ProgramFiles\PowerShell\pwsh.exe"
-
 # Set the path
-RUN setx PATH "%PATH%;%ProgramFiles%\PowerShell"
+ENV PATH="$PATH;${ProgramFiles}\PowerShell"
 
 CMD ["pwsh.exe"]
