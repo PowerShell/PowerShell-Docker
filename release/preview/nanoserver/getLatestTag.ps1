@@ -6,16 +6,16 @@
 
 param(
     [Switch]
-    $CI
+    $CI,
+    # The versions of nanoserver we care about
+    [string[]]
+    $ShortTags
 )
 
 $parent = Join-Path -Path $PSScriptRoot -ChildPath '..'
 $repoRoot = Join-Path -path (Join-Path -Path $parent -ChildPath '..') -ChildPath '..'
 $modulePath = Join-Path -Path $repoRoot -ChildPath 'tools\getDockerTags'
 Import-Module $modulePath
-
-# The versions of nanoserver we care about
-$shortTags = @('1709','1803','1809')
 
 if(!$CI.IsPresent)
 {
