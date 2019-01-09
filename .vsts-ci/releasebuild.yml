@@ -72,9 +72,6 @@ jobs:
   - template: manifestSteps.yml
 
 - job: GenerateTagsYaml
-  variables:
-    stableReleaseTag: $(stableReleaseTag)
-    previewReleaseTag: $(previewReleaseTag)
 
   displayName: Generate Tags YAML
 
