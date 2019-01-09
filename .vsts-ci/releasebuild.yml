@@ -85,7 +85,20 @@ jobs:
 
   steps:
   - powershell: |
-        $yaml = ./build.ps1 -GenerateTagsYaml -YamlChannels stable, preview
+      $stableVersion = '$(stableReleaseTag)' -replace '^v', ''
+      Write-Host "##vso[task.setvariable variable=StableVersion;]$stableVersion"
+      $previewVersion = '$(previewReleaseTag)' -replace '^v', ''
+      Write-Host "##vso[task.setvariable variable=PreviewVersion;]$previewVersion"
+    displayName: 'Set Versions'
+
+  - powershell: 'Get-ChildItem env:'
+    displayName: 'Capture Environment'
+
+  - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
+    displayName: 'Install Pester'
+
+  - powershell: |
+        $yaml = ./build.ps1 -GenerateTagsYaml -YamlChannels stable, preview -StableVersion $(StableVersion) -PreviewVersion $(PreviewVersion)
         $yaml | Out-File -Encoding ascii -Path ./tagsmetadata.yaml
         Get-ChildItem -Path ./tagsmetadata.yaml | Select-Object -ExpandProperty FullName | ForEach-Object {
                 Write-Host "##vso[artifact.upload containerfolder=artifacts;artifactname=artifacts]$_"
