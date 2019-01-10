@@ -1,7 +1,7 @@
 # escape=`
 # Args used by from statements must be defined here:
 ARG fromTag=1709
-ARG WindowsServerCoreVersion=1809
+ARG WindowsServerCoreVersion=latest
 ARG WindowsServerCoreRepo=mcr.microsoft.com/windows/servercore
 ARG NanoServerRepo=mcr.microsoft.com/windows/nanoserver
 
