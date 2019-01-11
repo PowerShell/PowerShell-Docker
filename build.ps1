@@ -91,6 +91,21 @@ param(
     [string]
     $Version,
 
+    [Parameter(ParameterSetName="GenerateTagsYaml")]
+    [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
+    [string]
+    $StableVersion,
+
+    [Parameter(ParameterSetName="GenerateTagsYaml")]
+    [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
+    [string]
+    $PreviewVersion,
+
+    [Parameter(ParameterSetName="GenerateTagsYaml")]
+    [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
+    [string]
+    $ServicingVersion,
+
     [switch]
     $IncludeKnownIssues
 )
@@ -168,11 +183,6 @@ DynamicParam {
 }
 
 Begin {
-    $versionExtraParams = @{}
-    if($Version){
-        $versionExtraParams.Add('Version', $Version)
-    }
-
     if ($PSCmdlet.ParameterSetName -ne 'GenerateTagsYaml')
     {
         # We are using the Channel parameter, so assign the variable to that
@@ -207,17 +217,34 @@ End {
             $Name = Get-ImageList -Channel $actualChannel
         }
 
+        $versionExtraParams = @{}
+        if($Version){
+            $versionExtraParams.Add('Version', $Version)
+        }
+
         switch -RegEx ($actualChannel)
         {
             'servicing$' {
+                if($ServicingVersion){
+                    $versionExtraParams['Version'] = $ServicingVersion
+                }
+
                 $windowsVersion = Get-PowerShellVersion -Servicing @versionExtraParams
                 $linuxVersion = Get-PowerShellVersion -Linux -Servicing @versionExtraParams
             }
             'preview$' {
+                if($PreviewVersion){
+                    $versionExtraParams['Version'] = $PreviewVersion
+                }
+
                 $windowsVersion = Get-PowerShellVersion -Preview @versionExtraParams
                 $linuxVersion = Get-PowerShellVersion -Linux -Preview @versionExtraParams
             }
             'stable$' {
+                if($StableVersion){
+                    $versionExtraParams['Version'] = $StableVersion
+                }
+
                 $windowsVersion = Get-PowerShellVersion @versionExtraParams
                 $linuxVersion = Get-PowerShellVersion -Linux @versionExtraParams
             }
