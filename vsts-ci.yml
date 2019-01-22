@@ -37,11 +37,6 @@ phases:
 
 - template: .vsts-ci/phase.yml
   parameters:
-    name: fedora27
-    imagename: fedora27
-
-- template: .vsts-ci/phase.yml
-  parameters:
     name: fedora28
     imagename: fedora28
     stable: true
@@ -59,14 +54,6 @@ phases:
   parameters:
     name: opensuse423
     imagename: opensuse423
-    stable: true
-    servicing: false
-    preview: false
-
-- template: .vsts-ci/phase.yml
-  parameters:
-    name: debian8
-    imagename: debian8
     stable: true
     servicing: false
     preview: false
