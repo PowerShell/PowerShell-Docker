@@ -5,8 +5,8 @@
 # installed from full PowerShell linux tar.gz package
 
 # Define arg(s) needed for the From statement
-ARG fromTag=2018.10.01
-ARG imageRepo=base/archlinux
+ARG fromTag=latest
+ARG imageRepo=archlinux/base
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
