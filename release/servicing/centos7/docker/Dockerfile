@@ -19,15 +19,14 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
 
 # Install dependencies and clean up
 RUN yum install -y /tmp/powershell.rpm \
-    && yum install -y \
-	# less is required for help in powershell
-	less \
     # Required for gssntlmssp
     && yum install -y epel-release \
     # Update now that we have epel-release
     && yum update -y \
     # Install libraries for NTLM support
     && yum install -y gssntlmssp \
+	# less is required for help in powershell
+	less \
     && yum upgrade-minimal -y --security \
     && yum clean all \
     && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
