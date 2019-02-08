@@ -24,6 +24,12 @@ RUN yum install -y /tmp/powershell.rpm \
     && yum install -y \
 	# less is required for help in powershell
 	less \
+    # Required for gssntlmssp
+    && yum install -y epel-release \
+    # Update now that we have epel-release
+    && yum update -y \
+    # Install libraries for NTLM support
+    && yum install -y gssntlmssp \
     && yum upgrade-minimal -y --security \
     && yum clean all \
     && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
@@ -41,15 +47,7 @@ RUN yum install -y /tmp/powershell.rpm \
             Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
             Start-Sleep -Seconds 6 ; \
           }"
-
-# Required for gssntlmssp
-RUN yum install -y epel-release
-
-# Update now that we have epel-release
-RUN yum update -y
-
-# Install libraries for NTLM support
-RUN yum install -y gssntlmssp
+          
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
