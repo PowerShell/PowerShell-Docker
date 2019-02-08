@@ -42,6 +42,15 @@ RUN yum install -y /tmp/powershell.rpm \
             Start-Sleep -Seconds 6 ; \
           }"
 
+# Required for gssntlmssp
+RUN yum install -y epel-release
+
+# Update now that we have epel-release
+RUN yum update -y
+
+# Install libraries for NTLM support
+RUN yum install -y gssntlmssp
+
 # Define args needed only for the labels
 ARG VCS_REF="none"
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:centos7
