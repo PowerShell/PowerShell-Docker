@@ -58,9 +58,8 @@ RUN apt-get update \
           }"
 
 # Required for gssntlmssp
-RUN yum install -y epel-release \
-    && yum update -y \
-    yum install -y gss-ntlmssp
+RUN apt-get install -y epel-release \
+    apt-get install -y gss-ntlmssp
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
