@@ -6,6 +6,6 @@
     "tagTemplates": [
         "#psversion#-ubuntu-#tag#",
         "ubuntu-#shorttag#"
-    ]
+    ],
     "SkipGssNtlmSspTests": true
 }
