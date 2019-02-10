@@ -418,6 +418,7 @@ End {
                         ExpectedVersion = $actualVersion
                         SkipVerification = $skipVerification
                         SkipWebCmdletTests = $meta.SkipWebCmdletTests
+                        SkipGssNtlmSspTests = $meta.SkipGssNtlmSspTests
                     }
 
                     $testArgList += $testArgs

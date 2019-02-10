@@ -129,6 +129,9 @@ class DockerImageMetaData {
     [bool]
     $SkipWebCmdletTests = $false
 
+    [bool]
+    $SkipGssNtlmSspTests = $false
+
     [string]
     $OsVersion
 
