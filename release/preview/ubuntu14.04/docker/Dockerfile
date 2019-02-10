@@ -58,8 +58,8 @@ RUN apt-get update \
           }"
 
 # Required for gssntlmssp
-RUN apt-get install -y epel-release \
-    apt-get install -y gss-ntlmssp
+RUN apt install epel-release \
+    apt install gss-ntlmssp
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
