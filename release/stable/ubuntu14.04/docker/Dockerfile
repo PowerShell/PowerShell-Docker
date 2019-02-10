@@ -56,6 +56,11 @@ RUN apt-get update \
             Start-Sleep -Seconds 6 ; \
           }"
 
+# Required for gssntlmssp
+RUN yum install -y epel-release \
+    && yum update -y \
+    yum install -y gss-ntlmssp
+
 # Define args needed only for the labels
 ARG VCS_REF="none"
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:ubuntu14.04
