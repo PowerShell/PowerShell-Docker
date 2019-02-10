@@ -126,6 +126,7 @@ function Get-LinuxContainer
                 BuildArgs = $testArgs.BuildArgs
                 ExpectedVersion = $testArgs.ExpectedVersion
                 SkipWebCmdletTests = $testArgs.SkipWebCmdletTests
+                SkipGssNtlmSspTests = $testArgs.SkipGssNtlmSspTests
                 ImageName = $testArgs.BuildArgs.IMAGE_NAME
             }
         }
@@ -156,6 +157,7 @@ function Get-WindowsContainer
                 BuildArgs = $testArgs.BuildArgs
                 ExpectedVersion = $testArgs.ExpectedVersion
                 SkipWebCmdletTests = $testArgs.SkipWebCmdletTests
+                SkipGssNtlmSspTests = $testArgs.SkipGssNtlmSspTests
                 ImageName = $testArgs.BuildArgs.IMAGE_NAME
             }
         }
@@ -283,6 +285,27 @@ function Get-MetadataUsingContainer
     $runParams += '-noprofile'
     $runParams += '-c'
     $runParams += '(Invoke-WebRequest -Uri "https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json").Content'
+
+    return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
+}
+
+function Get-LinuxGssNtlmSsp
+{
+    param(
+        [string] $Name
+    )
+
+    $imageTag = ${Name}
+
+    $runParams = @()
+    $runParams += '--rm'
+
+    $runParams += $imageTag
+    $runParams += 'pwsh'
+    $runParams += '-nologo'
+    $runParams += '-noprofile'
+    $runParams += '-c'
+    $runParams += '(Get-ChildItem /usr/lib*/*/gssntlmssp.so -Recurse |select-object -first 1).FullName'
 
     return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
 }

@@ -6,5 +6,6 @@
     "tagTemplates": [
         "#psversion#-alpine-#tag#",
         "preview-alpine-#shorttag#"
-    ]
+    ],
+    "SkipGssNtlmSspTests": true
 }

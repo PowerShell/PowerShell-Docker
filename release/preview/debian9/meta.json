@@ -2,5 +2,6 @@
     "IsLinux" : true,
     "UseLinuxVersion" : false,
     "PackageFormat": "powershell-preview_${PS_VERSION}-1.debian.9_amd64.deb",
-    "osVersion": "Debian 9"
+    "osVersion": "Debian 9",
+    "SkipGssNtlmSspTests": true
 }
