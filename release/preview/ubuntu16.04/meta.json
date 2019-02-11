@@ -3,5 +3,9 @@
     "UseLinuxVersion": false,
     "PackageFormat": "powershell${previewTag}_${PS_VERSION}-1.ubuntu.16.04_amd64.deb",
     "osVersion": "Ubuntu 16.04",
-    "SkipGssNtlmSspTests": true
+    "SkipGssNtlmSspTests": true,
+    "tagTemplates": [
+        "#psversion#-ubuntu-#tag#",
+        "ubuntu-#shorttag#"
+    ]
 }
