@@ -74,8 +74,8 @@ RUN \
     # upgrade distro
     && pacman -Syyu --noconfirm \
     # clean downloaded packages
-    # create /var/cache/pacman/pkg directory to prevent pacman error output on
-    # missing directory
+    # create /var/cache/pacman/pkg directory to prevent pacman -Scc generating
+    # an error output about this missing directory
     && mkdir /var/cache/pacman/pkg \
     && yes | pacman -Scc
 
