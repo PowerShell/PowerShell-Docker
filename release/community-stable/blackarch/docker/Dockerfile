@@ -49,6 +49,8 @@ RUN \
     && locale-gen \
     # set execute permission on BlackArch strap shell script
     && chmod +x /tmp/strap.sh \
+    # update keyring server in /tmp/strap.sh 
+    && sed -i "s|pgp.mit.edu|hkp://pool.sks-keyservers.net|g" /tmp/strap.sh \
     # run BlackArch strap shell script
     && /tmp/strap.sh \
     # remove BlackArch strap shell script
@@ -63,6 +65,8 @@ RUN \
       core/icu \
       # required for SSL
       openssl-1.0 \
+      # required for uncompressing tar file
+      tar \
     # create powershell folder
     && mkdir -p ${PS_INSTALL_FOLDER} \
     # uncompress powershell linux tar file
@@ -85,6 +89,9 @@ RUN \
     # upgrade distro
     && pacman -Syyu --noconfirm \
     # clean downloaded packages
+    # create /var/cache/pacman/pkg directory to prevent pacman -Scc generating
+    # an error output about this missing directory
+    && mkdir /var/cache/pacman/pkg \
     && yes | pacman -Scc
 
 # Define args needed only for the labels
