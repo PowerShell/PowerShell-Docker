@@ -1,4 +1,6 @@
 {
     "IsLinux" : true,
-    "PackageFormat": "powershell_${PS_VERSION}-1.ubuntu.16.04_amd64.deb"
+    "PackageFormat": "powershell_${PS_VERSION}-1.ubuntu.16.04_amd64.deb",
+    "SkipGssNtlmSspTests": true,
+    "tagTemplates": ["#psversion#-ubuntu-#tag#"]
 }

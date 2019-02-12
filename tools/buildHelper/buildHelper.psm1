@@ -129,11 +129,25 @@ class DockerImageMetaData {
     [bool]
     $SkipWebCmdletTests = $false
 
+    [bool]
+    $SkipGssNtlmSspTests = $false
+
     [string]
     $OsVersion
 
     [string]
     $TagGroup = 'Linux'
+
+    [ShortTagMetaData[]]
+    $ShortTags
+
+    [string[]]
+    $tagTemplates
+}
+
+class ShortTagMetaData {
+    [string] $Tag
+    [Bool] $KnownIssue
 }
 
 Function Get-DockerImageMetaData

@@ -21,7 +21,12 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
 
 # Install dependencies and clean up
 RUN yum install -y /tmp/powershell.rpm \
-    && yum install -y \
+    # Required for gssntlmssp
+    && yum install -y epel-release \
+    # Update now that we have epel-release
+    && yum update -y \
+    # Install libraries for NTLM support
+    && yum install -y gssntlmssp \
 	# less is required for help in powershell
 	less \
     && yum upgrade-minimal -y --security \
@@ -41,6 +46,7 @@ RUN yum install -y /tmp/powershell.rpm \
             Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
             Start-Sleep -Seconds 6 ; \
           }"
+          
 
 # Define args needed only for the labels
 ARG VCS_REF="none"

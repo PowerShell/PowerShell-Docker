@@ -50,8 +50,7 @@ COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell"]
 
 # Persist %PSCORE% ENV variable for user convenience
 ENV PSCORE="$ProgramFiles\PowerShell\pwsh.exe"
-
 # Set the path
-RUN setx PATH "%PATH%;%ProgramFiles%\PowerShell"
+ENV PATH="$PATH;${ProgramFiles}\PowerShell"
 
 CMD ["pwsh.exe"]

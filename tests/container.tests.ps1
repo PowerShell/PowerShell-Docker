@@ -162,6 +162,12 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 Name = $_.Name
             }
         }
+
+        $script:linuxContainerRunTests | Where-Object {$_.SkipGssNtlmSspTests -ne $true} | ForEach-Object {
+            $gssNtlmSspTestCases += @{
+                Name = $_.Name
+            }
+        }
     }
     AfterAll{
         # prune unused volumes
@@ -226,6 +232,17 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             $culture = Get-UICultureUsingContainer -Name $Name
             $culture | Should -Not -BeNullOrEmpty
             $culture | Should -BeExactly 'en-US'
+        }
+
+        it "gss-ntlmssp is installed in <Name>" -TestCases $gssNtlmSspTestCases -Skip:($script:skipLinuxRun -or $gssNtlmSspTestCases.count -eq 0) {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name
+            )
+
+            $gssNtlmSspPath = Get-LinuxGssNtlmSsp -Name $Name
+            $gssNtlmSspPath | Should -Not -BeNullOrEmpty
         }
     }
 

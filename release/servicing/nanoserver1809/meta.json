@@ -3,11 +3,9 @@
     "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip",
     "osVersion": "Nano Server, version ${fromTag}",
     "shortTags": [
-        {"Tag": "1709"},
-        {"Tag": "1803"}
+        {"Tag": "1809"}
     ],
     "tagTemplates": [
-        "#psversion#-nanoserver-#tag#",
-        "nanoserver-#shorttag#"
+        "#psversion#-nanoserver-#tag#"
     ]
 }

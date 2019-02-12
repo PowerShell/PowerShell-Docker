@@ -1,6 +1,0 @@
-{
-    "IsLinux" : true,
-    "UseLinuxVersion" : false,
-    "PackageFormat": "powershell${previewTag}_${PS_VERSION}-1.debian.8_amd64.deb",
-    "osVersion": "Debian 8"
-}
