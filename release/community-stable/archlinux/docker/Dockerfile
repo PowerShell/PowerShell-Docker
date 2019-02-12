@@ -50,6 +50,8 @@ RUN \
       core/icu \
       # required for SSL
       openssl-1.0 \
+      # required for uncompressing tar file
+      tar \
     # create powershell folder
     && mkdir -p ${PS_INSTALL_FOLDER} \
     # uncompress powershell linux tar file
@@ -72,6 +74,9 @@ RUN \
     # upgrade distro
     && pacman -Syyu --noconfirm \
     # clean downloaded packages
+    # create /var/cache/pacman/pkg directory to prevent pacman error output on
+    # missing directory
+    && mkdir /var/cache/pacman/pkg \
     && yes | pacman -Scc
 
 # Define args needed only for the labels
