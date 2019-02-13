@@ -47,7 +47,7 @@ jobs:
   dependsOn:
    - previewLinux
    - previewWindows
-  condition: always()
+  condition: succeededOrFailed()
   pool:
     name: PowerShell
     timeoutInMinutes: 30
@@ -65,7 +65,7 @@ jobs:
   dependsOn:
    - stableWindows
    - stableLinux
-  condition: always()
+  condition: succeededOrFailed()
   pool:
     name: PowerShell
     timeoutInMinutes: 30
@@ -77,7 +77,7 @@ jobs:
 
   displayName: Generate Tags YAML
 
-  condition: always()
+  condition: succeededOrFailed()
   pool:
     name: Hosted Ubuntu 1604
     timeoutInMinutes: 30
