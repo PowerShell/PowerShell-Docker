@@ -1,3 +1,5 @@
+name: s_$(stableReleaseTag)_p_$(previewReleaseTag)$(Rev:_rr)
+
 resources:
 - repo: self
   clean: true
@@ -45,7 +47,7 @@ jobs:
   dependsOn:
    - previewLinux
    - previewWindows
-  condition: always()
+  condition: succeededOrFailed()
   pool:
     name: PowerShell
     timeoutInMinutes: 30
@@ -63,7 +65,7 @@ jobs:
   dependsOn:
    - stableWindows
    - stableLinux
-  condition: always()
+  condition: succeededOrFailed()
   pool:
     name: PowerShell
     timeoutInMinutes: 30
@@ -75,7 +77,7 @@ jobs:
 
   displayName: Generate Tags YAML
 
-  condition: always()
+  condition: succeededOrFailed()
   pool:
     name: Hosted Ubuntu 1604
     timeoutInMinutes: 30
@@ -102,4 +104,11 @@ jobs:
             }
     displayName: Generate Tags YAML
 
-
+  - powershell: |
+      $path = '$(SYSTEM.DEFAULTWORKINGDIRECTORY)/releaseTags.json'
+      @{
+        'previewReleaseTag' = '$(previewReleaseTag)'
+        'stableReleaseTag' = '$(stableReleaseTag)'
+      }|convertto-json | out-file -FilePath $path -Encoding ascii
+      Write-Host "##vso[artifact.upload containerfolder=releaseTags;artifactname=releaseTags]$path"
+    displayName: Save release Tags
