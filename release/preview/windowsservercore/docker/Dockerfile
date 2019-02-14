@@ -1,11 +1,54 @@
 # escape=`
 ARG fromTag=latest
+ARG WindowsServerCoreRepo=mcr.microsoft.com/windows/servercore
 
-FROM mcr.microsoft.com/windows/servercore:${fromTag}
+# Use server core as an installer container to extract PowerShell,
+# As this is a multi-stage build, this stage will eventually be thrown away
+FROM ${WindowsServerCoreRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=6.1.0-rc.1
-ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/PowerShell-${PS_VERSION}-win-x64.msi
+ARG PS_VERSION=6.2.0-preview.4
+ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/PowerShell-${PS_VERSION}-win-x64.zip
+
+SHELL ["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "-command"]
+
+ARG PS_PACKAGE_URL_BASE64
+
+RUN Write-host "Verifying valid Version..."; `
+    if (!($env:PS_VERSION -match '^\d+\.\d+\.\d+(-\w+(\.\d+)?)?$' )) { `
+        throw ('PS_Version ({0}) must match the regex "^\d+\.\d+\.\d+(-\w+(\.\d+)?)?$"' -f $env:PS_VERSION) `
+    } `
+    $ProgressPreference = 'SilentlyContinue'; `
+    if($env:PS_PACKAGE_URL_BASE64){ `
+        Write-host "decoding: $env:PS_PACKAGE_URL_BASE64" ;`
+        $url = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($env:PS_PACKAGE_URL_BASE64)) `
+    } else { `
+        Write-host "using url: $env:PS_PACKAGE_URL" ;`
+        $url = $env:PS_PACKAGE_URL `
+    } `
+    Write-host "downloading: $url"; `
+    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12; `
+    Invoke-WebRequest -Uri $url -outfile /powershell.zip -verbose; `
+    Expand-Archive powershell.zip -DestinationPath  \PowerShell
+
+# Install PowerShell into WindowsServerCore
+FROM ${WindowsServerCoreRepo}:${fromTag}
+
+ENV ProgramFiles C:\Program Files
+
+# Copy PowerShell Core from the installer container
+COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell\\latest"]
+
+# Set the path
+RUN setx /M PATH "%ProgramFiles%\PowerShell\latest;%PATH%"
+
+# Persist %PSCORE% ENV variable for user convenience
+ENV PSCORE='"C:\Program Files\PowerShell\latest\pwsh.exe"'
+
+CMD ["pwsh.exe"]
+
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:windowsservercore
+ARG VCS_REF="none"
+ARG PS_VERSION=6.2.0-preview.4
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" `
@@ -22,37 +65,3 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
       org.label-schema.docker.cmd.devel="docker run ${IMAGE_NAME}" `
       org.label-schema.docker.cmd.test="docker run ${IMAGE_NAME} pwsh -c Invoke-Pester" `
       org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
-
-RUN setx /M PATH "%ProgramFiles%\PowerShell\latest;%PATH%"
-
-# TODO switch to using zip files
-# Setup PowerShell - Log-to > C:\Docker.log
-SHELL ["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "-command"]
-ADD ${PS_PACKAGE_URL} /PowerShell-win-x64.msi
-
-# Install PowerShell package and clean up
-RUN $ErrorActionPreference='Stop'; `
-    $ConfirmPreference='None'; `
-    $VerbosePreference='Continue'; `
-    Start-Transcript -path C:\Dockerfile.log -append -IncludeInvocationHeader ; `
-    $PSVersionTable | Write-Output ; `
-    $VerInfo = Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' ; `
-    ('FullBuildString: '+$VerInfo.BuildLabEx) | Write-Output ; `
-    ('OperatingSystem:  '+$VerInfo.ProductName+' '+$VerInfo.EditionId+' '+$VerInfo.InstallationType)  | Write-Output ; `
-    [System.IO.FileInfo]$MsiFile = Get-Item -Path ./PowerShell-win-x64.msi ; `
-    Start-Process -FilePath msiexec.exe -ArgumentList '-qn','-i c:\PowerShell-win-x64.msi', `
-      '-log c:\PowerShell-win-x64.msi.log','-norestart' -wait ; `
-    $log=get-content -Path C:\PowerShell-win-x64.msi.log -Last 10 ; `
-    if ($log -match 'Installation success or error status: 0') { `
-      Remove-Item -Path $MsiFile ; `
-      $psexe=Get-Item -Path $Env:ProgramFiles\PowerShell\*\pwsh.exe ; `
-      New-Item -Type SymbolicLink -Path $Env:ProgramFiles\PowerShell\ -Name latest -Value $psexe.DirectoryName `
-    } else { throw 'Installation failed!  See c:\PowerShell-win-x64.msi.log' } ;
-
-# Verify New pwsh.exe runs
-SHELL ["C:\\Program Files\\PowerShell\\latest\\pwsh.exe", "-command"]
-
-# Persist %PSCORE% ENV variable for user convenience
-ENV PSCORE='"C:\Program Files\PowerShell\latest\pwsh.exe"'
-
-CMD ["pwsh.exe"]

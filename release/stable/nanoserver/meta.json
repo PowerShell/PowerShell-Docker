@@ -9,5 +9,6 @@
     "tagTemplates": [
         "#psversion#-nanoserver-#tag#",
         "nanoserver-#shorttag#"
-    ]
+    ],
+    "Base64EncodePackageUrl": true
 }

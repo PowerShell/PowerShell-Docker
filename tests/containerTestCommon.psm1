@@ -395,10 +395,9 @@ function Invoke-DockerBuild
     foreach($argName in $buildArgNames)
     {
         $value = $BuildArgs.$argName
-        if($env:ACR_NAME)
+        if($env:ACR_NAME -and $value -match '&')
         {
-            # & must be escaped in ACR
-            $value = $value -replace '&', '%26'
+            throw "$argName contains '&' and this is not allowed in ACR using the az cli"
         }
 
         $buildArgList += @(

@@ -132,6 +132,9 @@ class DockerImageMetaData {
     [bool]
     $SkipGssNtlmSspTests = $false
 
+    [bool]
+    $Base64EncodePackageUrl = $false
+
     [string]
     $OsVersion
 
