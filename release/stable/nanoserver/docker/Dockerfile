@@ -13,11 +13,22 @@ FROM ${WindowsServerCoreRepo}:$WindowsServerCoreVersion  AS installer-env
 ARG PS_VERSION=6.1.0
 
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
+ARG PS_PACKAGE_URL_BASE64
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-RUN if (!($env:PS_VERSION -match '^\d+\.\d+\.\d+(-\w+(\.\d+)?)?$' )) {throw ('PS_Version ({0}) must match the regex "^\d+\.\d+\.\d+(-\w+(\.\d+)?)?$"' -f $env:PS_VERSION)}
-ADD ${PS_PACKAGE_URL} /powershell.zip
+RUN if (!($env:PS_VERSION -match '^\d+\.\d+\.\d+(-\w+(\.\d+)?)?$' )) { `
+        throw ('PS_Version ({0}) must match the regex "^\d+\.\d+\.\d+(-\w+(\.\d+)?)?$"' -f $env:PS_VERSION) `
+    } `
+    if($env:PS_PACKAGE_URL_BASE64){ `
+        Write-host "decoding: $env:PS_PACKAGE_URL_BASE64" `
+        $url = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($env:PS_PACKAGE_URL_BASE64)) `
+    } else { `
+        Write-host "using url: $env:PS_PACKAGE_URL" `
+        $url = $env:PS_PACKAGE_URL `
+    } `
+    Write-host "downloading: $url" `
+    Invoke-WebRequest -Uri $url -outfile /powershell.zip
 
 RUN Expand-Archive powershell.zip -DestinationPath \PowerShell
 
