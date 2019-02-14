@@ -196,7 +196,7 @@ Begin {
     {
         $sasUri = [uri]$SasUrl
         $sasBase = $sasUri.GetComponents([System.UriComponents]::Path -bor [System.UriComponents]::Scheme -bor [System.UriComponents]::Host ,[System.UriFormat]::Unescaped)
-        $sasQuery = $sasUri.Query
+        $sasQuery = $sasUri.Query -replace '^\?', ''
     }
 }
 
@@ -407,7 +407,16 @@ End {
                         $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
                         $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
                         $packageUrl.Query = $sasQuery
-                        $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+                        if($meta.Base64EncodePackageUrl)
+                        {
+                            $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.ToString())
+                            $encodedUrl =[Convert]::ToBase64String($urlBytes)
+                            $buildArgs.Add('PS_PACKAGE_URL_BASE64', $encodedUrl)
+                        }
+                        else
+                        {
+                            $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+                        }
                     }
 
                     $testArgs = @{
