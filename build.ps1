@@ -196,6 +196,9 @@ Begin {
     {
         $sasUri = [uri]$SasUrl
         $sasBase = $sasUri.GetComponents([System.UriComponents]::Path -bor [System.UriComponents]::Scheme -bor [System.UriComponents]::Host ,[System.UriFormat]::Unescaped)
+
+        # The UriBuilder used later adds the ? even if it is already there on Windows
+        # and will add it if it is not there on non-windows
         $sasQuery = $sasUri.Query -replace '^\?', ''
     }
 }
