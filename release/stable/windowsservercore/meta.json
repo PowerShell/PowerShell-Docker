@@ -1,6 +1,6 @@
 {
     "IsLinux": false,
-    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.msi",
+    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip",
     "osVersion": "Windows Server Core, version ${fromTag}",
     "Base64EncodePackageUrl": true
 }
