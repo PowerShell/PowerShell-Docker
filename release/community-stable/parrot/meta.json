@@ -1,5 +1,9 @@
 {
     "IsLinux" : true,
     "PackageFormat": "powershell_${PS_VERSION}-1.debian.9_amd64.deb",
-    "SkipGssNtlmSspTests": true
+    "SkipGssNtlmSspTests": true,
+    "tagTemplates": [
+        "#psversion#-parrot-#tag#",
+        "parrot-#shorttag#"
+    ]
 }
