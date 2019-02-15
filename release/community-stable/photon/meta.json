@@ -2,5 +2,9 @@
     "IsLinux" : true,
     "SkipWebCmdletTests": true,
     "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
-    "SkipGssNtlmSspTests": true
+    "SkipGssNtlmSspTests": true,
+    "tagTemplates": [
+        "#psversion#-photon-#tag#",
+        "photon-#shorttag#"
+    ]
 }
