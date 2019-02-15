@@ -115,7 +115,7 @@ Describe "Pull Linux Containers" -Tags 'Linux', 'Pull' {
 
 Describe "Pull Windows Containers" -Tags 'Windows', 'Pull' {
     BeforeAll {
-        $buildTestCases = @()
+        $pullTestCases = @()
         $script:windowsContainerRunTests | ForEach-Object {
             $pullTestCases += @{
                 Name = $_.Name
