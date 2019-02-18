@@ -552,7 +552,7 @@ End {
                 Write-Output "      osVersion: $($tag.osVersion)"
                 Write-Output "      architecture: $($tag.architecture)"
                 Write-Output "      os: $($tag.os)"
-                Write-Output "      Dockerfile: $($tag.dockerfile)"
+                Write-Output "      dockerfile: $($tag.dockerfile)"
             }
         }
     }
