@@ -69,6 +69,9 @@ param(
     [switch]
     $CI,
 
+    [string]
+    $TagFilter,
+
     [ValidateSet('stable','preview','servicing','community-stable','community-preview','community-servicing')]
     [Parameter(Mandatory, ParameterSetName="TestByName")]
     [Parameter(Mandatory, ParameterSetName="TestAll")]
@@ -87,6 +90,8 @@ param(
 
     [Parameter(ParameterSetName="localBuildByName")]
     [Parameter(ParameterSetName="localBuildAll")]
+    [Parameter(Mandatory, ParameterSetName="TestByName")]
+    [Parameter(Mandatory, ParameterSetName="TestAll")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
     $Version,
@@ -312,6 +317,10 @@ End {
             }
             # Get the tag data for the image
             $tagData = @(& $scriptPath -CI:$CI.IsPresent @getTagsExtraParams | Where-Object {$_.FromTag})
+            if($TagFilter)
+            {
+                $tagData = $tagData | Where-Object { $_.FromTag -match $TagFilter }
+            }
 
             foreach ($tagGroup in ($tagData | Group-Object -Property 'FromTag')) {
                 $actualTags = @()
