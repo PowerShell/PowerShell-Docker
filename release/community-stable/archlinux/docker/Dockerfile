@@ -50,7 +50,7 @@ RUN \
       core/icu \
       # required for SSL
       openssl-1.0 \
-      # required for uncompressing tar file
+      # required for uncompressing tar files
       tar \
     # create powershell folder
     && mkdir -p ${PS_INSTALL_FOLDER} \

@@ -114,7 +114,16 @@ Describe "Pull Linux Containers" -Tags 'Linux', 'Pull' {
 }
 
 Describe "Pull Windows Containers" -Tags 'Windows', 'Pull' {
-    it "<Name> pulls without error" -TestCases $script:windowsContainerRunTests  -skip:$script:skipWindowsRun {
+    BeforeAll {
+        $pullTestCases = @()
+        $script:windowsContainerRunTests | ForEach-Object {
+            $pullTestCases += @{
+                Name = $_.Name
+                Tags = $_.Tags
+            }
+        }
+    }
+    it "<Name> pulls without error" -TestCases $pullTestCases  -skip:$script:skipWindowsRun {
         param(
             [Parameter(Mandatory=$true)]
             [string]
@@ -122,19 +131,7 @@ Describe "Pull Windows Containers" -Tags 'Windows', 'Pull' {
 
             [Parameter(Mandatory=$true)]
             [string[]]
-            $Tags,
-
-            [Parameter(Mandatory=$true)]
-            [string]
-            $path,
-
-            [Parameter(Mandatory=$true)]
-            [object]
-            $BuildArgs,
-
-            [Parameter(Mandatory=$true)]
-            [string]
-            $ExpectedVersion
+            $Tags
         )
 
         foreach($tag in $tags) {

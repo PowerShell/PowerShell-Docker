@@ -69,6 +69,9 @@ param(
     [switch]
     $CI,
 
+    [string]
+    $TagFilter,
+
     [ValidateSet('stable','preview','servicing','community-stable','community-preview','community-servicing')]
     [Parameter(Mandatory, ParameterSetName="TestByName")]
     [Parameter(Mandatory, ParameterSetName="TestAll")]
@@ -87,6 +90,8 @@ param(
 
     [Parameter(ParameterSetName="localBuildByName")]
     [Parameter(ParameterSetName="localBuildAll")]
+    [Parameter(Mandatory, ParameterSetName="TestByName")]
+    [Parameter(Mandatory, ParameterSetName="TestAll")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
     $Version,
@@ -196,7 +201,10 @@ Begin {
     {
         $sasUri = [uri]$SasUrl
         $sasBase = $sasUri.GetComponents([System.UriComponents]::Path -bor [System.UriComponents]::Scheme -bor [System.UriComponents]::Host ,[System.UriFormat]::Unescaped)
-        $sasQuery = $sasUri.Query
+
+        # The UriBuilder used later adds the ? even if it is already there on Windows
+        # and will add it if it is not there on non-windows
+        $sasQuery = $sasUri.Query -replace '^\?', ''
     }
 }
 
@@ -309,6 +317,10 @@ End {
             }
             # Get the tag data for the image
             $tagData = @(& $scriptPath -CI:$CI.IsPresent @getTagsExtraParams | Where-Object {$_.FromTag})
+            if($TagFilter)
+            {
+                $tagData = $tagData | Where-Object { $_.FromTag -match $TagFilter }
+            }
 
             foreach ($tagGroup in ($tagData | Group-Object -Property 'FromTag')) {
                 $actualTags = @()
@@ -407,7 +419,16 @@ End {
                         $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
                         $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
                         $packageUrl.Query = $sasQuery
-                        $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+                        if($meta.Base64EncodePackageUrl)
+                        {
+                            $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.ToString())
+                            $encodedUrl =[Convert]::ToBase64String($urlBytes)
+                            $buildArgs.Add('PS_PACKAGE_URL_BASE64', $encodedUrl)
+                        }
+                        else
+                        {
+                            $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+                        }
                     }
 
                     $testArgs = @{

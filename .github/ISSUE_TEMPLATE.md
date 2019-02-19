@@ -11,40 +11,34 @@ If it is a bug report:
 If it's not a bug, please remove the template and elaborate the issue in your own words.
 -->
 
-Steps to reproduce
-------------------
+## Steps to reproduce
 
 ```powershell
 
 ```
 
-Expected behavior
------------------
+## Expected behavior
 
 ```none
 
 ```
 
-Actual behavior
----------------
+## Actual behavior
 
 ```none
 
 ```
 
-Environment data
-----------------
+## Environment data
 
 <!-- provide the docker info -->
 
 ```sh
 > docker info
-
 ```
 
 <!-- provide the output of $PSVersionTable from powershell in the docker container -->
 
 ```powershell
 > $PSVersionTable
-
 ```

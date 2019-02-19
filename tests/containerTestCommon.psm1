@@ -58,7 +58,7 @@ function Invoke-Docker
     $dockerExitCode = $LASTEXITCODE
     if($PassThru.IsPresent)
     {
-        Write-Verbose "passing through docker results of length: $($result.length)..." -Verbose
+        Write-Verbose "passing through Docker results of length: $($result.length)..." -Verbose
         return $result
     }
     elseif($dockerExitCode -ne 0 -and $FailureAction -eq 'error')
@@ -77,18 +77,18 @@ function Invoke-Docker
             Write-Warning "*** Last 80 lines of log:"
             $errorTail | ForEach-Object { Write-Warning -Message $_}
 
-            Write-Error "docker $command failed, see $filename ($($result.length))" -ErrorAction Stop
+            Write-Error "Docker $command failed, see $filename ($($result.length))" -ErrorAction Stop
         }
         else
         {
-            Write-Error "docker $command failed with: $resultString  ($($result.length))" -ErrorAction Stop
+            Write-Error "Docker $command failed with: $resultString  ($($result.length))" -ErrorAction Stop
         }
 
         return $false
     }
     elseif($dockerExitCode -ne 0 -and $FailureAction -eq 'warning')
     {
-        Write-Warning "docker $command failed with: $result"
+        Write-Warning "Docker $command failed with: $result"
         return $false
     }
     elseif($dockerExitCode -ne 0)
@@ -207,7 +207,7 @@ function Test-SkipLinux
             return $true
         }
         default {
-            throw "Unknow docker os '$os'"
+            throw "Unknown Docker os '$os'"
         }
     }
 }
@@ -349,7 +349,7 @@ function Get-DockerImageLabel
     return Invoke-Docker -Command inspect -Params $runParams -SuppressHostOutput -PassThru
 }
 
-# Builds a docker image
+# Builds a Docker image
 function Invoke-DockerBuild
 {
     param(
@@ -395,10 +395,9 @@ function Invoke-DockerBuild
     foreach($argName in $buildArgNames)
     {
         $value = $BuildArgs.$argName
-        if($env:ACR_NAME)
+        if($env:ACR_NAME -and $value -match '&')
         {
-            # & must be escaped in ACR
-            $value = $value -replace '&', '%26'
+            throw "$argName contains '&' and this is not allowed in ACR using the az cli"
         }
 
         $buildArgList += @(

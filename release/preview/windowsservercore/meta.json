@@ -1,5 +1,10 @@
 {
     "IsLinux": false,
-    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.msi",
-    "osVersion": "Windows Server Core, version ${fromTag}"
+    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip",
+    "osVersion": "Windows Server Core, version ${fromTag}",
+    "Base64EncodePackageUrl": true,
+    "tagTemplates": [
+        "#psversion#-windowsservercore-#tag#",
+        "preview-windowsservercore-#shorttag#"
+    ]    
 }
