@@ -6,6 +6,6 @@
     "SkipGssNtlmSspTests": true,
     "tagTemplates": [
         "#psversion#-ubuntu-#tag#",
-        "ubuntu-#shorttag#"
+        "preview-ubuntu-#shorttag#"
     ]
 }
