@@ -26,10 +26,10 @@ ARG KALI_REPO_KEY_PACKAGE_URL=https://http.kali.org/kali/pool/main/k/kali-archiv
 ADD ${KALI_REPO_KEY_PACKAGE_URL} /tmp/kali-archive-keyring_2018.1_all.deb
 
 # Define Args for the needed to add the package
-ARG DEBIAN_PACKAGE_URL=http://ftp.us.debian.org/debian/pool/main/i/icu/libicu57_57.1-9_amd64.deb
+ARG DEBIAN_PACKAGE_URL=http://ftp.us.debian.org/debian/pool/main/i/icu/libicu57_57.1-6+deb9u2_amd64.deb
 
 # Download the libicu57 Debian package and save it
-ADD ${DEBIAN_PACKAGE_URL} /tmp/libicu57_57.1-9_amd64.deb
+ADD ${DEBIAN_PACKAGE_URL} /tmp/libicu57_57.1-6+deb9u2_amd64.deb
 
 # Define Args and Env needed to create links
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
@@ -53,9 +53,9 @@ RUN \
     # remove kali package
     && rm -f /tmp/kali-archive-keyring_2018.1_all.deb \
     # install required libicu57 package
-    && dpkg -i /tmp/libicu57_57.1-9_amd64.deb \
+    && dpkg -i /tmp/libicu57_57.1-6+deb9u2_amd64.deb \
     # remove libicu57 package
-    && rm -f /tmp/libicu57_57.1-9_amd64.deb \
+    && rm -f /tmp/libicu57_57.1-6+deb9u2_amd64.deb \
     # update package list
     && apt-get update \
     # install dependencies
@@ -68,6 +68,8 @@ RUN \
       less \
       # required to setup the locale
       locales \
+      # required to support NTLM for PSRemoting
+      gss-ntlmssp \
     # enable en_US.UTF-8 locale
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     # generate locale
