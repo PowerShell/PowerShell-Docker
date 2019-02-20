@@ -55,6 +55,8 @@ RUN \
       less \
       # required to setup the locale
       locales \
+      # required to support NTLM for PSRemoting
+      gss-ntlmssp \
     # enable en_US.UTF-8 locale
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     # generate locale
