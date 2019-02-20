@@ -258,7 +258,7 @@ function Get-Versions
         $StableVersion
     )
 
-    Write-Verbose "Getting Version for $Channel - servicing: $ServicingVersion; Preview: $PreviewVersion; stable: $stableVersion" -Verbose
+    Write-Verbose "Getting Version for $Channel - servicing: $ServicingVersion; Preview: $PreviewVersion; stable: $stableVersion"
 
     $versionExtraParams = @{}
 
