@@ -29,7 +29,6 @@ param(
     [switch]
     $Pull,
 
-
     [Parameter(Mandatory, ParameterSetName="GenerateTagsYaml")]
     [switch]
     $GenerateTagsYaml,
@@ -53,6 +52,10 @@ param(
     [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
     [switch]
     $GetTags,
+
+    [Parameter(Mandatory, ParameterSetName="DupeCheckAll")]
+    [switch]
+    $CheckForDuplicateTags,
 
     [Parameter(Mandatory, ParameterSetName="TestAll")]
     [Parameter(Mandatory, ParameterSetName="localBuildAll")]
@@ -79,7 +82,9 @@ param(
     [Parameter(Mandatory, ParameterSetName="localBuildAll")]
     [Parameter(Mandatory, ParameterSetName="GetTagsByName")]
     [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
-    [string]
+    [Parameter(Mandatory, ParameterSetName="DupeCheckAll")]
+    [Parameter(Mandatory, ParameterSetName="GenerateTagsYaml")]
+    [string[]]
     $Channel='stable',
 
     [Parameter(ParameterSetName="localBuildByName")]
@@ -132,13 +137,14 @@ DynamicParam {
         }
 
         default {
-            $imageChannel = $Channel
+            $imageChannels = $Channel
         }
     }
 
     $dockerFileNames = @()
-    Get-ImageList -Channel $imageChannel | ForEach-Object { $dockerFileNames += $_ }
-
+    foreach($imageChannel in $imageChannels){
+        Get-ImageList -Channel $imageChannel | ForEach-Object { $dockerFileNames += $_ }
+    }
 
     function Add-ParameterAttribute {
         param(
@@ -168,34 +174,21 @@ DynamicParam {
     # Create the parameter
     $Parameter = New-Object "System.Management.Automation.RuntimeDefinedParameter" -ArgumentList ("Name", [string[]], $Attributes)
 
-    # Create the parameter attributs
-    $channelArrayAttributes = New-Object "System.Collections.ObjectModel.Collection``1[System.Attribute]"
-
-
-    Add-ParameterAttribute -ParameterSetName 'GenerateTagsYaml' -Attributes $channelArrayAttributes
-
-    $ValidateSetAttr = New-Object "System.Management.Automation.ValidateSetAttribute" -ArgumentList 'stable','preview','servicing','community-stable','community-preview','community-servicing'
-    $channelArrayAttributes.Add($ValidateSetAttr) > $null
-
-    # Create the parameter
-    $arrayParameter = New-Object "System.Management.Automation.RuntimeDefinedParameter" -ArgumentList ("YamlChannels", [string[]], $channelArrayAttributes)
-
     # Return parameters dictionaly
     $Dict = New-Object "System.Management.Automation.RuntimeDefinedParameterDictionary"
     $Dict.Add("Name", $Parameter) > $null
-    $Dict.Add("YamlChannels", $arrayParameter) > $null
     return $Dict
 }
 
 Begin {
-    if ($PSCmdlet.ParameterSetName -ne 'GenerateTagsYaml')
+    if ($PSCmdlet.ParameterSetName -notin 'GenerateTagsYaml', 'DupeCheckAll' -and $Channel.Count -gt 1)
     {
+        throw "Multiple Channels are not supported in this parameter set"
+
         # We are using the Channel parameter, so assign the variable to that
-        $Channels = $Channel
     }
-    else {
-        $Channels = $PSBoundParameters['YamlChannels']
-    }
+
+    $Channels = $Channel
 
     if($SasUrl)
     {
@@ -212,6 +205,8 @@ End {
     $localImageNames = @()
     $testArgList = @()
     $tagGroups = @{}
+    $dupeCheckTable = @{}
+    $dupeTagIssues = @()
 
     foreach ($actualChannel in $Channels) {
         if ($PSCmdlet.ParameterSetName -match '.*ByName')
@@ -448,6 +443,20 @@ End {
                 elseif ($GetTags.IsPresent) {
                     Write-Verbose "from: $fromTag actual: $($actualTags -join ', ') psversion: $psversion" -Verbose
                 }
+                elseif ($CheckForDuplicateTags.IsPresent) {
+                    Write-Verbose "$actualChannel - from: $fromTag actual: $($actualTags -join ', ') psversion: $psversion" -Verbose
+                    foreach($tag in $actualTags)
+                    {
+                        if($dupeCheckTable.ContainsKey($tag))
+                        {
+                            $dupeTagIssues += "$tag is duplicate for both '$actualChannel/$dockerFileName' and '$($dupeCheckTable.$tag)'"
+                        }
+                        else
+                        {
+                            $dupeCheckTable.Add($tag,"$actualChannel/$dockerFileName")
+                        }
+                    }
+                }
                 elseif ($GenerateTagsYaml.IsPresent) {
                     $tagGroup = 'public/powershell'
                     $os = 'windows'
@@ -554,6 +563,15 @@ End {
                 Write-Output "      os: $($tag.os)"
                 Write-Output "      dockerfile: $($tag.dockerfile)"
             }
+        }
+    }
+
+    if($CheckForDuplicateTags.IsPresent)
+    {
+        Write-Verbose "checking dup issues" -Verbose
+        if($dupeTagIssues.count -gt 0)
+        {
+            throw ($dupeTagIssues -join [System.Environment]::NewLine)
         }
     }
 }
