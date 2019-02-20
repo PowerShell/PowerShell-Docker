@@ -224,3 +224,153 @@ function script:Start-NativeExecution
         }
     }
 }
+
+# Add a parameter attribute to an Attribute Collection
+function Add-ParameterAttribute {
+    param(
+        [Parameter(Mandatory)]
+        [object]
+        $Attributes,
+        [Parameter(Mandatory)]
+        [string]
+        $ParameterSetName
+    )
+    $ParameterAttr = New-Object "System.Management.Automation.ParameterAttribute"
+    $ParameterAttr.ParameterSetName = $ParameterSetName
+    $ParameterAttr.Mandatory = $true
+    $Attributes.Add($ParameterAttr) > $null
+}
+
+function Get-Versions
+{
+    param(
+        [Parameter(Mandatory)]
+        [String]
+        $Channel,
+
+        [string]
+        $ServicingVersion,
+
+        [string]
+        $PreviewVersion,
+
+        [string]
+        $StableVersion
+    )
+
+    Write-Verbose "Getting Version for $Channel - servicing: $ServicingVersion; Preview: $PreviewVersion; stable: $stableVersion" -Verbose
+
+    $versionExtraParams = @{}
+
+    switch -RegEx ($Channel)
+    {
+        'servicing$' {
+            if($ServicingVersion){
+                $versionExtraParams['Version'] = $ServicingVersion
+            }
+
+            $windowsVersion = Get-PowerShellVersion -Servicing @versionExtraParams
+            $linuxVersion = Get-PowerShellVersion -Linux -Servicing @versionExtraParams
+        }
+        'preview$' {
+            if($PreviewVersion){
+                $versionExtraParams['Version'] = $PreviewVersion
+            }
+
+            $windowsVersion = Get-PowerShellVersion -Preview @versionExtraParams
+            $linuxVersion = Get-PowerShellVersion -Linux -Preview @versionExtraParams
+        }
+        'stable$' {
+            if($StableVersion){
+                $versionExtraParams['Version'] = $StableVersion
+            }
+
+            $windowsVersion = Get-PowerShellVersion @versionExtraParams
+            $linuxVersion = Get-PowerShellVersion -Linux @versionExtraParams
+        }
+        default {
+            throw "unknown channel: $Channel"
+        }
+    }
+
+    return [PSCustomObject] @{
+        WindowsVersion = $windowsVersion
+        LinuxVersion = $linuxVersion
+    }
+}
+
+function Get-DockerImageMetaDataWrapper
+{
+    param(
+        [parameter(Mandatory)]
+        [string]
+        $DockerFileName,
+
+        [switch]
+        $CI,
+
+        [switch]
+        $IncludeKnownIssues,
+
+        [parameter(Mandatory)]
+        [string]
+        $ChannelPath
+    )
+
+    $imagePath = Join-Path -Path $ChannelPath -ChildPath $dockerFileName
+    $scriptPath = Join-Path -Path $imagePath -ChildPath 'getLatestTag.ps1'
+    $tagsJsonPath = Join-Path -Path $imagePath -ChildPath 'tags.json'
+    $metaJsonPath = Join-Path -Path $imagePath -ChildPath 'meta.json'
+
+    # skip an image if it doesn't exist
+    if(!(Test-Path $scriptPath))
+    {
+        $message = "Channel: $actualChannel, Name: $dockerFileName does not existing.  Not every image exists in every channel.  Skipping."
+        if($CI.IsPresent)
+        {
+            throw $message
+        }
+
+        Write-Warning $message
+        continue
+    }
+
+    $meta = Get-DockerImageMetaData -Path $metaJsonPath
+    if($meta.tagTemplates.count -gt 0)
+    {
+        $tagsTemplates = $meta.tagTemplates
+    }
+    else
+    {
+        $tagsTemplates = Get-Content -Path $tagsJsonPath | ConvertFrom-Json
+    }
+
+    $getTagsExtraParams = @{}
+
+    if($meta.ShortTags.count -gt 0)
+    {
+        $shortTags = @()
+        foreach ($shortTag in $meta.ShortTags) {
+            if(!$shortTag.KnownIssue -or $IncludeKnownIssues.IsPresent)
+            {
+                $shortTags += $shortTag.Tag
+            }
+        }
+
+        $getTagsExtraParams.Add('ShortTags',$shortTags)
+    }
+
+    # Get the tag data for the image
+    $tagData = @(& $scriptPath -CI:$CI.IsPresent @getTagsExtraParams | Where-Object {$_.FromTag})
+    if($TagFilter)
+    {
+        $tagData = $tagData | Where-Object { $_.FromTag -match $TagFilter }
+    }
+
+    return [PSCustomObject]@{
+        meta = $meta
+        tagsTemplates = $tagsTemplates
+        imagePath = $imagePath
+        tagData = $tagData
+    }
+}
