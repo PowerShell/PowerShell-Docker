@@ -224,7 +224,13 @@ End {
         foreach($dockerFileName in $Name)
         {
             # Get all image meta data
-            $allMeta = Get-DockerImageMetaDataWrapper -DockerFileName $dockerFileName -CI:$CI.IsPresent -IncludeKnownIssues:$IncludeKnownIssues.IsPresent -ChannelPath $channelPath
+            $allMeta = Get-DockerImageMetaDataWrapper `
+                -DockerFileName $dockerFileName `
+                -CI:$CI.IsPresent `
+                -IncludeKnownIssues:$IncludeKnownIssues.IsPresent `
+                -ChannelPath $channelPath `
+                -TagFilter $TagFilter
+
             $meta = $allMeta.meta
             $tagsTemplates = $allMeta.tagsTemplates
             $imagePath = $allMeta.imagePath

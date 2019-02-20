@@ -313,6 +313,9 @@ function Get-DockerImageMetaDataWrapper
         [switch]
         $IncludeKnownIssues,
 
+        [string]
+        $TagFilter,
+
         [parameter(Mandatory)]
         [string]
         $ChannelPath
