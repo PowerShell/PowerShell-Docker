@@ -5,13 +5,17 @@ resources:
 phases:
 
 - phase: Set_Build_Name
-  condition: ne(variables['Build.Reason'], 'PullRequest')
   queue:
     name: Hosted Ubuntu 1604
+  displayName: Check For Duplicate Tags
   steps:
   - powershell:  Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhss"))"
     displayName: Set Build Name for Non-PR
     condition: ne(variables['Build.Reason'], 'PullRequest')
+
+  - powershell: ./build.ps1 -CheckForDuplicateTags -Channel stable, preview, servicing
+    displayName: Check for Duplicate Tags
+    condition: succeededOrFailed()
 
 - template: .vsts-ci/phase.yml
   parameters:
