@@ -487,10 +487,13 @@ End {
 
     if($CheckForDuplicateTags.IsPresent)
     {
-        Write-Verbose "checking dup issues" -Verbose
         if($dupeTagIssues.count -gt 0)
         {
             throw ($dupeTagIssues -join [System.Environment]::NewLine)
+        }
+        else
+        {
+            Write-Verbose "No duplicates found." -Verbose
         }
     }
 }
