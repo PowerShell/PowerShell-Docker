@@ -97,6 +97,8 @@ param(
     [Parameter(ParameterSetName="localBuildAll")]
     [Parameter(Mandatory, ParameterSetName="TestByName")]
     [Parameter(Mandatory, ParameterSetName="TestAll")]
+    [Parameter(Mandatory, ParameterSetName="GetTagsByName")]
+    [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
     $Version,
@@ -144,21 +146,6 @@ DynamicParam {
     $dockerFileNames = @()
     foreach($imageChannel in $imageChannels){
         Get-ImageList -Channel $imageChannel | ForEach-Object { $dockerFileNames += $_ }
-    }
-
-    function Add-ParameterAttribute {
-        param(
-            [Parameter(Mandatory)]
-            [object]
-            $Attributes,
-            [Parameter(Mandatory)]
-            [string]
-            $ParameterSetName
-        )
-        $ParameterAttr = New-Object "System.Management.Automation.ParameterAttribute"
-        $ParameterAttr.ParameterSetName = $ParameterSetName
-        $ParameterAttr.Mandatory = $true
-        $Attributes.Add($ParameterAttr) > $null
     }
 
     # Create the parameter attributs
@@ -220,101 +207,33 @@ End {
             $Name = Get-ImageList -Channel $actualChannel
         }
 
-        $versionExtraParams = @{}
-        if($Version){
-            $versionExtraParams.Add('Version', $Version)
+        $versionExtraParams = @{
+            ServicingVersion = if($Version) {$Version} else {$ServicingVersion}
+            PreviewVersion = if($Version) {$Version} else {$PreviewVersion}
+            StableVersion = if($Version) {$Version} else {$StableVersion}
         }
 
-        switch -RegEx ($actualChannel)
-        {
-            'servicing$' {
-                if($ServicingVersion){
-                    $versionExtraParams['Version'] = $ServicingVersion
-                }
-
-                $windowsVersion = Get-PowerShellVersion -Servicing @versionExtraParams
-                $linuxVersion = Get-PowerShellVersion -Linux -Servicing @versionExtraParams
-            }
-            'preview$' {
-                if($PreviewVersion){
-                    $versionExtraParams['Version'] = $PreviewVersion
-                }
-
-                $windowsVersion = Get-PowerShellVersion -Preview @versionExtraParams
-                $linuxVersion = Get-PowerShellVersion -Linux -Preview @versionExtraParams
-            }
-            'stable$' {
-                if($StableVersion){
-                    $versionExtraParams['Version'] = $StableVersion
-                }
-
-                $windowsVersion = Get-PowerShellVersion @versionExtraParams
-                $linuxVersion = Get-PowerShellVersion -Linux @versionExtraParams
-            }
-            default {
-                throw "unknown channel: $Channel"
-            }
-        }
+        # Get Versions
+        $versions = Get-Versions -Channel $actualChannel @versionExtraParams
+        $windowsVersion = $versions.windowsVersion
+        $linuxVersion = $versions.linuxVersion
 
         # Calculate the paths
         $channelPath = Join-Path -Path $releasePath -ChildPath $actualChannel.ToLowerInvariant()
 
-
         foreach($dockerFileName in $Name)
         {
-            $imagePath = Join-Path -Path $channelPath -ChildPath $dockerFileName
-            $scriptPath = Join-Path -Path $imagePath -ChildPath 'getLatestTag.ps1'
-            $tagsJsonPath = Join-Path -Path $imagePath -ChildPath 'tags.json'
-            $metaJsonPath = Join-Path -Path $imagePath -ChildPath 'meta.json'
-
-            # skip an image if it doesn't exist
-            if(!(Test-Path $scriptPath))
-            {
-                $message = "Channel: $actualChannel, Name: $dockerFileName does not existing.  Not every image exists in every channel.  Skipping."
-                if($CI.IsPresent)
-                {
-                    throw $message
-                }
-
-                Write-Warning $message
-                continue
-            }
-
-            $meta = Get-DockerImageMetaData -Path $metaJsonPath
-            if($meta.tagTemplates.count -gt 0)
-            {
-                $tagsTemplates = $meta.tagTemplates
-            }
-            else
-            {
-                $tagsTemplates = Get-Content -Path $tagsJsonPath | ConvertFrom-Json
-            }
+            # Get all image meta data
+            $allMeta = Get-DockerImageMetaDataWrapper -DockerFileName $dockerFileName -CI:$CI.IsPresent -IncludeKnownIssues:$IncludeKnownIssues.IsPresent -ChannelPath $channelPath
+            $meta = $allMeta.meta
+            $tagsTemplates = $allMeta.tagsTemplates
+            $imagePath = $allMeta.imagePath
+            $tagData = $allMeta.tagData
 
             $psversion = $windowsVersion
             if($meta.ShouldUseLinuxVersion())
             {
                 $psversion = $linuxVersion
-            }
-
-            $getTagsExtraParams = @{}
-
-            if($meta.ShortTags.count -gt 0)
-            {
-                $shortTags = @()
-                foreach ($shortTag in $meta.ShortTags) {
-                    if(!$shortTag.KnownIssue -or $IncludeKnownIssues.IsPresent)
-                    {
-                        $shortTags += $shortTag.Tag
-                    }
-                }
-
-                $getTagsExtraParams.Add('ShortTags',$shortTags)
-            }
-            # Get the tag data for the image
-            $tagData = @(& $scriptPath -CI:$CI.IsPresent @getTagsExtraParams | Where-Object {$_.FromTag})
-            if($TagFilter)
-            {
-                $tagData = $tagData | Where-Object { $_.FromTag -match $TagFilter }
             }
 
             foreach ($tagGroup in ($tagData | Group-Object -Property 'FromTag')) {
@@ -568,10 +487,13 @@ End {
 
     if($CheckForDuplicateTags.IsPresent)
     {
-        Write-Verbose "checking dup issues" -Verbose
         if($dupeTagIssues.count -gt 0)
         {
             throw ($dupeTagIssues -join [System.Environment]::NewLine)
+        }
+        else
+        {
+            Write-Verbose "No duplicates found." -Verbose
         }
     }
 }
