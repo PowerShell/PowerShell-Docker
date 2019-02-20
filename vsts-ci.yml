@@ -148,16 +148,31 @@ phases:
     preview: false
     communityStable: true
 
-# Use CI switch to disable 1709 and 1803 builds because the VSTS hosted instances don't yet support 1709 or 1803
+# Use the TagFilter to filter to 1803 because the docker instance inside the container only supports 1803
 # Skipping previews on windows due to how long it takes to build on windows
 - template: .vsts-ci/phase.yml
   parameters:
     name: nanoserver
     imagename: nanoserver
-    queue: Hosted VS2017
+    queue: Hosted Windows Container
     servicing: false
     preview: false
+    ciParameter: '-TagFilter 1803'
 
+# Run preview on 1803
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: windowsservercore
+    queue: Hosted Windows Container
+    imagename: windowsservercore
+    servicing: false
+    preview: true
+    stable: false
+    ciParameter: '-TagFilter 1803'
+
+# Use CI switch to disable 1709 and 1803 builds because the VSTS hosted instances don't yet support 1709 or 1803
+# Skipping previews on windows due to how long it takes to build on windows
+# Run stable on LTSC-2016
 - template: .vsts-ci/phase.yml
   parameters:
     name: windowsservercore
@@ -165,3 +180,4 @@ phases:
     imagename: windowsservercore
     servicing: false
     preview: false
+    ciParameter: '-CI'
