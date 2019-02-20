@@ -299,6 +299,7 @@ function Get-Versions
     }
 }
 
+# Get the meta data and the tag data for an image
 function Get-DockerImageMetaDataWrapper
 {
     param(
