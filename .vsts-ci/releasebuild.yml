@@ -112,3 +112,9 @@ jobs:
       }|convertto-json | out-file -FilePath $path -Encoding ascii
       Write-Host "##vso[artifact.upload containerfolder=releaseTags;artifactname=releaseTags]$path"
     displayName: Save release Tags
+
+  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+    displayName: 'Component Detection'
+    inputs:
+      sourceScanPath: '$(Build.SourcesDirectory)'
+      snapshotForceEnabled: true

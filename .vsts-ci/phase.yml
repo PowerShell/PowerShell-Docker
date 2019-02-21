@@ -9,6 +9,7 @@ parameters:
   communityPreview: 'false'
   communityServicing: 'false'
   continueonerror: false
+  ciParameter: '-CI'
 
 phases:
 - phase: ${{ parameters.name }}
@@ -23,37 +24,37 @@ phases:
     condition: succeededOrFailed()
 
   - ${{ if eq(parameters.stable, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -IncludeKnownIssues -Channel 'stable' -TestLogPostfix '$(ImageName)-stable'
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'stable' -TestLogPostfix '$(ImageName)-stable' ${{ parameters.ciParameter }}
       displayName: $(ImageName) Stable
       condition: succeededOrFailed()
       continueOnError: ${{ parameters.continueonerror }}
 
   - ${{ if eq(parameters.preview, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -IncludeKnownIssues -Channel 'preview' -TestLogPostfix '$(ImageName)-preview'
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'preview' -TestLogPostfix '$(ImageName)-preview' ${{ parameters.ciParameter }}
       displayName: $(ImageName) Preview
       condition: succeededOrFailed()
       continueOnError: ${{ parameters.continueonerror }}
 
   - ${{ if eq(parameters.servicing, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -IncludeKnownIssues -Channel 'servicing' -TestLogPostfix '$(ImageName)-servicing'
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'servicing' -TestLogPostfix '$(ImageName)-servicing' ${{ parameters.ciParameter }}
       displayName: $(ImageName) Servicing
       condition: succeededOrFailed()
       continueOnError: ${{ parameters.continueonerror }}
 
   - ${{ if eq(parameters.communityStable, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -IncludeKnownIssues -Channel 'community-stable' -TestLogPostfix '$(ImageName)-stable'
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'community-stable' -TestLogPostfix '$(ImageName)-stable' ${{ parameters.ciParameter }}
       displayName: $(ImageName) Stable
       condition: succeededOrFailed()
       continueOnError: ${{ parameters.continueonerror }}
 
   - ${{ if eq(parameters.communityPreview, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -IncludeKnownIssues -Channel 'community-preview' -TestLogPostfix '$(ImageName)-preview'
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'community-preview' -TestLogPostfix '$(ImageName)-preview' ${{ parameters.ciParameter }}
       displayName: $(ImageName) Preview
       condition: succeededOrFailed()
       continueOnError: ${{ parameters.continueonerror }}
 
   - ${{ if eq(parameters.communityServicing, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -CI -IncludeKnownIssues -Channel 'community-servicing' -TestLogPostfix '$(ImageName)-servicing'
+    - powershell: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'community-servicing' -TestLogPostfix '$(ImageName)-servicing' ${{ parameters.ciParameter }}
       displayName: $(ImageName) Servicing
       condition: succeededOrFailed()
       continueOnError: ${{ parameters.continueonerror }}
