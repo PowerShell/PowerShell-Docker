@@ -40,6 +40,10 @@ RUN \
       # required libstdc++.so.6
       # required bundle to make less executable
       os-core-dev \
+      # required libcrypto.so.1.0.0
+      # required libssl.so.1.0.0
+      # required these files to be copied to second stage
+      cryptoprocessor-management \
     # create less folder
     && mkdir -p /tmp/less \
     # uncompress GNU/Linux less tar file
