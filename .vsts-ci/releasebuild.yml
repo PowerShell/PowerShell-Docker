@@ -97,7 +97,7 @@ jobs:
     displayName: 'Install Pester'
 
   - powershell: |
-        $yaml = ./build.ps1 -GenerateTagsYaml -YamlChannels stable, preview -StableVersion $(StableVersion) -PreviewVersion $(PreviewVersion)
+        $yaml = ./build.ps1 -GenerateTagsYaml -Channel stable, preview -StableVersion $(StableVersion) -PreviewVersion $(PreviewVersion)
         $yaml | Out-File -Encoding ascii -Path ./tagsmetadata.yaml
         Get-ChildItem -Path ./tagsmetadata.yaml | Select-Object -ExpandProperty FullName | ForEach-Object {
                 Write-Host "##vso[artifact.upload containerfolder=artifacts;artifactname=artifacts]$_"

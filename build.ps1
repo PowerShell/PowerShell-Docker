@@ -29,7 +29,6 @@ param(
     [switch]
     $Pull,
 
-
     [Parameter(Mandatory, ParameterSetName="GenerateTagsYaml")]
     [switch]
     $GenerateTagsYaml,
@@ -53,6 +52,10 @@ param(
     [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
     [switch]
     $GetTags,
+
+    [Parameter(Mandatory, ParameterSetName="DupeCheckAll")]
+    [switch]
+    $CheckForDuplicateTags,
 
     [Parameter(Mandatory, ParameterSetName="TestAll")]
     [Parameter(Mandatory, ParameterSetName="localBuildAll")]
@@ -79,7 +82,9 @@ param(
     [Parameter(Mandatory, ParameterSetName="localBuildAll")]
     [Parameter(Mandatory, ParameterSetName="GetTagsByName")]
     [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
-    [string]
+    [Parameter(Mandatory, ParameterSetName="DupeCheckAll")]
+    [Parameter(Mandatory, ParameterSetName="GenerateTagsYaml")]
+    [string[]]
     $Channel='stable',
 
     [Parameter(ParameterSetName="localBuildByName")]
@@ -92,6 +97,8 @@ param(
     [Parameter(ParameterSetName="localBuildAll")]
     [Parameter(Mandatory, ParameterSetName="TestByName")]
     [Parameter(Mandatory, ParameterSetName="TestAll")]
+    [Parameter(Mandatory, ParameterSetName="GetTagsByName")]
+    [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
     $Version,
@@ -132,27 +139,13 @@ DynamicParam {
         }
 
         default {
-            $imageChannel = $Channel
+            $imageChannels = $Channel
         }
     }
 
     $dockerFileNames = @()
-    Get-ImageList -Channel $imageChannel | ForEach-Object { $dockerFileNames += $_ }
-
-
-    function Add-ParameterAttribute {
-        param(
-            [Parameter(Mandatory)]
-            [object]
-            $Attributes,
-            [Parameter(Mandatory)]
-            [string]
-            $ParameterSetName
-        )
-        $ParameterAttr = New-Object "System.Management.Automation.ParameterAttribute"
-        $ParameterAttr.ParameterSetName = $ParameterSetName
-        $ParameterAttr.Mandatory = $true
-        $Attributes.Add($ParameterAttr) > $null
+    foreach($imageChannel in $imageChannels){
+        Get-ImageList -Channel $imageChannel | ForEach-Object { $dockerFileNames += $_ }
     }
 
     # Create the parameter attributs
@@ -168,34 +161,21 @@ DynamicParam {
     # Create the parameter
     $Parameter = New-Object "System.Management.Automation.RuntimeDefinedParameter" -ArgumentList ("Name", [string[]], $Attributes)
 
-    # Create the parameter attributs
-    $channelArrayAttributes = New-Object "System.Collections.ObjectModel.Collection``1[System.Attribute]"
-
-
-    Add-ParameterAttribute -ParameterSetName 'GenerateTagsYaml' -Attributes $channelArrayAttributes
-
-    $ValidateSetAttr = New-Object "System.Management.Automation.ValidateSetAttribute" -ArgumentList 'stable','preview','servicing','community-stable','community-preview','community-servicing'
-    $channelArrayAttributes.Add($ValidateSetAttr) > $null
-
-    # Create the parameter
-    $arrayParameter = New-Object "System.Management.Automation.RuntimeDefinedParameter" -ArgumentList ("YamlChannels", [string[]], $channelArrayAttributes)
-
     # Return parameters dictionaly
     $Dict = New-Object "System.Management.Automation.RuntimeDefinedParameterDictionary"
     $Dict.Add("Name", $Parameter) > $null
-    $Dict.Add("YamlChannels", $arrayParameter) > $null
     return $Dict
 }
 
 Begin {
-    if ($PSCmdlet.ParameterSetName -ne 'GenerateTagsYaml')
+    if ($PSCmdlet.ParameterSetName -notin 'GenerateTagsYaml', 'DupeCheckAll' -and $Channel.Count -gt 1)
     {
+        throw "Multiple Channels are not supported in this parameter set"
+
         # We are using the Channel parameter, so assign the variable to that
-        $Channels = $Channel
     }
-    else {
-        $Channels = $PSBoundParameters['YamlChannels']
-    }
+
+    $Channels = $Channel
 
     if($SasUrl)
     {
@@ -212,6 +192,8 @@ End {
     $localImageNames = @()
     $testArgList = @()
     $tagGroups = @{}
+    $dupeCheckTable = @{}
+    $dupeTagIssues = @()
 
     foreach ($actualChannel in $Channels) {
         if ($PSCmdlet.ParameterSetName -match '.*ByName')
@@ -225,101 +207,33 @@ End {
             $Name = Get-ImageList -Channel $actualChannel
         }
 
-        $versionExtraParams = @{}
-        if($Version){
-            $versionExtraParams.Add('Version', $Version)
+        $versionExtraParams = @{
+            ServicingVersion = if($Version) {$Version} else {$ServicingVersion}
+            PreviewVersion = if($Version) {$Version} else {$PreviewVersion}
+            StableVersion = if($Version) {$Version} else {$StableVersion}
         }
 
-        switch -RegEx ($actualChannel)
-        {
-            'servicing$' {
-                if($ServicingVersion){
-                    $versionExtraParams['Version'] = $ServicingVersion
-                }
-
-                $windowsVersion = Get-PowerShellVersion -Servicing @versionExtraParams
-                $linuxVersion = Get-PowerShellVersion -Linux -Servicing @versionExtraParams
-            }
-            'preview$' {
-                if($PreviewVersion){
-                    $versionExtraParams['Version'] = $PreviewVersion
-                }
-
-                $windowsVersion = Get-PowerShellVersion -Preview @versionExtraParams
-                $linuxVersion = Get-PowerShellVersion -Linux -Preview @versionExtraParams
-            }
-            'stable$' {
-                if($StableVersion){
-                    $versionExtraParams['Version'] = $StableVersion
-                }
-
-                $windowsVersion = Get-PowerShellVersion @versionExtraParams
-                $linuxVersion = Get-PowerShellVersion -Linux @versionExtraParams
-            }
-            default {
-                throw "unknown channel: $Channel"
-            }
-        }
+        # Get Versions
+        $versions = Get-Versions -Channel $actualChannel @versionExtraParams
+        $windowsVersion = $versions.windowsVersion
+        $linuxVersion = $versions.linuxVersion
 
         # Calculate the paths
         $channelPath = Join-Path -Path $releasePath -ChildPath $actualChannel.ToLowerInvariant()
 
-
         foreach($dockerFileName in $Name)
         {
-            $imagePath = Join-Path -Path $channelPath -ChildPath $dockerFileName
-            $scriptPath = Join-Path -Path $imagePath -ChildPath 'getLatestTag.ps1'
-            $tagsJsonPath = Join-Path -Path $imagePath -ChildPath 'tags.json'
-            $metaJsonPath = Join-Path -Path $imagePath -ChildPath 'meta.json'
-
-            # skip an image if it doesn't exist
-            if(!(Test-Path $scriptPath))
-            {
-                $message = "Channel: $actualChannel, Name: $dockerFileName does not existing.  Not every image exists in every channel.  Skipping."
-                if($CI.IsPresent)
-                {
-                    throw $message
-                }
-
-                Write-Warning $message
-                continue
-            }
-
-            $meta = Get-DockerImageMetaData -Path $metaJsonPath
-            if($meta.tagTemplates.count -gt 0)
-            {
-                $tagsTemplates = $meta.tagTemplates
-            }
-            else
-            {
-                $tagsTemplates = Get-Content -Path $tagsJsonPath | ConvertFrom-Json
-            }
+            # Get all image meta data
+            $allMeta = Get-DockerImageMetaDataWrapper -DockerFileName $dockerFileName -CI:$CI.IsPresent -IncludeKnownIssues:$IncludeKnownIssues.IsPresent -ChannelPath $channelPath
+            $meta = $allMeta.meta
+            $tagsTemplates = $allMeta.tagsTemplates
+            $imagePath = $allMeta.imagePath
+            $tagData = $allMeta.tagData
 
             $psversion = $windowsVersion
             if($meta.ShouldUseLinuxVersion())
             {
                 $psversion = $linuxVersion
-            }
-
-            $getTagsExtraParams = @{}
-
-            if($meta.ShortTags.count -gt 0)
-            {
-                $shortTags = @()
-                foreach ($shortTag in $meta.ShortTags) {
-                    if(!$shortTag.KnownIssue -or $IncludeKnownIssues.IsPresent)
-                    {
-                        $shortTags += $shortTag.Tag
-                    }
-                }
-
-                $getTagsExtraParams.Add('ShortTags',$shortTags)
-            }
-            # Get the tag data for the image
-            $tagData = @(& $scriptPath -CI:$CI.IsPresent @getTagsExtraParams | Where-Object {$_.FromTag})
-            if($TagFilter)
-            {
-                $tagData = $tagData | Where-Object { $_.FromTag -match $TagFilter }
             }
 
             foreach ($tagGroup in ($tagData | Group-Object -Property 'FromTag')) {
@@ -448,6 +362,20 @@ End {
                 elseif ($GetTags.IsPresent) {
                     Write-Verbose "from: $fromTag actual: $($actualTags -join ', ') psversion: $psversion" -Verbose
                 }
+                elseif ($CheckForDuplicateTags.IsPresent) {
+                    Write-Verbose "$actualChannel - from: $fromTag actual: $($actualTags -join ', ') psversion: $psversion" -Verbose
+                    foreach($tag in $actualTags)
+                    {
+                        if($dupeCheckTable.ContainsKey($tag))
+                        {
+                            $dupeTagIssues += "$tag is duplicate for both '$actualChannel/$dockerFileName' and '$($dupeCheckTable.$tag)'"
+                        }
+                        else
+                        {
+                            $dupeCheckTable.Add($tag,"$actualChannel/$dockerFileName")
+                        }
+                    }
+                }
                 elseif ($GenerateTagsYaml.IsPresent) {
                     $tagGroup = 'public/powershell'
                     $os = 'windows'
@@ -554,6 +482,18 @@ End {
                 Write-Output "      os: $($tag.os)"
                 Write-Output "      dockerfile: $($tag.dockerfile)"
             }
+        }
+    }
+
+    if($CheckForDuplicateTags.IsPresent)
+    {
+        if($dupeTagIssues.count -gt 0)
+        {
+            throw ($dupeTagIssues -join [System.Environment]::NewLine)
+        }
+        else
+        {
+            Write-Verbose "No duplicates found." -Verbose
         }
     }
 }
