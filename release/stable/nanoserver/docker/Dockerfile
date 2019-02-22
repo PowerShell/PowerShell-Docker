@@ -59,7 +59,10 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
       org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
 
 # Copy PowerShell Core from the installer container
-ENV ProgramFiles C:\Program Files
+ENV ProgramFiles C:\Program Files `
+    # set a fixed location for the Module analysis cache
+    PSModuleAnalysisCachePath=C:\PSModuleAnalysisCache\ModuleAnalysisCache
+
 COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell"]
 
 # Persist %PSCORE% ENV variable for user convenience
