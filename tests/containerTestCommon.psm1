@@ -390,6 +390,7 @@ function Invoke-DockerBuild
     else {
         $buildArgList += '--pull'
         $buildArgList += '--quiet'
+        $buildArgList += '--squash'
     }
 
     foreach($argName in $buildArgNames)
