@@ -59,13 +59,27 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
       org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
 
 # Copy PowerShell Core from the installer container
-ENV ProgramFiles C:\Program Files
-COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell"]
+ENV ProgramFiles="C:\Program Files" `
+    # set a fixed location for the Module analysis cache
+    PSModuleAnalysisCachePath=C:\PSModuleAnalysisCache\ModuleAnalysisCache `
+    # Persist %PSCORE% ENV variable for user convenience
+    PSCORE="$ProgramFiles\PowerShell\pwsh.exe"
 
-# Persist %PSCORE% ENV variable for user convenience
-ENV PSCORE="$ProgramFiles\PowerShell\pwsh.exe"
+COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell"]
 
 # Set the path
 RUN setx PATH "%PATH%;%ProgramFiles%\PowerShell"
+
+# intialize powershell module cache
+RUN pwsh `
+        -NoLogo `
+        -NoProfile `
+        -Command " `
+          $ErrorActionPreference = 'Stop' ; `
+          $ProgressPreference = 'SilentlyContinue' ; `
+          while(!(Test-Path -Path $env:PSModuleAnalysisCachePath)) {  `
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; `
+            Start-Sleep -Seconds 6 ; `
+          }"
 
 CMD ["pwsh.exe"]
