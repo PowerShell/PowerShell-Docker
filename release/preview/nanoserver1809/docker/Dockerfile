@@ -61,7 +61,7 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
 # Copy PowerShell Core from the installer container
 ENV ProgramFiles="C:\Program Files" `
     # set a fixed location for the Module analysis cache
-    PSModuleAnalysisCachePath=C:\PSModuleAnalysisCache\ModuleAnalysisCache `
+    PSModuleAnalysisCachePath="$LOCALAPPDATA\Microsoft\Windows\PowerShell\docker\ModuleAnalysisCache":\PSModuleAnalysisCache\ModuleAnalysisCache `
     # Persist %PSCORE% ENV variable for user convenience
     PSCORE="$ProgramFiles\PowerShell\pwsh.exe"
 
