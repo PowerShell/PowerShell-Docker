@@ -353,6 +353,13 @@ End {
                     else
                     {
                         $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
+
+                        $previewTag = ''
+                        if($actualChannel -like '*preview*')
+                        {
+                            $previewTag = '-preview'
+                        }
+
                         $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
                         $packageName = $packageName -replace '\${previewTag}', $previewTag
                         $containerName = 'v' + ($psversion -replace '~', '-')
