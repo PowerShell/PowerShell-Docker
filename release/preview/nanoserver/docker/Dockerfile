@@ -61,7 +61,7 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
 # Copy PowerShell Core from the installer container
 ENV ProgramFiles="C:\Program Files" `
     # set a fixed location for the Module analysis cache
-    PSModuleAnalysisCachePath=C:\PSModuleAnalysisCache\ModuleAnalysisCache `
+    PSModuleAnalysisCachePath="$LOCALAPPDATA\Microsoft\Windows\PowerShell\docker\ModuleAnalysisCache" `
     # Persist %PSCORE% ENV variable for user convenience
     PSCORE="$ProgramFiles\PowerShell\pwsh.exe"
 
@@ -70,15 +70,19 @@ COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell"]
 # Set the path
 RUN setx PATH "%PATH%;%ProgramFiles%\PowerShell"
 
+RUN set
+
 # intialize powershell module cache
 RUN pwsh `
         -NoLogo `
         -NoProfile `
         -Command " `
+          $stopTime = (get-date).AddMinutes(15); `
           $ErrorActionPreference = 'Stop' ; `
           $ProgressPreference = 'SilentlyContinue' ; `
           while(!(Test-Path -Path $env:PSModuleAnalysisCachePath)) {  `
             Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; `
+            if((get-date) -gt $stopTime) { throw 'timout expired'} `
             Start-Sleep -Seconds 6 ; `
           }"
 
