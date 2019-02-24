@@ -350,6 +350,16 @@ End {
                             $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
                         }
                     }
+                    else
+                    {
+                        https://github.com/PowerShell/PowerShell/releases/download/v6.1.3/powershell-6.1.3-1.rhel.7.x86_64.rpm
+                        $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
+                        $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+                        $packageName = $packageName -replace '\${previewTag}', $previewTag
+                        $containerName = 'v' + ($psversion -replace '~', '-')
+                        $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
+                        $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+                    }
 
                     $testArgs = @{
                         tags = $actualTags
