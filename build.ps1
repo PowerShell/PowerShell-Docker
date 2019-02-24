@@ -352,7 +352,6 @@ End {
                     }
                     else
                     {
-                        https://github.com/PowerShell/PowerShell/releases/download/v6.1.3/powershell-6.1.3-1.rhel.7.x86_64.rpm
                         $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
                         $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
                         $packageName = $packageName -replace '\${previewTag}', $previewTag
