@@ -33,7 +33,6 @@ RUN Write-host "Verifying valid Version..."; `
 # Install PowerShell into WindowsServerCore
 FROM ${WindowsServerCoreRepo}:${fromTag}
 
-RUN set
 # Copy PowerShell Core from the installer container
 ENV ProgramFiles="C:\Program Files" `
     # set a fixed location for the Module analysis cache
@@ -53,10 +52,12 @@ RUN pwsh `
         -NoLogo `
         -NoProfile `
         -Command " `
+          $stopTime = (get-date).AddMinutes(15); `
           $ErrorActionPreference = 'Stop' ; `
           $ProgressPreference = 'SilentlyContinue' ; `
           while(!(Test-Path -Path $env:PSModuleAnalysisCachePath)) {  `
             Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; `
+            if((get-date) -gt $stopTime) { throw 'timout expired'} `
             Start-Sleep -Seconds 6 ; `
           }"
 

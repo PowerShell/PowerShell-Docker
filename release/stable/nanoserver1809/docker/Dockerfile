@@ -76,10 +76,12 @@ RUN pwsh `
         -NoLogo `
         -NoProfile `
         -Command " `
+          $stopTime = (get-date).AddMinutes(15); `
           $ErrorActionPreference = 'Stop' ; `
           $ProgressPreference = 'SilentlyContinue' ; `
           while(!(Test-Path -Path $env:PSModuleAnalysisCachePath)) {  `
             Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; `
+            if((get-date) -gt $stopTime) { throw 'timout expired'} `
             Start-Sleep -Seconds 6 ; `
           }"
 

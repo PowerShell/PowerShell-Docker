@@ -71,8 +71,6 @@ COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell"]
 # Set the path
 RUN setx PATH "%PATH%;%ProgramFiles%\PowerShell"
 
-RUN set
-
 # intialize powershell module cache
 RUN pwsh `
         -NoLogo `
