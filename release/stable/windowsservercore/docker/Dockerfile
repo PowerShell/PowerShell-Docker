@@ -33,7 +33,13 @@ RUN Write-host "Verifying valid Version..."; `
 # Install PowerShell into WindowsServerCore
 FROM ${WindowsServerCoreRepo}:${fromTag}
 
-ENV ProgramFiles C:\Program Files
+# Copy PowerShell Core from the installer container
+ENV ProgramFiles="C:\Program Files" `
+    # set a fixed location for the Module analysis cache
+    LOCALAPPDATA="C:\Users\ContainerAdministrator\AppData\Local" `
+    PSModuleAnalysisCachePath="$LOCALAPPDATA\Microsoft\Windows\PowerShell\docker\ModuleAnalysisCache" `
+    # Persist %PSCORE% ENV variable for user convenience
+    PSCORE="$ProgramFiles\PowerShell\pwsh.exe"
 
 # Copy PowerShell Core from the installer container
 COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell\\latest"]
@@ -41,8 +47,19 @@ COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell\\latest"
 # Set the path
 RUN setx /M PATH "%ProgramFiles%\PowerShell\latest;%PATH%"
 
-# Persist %PSCORE% ENV variable for user convenience
-ENV PSCORE='"C:\Program Files\PowerShell\latest\pwsh.exe"'
+# intialize powershell module cache
+RUN pwsh `
+        -NoLogo `
+        -NoProfile `
+        -Command " `
+          $stopTime = (get-date).AddMinutes(15); `
+          $ErrorActionPreference = 'Stop' ; `
+          $ProgressPreference = 'SilentlyContinue' ; `
+          while(!(Test-Path -Path $env:PSModuleAnalysisCachePath)) {  `
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; `
+            if((get-date) -gt $stopTime) { throw 'timout expired'} `
+            Start-Sleep -Seconds 6 ; `
+          }"
 
 CMD ["pwsh.exe"]
 
