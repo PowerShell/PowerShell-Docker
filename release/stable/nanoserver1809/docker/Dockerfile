@@ -67,8 +67,8 @@ ENV ProgramFiles="C:\Program Files" `
     PSCORE="$ProgramFiles\PowerShell\pwsh.exe" `
     # Set the default windows path so we can use it
     WindowsPATH="C:\Windows\system32;C:\Windows"
-    # Set the path
 
+    # Set the path
 ENV PATH="$WindowsPATH;${ProgramFiles}\PowerShell"
 
 COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell"]
