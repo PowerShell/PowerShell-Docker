@@ -266,6 +266,28 @@ function Get-ContainerPowerShellVersion
     return $version
 }
 
+function Get-ContainerPath
+{
+    param(
+        [HashTable] $TestContext,
+        [string] $Name
+    )
+
+    $imageTag = ${Name}
+
+    $runParams = @()
+    $runParams += '--rm'
+
+    $runParams += $imageTag
+    $runParams += 'pwsh'
+    $runParams += '-nologo'
+    $runParams += '-noprofile'
+    $runParams += '-c'
+    $runParams += '$env:PATH'
+
+    return (Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru)
+}
+
 function Get-MetadataUsingContainer
 {
     param(
