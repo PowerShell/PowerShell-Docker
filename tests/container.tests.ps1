@@ -368,7 +368,7 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
 
             #TODO: Run the base image and make sure the path is included
 
-            $path | should -Match [System.Text.RegularExpressions.Regex]::Escape("C:\Windows\system32")
+            $path | should -Match ([System.Text.RegularExpressions.Regex]::Escape("C:\Windows\system32"))
         }
     }
 
