@@ -345,6 +345,20 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
             $metadataJson = $metadataString | ConvertFrom-Json -ErrorAction Stop
             $metadataJson | Select-Object -ExpandProperty StableReleaseTag | Should -Match '^v\d+\.\d+\.\d+.*$'
         }
+
+        it "Path of <Name> should match the base container" -TestCases $webTestCases -skip:$script:skipWindowsRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name
+            )
+
+            $path = Get-ContainerPath -Name $Name
+
+            #TODO: Run the base image and make sure the path is included
+
+            $path | should -Match ([System.Text.RegularExpressions.Regex]::Escape("C:\Windows\system32"))
+        }
     }
 
     Context "Labels" {
