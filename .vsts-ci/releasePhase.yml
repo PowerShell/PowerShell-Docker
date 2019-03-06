@@ -44,7 +44,7 @@ jobs:
     displayName: 'az login'
 
   - powershell: |
-      Select-AzSubscription -SubscriptionName $(StorageSubscriptionName)
+      az account set --subscription $(StorageSubscriptionName)
       $querystring = az storage account generate-sas --account-name $(storageAccountName) --services b --resource-types o --expiry ((get-date).AddDays(2).ToString("yyyy-MM-dd")) --permission r --https-only | convertfrom-json
       $url = "https://$(storageAccountName).blob.core.windows.net/?$querystring"
       Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
@@ -54,7 +54,7 @@ jobs:
     displayName: 'Install Pester'
 
   - powershell: |
-      Select-AzSubscription -SubscriptionName $(AcrSubscriptionName)
+      az account set --subscription $(AcrSubscriptionName)
       $extraParams = @{}
       if($env:ACR -eq 'no')
       {
