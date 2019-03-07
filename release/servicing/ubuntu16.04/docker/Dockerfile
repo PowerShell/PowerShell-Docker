@@ -27,7 +27,6 @@ RUN apt-get update \
         locales \
     # required for SSL
         ca-certificates \
-        gss-ntlmssp \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
