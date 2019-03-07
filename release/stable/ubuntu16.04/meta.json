@@ -7,5 +7,5 @@
         "#psversion#-ubuntu-#tag#",
         "ubuntu-#shorttag#"
     ],
-    "SkipGssNtlmSspTests": true
+    "SkipGssNtlmSspTests": false
 }
