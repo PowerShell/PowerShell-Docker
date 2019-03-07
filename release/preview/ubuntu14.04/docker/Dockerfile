@@ -30,7 +30,6 @@ RUN apt-get update \
         ca-certificates \
     # simplifies deb file install
         gdebi \
-        gss-ntlmssp \
     && gdebi --n /tmp/powershell.deb \
     # gdebi isn't needed anymore remove it
     && apt-get purge -y gdebi \
