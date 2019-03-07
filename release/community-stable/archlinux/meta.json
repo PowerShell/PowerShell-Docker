@@ -3,7 +3,7 @@
     "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
     "SkipGssNtlmSspTests": true,
     "tagTemplates": [	
-        "#psversion#-archlinux-#tag#",	
-        "archlinux-#shorttag#"	
+        "#psversion#-archlinux-#tag#",
+        "archlinux-#shorttag#"
     ]
 }
