@@ -20,7 +20,7 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
 # Install dependencies and clean up
 RUN apt-get update \
     && apt-get install -y \
-    # less is required for help in PowerShell
+    # less is required for help in powershell
         less \
     # requied to setup the locale
         locales \
@@ -28,7 +28,6 @@ RUN apt-get update \
         ca-certificates \
     # simplifies deb file install
         gdebi \
-    # for remoting:
         gss-ntlmssp \
     && gdebi --n /tmp/powershell.deb \
     # gdebi isn't needed anymore remove it
