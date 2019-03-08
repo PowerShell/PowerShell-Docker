@@ -32,7 +32,6 @@ phases:
     name: ubuntu1804
     imagename: ubuntu18.04
     stable: true
-    servicing: false
 
 - template: .vsts-ci/phase.yml
   parameters:
@@ -44,14 +43,12 @@ phases:
     name: fedora28
     imagename: fedora28
     stable: true
-    servicing: false
 
 - template: .vsts-ci/phase.yml
   parameters:
     name: alpine
     imagename: alpine
     stable: true
-    servicing: false
     preview: true
 
 - template: .vsts-ci/phase.yml
@@ -59,7 +56,6 @@ phases:
     name: opensuse423
     imagename: opensuse423
     stable: true
-    servicing: false
     preview: true
 
 - template: .vsts-ci/phase.yml
@@ -67,7 +63,6 @@ phases:
     name: debian9
     imagename: debian9
     stable: true
-    servicing: false
     preview: false
 
 - template: .vsts-ci/phase.yml
@@ -75,7 +70,6 @@ phases:
     name: kaliRolling
     imagename: kali-rolling
     stable: false
-    servicing: false
     preview: false
     communityStable: true
     continueonerror: false
@@ -85,7 +79,6 @@ phases:
     name: archlinux
     imagename: archlinux
     stable: false
-    servicing: false
     preview: false
     communityStable: true
     continueonerror: false
@@ -95,7 +88,6 @@ phases:
     name: blackArch
     imagename: blackarch
     stable: false
-    servicing: false
     preview: false
     communityStable: true
     continueonerror: false
@@ -106,7 +98,6 @@ phases:
     name: parrot
     imagename: parrot
     stable: false
-    servicing: false
     preview: false
     communityStable: true
     continueonerror: false
@@ -116,7 +107,6 @@ phases:
     name: amazonLinux
     imagename: amazonlinux
     stable: false
-    servicing: false
     preview: false
     communityStable: true
 
@@ -125,7 +115,6 @@ phases:
     name: oracleLinux
     imagename: oraclelinux
     stable: false
-    servicing: false
     preview: false
     communityStable: true
 
@@ -134,7 +123,6 @@ phases:
     name: clearLinux
     imagename: clearlinux
     stable: false
-    servicing: false
     preview: false
     communityStable: true
     continueonerror: false
@@ -144,7 +132,6 @@ phases:
     name: photon
     imagename: photon
     stable: false
-    servicing: false
     preview: false
     communityStable: true
 
@@ -155,7 +142,6 @@ phases:
     name: nanoserver_ltsc_2016
     imagename: nanoserver
     queue: Hosted VS2017
-    servicing: false
     preview: false
     ciParameter: '-CI'
 
@@ -165,6 +151,5 @@ phases:
     name: windowsservercore_1803
     queue: Hosted Windows Container
     imagename: windowsservercore
-    servicing: false
     preview: false
     ciParameter: '-CI -TagFilter 1803'
