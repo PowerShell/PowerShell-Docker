@@ -120,23 +120,6 @@ you must specify `-Scope CurrentUser` when using `Install-Module`.  Example:
 Install-Module <ModuleName> -Scope CurrentUser
 ```
 
-#### Docker run requires full path
-
-> **Note:** this is fixed in `10.0.16257.1000` of the NanoServer-Insider build.  The PowerShell version of this should be released soon.
-
-Due to [an issue with the container not picking up the path](https://github.com/Microsoft/Virtualization-Documentation/blob/live/virtualization/windowscontainers/quick-start/Insider-Known-Issues.md#build-16237), you must specify the path
-when running a command on the command line.  For example, you would expect to be able to run:
-
-```powershell
-PS > docker run -it microsoft/nanoserver-insider-powershell powershell -c '$psversiontable'
-```
-
-but, in `nanoserver-insider-powershell` you must run:
-
-```powershell
-PS > docker run -it microsoft/nanoserver-insider-powershell 'C:\program files\powershell\powershell' -c '$psversiontable'
-```
-
 ## Developing and Contributing
 
 Please see the [Contribution Guide][] for general information about how to develop and contribute.
