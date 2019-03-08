@@ -21,11 +21,13 @@ phases:
   parameters:
     name: ubuntu1604
     imagename: ubuntu16.04
+    servicing: false
 
 - template: .vsts-ci/phase.yml
   parameters:
     name: ubuntu1404
     imagename: ubuntu14.04
+    servicing: false
 
 - template: .vsts-ci/phase.yml
   parameters:
