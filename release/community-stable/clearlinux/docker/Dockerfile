@@ -35,8 +35,10 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 
 # Installation
 RUN \
+    # generate trust store
+    clrtrust generate -f \
     # install dependencies
-    swupd bundle-add \
+    && swupd bundle-add \
       # required libstdc++.so.6
       # required bundle to make less executable
       os-core-dev \
@@ -77,8 +79,10 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0
 
 RUN \
+    # generate trust store
+    clrtrust generate -f \
     # install dependencies
-    swupd bundle-add \
+    && swupd bundle-add \
       # required package for International Components for Unicode
       runtime-libs-boost \
     # Create the pwsh symbolic link that points to powershell
