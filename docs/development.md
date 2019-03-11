@@ -22,12 +22,14 @@ In this folder, there are 4 items:
 ```json
 {
     "IsLinux" : true
-    // tags: This is a JSON array that describes the tags the image should have:
     "tagTemplates": [
-        "my-tag"
+        "my-tag",
+        "my-other-tag"
     ]
 }
 ```
+
+Tags are a JSON array that describes the tags the image should have.
 
 Tags you can use:
   * `#psversion#` is replaced by the version of PowerShell used to build the image.
