@@ -21,7 +21,7 @@ In this folder, there are 4 items:
 
 ```json
 {
-    "IsLinux" : true
+    "IsLinux" : true,
     "tagTemplates": [
         "my-tag",
         "my-other-tag"
