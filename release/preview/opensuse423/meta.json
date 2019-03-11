@@ -3,5 +3,9 @@
     "UseLinuxVersion": false,
     "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
     "osVersion": "OpenSuse 42.3",
-    "SkipGssNtlmSspTests": false
+    "SkipGssNtlmSspTests": false,
+    "tagTemplates": [
+        "#psversion#-opensuse-#tag#",
+        "preview-opensuse-#shorttag#"
+    ]
 }
