@@ -29,6 +29,7 @@ RUN dnf install -y /tmp/powershell.rpm \
         glibc-locale-source \
     # Invoke-WebRequest doesn't work correctly without this
         compat-openssl10 \
+	gssntlmssp \
     && dnf upgrade-minimal -y --security \
     && dnf clean all \
     && localedef --charmap=UTF-8 --inputfile=en_US $LANG \

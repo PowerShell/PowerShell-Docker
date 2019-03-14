@@ -3,7 +3,7 @@ parameters:
   imagename: ''
   queue: 'Hosted Ubuntu 1604'
   stable: 'true'
-  servicing: 'true'
+  servicing: 'false'
   preview: 'true'
   communityStable: 'false'
   communityPreview: 'false'
