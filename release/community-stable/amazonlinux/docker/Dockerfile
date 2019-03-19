@@ -42,7 +42,7 @@ RUN \
 	    epel-release \
     && yum upgrade -y \
     && yum install -y \
-            gssntlmssp
+            gssntlmssp \
     # install powershell package
     && yum install -y /tmp/powershell-linux.rpm \
     # remove powershell package
