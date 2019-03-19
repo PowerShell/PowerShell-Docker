@@ -36,12 +36,10 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 RUN \
     # install dependencies
     yum install -y \
-	    # required for help in powershell
+	    # required for help in PowerShell
 	    less \
 	    # NTLM remoting
 	    epel-release \
-    && yum upgrade -y \
-    && yum install -y \
             gssntlmssp \
     # install powershell package
     && yum install -y /tmp/powershell-linux.rpm \
