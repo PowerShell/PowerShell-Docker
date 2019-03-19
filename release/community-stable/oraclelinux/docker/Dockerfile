@@ -39,7 +39,7 @@ RUN \
 	    # required for help in powershell
 	    less \
 	    epel-release \
-		gssntlmssp \
+	    gssntlmssp \
     # install powershell package
     && yum install -y /tmp/powershell-linux.rpm \
     # remove powershell package
