@@ -60,8 +60,7 @@ RUN \
     # clean cached data
     && yum clean all \
     # remove cache folders and files
-    && rm -rf /var/cache/yum \
-    && find /. -name 'gssntlmssp.so' -exec echo {} \;
+    && rm -rf /var/cache/yum
 
 # Define args needed only for the labels
 ARG IMAGE_NAME=pshorg/powershellcommunity:oraclelinux-7.5
