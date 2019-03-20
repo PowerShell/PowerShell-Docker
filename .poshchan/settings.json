@@ -1,7 +1,14 @@
 {
-    "build_targets": {},
+    "build_targets": {
+        "ci": "docker-PR",
+        "all": [
+            "docker-PR"
+        ]
+    },
     "authorized_users": [
         "SteveL-MSFT",
-        "TravisEz13"
+        "TravisEz13",
+        "anmenaga",
+        "RDIL"
     ]
 }
