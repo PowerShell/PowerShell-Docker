@@ -1,10 +1,5 @@
 {
-    "build_targets": {
-        "ci": "docker-PR",
-        "all": [
-            "docker-PR"
-        ]
-    },
+    "build_targets": {},
     "authorized_users": [
         "SteveL-MSFT",
         "TravisEz13",
