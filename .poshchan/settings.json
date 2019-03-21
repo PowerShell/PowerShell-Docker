@@ -2,17 +2,17 @@
     "version": "0.1",
     "azdevops": {
         "organization": "powershell",
-        "project": "docker"
-    },
-    "build_targets": {
-        "CI": "Docker-PR"
-    },
-    "authorized_users": {
-        "build_targets": [
+        "project": "docker",
+        "build_targets": {
+            "CI": "Docker-PR"
+        },
+        "authorized_users": [
             "SteveL-MSFT",
             "TravisEz13",
             "anmenaga"
         ],
-        "reminders": "*"
+    },
+    "reminders": {
+        "authorized_users": "*"
     }
 }
