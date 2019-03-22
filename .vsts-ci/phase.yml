@@ -19,7 +19,7 @@ phases:
 
   queue: ${{ parameters.queue }}
   steps:
-  - powershell:  Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck
+  - powershell: Install-module pester -Scope CurrentUser -Force
     displayName: Install Pester
     condition: succeededOrFailed()
 
