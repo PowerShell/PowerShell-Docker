@@ -95,9 +95,7 @@ RUN \
             Start-Sleep -Seconds 6 ; \
           }" \
     # upgrade distro
-    && swupd update \
-    # clean downloaded packages
-    && swupd clean --all
+    && swupd update
 
 # Copy only the files we need from the previous stage after distro upgrade
 # These files are required to resolve SSL issue with Invoke-WebRequest
