@@ -38,6 +38,8 @@ RUN \
     yum install -y \
 	    # required for help in powershell
 	    less \
+	    epel-release \
+	    gssntlmssp \
     # install powershell package
     && yum install -y /tmp/powershell-linux.rpm \
     # remove powershell package
@@ -58,7 +60,8 @@ RUN \
     # clean cached data
     && yum clean all \
     # remove cache folders and files
-    && rm -rf /var/cache/yum
+    && rm -rf /var/cache/yum \
+    && find /. -name 'gssntlmssp.so' -exec echo {} \;
 
 # Define args needed only for the labels
 ARG IMAGE_NAME=pshorg/powershellcommunity:oraclelinux-7.5
