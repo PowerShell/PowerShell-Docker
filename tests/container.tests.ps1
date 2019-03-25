@@ -160,6 +160,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             }
         }
 
+        $gssNtlmSspTestCases = @()
         $script:linuxContainerRunTests | Where-Object {$_.SkipGssNtlmSspTests -ne $true} | ForEach-Object {
             $gssNtlmSspTestCases += @{
                 Name = $_.Name
