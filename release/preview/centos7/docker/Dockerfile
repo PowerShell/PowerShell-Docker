@@ -46,7 +46,6 @@ RUN yum install -y /tmp/powershell.rpm \
             Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
             Start-Sleep -Seconds 6 ; \
           }"
-          
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
