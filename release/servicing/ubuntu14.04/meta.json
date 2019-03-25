@@ -1,6 +1,11 @@
 {
     "IsLinux" : true,
-    "PackageFormat": "powershell_${PS_VERSION}-1.ubuntu.14.04_amd64.deb",
-    "SkipGssNtlmSspTests": true,
-    "tagTemplates": ["#psversion#-ubuntu-#tag#"]
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell${previewTag}_${PS_VERSION}-1.ubuntu.14.04_amd64.deb",
+    "osVersion": "Ubuntu 14.04",
+     "tagTemplates": [
+         "#psversion#-ubuntu-#tag#",
+         "ubuntu-#shorttag#"
+     ],
+    "SkipGssNtlmSspTests": true
 }

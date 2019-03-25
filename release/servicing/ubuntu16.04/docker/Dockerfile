@@ -4,7 +4,7 @@ ARG imageRepo=ubuntu
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=6.0.4
+ARG PS_VERSION=6.2.0
 ARG PS_PACKAGE=powershell_${PS_VERSION}-1.ubuntu.16.04_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
@@ -15,7 +15,9 @@ ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8
+    LANG=en_US.UTF-8 \
+    # set a fixed location for the Module analysis cache
+    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
 
 # Install dependencies and clean up
 RUN apt-get update \
@@ -32,7 +34,18 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && locale-gen $LANG && update-locale \
     # remove powershell package
-    && rm /tmp/powershell.deb
+    && rm /tmp/powershell.deb \
+    # intialize powershell module cache
+    && pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          \$ErrorActionPreference = 'Stop' ; \
+          \$ProgressPreference = 'SilentlyContinue' ; \
+          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+            Start-Sleep -Seconds 6 ; \
+          }"
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
