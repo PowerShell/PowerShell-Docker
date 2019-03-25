@@ -1,13 +1,13 @@
-# Docker image file that describes an CentOS7 image with PowerShell installed from Microsoft YUM Repo
-ARG fromTag=7
-ARG imageRepo=centos
+# Docker image file that describes Fedora 28 image with PowerShell installed from Microsoft YUM Repo
+ARG fromTag=28
+ARG imageRepo=fedora
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=6.1.1
-ARG PACKAGE_VERSION=6.1.1
-ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
+ARG PS_VERSION=6.1.0
+ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
+
 
 # Download the Linux package and save it
 ADD ${PS_PACKAGE_URL} /tmp/powershell.rpm
@@ -20,17 +20,17 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
 
 # Install dependencies and clean up
-RUN yum install -y /tmp/powershell.rpm \
-    # Required for gssntlmssp
-    && yum install -y epel-release \
-    # Update now that we have epel-release
-    && yum update -y \
-    # Install libraries for NTLM support
-    && yum install -y gssntlmssp \
-	# less is required for help in powershell
+RUN dnf install -y /tmp/powershell.rpm \
+    && dnf install -y \
+	# less is needed for help
 	less \
-    && yum upgrade-minimal -y --security \
-    && yum clean all \
+    # Needed to run localdef
+        glibc-locale-source \
+    # Invoke-WebRequest doesn't work correctly without this
+        compat-openssl10 \
+	gssntlmssp \
+    && dnf upgrade-minimal -y --security \
+    && dnf clean all \
     && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # remove powershell package
     && rm /tmp/powershell.rpm \
@@ -48,7 +48,7 @@ RUN yum install -y /tmp/powershell.rpm \
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:centos7
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:fedora28
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
