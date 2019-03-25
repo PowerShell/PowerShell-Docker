@@ -10,7 +10,7 @@ ARG NanoServerRepo=mcr.microsoft.com/windows/nanoserver
 FROM ${WindowsServerCoreRepo}:$WindowsServerCoreVersion  AS installer-env
 
 # Arguments for installing PowerShell, must be defined in the container they are used
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=6.2.0
 
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
 
@@ -39,7 +39,7 @@ RUN Write-host "Verifying valid Version..."; `
 FROM ${NanoServerRepo}:${fromTag}
 
 ARG VCS_REF="none"
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=6.2.0
 ARG IMAGE_NAME=mcr.microsoft.com/powershell
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `

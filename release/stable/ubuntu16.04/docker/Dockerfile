@@ -4,7 +4,7 @@ ARG imageRepo=ubuntu
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=6.2.0
 ARG PS_PACKAGE=powershell_${PS_VERSION}-1.ubuntu.16.04_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
