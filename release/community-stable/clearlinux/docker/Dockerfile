@@ -99,7 +99,6 @@ RUN \
 
 # Copy only the files we need from the previous stage after distro upgrade
 # These files are required to resolve SSL issue with Invoke-WebRequest
-COPY --from=installer-env ["/usr/lib64/libcrypto.so.1.0.0", "/usr/lib64/libcrypto.so.1.0.0"]
 COPY --from=installer-env ["/usr/lib64/libssl.so.1.0.0", "/usr/lib64/libssl.so.1.0.0"]
 
 # Define args needed only for the labels
