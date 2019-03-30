@@ -1,16 +1,16 @@
-# Docker image file that describes an CentOS7 image with PowerShell installed from Microsoft YUM Repo
-ARG fromTag=7
-ARG imageRepo=centos
+# Docker image file that describes an Ubuntu14.04 image with PowerShell installed from Microsoft APT Repo
+ARG fromTag=14.04
+ARG imageRepo=ubuntu
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=6.2.0
-ARG PACKAGE_VERSION=6.2.0
-ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
+ARG PS_VERSION=6.1.0
+ARG PS_PACKAGE=powershell_${PS_VERSION}-1.ubuntu.14.04_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
+RUN echo ${PS_PACKAGE_URL}
 # Download the Linux package and save it
-ADD ${PS_PACKAGE_URL} /tmp/powershell.rpm
+ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
 
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
@@ -20,20 +20,30 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
 
 # Install dependencies and clean up
-RUN yum install -y /tmp/powershell.rpm \
-    # Required for gssntlmssp
-    && yum install -y epel-release \
-    # Update now that we have epel-release
-    && yum update -y \
-    # Install libraries for NTLM support
-    && yum install -y gssntlmssp \
-	# less is required for help in powershell
-	less \
-    && yum upgrade-minimal -y --security \
-    && yum clean all \
-    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
+RUN apt-get update \
+    && apt-get install -y \
+    # less is required for help in powershell
+        less \
+    # requied to setup the locale
+        locales \
+    # required for SSL
+        ca-certificates \
+    # simplifies deb file install
+        gdebi \
+    && gdebi --n /tmp/powershell.deb \
+    # gdebi isn't needed anymore remove it
+    && apt-get purge -y gdebi \
+    # remove any unused dependecies
+    && apt-get autoremove -y \
+    # upgrade all packages
+    && apt-get dist-upgrade -y \
+    # clean the cache
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    # generate the locales
+    && locale-gen $LANG && update-locale \
     # remove powershell package
-    && rm /tmp/powershell.rpm \
+    && rm /tmp/powershell.deb \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
@@ -48,7 +58,7 @@ RUN yum install -y /tmp/powershell.rpm \
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:centos7
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:ubuntu14.04
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
