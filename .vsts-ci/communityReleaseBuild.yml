@@ -1,25 +1,26 @@
 resources:
 - repo: self
   clean: true
-queue:
-  name: Hosted Ubuntu 1604
+jobs:
+- job: communityRelease
+  pool:
+    name: Hosted Ubuntu 1604
+  #Your build pipeline references an undefined variable named ‘dockerHost’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+  #Your build pipeline references an undefined variable named ‘dockerImage’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+  #Your build pipeline references an undefined variable named ‘dockerKey’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+  #Your build pipeline references an undefined variable named ‘dockerNamespace’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+  #Your build pipeline references an undefined variable named ‘dockerUserName’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
 
-# This pipeline references a variable named ‘dockerHost’. This should be 'docker.io'
-# This pipeline references a variable named ‘dockerUserName’. This should be the username to login to the dockerHost
-# This pipeline references a variable named ‘dockerKey’. This should be the password or key to login to the docker Host
-# This pipeline references a variable named ‘dockerNamespace’. Thish should be 'pshorg'
-# This pipeline references a variable named ‘dockerImage’. This should be 'powershellcommunity'
+  steps:
+  - powershell: 'docker login $(dockerHost) -u $(dockerUserName) -p "$(dockerKey)"'
+    displayName: 'docker login'
 
-steps:
-- powershell: 'docker login $(dockerHost) -u $(dockerUserName) -p "$(dockerKey)"'
-  displayName: 'docker login'
+  - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
+    displayName: 'Install Pester'
 
-- powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
-  displayName: 'Install Pester'
+  - powershell: './build.ps1 -Build -ImageName $(dockerHost)/$(dockerNamespace)/$(dockerImage) -All -Channel community-stable -push'
+    displayName: Build
 
-- powershell: './build.ps1 -Build -ImageName $(dockerHost)/$(dockerNamespace)/$(dockerImage) -All -Channel community-stable -push'
-  displayName: Build
-
-- powershell: 'docker logout $(dockerHost)'
-  displayName: 'docker logout'
-  condition: always()
+  - powershell: 'docker logout $(dockerHost)'
+    displayName: 'docker logout'
+    condition: always()
