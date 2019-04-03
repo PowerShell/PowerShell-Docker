@@ -414,7 +414,9 @@ function Get-TestParams
         [string]
         $actualVersion,
         [object]
-        $allMeta
+        $allMeta,
+        [switch]
+        $CI
     )
 
     Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $($actualTagData.FromTag) Tag: $($actualTagData.ActualTag) PSversion: $psversion" -Verbose

@@ -265,7 +265,8 @@ End {
                         -actualChannel $actualChannel `
                         -actualTagData $actualTagData `
                         -actualVersion $windowsVersion `
-                        -AllMeta $allMeta
+                        -AllMeta $allMeta `
+                        -CI:$CI.IsPresent
 
                     $testArgList += $testParams.TestArgs
                     $localImageNames += $testParams.ImageName
