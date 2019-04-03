@@ -279,12 +279,6 @@ End {
 
                     $testArgList += $testParams.TestArgs
                     $localImageNames += $testParams.ImageName
-
-                    if($allMeta.meta.subImagePath)
-                    {
-
-                    }
-
                 }
                 elseif ($GetTags.IsPresent) {
                     Write-Verbose "from: $fromTag actual: $($actualTags -join ', ') psversion: $psversion" -Verbose
