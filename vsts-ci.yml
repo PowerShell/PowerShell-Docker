@@ -2,11 +2,12 @@ name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
 resources:
 - repo: self
   clean: true
-phases:
 
-- phase: Set_Build_Name
-  queue:
-    name: Hosted Ubuntu 1604
+jobs:
+
+- job: Set_Build_Name
+  pool:
+    vmImage: ubuntu-16.04
   displayName: Check For Duplicate Tags
   steps:
   - powershell:  Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhss"))"
@@ -141,7 +142,7 @@ phases:
   parameters:
     name: nanoserver_ltsc_2016
     imagename: nanoserver
-    queue: Hosted VS2017
+    vmImage: windows-2019
     preview: false
     ciParameter: '-CI'
 
@@ -149,7 +150,7 @@ phases:
 - template: .vsts-ci/phase.yml
   parameters:
     name: windowsservercore_1803
-    queue: Hosted Windows Container
+    vmImage: windows-2019
     imagename: windowsservercore
     preview: false
     ciParameter: '-CI -TagFilter 1803'

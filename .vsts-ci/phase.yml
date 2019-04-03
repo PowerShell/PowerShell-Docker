@@ -1,7 +1,7 @@
 parameters:
   name: ''
   imagename: ''
-  queue: 'Hosted Ubuntu 1604'
+  vmImage: 'ubuntu-16.04'
   stable: 'true'
   servicing: 'false'
   preview: 'true'
@@ -11,13 +11,14 @@ parameters:
   continueonerror: false
   ciParameter: '-CI'
 
-phases:
-- phase: ${{ parameters.name }}
+jobs:
+- job: ${{ parameters.name }}
   variables:
     ImageName: ${{ parameters.imagename }}
     ContinueOnError: ${{ parameters.continueonerror }}
 
-  queue: ${{ parameters.queue }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
   steps:
   - powershell: Install-module pester -Scope CurrentUser -Force
     displayName: Install Pester
