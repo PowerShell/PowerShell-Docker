@@ -332,7 +332,6 @@ function Get-DockerImageMetaDataWrapper
 
     $imagePath = Join-Path -Path $ChannelPath -ChildPath $dockerFileName
     $scriptPath = Join-Path -Path $imagePath -ChildPath 'getLatestTag.ps1'
-    $tagsJsonPath = Join-Path -Path $imagePath -ChildPath 'tags.json'
     $metaJsonPath = Join-Path -Path $imagePath -ChildPath 'meta.json'
 
     # skip an image if it doesn't exist
@@ -418,27 +417,12 @@ function Get-TestParams
         $allMeta
     )
 
-    $meta = $allMeta.meta
-
-    $sasBase = $sasData.sasBase
-    $SasUrl = $sasData.sasUrl
-    $sasQuery = $sasData.sasQuery
-
-    $actualTag = $actualTagData.ActualTag
-    $actualTags = $actualTagData.ActualTags
-    $tagList = $actualTagData.TagList
-    $fromTag = $actualTagData.FromTag
-    $firstActualTag = $actualTags[0]
-    $firstActualTagOnly = $tagList[0]
-    $meta = $allMeta.meta
-    $imagePath = $allMeta.imagePath
-
-    Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
-    $contextPath = Join-Path -Path $imagePath -ChildPath 'docker'
+    Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $($actualTagData.FromTag) Tag: $($actualTagData.ActualTag) PSversion: $psversion" -Verbose
+    $contextPath = Join-Path -Path $allMeta.imagePath -ChildPath 'docker'
     $vcf_ref = git rev-parse --short HEAD
     $script:ErrorActionPreference = 'stop'
     Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
-    if ($meta.IsLinux) {
+    if ($allMeta.meta.IsLinux) {
         $os = 'linux'
     }
     else {
@@ -448,39 +432,39 @@ function Get-TestParams
     $skipVerification = $false
     if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
     {
-        Write-Verbose -Message "Skipping verification of $firstActualTagOnly in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
+        Write-Verbose -Message "Skipping verification of $($actualTagData.ActualTags[0]) in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
         # The version of nanoserver in CI doesn't have all the changes needed to verify the image
         $skipVerification = $true
     }
 
     # for the image name label, always use the official image name
-    $imageNameParam = 'mcr.microsoft.com/powershell:' + $firstActualTagOnly
+    $imageNameParam = 'mcr.microsoft.com/powershell:' + $actualTagData.TagList[0]
     if($actualChannel -like 'community-*')
     {
         # use the image name for pshorg for community images
-        $imageNameParam = 'pshorg/powershellcommunity:' + $firstActualTagOnly
+        $imageNameParam = 'pshorg/powershellcommunity:' + $actualTagData.TagList[0]
     }
 
     $packageVersion = $psversion
 
     # if the package name ends with rpm
     # then replace the - in the filename with _ as fpm creates the packages this way.
-    if($meta.PackageFormat -match 'rpm$')
+    if($allMeta.meta.PackageFormat -match 'rpm$')
     {
         $packageVersion = $packageVersion -replace '-', '_'
     }
 
     $buildArgs =  @{
-            fromTag = $fromTag
+            fromTag = $actualTagData.FromTag
             PS_VERSION = $psVersion
             PACKAGE_VERSION = $packageVersion
             VCS_REF = $vcf_ref
             IMAGE_NAME = $imageNameParam
         }
 
-    if($SasUrl)
+    if($sasData.sasUrl)
     {
-        $packageUrl = [System.UriBuilder]::new($sasBase)
+        $packageUrl = [System.UriBuilder]::new($sasData.sasBase)
 
         $previewTag = ''
         if($actualChannel -like '*preview*')
@@ -488,12 +472,12 @@ function Get-TestParams
             $previewTag = '-preview'
         }
 
-        $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+        $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
         $packageName = $packageName -replace '\${previewTag}', $previewTag
         $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
         $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
-        $packageUrl.Query = $sasQuery
-        if($meta.Base64EncodePackageUrl)
+        $packageUrl.Query = $sasData.sasQuery
+        if($allMeta.meta.Base64EncodePackageUrl)
         {
             $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.ToString())
             $encodedUrl =[Convert]::ToBase64String($urlBytes)
@@ -514,7 +498,7 @@ function Get-TestParams
             $previewTag = '-preview'
         }
 
-        $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+        $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
         $packageName = $packageName -replace '\${previewTag}', $previewTag
         $containerName = 'v' + ($psversion -replace '~', '-')
         $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
@@ -522,19 +506,19 @@ function Get-TestParams
     }
 
     $testArgs = @{
-        tags = $actualTags
+        tags = $actualTagData.ActualTags
         BuildArgs = $buildArgs
         ContextPath = $contextPath
         OS = $os
         ExpectedVersion = $actualVersion
         SkipVerification = $skipVerification
-        SkipWebCmdletTests = $meta.SkipWebCmdletTests
-        SkipGssNtlmSspTests = $meta.SkipGssNtlmSspTests
+        SkipWebCmdletTests = $allMeta.meta.SkipWebCmdletTests
+        SkipGssNtlmSspTests = $allMeta.meta.SkipGssNtlmSspTests
     }
 
     return [PSCustomObject]@{
         TestArgs = $testArgs
-        ImageName = $firstActualTag
+        ImageName = $actualTagData.ActualTags[0]
     }
 }
 

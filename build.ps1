@@ -252,19 +252,9 @@ End {
 
     foreach($allMeta in $toBuild)
     {
-            $meta = $allMeta.meta
-            $tagsTemplates = $allMeta.tagsTemplates
-            $tagData = $allMeta.tagData
-            $psversion = $allMeta.psversion
-
             foreach ($tagGroup in $allMeta.ActualTagDataByGroup.Keys)
             {
-                $actualTagData=$allMeta.ActualTagDataByGroup.$tagGroup
-                $actualVersion = $windowsVersion
-                $fromTag = $actualTagData.fromTag
-                $actualTags = $actualTagData.actualTags
-                $firstActualTagOnly = $actualTagData.tagList[0]
-                $tagList = $actualTagData.TagList
+                $actualTagData = $allMeta.ActualTagDataByGroup.$tagGroup
 
                 if ($Build.IsPresent -or $Test.IsPresent)
                 {
@@ -274,18 +264,18 @@ End {
                         -SasData $sasData `
                         -actualChannel $actualChannel `
                         -actualTagData $actualTagData `
-                        -actualVersion $actualVersion `
+                        -actualVersion $windowsVersion `
                         -AllMeta $allMeta
 
                     $testArgList += $testParams.TestArgs
                     $localImageNames += $testParams.ImageName
                 }
                 elseif ($GetTags.IsPresent) {
-                    Write-Verbose "from: $fromTag actual: $($actualTags -join ', ') psversion: $psversion" -Verbose
+                    Write-Verbose "from: $($actualTagData.fromTag) actual: $($actualTagData.actualTags -join ', ') psversion: $($allMeta.psversion)" -Verbose
                 }
                 elseif ($CheckForDuplicateTags.IsPresent) {
-                    Write-Verbose "$actualChannel - from: $fromTag actual: $($actualTags -join ', ') psversion: $psversion" -Verbose
-                    foreach($tag in $actualTags)
+                    Write-Verbose "$actualChannel - from: $($actualTagData.fromTag) actual: $($actualTagData.actualTags -join ', ') psversion: $($allMeta.psversion)" -Verbose
+                    foreach($tag in $actualTagData.actualTags)
                     {
                         if($dupeCheckTable.ContainsKey($tag))
                         {
@@ -300,17 +290,17 @@ End {
                 elseif ($GenerateTagsYaml.IsPresent) {
                     $tagGroup = 'public/powershell'
                     $os = 'windows'
-                    if($meta.IsLinux)
+                    if($allMeta.meta.IsLinux)
                     {
                         $os = 'linux'
                     }
                     $architecture = 'amd64'
                     $dockerfile = "https://github.com/PowerShell/PowerShell-Docker/blob/master/release/$actualChannel/$dockerFileName/docker/Dockerfile"
 
-                    $osVersion = $meta.osVersion
+                    $osVersion = $allMeta.meta.osVersion
                     if($osVersion)
                     {
-                        $osVersion = $osVersion.replace('${fromTag}',$fromTag)
+                        $osVersion = $osVersion.replace('${fromTag}',$actualTagData.fromTag)
 
                         if(!$tagGroups.ContainsKey($tagGroup))
                         {
@@ -321,14 +311,14 @@ End {
                             Architecture = $architecture
                             OsVersion = $osVersion
                             Os = $os
-                            Tags = $tagList
+                            Tags = $actualTagData.TagList
                             Dockerfile = $dockerfile
                         }
 
                         $tagGroups[$tagGroup] += $tag
                     }
                     else {
-                        Write-Verbose "Skipping $firstActualTagOnly due to no OS Version in meta.json" -Verbose
+                        Write-Verbose "Skipping $($actualTagData.tagList[0]) due to no OS Version in meta.json" -Verbose
                     }
                 }
             }
