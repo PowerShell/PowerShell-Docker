@@ -246,6 +246,21 @@ End {
                 -ImageName $ImageName `
                 -LinuxVersion $linuxVersion
 
+            $nameForMessage = Split-Path -Leaf -Path $dockerFileName
+            $message = "Channel: $nameForMessage does not exist.  Not every image exists in every channel.  Skipping."
+            if(!$allMeta)
+            {
+                if($CI.IsPresent -and !$GetTags.IsPresent)
+                {
+                    Write-Warning $message
+                    throw $message
+                }
+                else
+                {
+                    Write-Warning $message
+                }
+            }
+
             $toBuild += $allMeta
         }
     }

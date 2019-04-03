@@ -337,14 +337,7 @@ function Get-DockerImageMetaDataWrapper
     # skip an image if it doesn't exist
     if(!(Test-Path $scriptPath))
     {
-        $message = "Channel: $imagePath does not exist.  Not every image exists in every channel.  Skipping."
-        if($CI.IsPresent)
-        {
-            throw $message
-        }
-
-        Write-Warning $message
-        continue
+        return
     }
 
     $meta = Get-DockerImageMetaData -Path $metaJsonPath
