@@ -318,7 +318,16 @@ function Get-DockerImageMetaDataWrapper
 
         [parameter(Mandatory)]
         [string]
-        $ChannelPath
+        $ChannelPath,
+
+        [string]
+        $Version,
+
+        [string]
+        $ImageName,
+
+        [string]
+        $linuxVersion
     )
 
     $imagePath = Join-Path -Path $ChannelPath -ChildPath $dockerFileName
@@ -329,7 +338,7 @@ function Get-DockerImageMetaDataWrapper
     # skip an image if it doesn't exist
     if(!(Test-Path $scriptPath))
     {
-        $message = "Channel: $actualChannel, Name: $dockerFileName does not existing.  Not every image exists in every channel.  Skipping."
+        $message = "Channel: $imagePath does not exist.  Not every image exists in every channel.  Skipping."
         if($CI.IsPresent)
         {
             throw $message
@@ -340,14 +349,7 @@ function Get-DockerImageMetaDataWrapper
     }
 
     $meta = Get-DockerImageMetaData -Path $metaJsonPath
-    if($meta.tagTemplates.count -gt 0)
-    {
-        $tagsTemplates = $meta.tagTemplates
-    }
-    else
-    {
-        $tagsTemplates = Get-Content -Path $tagsJsonPath | ConvertFrom-Json
-    }
+    $tagsTemplates = $meta.tagTemplates
 
     $getTagsExtraParams = @{}
 
@@ -371,10 +373,217 @@ function Get-DockerImageMetaDataWrapper
         $tagData = $tagData | Where-Object { $_.FromTag -match $TagFilter }
     }
 
+    $actualTagDataByGroup = @{}
+    foreach ($tagGroup in ($tagData | Group-Object -Property 'FromTag'))
+    {
+        $actualTagDataByGroup[$tagGroup] = Get-TagData -TagsTemplates $tagsTemplates -TagGroup $tagGroup -Version $Version -ImageName $ImageName
+    }
+
+    $psversion = $Version
+    if($meta.ShouldUseLinuxVersion())
+    {
+        $psversion = $linuxVersion
+    }
+
     return [PSCustomObject]@{
         meta = $meta
         tagsTemplates = $tagsTemplates
         imagePath = $imagePath
         tagData = $tagData
+        ActualTagDataByGroup = $actualTagDataByGroup
+        PSVersion = $psversion
+    }
+}
+
+$toolsPath = Join-Path -Path $PSScriptRoot -ChildPath '..'
+$rootPath = Join-Path -Path $toolsPath -ChildPath '..'
+$testsPath = Join-Path -Path $rootPath -ChildPath 'tests'
+
+function Get-TestParams
+{
+    param(
+        [string]
+        $dockerFileName,
+        [string]
+        $psversion,
+        [Object]
+        $SasData,
+        [string]
+        $actualChannel,
+        [object]
+        $actualTagData,
+        [string]
+        $actualVersion,
+        [object]
+        $allMeta
+    )
+
+    $meta = $allMeta.meta
+
+    $sasBase = $sasData.sasBase
+    $SasUrl = $sasData.sasUrl
+    $sasQuery = $sasData.sasQuery
+
+    $actualTag = $actualTagData.ActualTag
+    $actualTags = $actualTagData.ActualTags
+    $tagList = $actualTagData.TagList
+    $fromTag = $actualTagData.FromTag
+    $firstActualTag = $actualTags[0]
+    $firstActualTagOnly = $tagList[0]
+    $meta = $allMeta.meta
+    $imagePath = $allMeta.imagePath
+
+    Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
+    $contextPath = Join-Path -Path $imagePath -ChildPath 'docker'
+    $vcf_ref = git rev-parse --short HEAD
+    $script:ErrorActionPreference = 'stop'
+    Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
+    if ($meta.IsLinux) {
+        $os = 'linux'
+    }
+    else {
+        $os = 'windows'
+    }
+
+    $skipVerification = $false
+    if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
+    {
+        Write-Verbose -Message "Skipping verification of $firstActualTagOnly in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
+        # The version of nanoserver in CI doesn't have all the changes needed to verify the image
+        $skipVerification = $true
+    }
+
+    # for the image name label, always use the official image name
+    $imageNameParam = 'mcr.microsoft.com/powershell:' + $firstActualTagOnly
+    if($actualChannel -like 'community-*')
+    {
+        # use the image name for pshorg for community images
+        $imageNameParam = 'pshorg/powershellcommunity:' + $firstActualTagOnly
+    }
+
+    $packageVersion = $psversion
+
+    # if the package name ends with rpm
+    # then replace the - in the filename with _ as fpm creates the packages this way.
+    if($meta.PackageFormat -match 'rpm$')
+    {
+        $packageVersion = $packageVersion -replace '-', '_'
+    }
+
+    $buildArgs =  @{
+            fromTag = $fromTag
+            PS_VERSION = $psVersion
+            PACKAGE_VERSION = $packageVersion
+            VCS_REF = $vcf_ref
+            IMAGE_NAME = $imageNameParam
+        }
+
+    if($SasUrl)
+    {
+        $packageUrl = [System.UriBuilder]::new($sasBase)
+
+        $previewTag = ''
+        if($actualChannel -like '*preview*')
+        {
+            $previewTag = '-preview'
+        }
+
+        $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+        $packageName = $packageName -replace '\${previewTag}', $previewTag
+        $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
+        $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
+        $packageUrl.Query = $sasQuery
+        if($meta.Base64EncodePackageUrl)
+        {
+            $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.ToString())
+            $encodedUrl =[Convert]::ToBase64String($urlBytes)
+            $buildArgs.Add('PS_PACKAGE_URL_BASE64', $encodedUrl)
+        }
+        else
+        {
+            $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+        }
+    }
+    else
+    {
+        $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
+
+        $previewTag = ''
+        if($actualChannel -like '*preview*')
+        {
+            $previewTag = '-preview'
+        }
+
+        $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+        $packageName = $packageName -replace '\${previewTag}', $previewTag
+        $containerName = 'v' + ($psversion -replace '~', '-')
+        $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
+        $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+    }
+
+    $testArgs = @{
+        tags = $actualTags
+        BuildArgs = $buildArgs
+        ContextPath = $contextPath
+        OS = $os
+        ExpectedVersion = $actualVersion
+        SkipVerification = $skipVerification
+        SkipWebCmdletTests = $meta.SkipWebCmdletTests
+        SkipGssNtlmSspTests = $meta.SkipGssNtlmSspTests
+    }
+
+    return [PSCustomObject]@{
+        TestArgs = $testArgs
+        ImageName = $firstActualTag
+    }
+}
+
+function Get-TagData
+{
+    param(
+        [string[]]
+        $TagsTemplates,
+        [object]
+        $TagGroup,
+        [string]
+        $Version,
+        [string]
+        $ImageName
+    )
+
+    $actualTags = @()
+    $tagList = @()
+    foreach($tag in $tagGroup.Group) {
+        foreach ($tagTemplate in $tagsTemplates) {
+            # replace the tag token with the tag
+            if ($tagTemplate -match '#tag#') {
+                $actualTag = $tagTemplate -replace '#tag#', $tag.Tag
+            }
+            elseif ($tagTemplate -match '#shorttag#' -and $tag.Type -eq 'Short') {
+                $actualTag = $tagTemplate -replace '#shorttag#', $tag.Tag
+            }
+            elseif ($tagTemplate -match '#fulltag#' -and $tag.Type -eq 'Full') {
+                $actualTag = $tagTemplate -replace '#fulltag#', $tag.Tag
+            }
+            else {
+                # skip if the type of tag token doesn't match the type of tag
+                Write-Verbose -Message "Skipping $($tag.Tag) - $tagTemplate, token doesn't match template"
+                continue
+            }
+
+            # Replace the the psversion token with the powershell version in the tag
+            $actualTag = $actualTag -replace '#psversion#', $Version
+            $actualTag = $actualTag.ToLowerInvariant()
+            $actualTags += "${ImageName}:$actualTag"
+            $tagList += $actualTag
+            $fromTag = $Tag.FromTag
+        }
+    }
+
+    return [PSCustomObject]@{
+        TagList = $tagList
+        FromTag = $fromTag
+        ActualTags = $actualTags
+        ActualTag = $actualTag
     }
 }
