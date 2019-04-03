@@ -425,12 +425,12 @@ function Get-TestParams
     }
 
     $skipVerification = $false
-    <#if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
+    if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
     {
         Write-Verbose -Message "Skipping verification of $($actualTagData.ActualTags[0]) in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
         # The version of nanoserver in CI doesn't have all the changes needed to verify the image
         $skipVerification = $true
-    }#>
+    }
 
     # for the image name label, always use the official image name
     $imageNameParam = 'mcr.microsoft.com/powershell:' + $actualTagData.TagList[0]
