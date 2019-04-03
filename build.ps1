@@ -192,7 +192,7 @@ Begin {
         $sasData = [PSCustomObject]@{
             SasUrl = $sasUrl
             SasUri = $sasUri
-            SasBas = $sasBase
+            SasBase = $sasBase
             SasQuery = $sasQuery
         }
     }
