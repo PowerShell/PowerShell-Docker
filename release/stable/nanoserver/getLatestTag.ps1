@@ -23,8 +23,8 @@ if(!$CI.IsPresent)
 }
 else {
     # This is not supported for nanoserver so don't build in production but try building it as a CI test for the Dockerfile
-    $shortTags = @('latest')
+    $shortTags = @('1803')
 
-    # The \d{4,} part of the regex is because the API is returning tags which are 3 digits and older than the 4 digit tags
-    Get-DockerTags -ShortTags $shortTags -Image "mcr.microsoft.com/windows/nanoserver" -FullTagFilter '10\.0\.14393\.\d{4,}$' -SkipShortTagFilter -Mcr
+    # Only return the latest supported short tag
+    Get-DockerTags -ShortTags $shortTags -Image "mcr.microsoft.com/windows/nanoserver" -FullTagFilter '^1803$' -SkipShortTagFilter -Mcr
 }
