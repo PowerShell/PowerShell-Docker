@@ -149,7 +149,6 @@ jobs:
     imagename: nanoserver
     vmImage: win1803
     preview: false
-    ciParameter: '-CI'
 
 - template: .vsts-ci/phase.yml
   parameters:
