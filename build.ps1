@@ -183,18 +183,7 @@ Begin {
     $sasData = $null
     if($SasUrl)
     {
-        $sasUri = [uri]$SasUrl
-        $sasBase = $sasUri.GetComponents([System.UriComponents]::Path -bor [System.UriComponents]::Scheme -bor [System.UriComponents]::Host ,[System.UriFormat]::Unescaped)
-
-        # The UriBuilder used later adds the ? even if it is already there on Windows
-        # and will add it if it is not there on non-windows
-        $sasQuery = $sasUri.Query -replace '^\?', ''
-        $sasData = [PSCustomObject]@{
-            SasUrl = $sasUrl
-            SasUri = $sasUri
-            SasBase = $sasBase
-            SasQuery = $sasQuery
-        }
+        $sasData = New-SasData -SasUrl $SasUrl
     }
 }
 
