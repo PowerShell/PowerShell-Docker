@@ -157,7 +157,7 @@ DynamicParam {
 
     if($dockerFileNames.Count -gt 0)
     {
-        $ValidateSetAttr = New-Object "System.Management.Automation.ValidateSetAttribute" -ArgumentList $dockerFileNames
+        $ValidateSetAttr = [System.Management.Automation.ValidateSetAttribute]::new(([string[]]$dockerFileNames))
         $Attributes.Add($ValidateSetAttr) > $null
     }
 
@@ -267,78 +267,79 @@ End {
 
     foreach($allMeta in $toBuild)
     {
-            foreach ($tagGroup in $allMeta.ActualTagDataByGroup.Keys)
+        foreach ($tagGroup in $allMeta.ActualTagDataByGroup.Keys)
+        {
+            $actualTagData = $allMeta.ActualTagDataByGroup.$tagGroup
+
+            if ($Build.IsPresent -or $Test.IsPresent)
             {
-                $actualTagData = $allMeta.ActualTagDataByGroup.$tagGroup
+                $testParams = Get-TestParams `
+                    -Dockerfile $dockerFileName `
+                    -psversion $allMeta.psversion `
+                    -SasData $sasData `
+                    -actualChannel $actualChannel `
+                    -actualTagData $actualTagData `
+                    -actualVersion $windowsVersion `
+                    -AllMeta $allMeta `
+                    -CI:$CI.IsPresent
 
-                if ($Build.IsPresent -or $Test.IsPresent)
+                $testArgList += $testParams.TestArgs
+                $localImageNames += $testParams.ImageName
+            }
+            elseif ($GetTags.IsPresent) {
+                Write-Verbose "from: $($actualTagData.fromTag) actual: $($actualTagData.actualTags -join ', ') psversion: $($allMeta.psversion)" -Verbose
+            }
+            elseif ($CheckForDuplicateTags.IsPresent) {
+                Write-Verbose "$actualChannel - from: $($actualTagData.fromTag) actual: $($actualTagData.actualTags -join ', ') psversion: $($allMeta.psversion)" -Verbose
+                foreach($tag in $actualTagData.actualTags)
                 {
-                    $testParams = Get-TestParams `
-                        -Dockerfile $dockerFileName `
-                        -psversion $allMeta.psversion `
-                        -SasData $sasData `
-                        -actualChannel $actualChannel `
-                        -actualTagData $actualTagData `
-                        -actualVersion $windowsVersion `
-                        -AllMeta $allMeta `
-                        -CI:$CI.IsPresent
-
-                    $testArgList += $testParams.TestArgs
-                    $localImageNames += $testParams.ImageName
-                }
-                elseif ($GetTags.IsPresent) {
-                    Write-Verbose "from: $($actualTagData.fromTag) actual: $($actualTagData.actualTags -join ', ') psversion: $($allMeta.psversion)" -Verbose
-                }
-                elseif ($CheckForDuplicateTags.IsPresent) {
-                    Write-Verbose "$actualChannel - from: $($actualTagData.fromTag) actual: $($actualTagData.actualTags -join ', ') psversion: $($allMeta.psversion)" -Verbose
-                    foreach($tag in $actualTagData.actualTags)
+                    if($dupeCheckTable.ContainsKey($tag))
                     {
-                        if($dupeCheckTable.ContainsKey($tag))
-                        {
-                            $dupeTagIssues += "$tag is duplicate for both '$actualChannel/$dockerFileName' and '$($dupeCheckTable.$tag)'"
-                        }
-                        else
-                        {
-                            $dupeCheckTable.Add($tag,"$actualChannel/$dockerFileName")
-                        }
+                        $dupeTagIssues += "$tag is duplicate for both '$actualChannel/$dockerFileName' and '$($dupeCheckTable.$tag)'"
                     }
-                }
-                elseif ($GenerateTagsYaml.IsPresent) {
-                    $tagGroup = 'public/powershell'
-                    $os = 'windows'
-                    if($allMeta.meta.IsLinux)
+                    else
                     {
-                        $os = 'linux'
-                    }
-                    $architecture = 'amd64'
-                    $dockerfile = "https://github.com/PowerShell/PowerShell-Docker/blob/master/release/$actualChannel/$dockerFileName/docker/Dockerfile"
-
-                    $osVersion = $allMeta.meta.osVersion
-                    if($osVersion)
-                    {
-                        $osVersion = $osVersion.replace('${fromTag}',$actualTagData.fromTag)
-
-                        if(!$tagGroups.ContainsKey($tagGroup))
-                        {
-                            $tags = @()
-                            $tagGroups[$tagGroup] = $tags
-                        }
-                        $tag = [PSCustomObject]@{
-                            Architecture = $architecture
-                            OsVersion = $osVersion
-                            Os = $os
-                            Tags = $actualTagData.TagList
-                            Dockerfile = $dockerfile
-                        }
-
-                        $tagGroups[$tagGroup] += $tag
-                    }
-                    else {
-                        Write-Verbose "Skipping $($actualTagData.tagList[0]) due to no OS Version in meta.json" -Verbose
+                        $dupeCheckTable.Add($tag,"$actualChannel/$dockerFileName")
                     }
                 }
             }
+            elseif ($GenerateTagsYaml.IsPresent) {
+                $tagGroup = 'public/powershell'
+                $os = 'windows'
+                if($allMeta.meta.IsLinux)
+                {
+                    $os = 'linux'
+                }
+                $architecture = 'amd64'
+                $dockerfile = "https://github.com/PowerShell/PowerShell-Docker/blob/master/release/$actualChannel/$dockerFileName/docker/Dockerfile"
+
+                $osVersion = $allMeta.meta.osVersion
+                if($osVersion)
+                {
+                    $osVersion = $osVersion.replace('${fromTag}',$actualTagData.fromTag)
+
+                    if(!$tagGroups.ContainsKey($tagGroup))
+                    {
+                        $tags = @()
+                        $tagGroups[$tagGroup] = $tags
+                    }
+
+                    $tag = [PSCustomObject]@{
+                        Architecture = $architecture
+                        OsVersion = $osVersion
+                        Os = $os
+                        Tags = $actualTagData.TagList
+                        Dockerfile = $dockerfile
+                    }
+
+                    $tagGroups[$tagGroup] += $tag
+                }
+                else {
+                    Write-Verbose "Skipping $($actualTagData.tagList[0]) due to no OS Version in meta.json" -Verbose
+                }
+            }
         }
+    }
 
 
     if($testArgList.Count -gt 0)
