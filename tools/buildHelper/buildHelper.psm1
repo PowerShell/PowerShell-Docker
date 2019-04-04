@@ -235,12 +235,17 @@ function Add-ParameterAttribute {
         [string]
         $ParameterSetName
     )
-    $ParameterAttr = New-Object "System.Management.Automation.ParameterAttribute"
+    $ParameterAttr = [System.Management.Automation.ParameterAttribute]::new()
     $ParameterAttr.ParameterSetName = $ParameterSetName
     $ParameterAttr.Mandatory = $true
     $Attributes.Add($ParameterAttr) > $null
 }
 
+class DockerVersions {
+    [string] $WindowsVersion
+    [string] $LinuxVersion
+
+}
 function Get-Versions
 {
     param(
@@ -293,10 +298,21 @@ function Get-Versions
         }
     }
 
-    return [PSCustomObject] @{
+    return [DockerVersions] @{
         WindowsVersion = $windowsVersion
         LinuxVersion = $linuxVersion
     }
+}
+
+class DockerImageFullMetaData
+{
+    [DockerImageMetaData] $Meta
+    [string[]] $TagsTemplates
+    [string] $ImagePath
+    # this is UpstreamDockerTagData[]
+    [object[]] $TagData
+    [System.Collections.Generic.Dictionary[string,TagData]] $ActualTagDataByGroup
+    [string] $PSVersion
 }
 
 # Get the meta data and the tag data for an image
@@ -365,7 +381,7 @@ function Get-DockerImageMetaDataWrapper
         $tagData = $tagData | Where-Object { $_.FromTag -match $TagFilter }
     }
 
-    $actualTagDataByGroup = @{}
+    $actualTagDataByGroup = [System.Collections.Generic.Dictionary[string,TagData]]::new()
     foreach ($tagGroup in ($tagData | Group-Object -Property 'FromTag'))
     {
         $actualTagDataByGroup[$tagGroup] = Get-TagData -TagsTemplates $tagsTemplates -TagGroup $tagGroup -Version $Version -ImageName $ImageName
@@ -377,7 +393,7 @@ function Get-DockerImageMetaDataWrapper
         $psversion = $linuxVersion
     }
 
-    return [PSCustomObject]@{
+    return [DockerImageFullMetaData]@{
         meta = $meta
         tagsTemplates = $tagsTemplates
         imagePath = $imagePath
@@ -391,6 +407,24 @@ $toolsPath = Join-Path -Path $PSScriptRoot -ChildPath '..'
 $rootPath = Join-Path -Path $toolsPath -ChildPath '..'
 $testsPath = Join-Path -Path $rootPath -ChildPath 'tests'
 
+class DockerTestParams
+{
+    [DockerTestArgs] $TestArgs
+    [string] $ImageName
+}
+
+class DockerTestArgs
+{
+    [string[]] $Tags
+    [System.Collections.Generic.Dictionary[string,string]] $BuildArgs
+    [string] $ContextPath
+    [string] $OS
+    [string] $ExpectedVersion
+    [bool] $SkipVerification
+    [bool] $SkipWebCmdletTests
+    [bool] $SkipGssNtlmSspTests
+}
+
 function Get-TestParams
 {
     param(
@@ -398,15 +432,15 @@ function Get-TestParams
         $dockerFileName,
         [string]
         $psversion,
-        [Object]
+        [SasData]
         $SasData,
         [string]
         $actualChannel,
-        [object]
+        [TagData]
         $actualTagData,
         [string]
         $actualVersion,
-        [object]
+        [DockerImageFullMetaData]
         $allMeta,
         [switch]
         $CI
@@ -449,13 +483,12 @@ function Get-TestParams
         $packageVersion = $packageVersion -replace '-', '_'
     }
 
-    $buildArgs =  @{
-            fromTag = $actualTagData.FromTag
-            PS_VERSION = $psVersion
-            PACKAGE_VERSION = $packageVersion
-            VCS_REF = $vcf_ref
-            IMAGE_NAME = $imageNameParam
-        }
+    $buildArgs = [System.Collections.Generic.Dictionary[string,string]]::new()
+    $buildArgs['fromTag'] = $actualTagData.FromTag
+    $buildArgs['PS_VERSION'] = $psversion
+    $buildArgs['PACKAGE_VERSION'] = $packageVersion
+    $buildArgs['VCS_REF'] = $vcf_ref
+    $buildArgs['IMAGE_NAME'] = $imageNameParam
 
     if($sasData.sasUrl)
     {
@@ -511,10 +544,17 @@ function Get-TestParams
         SkipGssNtlmSspTests = $allMeta.meta.SkipGssNtlmSspTests
     }
 
-    return [PSCustomObject]@{
+    return [DockerTestParams] @{
         TestArgs = $testArgs
         ImageName = $actualTagData.ActualTags[0]
     }
+}
+
+class TagData{
+    [string[]] $TagList
+    [string] $FromTag
+    [string[]] $ActualTags
+    [string] $ActualTag
 }
 
 function Get-TagData
@@ -522,7 +562,7 @@ function Get-TagData
     param(
         [string[]]
         $TagsTemplates,
-        [object]
+        [Microsoft.PowerShell.Commands.GroupInfo]
         $TagGroup,
         [string]
         $Version,
@@ -559,7 +599,7 @@ function Get-TagData
         }
     }
 
-    return [PSCustomObject]@{
+    return [TagData]@{
         TagList = $tagList
         FromTag = $fromTag
         ActualTags = $actualTags
@@ -589,11 +629,10 @@ function New-SasData
     # and will add it if it is not there on non-windows
     $sasQuery = $sasUri.Query -replace '^\?', ''
 
-    $sasData = [SasData]::new()
-    $sasData.SasUrl = $SasUrl
-    $sasData.SasUri = $sasUri
-    $sasData.SasBase = $sasBase
-    $sasData.SasQuery = $sasQuery
-
-    return $sasData
+    return [SasData]@{
+        SasUrl = $SasUrl
+        SasUri = $sasUri
+        SasBase = $sasBase
+        SasQuery = $sasQuery
+    }
 }

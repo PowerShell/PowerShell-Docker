@@ -149,7 +149,7 @@ DynamicParam {
     }
 
     # Create the parameter attributs
-    $Attributes = New-Object "System.Collections.ObjectModel.Collection``1[System.Attribute]"
+    $Attributes = [System.Collections.ObjectModel.Collection[System.Attribute]]::new()
 
     Add-ParameterAttribute -ParameterSetName 'TestByName' -Attributes $Attributes
     Add-ParameterAttribute -ParameterSetName 'localBuildByName' -Attributes $Attributes
@@ -162,12 +162,12 @@ DynamicParam {
     }
 
     # Create the parameter
-    $Parameter = New-Object "System.Management.Automation.RuntimeDefinedParameter" -ArgumentList ("Name", [string[]], $Attributes)
+    $Parameter = [System.Management.Automation.RuntimeDefinedParameter]::new("Name", [string[]], $Attributes)
 
     # Return parameters dictionaly
-    $Dict = New-Object "System.Management.Automation.RuntimeDefinedParameterDictionary"
-    $Dict.Add("Name", $Parameter) > $null
-    return $Dict
+    $parameters = [System.Management.Automation.RuntimeDefinedParameterDictionary]::new()
+    $parameters.Add("Name", $Parameter) > $null
+    return $parameters
 }
 
 Begin {
