@@ -2,11 +2,12 @@ name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
 resources:
 - repo: self
   clean: true
-phases:
 
-- phase: Set_Build_Name
-  queue:
-    name: Hosted Ubuntu 1604
+jobs:
+
+- job: Set_Build_Name
+  pool:
+    vmImage: ubuntu-16.04
   displayName: Check For Duplicate Tags
   steps:
   - powershell:  Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhss"))"
@@ -135,21 +136,22 @@ phases:
     preview: false
     communityStable: true
 
+
 # The -CI filters to LTSC-2016 for nanoserver by default, which is the only thing that works on Hosted VS2017
 # Skipping previews on windows due to how long it takes to build on windows
 - template: .vsts-ci/phase.yml
   parameters:
     name: nanoserver_ltsc_2016
     imagename: nanoserver
-    queue: Hosted VS2017
+    vmImage: vs2017-win2016
     preview: false
     ciParameter: '-CI'
 
-# Use the TagFilter to filter to 1803 because the docker instance inside the container only supports 1803
+# Use the TagFilter to filter to 1809 because the docker instance inside the agent only supports 1809
 - template: .vsts-ci/phase.yml
   parameters:
-    name: windowsservercore_1803
-    queue: Hosted Windows Container
+    name: windowsservercore_1809
+    vmImage: windows-2019
     imagename: windowsservercore
     preview: false
-    ciParameter: '-CI -TagFilter 1803'
+    ciParameter: '-CI -TagFilter 1809'

@@ -149,22 +149,25 @@ DynamicParam {
     }
 
     # Create the parameter attributs
-    $Attributes = New-Object "System.Collections.ObjectModel.Collection``1[System.Attribute]"
+    $Attributes = [System.Collections.ObjectModel.Collection[System.Attribute]]::new()
 
     Add-ParameterAttribute -ParameterSetName 'TestByName' -Attributes $Attributes
     Add-ParameterAttribute -ParameterSetName 'localBuildByName' -Attributes $Attributes
     Add-ParameterAttribute -ParameterSetName 'GetTagsByName' -Attributes $Attributes
 
-    $ValidateSetAttr = New-Object "System.Management.Automation.ValidateSetAttribute" -ArgumentList $dockerFileNames
-    $Attributes.Add($ValidateSetAttr) > $null
+    if($dockerFileNames.Count -gt 0)
+    {
+        $ValidateSetAttr = [System.Management.Automation.ValidateSetAttribute]::new(([string[]]$dockerFileNames))
+        $Attributes.Add($ValidateSetAttr) > $null
+    }
 
     # Create the parameter
-    $Parameter = New-Object "System.Management.Automation.RuntimeDefinedParameter" -ArgumentList ("Name", [string[]], $Attributes)
+    $Parameter = [System.Management.Automation.RuntimeDefinedParameter]::new("Name", [string[]], $Attributes)
 
     # Return parameters dictionaly
-    $Dict = New-Object "System.Management.Automation.RuntimeDefinedParameterDictionary"
-    $Dict.Add("Name", $Parameter) > $null
-    return $Dict
+    $parameters = [System.Management.Automation.RuntimeDefinedParameterDictionary]::new()
+    $parameters.Add("Name", $Parameter) > $null
+    return $parameters
 }
 
 Begin {
@@ -177,24 +180,22 @@ Begin {
 
     $Channels = $Channel
 
+    $sasData = $null
     if($SasUrl)
     {
-        $sasUri = [uri]$SasUrl
-        $sasBase = $sasUri.GetComponents([System.UriComponents]::Path -bor [System.UriComponents]::Scheme -bor [System.UriComponents]::Host ,[System.UriFormat]::Unescaped)
-
-        # The UriBuilder used later adds the ? even if it is already there on Windows
-        # and will add it if it is not there on non-windows
-        $sasQuery = $sasUri.Query -replace '^\?', ''
+        $sasData = New-SasData -SasUrl $SasUrl
     }
 }
 
 End {
+    Set-StrictMode -Version latest
     $localImageNames = @()
     $testArgList = @()
     $tagGroups = @{}
     $dupeCheckTable = @{}
     $dupeTagIssues = @()
 
+    $toBuild = @()
     foreach ($actualChannel in $Channels) {
         if ($PSCmdlet.ParameterSetName -match '.*ByName')
         {
@@ -229,219 +230,114 @@ End {
                 -CI:$CI.IsPresent `
                 -IncludeKnownIssues:$IncludeKnownIssues.IsPresent `
                 -ChannelPath $channelPath `
-                -TagFilter $TagFilter
+                -TagFilter $TagFilter `
+                -Version $windowsVersion `
+                -ImageName $ImageName `
+                -LinuxVersion $linuxVersion
 
-            $meta = $allMeta.meta
-            $tagsTemplates = $allMeta.tagsTemplates
-            $imagePath = $allMeta.imagePath
-            $tagData = $allMeta.tagData
-
-            $psversion = $windowsVersion
-            if($meta.ShouldUseLinuxVersion())
+            $nameForMessage = Split-Path -Leaf -Path $dockerFileName
+            $message = "Channel: $nameForMessage does not exist.  Not every image exists in every channel.  Skipping."
+            if(!$allMeta)
             {
-                $psversion = $linuxVersion
+                if($CI.IsPresent -and !$GetTags.IsPresent)
+                {
+                    Write-Warning $message
+                    throw $message
+                }
+                else
+                {
+                    Write-Warning $message
+                }
             }
 
-            foreach ($tagGroup in ($tagData | Group-Object -Property 'FromTag')) {
-                $actualTags = @()
-                $tagList = @()
-                foreach($tag in $tagGroup.Group) {
-                    foreach ($tagTemplate in $tagsTemplates) {
-                        # replace the tag token with the tag
-                        if ($tagTemplate -match '#tag#') {
-                            $actualTag = $tagTemplate -replace '#tag#', $tag.Tag
-                        }
-                        elseif ($tagTemplate -match '#shorttag#' -and $tag.Type -eq 'Short') {
-                            $actualTag = $tagTemplate -replace '#shorttag#', $tag.Tag
-                        }
-                        elseif ($tagTemplate -match '#fulltag#' -and $tag.Type -eq 'Full') {
-                            $actualTag = $tagTemplate -replace '#fulltag#', $tag.Tag
-                        }
-                        else {
-                            # skip if the type of tag token doesn't match the type of tag
-                            Write-Verbose -Message "Skipping $($tag.Tag) - $tagTemplate, token doesn't match template"
-                            continue
-                        }
+            $toBuild += $allMeta
+        }
+    }
 
-                        # Replace the the psversion token with the powershell version in the tag
-                        $actualVersion = $windowsVersion
-                        $actualTag = $actualTag -replace '#psversion#', $actualVersion
-                        $actualTag = $actualTag.ToLowerInvariant()
-                        $actualTags += "${ImageName}:$actualTag"
-                        $tagList += $actualTag
-                        $fromTag = $Tag.FromTag
-                    }
-                }
+    foreach($allMeta in $toBuild)
+    {
+        foreach ($tagGroup in $allMeta.ActualTagDataByGroup.Keys)
+        {
+            $actualTagData = $allMeta.ActualTagDataByGroup.$tagGroup
 
-                $firstActualTag = $actualTags[0]
-                $firstActualTagOnly = $tagList[0]
+            if ($Build.IsPresent -or $Test.IsPresent)
+            {
+                $testParams = Get-TestParams `
+                    -Dockerfile $dockerFileName `
+                    -psversion $allMeta.psversion `
+                    -SasData $sasData `
+                    -actualChannel $actualChannel `
+                    -actualTagData $actualTagData `
+                    -actualVersion $windowsVersion `
+                    -AllMeta $allMeta `
+                    -CI:$CI.IsPresent
 
-                if ($Build.IsPresent -or $Test.IsPresent)
+                $testArgList += $testParams.TestArgs
+                $localImageNames += $testParams.ImageName
+            }
+            elseif ($GetTags.IsPresent) {
+                Write-Verbose "from: $($actualTagData.fromTag) actual: $($actualTagData.actualTags -join ', ') psversion: $($allMeta.psversion)" -Verbose
+            }
+            elseif ($CheckForDuplicateTags.IsPresent) {
+                Write-Verbose "$actualChannel - from: $($actualTagData.fromTag) actual: $($actualTagData.actualTags -join ', ') psversion: $($allMeta.psversion)" -Verbose
+                foreach($tag in $actualTagData.actualTags)
                 {
-                    Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $fromTag Tag: $actualTag PSversion: $psversion" -Verbose
-                    $contextPath = Join-Path -Path $imagePath -ChildPath 'docker'
-                    $vcf_ref = git rev-parse --short HEAD
-                    $script:ErrorActionPreference = 'stop'
-                    $testsPath = Join-Path -Path $PSScriptRoot -ChildPath 'tests'
-                    Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
-                    if ($meta.IsLinux) {
-                        $os = 'linux'
-                    }
-                    else {
-                        $os = 'windows'
-                    }
-
-                    $skipVerification = $false
-                    if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
+                    if($dupeCheckTable.ContainsKey($tag))
                     {
-                        Write-Verbose -Message "Skipping verification of $firstActualTagOnly in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
-                        # The version of nanoserver in CI doesn't have all the changes needed to verify the image
-                        $skipVerification = $true
-                    }
-
-                    # for the image name label, always use the official image name
-                    $imageNameParam = 'mcr.microsoft.com/powershell:' + $firstActualTagOnly
-                    if($actualChannel -like 'community-*')
-                    {
-                        # use the image name for pshorg for community images
-                        $imageNameParam = 'pshorg/powershellcommunity:' + $firstActualTagOnly
-                    }
-
-                    $packageVersion = $psversion
-
-                    # if the package name ends with rpm
-                    # then replace the - in the filename with _ as fpm creates the packages this way.
-                    if($meta.PackageFormat -match 'rpm$')
-                    {
-                        $packageVersion = $packageVersion -replace '-', '_'
-                    }
-
-                    $buildArgs =  @{
-                            fromTag = $fromTag
-                            PS_VERSION = $psVersion
-                            PACKAGE_VERSION = $packageVersion
-                            VCS_REF = $vcf_ref
-                            IMAGE_NAME = $imageNameParam
-                        }
-
-                    if($SasUrl)
-                    {
-                        $packageUrl = [System.UriBuilder]::new($sasBase)
-
-                        $previewTag = ''
-                        if($actualChannel -like '*preview*')
-                        {
-                            $previewTag = '-preview'
-                        }
-
-                        $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
-                        $packageName = $packageName -replace '\${previewTag}', $previewTag
-                        $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
-                        $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
-                        $packageUrl.Query = $sasQuery
-                        if($meta.Base64EncodePackageUrl)
-                        {
-                            $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.ToString())
-                            $encodedUrl =[Convert]::ToBase64String($urlBytes)
-                            $buildArgs.Add('PS_PACKAGE_URL_BASE64', $encodedUrl)
-                        }
-                        else
-                        {
-                            $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
-                        }
+                        $dupeTagIssues += "$tag is duplicate for both '$actualChannel/$dockerFileName' and '$($dupeCheckTable.$tag)'"
                     }
                     else
                     {
-                        $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
-
-                        $previewTag = ''
-                        if($actualChannel -like '*preview*')
-                        {
-                            $previewTag = '-preview'
-                        }
-
-                        $packageName = $meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
-                        $packageName = $packageName -replace '\${previewTag}', $previewTag
-                        $containerName = 'v' + ($psversion -replace '~', '-')
-                        $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
-                        $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
-                    }
-
-                    $testArgs = @{
-                        tags = $actualTags
-                        BuildArgs = $buildArgs
-                        ContextPath = $contextPath
-                        OS = $os
-                        ExpectedVersion = $actualVersion
-                        SkipVerification = $skipVerification
-                        SkipWebCmdletTests = $meta.SkipWebCmdletTests
-                        SkipGssNtlmSspTests = $meta.SkipGssNtlmSspTests
-                    }
-
-                    $testArgList += $testArgs
-                    $localImageNames += $firstActualTag
-                }
-                elseif ($GetTags.IsPresent) {
-                    Write-Verbose "from: $fromTag actual: $($actualTags -join ', ') psversion: $psversion" -Verbose
-                }
-                elseif ($CheckForDuplicateTags.IsPresent) {
-                    Write-Verbose "$actualChannel - from: $fromTag actual: $($actualTags -join ', ') psversion: $psversion" -Verbose
-                    foreach($tag in $actualTags)
-                    {
-                        if($dupeCheckTable.ContainsKey($tag))
-                        {
-                            $dupeTagIssues += "$tag is duplicate for both '$actualChannel/$dockerFileName' and '$($dupeCheckTable.$tag)'"
-                        }
-                        else
-                        {
-                            $dupeCheckTable.Add($tag,"$actualChannel/$dockerFileName")
-                        }
+                        $dupeCheckTable.Add($tag,"$actualChannel/$dockerFileName")
                     }
                 }
-                elseif ($GenerateTagsYaml.IsPresent) {
-                    $tagGroup = 'public/powershell'
-                    $os = 'windows'
-                    if($meta.IsLinux)
+            }
+            elseif ($GenerateTagsYaml.IsPresent) {
+                $tagGroup = 'public/powershell'
+                $os = 'windows'
+                if($allMeta.meta.IsLinux)
+                {
+                    $os = 'linux'
+                }
+                $architecture = 'amd64'
+                $dockerfile = "https://github.com/PowerShell/PowerShell-Docker/blob/master/release/$actualChannel/$dockerFileName/docker/Dockerfile"
+
+                $osVersion = $allMeta.meta.osVersion
+                if($osVersion)
+                {
+                    $osVersion = $osVersion.replace('${fromTag}',$actualTagData.fromTag)
+
+                    if(!$tagGroups.ContainsKey($tagGroup))
                     {
-                        $os = 'linux'
+                        $tags = @()
+                        $tagGroups[$tagGroup] = $tags
                     }
-                    $architecture = 'amd64'
-                    $dockerfile = "https://github.com/PowerShell/PowerShell-Docker/blob/master/release/$actualChannel/$dockerFileName/docker/Dockerfile"
 
-                    $osVersion = $meta.osVersion
-                    if($osVersion)
-                    {
-                        $osVersion = $osVersion.replace('${fromTag}',$fromTag)
-
-                        if(!$tagGroups.ContainsKey($tagGroup))
-                        {
-                            $tags = @()
-                            $tagGroups[$tagGroup] = $tags
-                        }
-                        $tag = [PSCustomObject]@{
-                            Architecture = $architecture
-                            OsVersion = $osVersion
-                            Os = $os
-                            Tags = $tagList
-                            Dockerfile = $dockerfile
-                        }
-
-                        $tagGroups[$tagGroup] += $tag
+                    $tag = [PSCustomObject]@{
+                        Architecture = $architecture
+                        OsVersion = $osVersion
+                        Os = $os
+                        Tags = $actualTagData.TagList
+                        Dockerfile = $dockerfile
                     }
-                    else {
-                        Write-Verbose "Skipping $firstActualTagOnly due to no OS Version in meta.json" -Verbose
-                    }
+
+                    $tagGroups[$tagGroup] += $tag
+                }
+                else {
+                    Write-Verbose "Skipping $($actualTagData.tagList[0]) due to no OS Version in meta.json" -Verbose
                 }
             }
         }
     }
 
+
     if($testArgList.Count -gt 0)
     {
         $logPath = Join-Path -Path $PSScriptRoot -ChildPath "testResults$TestLogPostfix.xml"
+        $testsPath = Join-Path -Path $PSScriptRoot -ChildPath 'tests'
         $testArgPath = Join-Path -Path $testsPath -ChildPath 'testArgs.json'
         $testArgList | ConvertTo-Json -Depth 2 | Out-File -FilePath $testArgPath
-        $testArgList += $testArgs
+
         Write-Verbose "Launching pester..." -Verbose
         $extraParams = @{}
         if($Test.IsPresent)

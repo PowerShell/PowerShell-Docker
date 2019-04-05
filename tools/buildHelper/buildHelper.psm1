@@ -235,12 +235,17 @@ function Add-ParameterAttribute {
         [string]
         $ParameterSetName
     )
-    $ParameterAttr = New-Object "System.Management.Automation.ParameterAttribute"
+    $ParameterAttr = [System.Management.Automation.ParameterAttribute]::new()
     $ParameterAttr.ParameterSetName = $ParameterSetName
     $ParameterAttr.Mandatory = $true
     $Attributes.Add($ParameterAttr) > $null
 }
 
+class DockerVersions {
+    [string] $WindowsVersion
+    [string] $LinuxVersion
+
+}
 function Get-Versions
 {
     param(
@@ -293,10 +298,21 @@ function Get-Versions
         }
     }
 
-    return [PSCustomObject] @{
+    return [DockerVersions] @{
         WindowsVersion = $windowsVersion
         LinuxVersion = $linuxVersion
     }
+}
+
+class DockerImageFullMetaData
+{
+    [DockerImageMetaData] $Meta
+    [string[]] $TagsTemplates
+    [string] $ImagePath
+    # this is UpstreamDockerTagData[]
+    [object[]] $TagData
+    [System.Collections.Generic.Dictionary[string,TagData]] $ActualTagDataByGroup
+    [string] $PSVersion
 }
 
 # Get the meta data and the tag data for an image
@@ -318,36 +334,30 @@ function Get-DockerImageMetaDataWrapper
 
         [parameter(Mandatory)]
         [string]
-        $ChannelPath
+        $ChannelPath,
+
+        [string]
+        $Version,
+
+        [string]
+        $ImageName,
+
+        [string]
+        $linuxVersion
     )
 
     $imagePath = Join-Path -Path $ChannelPath -ChildPath $dockerFileName
     $scriptPath = Join-Path -Path $imagePath -ChildPath 'getLatestTag.ps1'
-    $tagsJsonPath = Join-Path -Path $imagePath -ChildPath 'tags.json'
     $metaJsonPath = Join-Path -Path $imagePath -ChildPath 'meta.json'
 
     # skip an image if it doesn't exist
     if(!(Test-Path $scriptPath))
     {
-        $message = "Channel: $actualChannel, Name: $dockerFileName does not existing.  Not every image exists in every channel.  Skipping."
-        if($CI.IsPresent)
-        {
-            throw $message
-        }
-
-        Write-Warning $message
-        continue
+        return
     }
 
     $meta = Get-DockerImageMetaData -Path $metaJsonPath
-    if($meta.tagTemplates.count -gt 0)
-    {
-        $tagsTemplates = $meta.tagTemplates
-    }
-    else
-    {
-        $tagsTemplates = Get-Content -Path $tagsJsonPath | ConvertFrom-Json
-    }
+    $tagsTemplates = $meta.tagTemplates
 
     $getTagsExtraParams = @{}
 
@@ -371,10 +381,258 @@ function Get-DockerImageMetaDataWrapper
         $tagData = $tagData | Where-Object { $_.FromTag -match $TagFilter }
     }
 
-    return [PSCustomObject]@{
+    $actualTagDataByGroup = [System.Collections.Generic.Dictionary[string,TagData]]::new()
+    foreach ($tagGroup in ($tagData | Group-Object -Property 'FromTag'))
+    {
+        $actualTagDataByGroup[$tagGroup] = Get-TagData -TagsTemplates $tagsTemplates -TagGroup $tagGroup -Version $Version -ImageName $ImageName
+    }
+
+    $psversion = $Version
+    if($meta.ShouldUseLinuxVersion())
+    {
+        $psversion = $linuxVersion
+    }
+
+    return [DockerImageFullMetaData]@{
         meta = $meta
         tagsTemplates = $tagsTemplates
         imagePath = $imagePath
         tagData = $tagData
+        ActualTagDataByGroup = $actualTagDataByGroup
+        PSVersion = $psversion
+    }
+}
+
+$toolsPath = Join-Path -Path $PSScriptRoot -ChildPath '..'
+$rootPath = Join-Path -Path $toolsPath -ChildPath '..'
+$testsPath = Join-Path -Path $rootPath -ChildPath 'tests'
+
+class DockerTestParams
+{
+    [DockerTestArgs] $TestArgs
+    [string] $ImageName
+}
+
+class DockerTestArgs
+{
+    [string[]] $Tags
+    [System.Collections.Generic.Dictionary[string,string]] $BuildArgs
+    [string] $ContextPath
+    [string] $OS
+    [string] $ExpectedVersion
+    [bool] $SkipVerification
+    [bool] $SkipWebCmdletTests
+    [bool] $SkipGssNtlmSspTests
+}
+
+function Get-TestParams
+{
+    param(
+        [string]
+        $dockerFileName,
+        [string]
+        $psversion,
+        [SasData]
+        $SasData,
+        [string]
+        $actualChannel,
+        [TagData]
+        $actualTagData,
+        [string]
+        $actualVersion,
+        [DockerImageFullMetaData]
+        $allMeta,
+        [switch]
+        $CI
+    )
+
+    Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $($actualTagData.FromTag) Tag: $($actualTagData.ActualTag) PSversion: $psversion" -Verbose
+    $contextPath = Join-Path -Path $allMeta.imagePath -ChildPath 'docker'
+    $vcf_ref = git rev-parse --short HEAD
+    $script:ErrorActionPreference = 'stop'
+    Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
+    if ($allMeta.meta.IsLinux) {
+        $os = 'linux'
+    }
+    else {
+        $os = 'windows'
+    }
+
+    $skipVerification = $false
+    if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
+    {
+        Write-Verbose -Message "Skipping verification of $($actualTagData.ActualTags[0]) in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
+        # The version of nanoserver in CI doesn't have all the changes needed to verify the image
+        $skipVerification = $true
+    }
+
+    # for the image name label, always use the official image name
+    $imageNameParam = 'mcr.microsoft.com/powershell:' + $actualTagData.TagList[0]
+    if($actualChannel -like 'community-*')
+    {
+        # use the image name for pshorg for community images
+        $imageNameParam = 'pshorg/powershellcommunity:' + $actualTagData.TagList[0]
+    }
+
+    $packageVersion = $psversion
+
+    # if the package name ends with rpm
+    # then replace the - in the filename with _ as fpm creates the packages this way.
+    if($allMeta.meta.PackageFormat -match 'rpm$')
+    {
+        $packageVersion = $packageVersion -replace '-', '_'
+    }
+
+    $buildArgs = [System.Collections.Generic.Dictionary[string,string]]::new()
+    $buildArgs['fromTag'] = $actualTagData.FromTag
+    $buildArgs['PS_VERSION'] = $psversion
+    $buildArgs['PACKAGE_VERSION'] = $packageVersion
+    $buildArgs['VCS_REF'] = $vcf_ref
+    $buildArgs['IMAGE_NAME'] = $imageNameParam
+
+    if($sasData.sasUrl)
+    {
+        $packageUrl = [System.UriBuilder]::new($sasData.sasBase)
+
+        $previewTag = ''
+        if($actualChannel -like '*preview*')
+        {
+            $previewTag = '-preview'
+        }
+
+        $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+        $packageName = $packageName -replace '\${previewTag}', $previewTag
+        $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
+        $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
+        $packageUrl.Query = $sasData.sasQuery
+        if($allMeta.meta.Base64EncodePackageUrl)
+        {
+            $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.ToString())
+            $encodedUrl =[Convert]::ToBase64String($urlBytes)
+            $buildArgs.Add('PS_PACKAGE_URL_BASE64', $encodedUrl)
+        }
+        else
+        {
+            $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+        }
+    }
+    else
+    {
+        $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
+
+        $previewTag = ''
+        if($actualChannel -like '*preview*')
+        {
+            $previewTag = '-preview'
+        }
+
+        $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+        $packageName = $packageName -replace '\${previewTag}', $previewTag
+        $containerName = 'v' + ($psversion -replace '~', '-')
+        $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
+        $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+    }
+
+    $testArgs = @{
+        tags = $actualTagData.ActualTags
+        BuildArgs = $buildArgs
+        ContextPath = $contextPath
+        OS = $os
+        ExpectedVersion = $actualVersion
+        SkipVerification = $skipVerification
+        SkipWebCmdletTests = $allMeta.meta.SkipWebCmdletTests
+        SkipGssNtlmSspTests = $allMeta.meta.SkipGssNtlmSspTests
+    }
+
+    return [DockerTestParams] @{
+        TestArgs = $testArgs
+        ImageName = $actualTagData.ActualTags[0]
+    }
+}
+
+class TagData{
+    [string[]] $TagList
+    [string] $FromTag
+    [string[]] $ActualTags
+    [string] $ActualTag
+}
+
+function Get-TagData
+{
+    param(
+        [string[]]
+        $TagsTemplates,
+        [Microsoft.PowerShell.Commands.GroupInfo]
+        $TagGroup,
+        [string]
+        $Version,
+        [string]
+        $ImageName
+    )
+
+    $actualTags = @()
+    $tagList = @()
+    foreach($tag in $tagGroup.Group) {
+        foreach ($tagTemplate in $tagsTemplates) {
+            # replace the tag token with the tag
+            if ($tagTemplate -match '#tag#') {
+                $actualTag = $tagTemplate -replace '#tag#', $tag.Tag
+            }
+            elseif ($tagTemplate -match '#shorttag#' -and $tag.Type -eq 'Short') {
+                $actualTag = $tagTemplate -replace '#shorttag#', $tag.Tag
+            }
+            elseif ($tagTemplate -match '#fulltag#' -and $tag.Type -eq 'Full') {
+                $actualTag = $tagTemplate -replace '#fulltag#', $tag.Tag
+            }
+            else {
+                # skip if the type of tag token doesn't match the type of tag
+                Write-Verbose -Message "Skipping $($tag.Tag) - $tagTemplate, token doesn't match template"
+                continue
+            }
+
+            # Replace the the psversion token with the powershell version in the tag
+            $actualTag = $actualTag -replace '#psversion#', $Version
+            $actualTag = $actualTag.ToLowerInvariant()
+            $actualTags += "${ImageName}:$actualTag"
+            $tagList += $actualTag
+            $fromTag = $Tag.FromTag
+        }
+    }
+
+    return [TagData]@{
+        TagList = $tagList
+        FromTag = $fromTag
+        ActualTags = $actualTags
+        ActualTag = $actualTag
+    }
+}
+
+class SasData{
+    [string] $SasUrl
+    [Uri] $SasUri
+    [string] $SasBase
+    [string] $SasQuery
+}
+
+function New-SasData
+{
+    param(
+        [parameter(Mandatory)]
+        [string]
+        $SasUrl
+    )
+
+    $sasUri = [uri]$SasUrl
+    $sasBase = $sasUri.GetComponents([System.UriComponents]::Path -bor [System.UriComponents]::Scheme -bor [System.UriComponents]::Host ,[System.UriFormat]::Unescaped)
+
+    # The UriBuilder used later adds the ? even if it is already there on Windows
+    # and will add it if it is not there on non-windows
+    $sasQuery = $sasUri.Query -replace '^\?', ''
+
+    return [SasData]@{
+        SasUrl = $SasUrl
+        SasUri = $sasUri
+        SasBase = $sasBase
+        SasQuery = $sasQuery
     }
 }

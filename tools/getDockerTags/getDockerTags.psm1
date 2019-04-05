@@ -34,6 +34,13 @@ function Get-DockerTagsList
     }
 }
 
+class UpstreamDockerTagData
+{
+    [string] $Type
+    [string] $Tag
+    [string] $FromTag
+}
+
 # return objects representing the tags we need for a given Image
 function Get-DockerTags
 {
@@ -108,7 +115,7 @@ function Get-DockerTags
                         Select-Object -First 1
 
         # Return the short form of the tag
-        $results += [PSCustomObject] @{
+        $results += [UpstreamDockerTagData] @{
             Type = 'Short'
             Tag = $shortTag
             FromTag = $fullTag
@@ -117,7 +124,7 @@ function Get-DockerTags
         if($AlternativeShortTag)
         {
             # Return the short form of the tag
-            $results += [PSCustomObject] @{
+            $results += [UpstreamDockerTagData] @{
                 Type = 'Short'
                 Tag = $AlternativeShortTag
                 FromTag = $fullTag
@@ -127,7 +134,7 @@ function Get-DockerTags
         if(!$OnlyShortTags.IsPresent)
         {
             # Return the full form of the tag
-            $results += [PSCustomObject] @{
+            $results += [UpstreamDockerTagData] @{
                 Type = 'Full'
                 Tag = $fullTag
                 FromTag = $fullTag
