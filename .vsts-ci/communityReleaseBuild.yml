@@ -18,7 +18,8 @@ jobs:
   - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
     displayName: 'Install Pester'
 
-  - powershell: './build.ps1 -Build -ImageName $(dockerHost) -All -Channel community-stable -push' -Repository $(dockerNamespace)/$(dockerImage)
+  - powershell: |
+      ./build.ps1 -Build -ImageName $(dockerHost) -All -Channel community-stable -push -Repository $(dockerNamespace)/$(dockerImage)
     displayName: Build
 
   - powershell: 'docker logout $(dockerHost)'
