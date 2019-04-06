@@ -75,7 +75,7 @@ jobs:
 
       if($env:$(Channel) -eq 'true')
       {
-        ./build.ps1 -Build -ImageName $(dockerHost)/$(dockerNamespace)/$(dockerImage) -All -Channel $(channel) @extraParams -version '$(Version)'
+        ./build.ps1 -Build -ImageName $(dockerHost) -All -Channel $(channel) @extraParams -version '$(Version)' -Repository $(dockerNamespace)/$(dockerImage)
       }
       else
       {
