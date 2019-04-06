@@ -7,6 +7,5 @@
         "#psversion#-centos-#tag#",
         "centos-#shorttag#"
     ],
-    "SubImage": "test-deps"
-
+    "SubRepository": "test-deps"
 }
