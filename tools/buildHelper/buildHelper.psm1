@@ -320,6 +320,7 @@ class DockerImageFullMetaData
     [System.Collections.Generic.Dictionary[string,TagData]] $ActualTagDataByGroup
     [string] $PSVersion
     [string] $BaseImage
+    [string] $FullRepository
 }
 
 # Get the meta data and the tag data for an image
@@ -430,6 +431,7 @@ function Get-DockerImageMetaDataWrapper
         ActualTagDataByGroup = $actualTagDataByGroup
         PSVersion = $psversion
         BaseImage = $BaseImage
+        FullRepository = $fullRepository
     }
 }
 
@@ -499,7 +501,7 @@ function Get-TestParams
     }
 
     # for the image name label, always use the official image name
-    $imageNameParam = "mcr.microsoft.com/$($allMeta.meta.Repository):" + $actualTagData.TagList[0]
+    $imageNameParam = "mcr.microsoft.com/$($allMeta.FullRepository):" + $actualTagData.TagList[0]
     if($actualChannel -like 'community-*')
     {
         # use the image name for pshorg for community images
