@@ -455,6 +455,7 @@ class DockerTestArgs
     [bool] $SkipVerification
     [bool] $SkipWebCmdletTests
     [bool] $SkipGssNtlmSspTests
+    [string] $BaseImage
 }
 
 function Get-TestParams
@@ -577,6 +578,7 @@ function Get-TestParams
         SkipVerification = $skipVerification
         SkipWebCmdletTests = $allMeta.meta.SkipWebCmdletTests
         SkipGssNtlmSspTests = $allMeta.meta.SkipGssNtlmSspTests
+        BaseImage = $BaseImage
     }
 
     return [DockerTestParams] @{

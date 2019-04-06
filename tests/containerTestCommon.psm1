@@ -119,6 +119,7 @@ function Get-LinuxContainer
         # not (purpose eq verification -and SkipVerification)
         if($testArgs.os -eq 'linux' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification))
         {
+            $skipPull = ![string]::IsNullOrEmpty($testArgs.BaseImage)
             Write-Output @{
                 Name = $testArgs.Tags[0]
                 Tags = $testArgs.Tags
@@ -128,6 +129,7 @@ function Get-LinuxContainer
                 SkipWebCmdletTests = $testArgs.SkipWebCmdletTests
                 SkipGssNtlmSspTests = $testArgs.SkipGssNtlmSspTests
                 ImageName = $testArgs.BuildArgs.IMAGE_NAME
+                SkipPull = $skipPull
             }
         }
     }
@@ -150,6 +152,7 @@ function Get-WindowsContainer
     {
         if($testArgs.os -eq 'windows' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification))
         {
+            $skipPull = ![string]::IsNullOrEmpty($testArgs.BaseImage)
             Write-Output @{
                 Name = $testArgs.Tags[0]
                 Tags = $testArgs.Tags
@@ -159,6 +162,7 @@ function Get-WindowsContainer
                 SkipWebCmdletTests = $testArgs.SkipWebCmdletTests
                 SkipGssNtlmSspTests = $testArgs.SkipGssNtlmSspTests
                 ImageName = $testArgs.BuildArgs.IMAGE_NAME
+                SkipPull = $skipPull
             }
         }
     }
@@ -390,7 +394,10 @@ function Invoke-DockerBuild
         [Parameter(Mandatory=$true)]
         [ValidateSet('windows','linux')]
         [string]
-        $OSType
+        $OSType,
+
+        [switch]
+        $SkipPull
     )
 
 
@@ -410,7 +417,11 @@ function Invoke-DockerBuild
         )
     }
     else {
-        $buildArgList += '--pull'
+        if (!$SkipPull.IsPresent)
+        {
+            $buildArgList += '--pull'
+        }
+
         $buildArgList += '--quiet'
     }
 

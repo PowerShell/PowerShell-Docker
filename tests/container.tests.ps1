@@ -20,6 +20,7 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
                 Tags = $_.Tags
                 Path = $_.Path
                 BuildArgs = $_.BuildArgs
+                SkipPull = $_.SkipPull
             }
         }
     }
@@ -40,10 +41,13 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
 
             [Parameter(Mandatory=$true)]
             [object]
-            $BuildArgs
+            $BuildArgs,
+
+            [bool]
+            $SkipPull
         )
 
-        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType linux
+        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType linux -SkipPull:$SkipPull
     }
 }
 
@@ -56,6 +60,7 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
                 Tags = $_.Tags
                 Path = $_.Path
                 BuildArgs = $_.BuildArgs
+                SkipPull = $_.SkipPull
             }
         }
     }
@@ -76,10 +81,13 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
 
             [Parameter(Mandatory=$true)]
             [object]
-            $BuildArgs
+            $BuildArgs,
+
+            [bool]
+            $SkipPull
         )
 
-        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType windows
+        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType windows -SkipPull:$SkipPull
     }
 }
 
