@@ -5,6 +5,5 @@
     "tagTemplates": [
         "#psversion#-amazonlinux-#tag#",
         "amazonlinux-#shorttag#"
-    ],
-    "SubImage": "test-deps"
+    ]
 }
