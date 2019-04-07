@@ -302,6 +302,42 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             }
         }
     }
+
+    Context "test-deps" {
+        BeforeAll{
+            $testdepsTestCases = @()
+            $script:linuxContainerRunTests | Where-Object { $_.OptionalTests -contains 'test-deps' } | ForEach-Object {
+                $testdepsTestCases += @{
+                    Name = $_.Name
+                    Command = 'su'
+                }
+                $testdepsTestCases += @{
+                    Name = $_.Name
+                    Command = 'sudo'
+                }
+                $testdepsTestCases += @{
+                    Name = $_.Name
+                    Command = 'adduser'
+                }
+            }
+
+            $skipTestDeps = $testdepsTestCases.count -eq 0
+        }
+
+        it "<Name> should have <command>" -TestCases $testdepsTestCases -Skip:$skipTestDeps {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Command
+            )
+
+            $source = Get-DockerCommandSource -Name $name -command $Command
+            $source | Should -Not -BeNullOrEmpty
+        }
+    }
 }
 
 Describe "Windows Containers" -Tags 'Behavior', 'Windows' {

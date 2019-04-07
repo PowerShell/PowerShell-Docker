@@ -8,5 +8,4 @@
         "centos-#shorttag#"
     ],
     "SubImage": "test-deps"
-
 }

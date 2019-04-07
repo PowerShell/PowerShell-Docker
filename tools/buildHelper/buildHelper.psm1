@@ -155,6 +155,9 @@ class DockerImageMetaData {
 
     [string]
     $FullRepository
+
+    [string[]]
+    $OptionalTests
 }
 
 class ShortTagMetaData {
@@ -466,6 +469,7 @@ class DockerTestArgs
     [bool] $SkipWebCmdletTests
     [bool] $SkipGssNtlmSspTests
     [string] $BaseImage
+    [string] $OptionalTests
 }
 
 function Get-TestParams
@@ -589,6 +593,7 @@ function Get-TestParams
         SkipWebCmdletTests = $allMeta.meta.SkipWebCmdletTests
         SkipGssNtlmSspTests = $allMeta.meta.SkipGssNtlmSspTests
         BaseImage = $BaseImage
+        OptionalTests = $allMeta.meta.OptionalTests
     }
 
     return [DockerTestParams] @{

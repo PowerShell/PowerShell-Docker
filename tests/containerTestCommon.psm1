@@ -130,6 +130,7 @@ function Get-LinuxContainer
                 SkipGssNtlmSspTests = $testArgs.SkipGssNtlmSspTests
                 ImageName = $testArgs.BuildArgs.IMAGE_NAME
                 SkipPull = $skipPull
+                OptionalTests = $testArgs.OptionalTests
             }
         }
     }
@@ -373,6 +374,29 @@ function Get-DockerImageLabel
     $runParams += $imageTag
 
     return Invoke-Docker -Command inspect -Params $runParams -SuppressHostOutput -PassThru
+}
+
+# get the Source (path) of a command in a docker container
+function Get-DockerCommandSource
+{
+    param(
+        [string] $Name,
+        [String] $Command
+    )
+
+    $imageTag = ${Name}
+
+    $runParams = @()
+    $runParams += '--rm'
+
+    $runParams += $imageTag
+    $runParams += 'pwsh'
+    $runParams += '-nologo'
+    $runParams += '-noprofile'
+    $runParams += '-c'
+    $runParams += "(Get-Command -name '$Command').Source"
+
+    return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
 }
 
 # Builds a Docker image
