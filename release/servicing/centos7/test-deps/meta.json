@@ -1,0 +1,13 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell${previewTag}-${PS_VERSION}-1.rhel.7.x86_64.rpm",
+    "osVersion": "CentOS 7",
+    "tagTemplates": [
+        "#psversion#-centos-#tag#"
+    ],
+    "SubRepository": "test-deps",
+    "OptionalTests": [
+        "test-deps"
+    ]
+}
