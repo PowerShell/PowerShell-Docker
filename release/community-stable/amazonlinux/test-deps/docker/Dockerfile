@@ -16,6 +16,8 @@ RUN \
 	    # adds adduser
 	    shadow-utils \
 	    sudo \
+      # add su
+      util-linux \
     && yum clean all \
     # remove cache folders and files
     && rm -rf /var/cache/yum
