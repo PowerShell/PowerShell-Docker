@@ -6,5 +6,5 @@
         "#psversion#-amazonlinux-#tag#",
         "amazonlinux-#shorttag#"
     ],
-    "SubRepository": "test-deps"
+    "FullRepository": "pshorg/powershellcommunity-test-deps"
 }

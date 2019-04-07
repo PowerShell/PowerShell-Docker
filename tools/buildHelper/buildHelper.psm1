@@ -152,6 +152,9 @@ class DockerImageMetaData {
 
     [string]
     $SubRepository
+
+    [string]
+    $FullRepository
 }
 
 class ShortTagMetaData {
@@ -405,10 +408,17 @@ function Get-DockerImageMetaDataWrapper
         $tagDataFromScript = $TagData
     }
 
-    $fullRepository = $BaseRepositry
-    if($meta.SubRepository)
+    if ($meta.FullRepository)
     {
-        $fullRepository += '/{0}' -f $meta.SubRepository
+        $fullRepository = $meta.FullRepository
+    }
+    else
+    {
+        $fullRepository = $BaseRepositry
+        if($meta.SubRepository)
+        {
+            $fullRepository += '/{0}' -f $meta.SubRepository
+        }
     }
 
     $actualTagDataByGroup = [System.Collections.Generic.Dictionary[string,TagData]]::new()
