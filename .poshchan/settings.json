@@ -12,6 +12,14 @@
             "anmenaga"
         ],
     },
+    "failures": {
+        "authorized_users": [
+            "adityapatwardhan",
+            "anmenaga",
+            "TravisEz13",
+            "RDIL"
+        ]
+    },
     "reminders": {
         "authorized_users": "*"
     }
