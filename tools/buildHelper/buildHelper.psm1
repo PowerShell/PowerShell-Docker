@@ -3,6 +3,11 @@
 
 # Gets the Current version of PowerShell from the PowerShell repo
 # or formats the version based on the parameters
+
+# force Microsoft.PowerShell.Commands.GroupInfo to load
+Import-module Microsoft.PowerShell.Utility
+$null = 1,2 | group-object
+
 function Get-PowerShellVersion
 {
     [CmdletBinding(DefaultParameterSetName='Default')]
