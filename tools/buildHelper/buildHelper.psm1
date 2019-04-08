@@ -146,6 +146,18 @@ class DockerImageMetaData {
 
     [string[]]
     $tagTemplates
+
+    [string]
+    $SubImage
+
+    [string]
+    $SubRepository
+
+    [string]
+    $FullRepository
+
+    [string[]]
+    $OptionalTests
 }
 
 class ShortTagMetaData {
@@ -313,6 +325,8 @@ class DockerImageFullMetaData
     [object[]] $TagData
     [System.Collections.Generic.Dictionary[string,TagData]] $ActualTagDataByGroup
     [string] $PSVersion
+    [string] $BaseImage
+    [string] $FullRepository
 }
 
 # Get the meta data and the tag data for an image
@@ -343,7 +357,16 @@ function Get-DockerImageMetaDataWrapper
         $ImageName,
 
         [string]
-        $linuxVersion
+        $linuxVersion,
+
+        [object[]]
+        $TagData,
+
+        [string]
+        $BaseImage,
+
+        [string]
+        $BaseRepositry
     )
 
     $imagePath = Join-Path -Path $ChannelPath -ChildPath $dockerFileName
@@ -351,7 +374,7 @@ function Get-DockerImageMetaDataWrapper
     $metaJsonPath = Join-Path -Path $imagePath -ChildPath 'meta.json'
 
     # skip an image if it doesn't exist
-    if(!(Test-Path $scriptPath))
+    if(!(Test-Path $scriptPath) -and !$TagData)
     {
         return
     }
@@ -374,17 +397,37 @@ function Get-DockerImageMetaDataWrapper
         $getTagsExtraParams.Add('ShortTags',$shortTags)
     }
 
-    # Get the tag data for the image
-    $tagData = @(& $scriptPath -CI:$CI.IsPresent @getTagsExtraParams | Where-Object {$_.FromTag})
-    if($TagFilter)
+    if(!$TagData)
     {
-        $tagData = $tagData | Where-Object { $_.FromTag -match $TagFilter }
+        # Get the tag data for the image
+        $tagDataFromScript = @(& $scriptPath -CI:$CI.IsPresent @getTagsExtraParams | Where-Object {$_.FromTag})
+        if($TagFilter)
+        {
+            $tagDataFromScript = $tagDataFromScript | Where-Object { $_.FromTag -match $TagFilter }
+        }
+    }
+    else
+    {
+        $tagDataFromScript = $TagData
+    }
+
+    if ($meta.FullRepository)
+    {
+        $fullRepository = $meta.FullRepository
+    }
+    else
+    {
+        $fullRepository = $BaseRepositry
+        if($meta.SubRepository)
+        {
+            $fullRepository += '/{0}' -f $meta.SubRepository
+        }
     }
 
     $actualTagDataByGroup = [System.Collections.Generic.Dictionary[string,TagData]]::new()
-    foreach ($tagGroup in ($tagData | Group-Object -Property 'FromTag'))
+    foreach ($tagGroup in ($tagDataFromScript | Group-Object -Property 'FromTag'))
     {
-        $actualTagDataByGroup[$tagGroup] = Get-TagData -TagsTemplates $tagsTemplates -TagGroup $tagGroup -Version $Version -ImageName $ImageName
+        $actualTagDataByGroup[$tagGroup] = Get-TagData -TagsTemplates $tagsTemplates -TagGroup $tagGroup -Version $Version -ImageName $ImageName -Repository $fullRepository
     }
 
     $psversion = $Version
@@ -397,9 +440,11 @@ function Get-DockerImageMetaDataWrapper
         meta = $meta
         tagsTemplates = $tagsTemplates
         imagePath = $imagePath
-        tagData = $tagData
+        tagData = $tagDataFromScript
         ActualTagDataByGroup = $actualTagDataByGroup
         PSVersion = $psversion
+        BaseImage = $BaseImage
+        FullRepository = $fullRepository
     }
 }
 
@@ -423,6 +468,8 @@ class DockerTestArgs
     [bool] $SkipVerification
     [bool] $SkipWebCmdletTests
     [bool] $SkipGssNtlmSspTests
+    [string] $BaseImage
+    [string] $OptionalTests
 }
 
 function Get-TestParams
@@ -443,7 +490,9 @@ function Get-TestParams
         [DockerImageFullMetaData]
         $allMeta,
         [switch]
-        $CI
+        $CI,
+        [string]
+        $BaseImage
     )
 
     Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $($actualTagData.FromTag) Tag: $($actualTagData.ActualTag) PSversion: $psversion" -Verbose
@@ -467,7 +516,7 @@ function Get-TestParams
     }
 
     # for the image name label, always use the official image name
-    $imageNameParam = 'mcr.microsoft.com/powershell:' + $actualTagData.TagList[0]
+    $imageNameParam = "mcr.microsoft.com/$($allMeta.FullRepository):" + $actualTagData.TagList[0]
     if($actualChannel -like 'community-*')
     {
         # use the image name for pshorg for community images
@@ -489,6 +538,7 @@ function Get-TestParams
     $buildArgs['PACKAGE_VERSION'] = $packageVersion
     $buildArgs['VCS_REF'] = $vcf_ref
     $buildArgs['IMAGE_NAME'] = $imageNameParam
+    $buildArgs['BaseImage'] = $BaseImage
 
     if($sasData.sasUrl)
     {
@@ -542,6 +592,8 @@ function Get-TestParams
         SkipVerification = $skipVerification
         SkipWebCmdletTests = $allMeta.meta.SkipWebCmdletTests
         SkipGssNtlmSspTests = $allMeta.meta.SkipGssNtlmSspTests
+        BaseImage = $BaseImage
+        OptionalTests = $allMeta.meta.OptionalTests
     }
 
     return [DockerTestParams] @{
@@ -567,7 +619,9 @@ function Get-TagData
         [string]
         $Version,
         [string]
-        $ImageName
+        $ImageName,
+        [string]
+        $Repository
     )
 
     $actualTags = @()
@@ -593,7 +647,7 @@ function Get-TagData
             # Replace the the psversion token with the powershell version in the tag
             $actualTag = $actualTag -replace '#psversion#', $Version
             $actualTag = $actualTag.ToLowerInvariant()
-            $actualTags += "${ImageName}:$actualTag"
+            $actualTags += "${ImageName}/${Repository}:$actualTag"
             $tagList += $actualTag
             $fromTag = $Tag.FromTag
         }

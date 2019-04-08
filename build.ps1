@@ -67,6 +67,9 @@ param(
     $ImageName = 'powershell.local',
 
     [string]
+    $Repository = 'powershell',
+
+    [string]
     $TestLogPostfix,
 
     [switch]
@@ -233,7 +236,8 @@ End {
                 -TagFilter $TagFilter `
                 -Version $windowsVersion `
                 -ImageName $ImageName `
-                -LinuxVersion $linuxVersion
+                -LinuxVersion $linuxVersion `
+                -BaseRepositry $Repository
 
             $nameForMessage = Split-Path -Leaf -Path $dockerFileName
             $message = "Channel: $nameForMessage does not exist.  Not every image exists in every channel.  Skipping."
@@ -249,8 +253,35 @@ End {
                     Write-Warning $message
                 }
             }
+            else
+            {
 
-            $toBuild += $allMeta
+                $toBuild += $allMeta
+                if($allMeta.Meta.SubImage)
+                {
+                    foreach ($tagGroup in $allMeta.ActualTagDataByGroup.Keys)
+                    {
+                        $actualTagData = $allMeta.ActualTagDataByGroup.$tagGroup
+                        Write-Verbose -Message "getting subimage: $tagGroup $($allMeta.Meta.SubImage)" -Verbose
+                        $SubImagePath = Join-Path -Path $dockerFileName -ChildPath $allMeta.Meta.SubImage
+
+                        $subImageAllMeta = Get-DockerImageMetaDataWrapper `
+                            -DockerFileName $SubImagePath `
+                            -CI:$CI.IsPresent `
+                            -IncludeKnownIssues:$IncludeKnownIssues.IsPresent `
+                            -ChannelPath $channelPath `
+                            -TagFilter $TagFilter `
+                            -Version $windowsVersion `
+                            -ImageName $ImageName `
+                            -LinuxVersion $linuxVersion `
+                            -TagData $allMeta.TagData `
+                            -BaseImage $actualTagData.ActualTags[0] `
+                            -BaseRepositry $Repository
+
+                        $toBuild += $subImageAllMeta
+                    }
+                }
+            }
         }
     }
 
@@ -262,15 +293,23 @@ End {
 
             if ($Build.IsPresent -or $Test.IsPresent)
             {
-                $testParams = Get-TestParams `
-                    -Dockerfile $dockerFileName `
-                    -psversion $allMeta.psversion `
-                    -SasData $sasData `
-                    -actualChannel $actualChannel `
-                    -actualTagData $actualTagData `
-                    -actualVersion $windowsVersion `
-                    -AllMeta $allMeta `
-                    -CI:$CI.IsPresent
+                $params = @{
+                    Dockerfile=$dockerFileName
+                    psversion=$allMeta.psversion
+                    SasData= $sasData
+                    actualChannel= $actualChannel
+                    actualTagData= $actualTagData
+                    actualVersion= $windowsVersion
+                    AllMeta= $allMeta
+                    CI=$CI.IsPresent
+                }
+
+                if($allMeta.BaseImage)
+                {
+                    $params.Add('BaseImage',$allMeta.BaseImage)
+                }
+
+                $testParams = Get-TestParams @params
 
                 $testArgList += $testParams.TestArgs
                 $localImageNames += $testParams.ImageName

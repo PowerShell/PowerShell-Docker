@@ -4,8 +4,10 @@
     "PackageFormat": "powershell${previewTag}-${PS_VERSION}-1.rhel.7.x86_64.rpm",
     "osVersion": "CentOS 7",
     "tagTemplates": [
-        "#psversion#-centos-#tag#",
         "centos-#shorttag#"
     ],
-    "SubImage": "test-deps"
+    "SubRepository": "test-deps",
+    "OptionalTests": [
+        "test-deps"
+    ]
 }

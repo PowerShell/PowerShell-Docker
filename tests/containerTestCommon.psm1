@@ -119,6 +119,7 @@ function Get-LinuxContainer
         # not (purpose eq verification -and SkipVerification)
         if($testArgs.os -eq 'linux' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification))
         {
+            $skipPull = ![string]::IsNullOrEmpty($testArgs.BaseImage)
             Write-Output @{
                 Name = $testArgs.Tags[0]
                 Tags = $testArgs.Tags
@@ -128,6 +129,8 @@ function Get-LinuxContainer
                 SkipWebCmdletTests = $testArgs.SkipWebCmdletTests
                 SkipGssNtlmSspTests = $testArgs.SkipGssNtlmSspTests
                 ImageName = $testArgs.BuildArgs.IMAGE_NAME
+                SkipPull = $skipPull
+                OptionalTests = $testArgs.OptionalTests
             }
         }
     }
@@ -150,6 +153,7 @@ function Get-WindowsContainer
     {
         if($testArgs.os -eq 'windows' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification))
         {
+            $skipPull = ![string]::IsNullOrEmpty($testArgs.BaseImage)
             Write-Output @{
                 Name = $testArgs.Tags[0]
                 Tags = $testArgs.Tags
@@ -159,6 +163,7 @@ function Get-WindowsContainer
                 SkipWebCmdletTests = $testArgs.SkipWebCmdletTests
                 SkipGssNtlmSspTests = $testArgs.SkipGssNtlmSspTests
                 ImageName = $testArgs.BuildArgs.IMAGE_NAME
+                SkipPull = $skipPull
             }
         }
     }
@@ -371,6 +376,29 @@ function Get-DockerImageLabel
     return Invoke-Docker -Command inspect -Params $runParams -SuppressHostOutput -PassThru
 }
 
+# get the Source (path) of a command in a docker container
+function Get-DockerCommandSource
+{
+    param(
+        [string] $Name,
+        [String] $Command
+    )
+
+    $imageTag = ${Name}
+
+    $runParams = @()
+    $runParams += '--rm'
+
+    $runParams += $imageTag
+    $runParams += 'pwsh'
+    $runParams += '-nologo'
+    $runParams += '-noprofile'
+    $runParams += '-c'
+    $runParams += "(Get-Command -name '$Command').Source"
+
+    return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
+}
+
 # Builds a Docker image
 function Invoke-DockerBuild
 {
@@ -390,7 +418,10 @@ function Invoke-DockerBuild
         [Parameter(Mandatory=$true)]
         [ValidateSet('windows','linux')]
         [string]
-        $OSType
+        $OSType,
+
+        [switch]
+        $SkipPull
     )
 
 
@@ -410,7 +441,11 @@ function Invoke-DockerBuild
         )
     }
     else {
-        $buildArgList += '--pull'
+        if (!$SkipPull.IsPresent)
+        {
+            $buildArgList += '--pull'
+        }
+
         $buildArgList += '--quiet'
     }
 

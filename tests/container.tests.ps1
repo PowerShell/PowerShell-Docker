@@ -20,6 +20,7 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
                 Tags = $_.Tags
                 Path = $_.Path
                 BuildArgs = $_.BuildArgs
+                SkipPull = $_.SkipPull
             }
         }
     }
@@ -40,10 +41,13 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
 
             [Parameter(Mandatory=$true)]
             [object]
-            $BuildArgs
+            $BuildArgs,
+
+            [bool]
+            $SkipPull
         )
 
-        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType linux
+        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType linux -SkipPull:$SkipPull
     }
 }
 
@@ -56,6 +60,7 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
                 Tags = $_.Tags
                 Path = $_.Path
                 BuildArgs = $_.BuildArgs
+                SkipPull = $_.SkipPull
             }
         }
     }
@@ -76,10 +81,13 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
 
             [Parameter(Mandatory=$true)]
             [object]
-            $BuildArgs
+            $BuildArgs,
+
+            [bool]
+            $SkipPull
         )
 
-        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType windows
+        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType windows -SkipPull:$SkipPull
     }
 }
 
@@ -292,6 +300,42 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                     throw "Unexpected expactation '$Expectation'"
                 }
             }
+        }
+    }
+
+    Context "test-deps" {
+        BeforeAll{
+            $testdepsTestCases = @()
+            $script:linuxContainerRunTests | Where-Object { $_.OptionalTests -contains 'test-deps' } | ForEach-Object {
+                $testdepsTestCases += @{
+                    Name = $_.Name
+                    Command = 'su'
+                }
+                $testdepsTestCases += @{
+                    Name = $_.Name
+                    Command = 'sudo'
+                }
+                $testdepsTestCases += @{
+                    Name = $_.Name
+                    Command = 'adduser'
+                }
+            }
+
+            $skipTestDeps = $testdepsTestCases.count -eq 0
+        }
+
+        it "<Name> should have <command>" -TestCases $testdepsTestCases -Skip:$skipTestDeps {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Command
+            )
+
+            $source = Get-DockerCommandSource -Name $name -command $Command
+            $source | Should -Not -BeNullOrEmpty
         }
     }
 }
