@@ -323,7 +323,7 @@ class DockerImageFullMetaData
     [string] $ImagePath
     # this is UpstreamDockerTagData[]
     [object[]] $TagData
-    [System.Collections.Generic.Dictionary[string,TagData]] $ActualTagDataByGroup
+    [System.Collections.Generic.Dictionary[Microsoft.PowerShell.Commands.GroupInfo,TagData]] $ActualTagDataByGroup
     [string] $PSVersion
     [string] $BaseImage
     [string] $FullRepository
@@ -424,7 +424,7 @@ function Get-DockerImageMetaDataWrapper
         }
     }
 
-    $actualTagDataByGroup = [System.Collections.Generic.Dictionary[string,TagData]]::new()
+    $actualTagDataByGroup = [System.Collections.Generic.Dictionary[Microsoft.PowerShell.Commands.GroupInfo,TagData]]::new()
     foreach ($tagGroup in ($tagDataFromScript | Group-Object -Property 'FromTag'))
     {
         $actualTagDataByGroup[$tagGroup] = Get-TagData -TagsTemplates $tagsTemplates -TagGroup $tagGroup -Version $Version -ImageName $ImageName -Repository $fullRepository
