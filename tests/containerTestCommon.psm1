@@ -436,7 +436,7 @@ function Invoke-DockerBuild
         $buildArgList += @(
             '-r'
             $env:ACR_NAME
-            '--os'
+            '--platform'
             $OSType
         )
     }
