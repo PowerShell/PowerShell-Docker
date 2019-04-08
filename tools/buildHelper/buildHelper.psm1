@@ -4,10 +4,6 @@
 # Gets the Current version of PowerShell from the PowerShell repo
 # or formats the version based on the parameters
 
-# force Microsoft.PowerShell.Commands.GroupInfo to load
-Import-module Microsoft.PowerShell.Utility
-$null = 1,2 | group-object
-
 function Get-PowerShellVersion
 {
     [CmdletBinding(DefaultParameterSetName='Default')]
@@ -328,7 +324,7 @@ class DockerImageFullMetaData
     [string] $ImagePath
     # this is UpstreamDockerTagData[]
     [object[]] $TagData
-    [System.Collections.Generic.Dictionary[Microsoft.PowerShell.Commands.GroupInfo,TagData]] $ActualTagDataByGroup
+    [System.Collections.Generic.Dictionary[object,TagData]] $ActualTagDataByGroup
     [string] $PSVersion
     [string] $BaseImage
     [string] $FullRepository
@@ -429,7 +425,7 @@ function Get-DockerImageMetaDataWrapper
         }
     }
 
-    $actualTagDataByGroup = [System.Collections.Generic.Dictionary[Microsoft.PowerShell.Commands.GroupInfo,TagData]]::new()
+    $actualTagDataByGroup = [System.Collections.Generic.Dictionary[object,TagData]]::new()
     foreach ($tagGroup in ($tagDataFromScript | Group-Object -Property 'FromTag'))
     {
         $actualTagDataByGroup[$tagGroup] = Get-TagData -TagsTemplates $tagsTemplates -TagGroup $tagGroup -Version $Version -ImageName $ImageName -Repository $fullRepository
@@ -619,7 +615,7 @@ function Get-TagData
     param(
         [string[]]
         $TagsTemplates,
-        [Microsoft.PowerShell.Commands.GroupInfo]
+        [object]
         $TagGroup,
         [string]
         $Version,
