@@ -3,7 +3,6 @@
     "PackageFormat": "powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm",
     "SkipGssNtlmSspTests": true,
     "tagTemplates": [
-        "#psversion#-amazonlinux-#tag#",
         "amazonlinux-#shorttag#"
     ],
     "FullRepository": "pshorg/powershellcommunity-test-deps",
