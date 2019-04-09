@@ -262,7 +262,7 @@ End {
                     foreach ($tagGroup in $allMeta.ActualTagDataByGroup.Keys)
                     {
                         $actualTagData = $allMeta.ActualTagDataByGroup.$tagGroup
-                        Write-Verbose -Message "getting subimage: $tagGroup $($allMeta.Meta.SubImage)" -Verbose
+                        Write-Verbose -Message "getting subimage - fromtag: $($tagGroup.Name) - subimage: $($allMeta.Meta.SubImage)"
                         $SubImagePath = Join-Path -Path $dockerFileName -ChildPath $allMeta.Meta.SubImage
 
                         $subImageAllMeta = Get-DockerImageMetaDataWrapper `
@@ -332,14 +332,17 @@ End {
                 }
             }
             elseif ($GenerateTagsYaml.IsPresent) {
-                $tagGroup = 'public/powershell'
+                $tagGroup = "public/$($allMeta.FullRepository)"
                 $os = 'windows'
                 if($allMeta.meta.IsLinux)
                 {
                     $os = 'linux'
                 }
                 $architecture = 'amd64'
-                $dockerfile = "https://github.com/PowerShell/PowerShell-Docker/blob/master/release/$actualChannel/$dockerFileName/docker/Dockerfile"
+                $imagePath = $allMeta.imagePath
+                $relativeImagePath = $imagePath -replace $PSScriptRoot
+                $relativeImagePath = $relativeImagePath -replace '\\', '/'
+                $dockerfile = "https://github.com/PowerShell/PowerShell-Docker/blob/master$relativeImagePath/docker/Dockerfile"
 
                 $osVersion = $allMeta.meta.osVersion
                 if($osVersion)

@@ -436,7 +436,7 @@ function Invoke-DockerBuild
         $buildArgList += @(
             '-r'
             $env:ACR_NAME
-            '--os'
+            '--platform'
             $OSType
         )
     }
@@ -457,10 +457,13 @@ function Invoke-DockerBuild
             throw "$argName contains '&' and this is not allowed in ACR using the az cli"
         }
 
-        $buildArgList += @(
-            "--build-arg"
-            "$argName=$value"
-        )
+        if($value)
+        {
+            $buildArgList += @(
+                "--build-arg"
+                "$argName=$value"
+            )
+        }
     }
 
     foreach($tag in $Tags)
