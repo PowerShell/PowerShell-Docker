@@ -404,7 +404,7 @@ function Get-DockerImageMetaDataWrapper
         $tagDataFromScript = @(& $scriptPath -CI:$CI.IsPresent @getTagsExtraParams | Where-Object {$_.FromTag})
         if($TagFilter)
         {
-            $tagDataFromScript = $tagDataFromScript | Where-Object { $_.FromTag -match $TagFilter }
+            $tagDataFromScript = @($tagDataFromScript | Where-Object { $_.FromTag -match $TagFilter })
         }
     }
     else
