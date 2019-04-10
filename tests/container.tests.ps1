@@ -305,19 +305,47 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
     Context "test-deps" {
         BeforeAll{
+            #apt-utils ca-certificates curl wget apt-transport-https locales gnupg2 inetutils-ping git sudo less procps
+            $commands = @(
+                'adduser'
+                'curl'
+                'less'
+                'locale-gen'
+                'ping'
+                'ps'
+                'su'
+                'sudo'
+                'tar'
+                'update-ca-certificates'
+                'wget'
+                'hostname'
+            )
+
+            $debianCommands = @(
+                'apt'
+                'apt-get'
+            )
+
             $testdepsTestCases = @()
             $script:linuxContainerRunTests | Where-Object { $_.OptionalTests -contains 'test-deps' } | ForEach-Object {
-                $testdepsTestCases += @{
-                    Name = $_.Name
-                    Command = 'su'
+                $name = $_.Name
+                foreach($command in $commands)
+                {
+                    $testdepsTestCases += @{
+                        Name = $name
+                        Command = $command
+                    }
                 }
-                $testdepsTestCases += @{
-                    Name = $_.Name
-                    Command = 'sudo'
-                }
-                $testdepsTestCases += @{
-                    Name = $_.Name
-                    Command = 'adduser'
+            }
+
+            $script:linuxContainerRunTests | Where-Object { $_.OptionalTests -contains 'test-deps-debian' } | ForEach-Object {
+                $name = $_.Name
+                foreach($command in $debianCommands)
+                {
+                    $testdepsTestCases += @{
+                        Name = $name
+                        Command = $command
+                    }
                 }
             }
 
