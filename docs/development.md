@@ -6,10 +6,11 @@
 
 The top level folder with the docker files is `release`.
 This should only have folders under it.
-The two folders are:
+The three folders are:
 
 * `stable` - Images for the current stable release of PowerShell Core.
 * `preview` - Images for the current preview release of PowerShell Core.
+* `community-stable` - Images for the current release of PowerShell Core that are not officially supported.
 
 Under each of these, will be a folder for each image.
 The name of the folder will be the name of the image in the build system, but does not translate into anything in docker.
@@ -56,7 +57,7 @@ The Dockerfile should follow certain standards:
 
   * Copyright notice
   * Software license
-  * A brief Docker image file description should be applied to describe the image after a new line.
+  * A brief description should be applied after a new line.
 
    For example:
 
@@ -129,4 +130,19 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
 You should not have to write any specific tests for your image,
 but you should consider if it needs to be added to the CI system.
 
-The CI definition is here at `vsts-ci.yml`
+The CI definition is here at `vsts-ci.yml`.
+
+### Template
+
+Here is a template for an image build job:
+
+```yaml
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: insertImageNameHere
+    imagename: insertImageNameHere
+    stable: false
+    preview: false
+    communityStable: true
+    continueonerror: false
+```
