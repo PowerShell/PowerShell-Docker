@@ -27,8 +27,8 @@ RUN yum install -y /tmp/powershell.rpm \
     && yum update -y \
     # Install libraries for NTLM support
     && yum install -y gssntlmssp \
-	# less is required for help in powershell
-	less \
+    # less is required for help in powershell
+    less \
     && yum upgrade-minimal -y --security \
     && yum clean all \
     && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
@@ -49,7 +49,7 @@ RUN yum install -y /tmp/powershell.rpm \
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:centos7
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:centos-7
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \

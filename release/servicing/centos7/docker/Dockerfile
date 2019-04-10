@@ -48,7 +48,7 @@ RUN yum install -y /tmp/powershell.rpm \
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:centos7
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:centos-7
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
