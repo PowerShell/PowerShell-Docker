@@ -1,6 +1,10 @@
 resources:
 - repo: self
   clean: true
+
+variables:
+  POWERSHELL_TELEMETRY_OPTOUT: 1
+
 jobs:
 - job: communityRelease
   pool:

@@ -3,8 +3,11 @@ name: s_$(stableReleaseTag)_p_$(previewReleaseTag)$(Rev:_rr)
 resources:
 - repo: self
   clean: true
-jobs:
 
+variables:
+  POWERSHELL_TELEMETRY_OPTOUT: 1
+
+jobs:
 - template: releasePhase.yml
   parameters:
     channel: STABLE
