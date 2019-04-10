@@ -7,5 +7,6 @@
     "tagTemplates": [
         "#psversion#-debian-#tag#",
         "debian-#shorttag#"
-    ]
+    ],
+    "SubImage": "test-deps"
 }
