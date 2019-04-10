@@ -1,14 +1,15 @@
 # Docker image file that describes an CentOS7 image with PowerShell installed from Microsoft YUM Repo
-ARG baseImage=mcr.microsoft.com/powershell:centos-7
+ARG BaseImage=mcr.microsoft.com/powershell:centos-7
 
-FROM ${baseImage}
+FROM ${BaseImage}
 
 # Install dependencies and clean up
-RUN yum install -y sudo
+RUN yum install -y sudo \
+    && yum clean all
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:centos7
+ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:centos-7
 ARG PS_VERSION=6.2.0
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
