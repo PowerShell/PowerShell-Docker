@@ -6,5 +6,6 @@
     "tagTemplates": [
         "#psversion#-centos-#tag#",
         "preview-centos-#shorttag#"
-    ]
+    ],
+    "SubImage": "test-deps"
 }
