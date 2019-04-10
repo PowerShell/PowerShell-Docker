@@ -43,16 +43,26 @@ function Invoke-Docker
         $cli = @('docker')
     }
 
+    $actualParams = @()
+
+    if($command -eq 'run')
+    {
+        $actualParams += '--env'
+        $actualParams += 'POWERSHELL_TELEMETRY_OPTOUT=1'
+    }
+
+    $actualParams += $Params
+
     # Log how we are running Docker for troubleshooting issues
-    Write-Verbose "Running $cli $cliCommand $command $params" -Verbose
+    Write-Verbose "Running $cli $cliCommand $command $actualParams" -Verbose
 
     if($SuppressHostOutput.IsPresent)
     {
-        $result = &$cli $cliCommand $command $params 2>&1
+        $result = &$cli $cliCommand $command $actualParams 2>&1
     }
     else
     {
-        &$cli $cliCommand $command $params 2>&1 | Tee-Object -Variable result -ErrorAction SilentlyContinue | Out-String -Stream -ErrorAction SilentlyContinue | Write-Host -ErrorAction SilentlyContinue
+        &$cli $cliCommand $command $actualParams 2>&1 | Tee-Object -Variable result -ErrorAction SilentlyContinue | Out-String -Stream -ErrorAction SilentlyContinue | Write-Host -ErrorAction SilentlyContinue
     }
 
     $dockerExitCode = $LASTEXITCODE
