@@ -125,7 +125,7 @@ class DockerImageMetaData {
     }
 
     [string]
-    $PackageFormat = "undefined"
+    $PackageFormat
 
     [bool]
     $SkipWebCmdletTests = $false
@@ -528,7 +528,7 @@ function Get-TestParams
 
     # if the package name ends with rpm
     # then replace the - in the filename with _ as fpm creates the packages this way.
-    if($allMeta.meta.PackageFormat -match 'rpm$')
+    if($allMeta.meta.PackageFormat -and $allMeta.meta.PackageFormat -match 'rpm$')
     {
         $packageVersion = $packageVersion -replace '-', '_'
     }
@@ -541,47 +541,50 @@ function Get-TestParams
     $buildArgs['IMAGE_NAME'] = $imageNameParam
     $buildArgs['BaseImage'] = $BaseImage
 
-    if($sasData.sasUrl)
+    if ($allMeta.meta.PackageFormat)
     {
-        $packageUrl = [System.UriBuilder]::new($sasData.sasBase)
-
-        $previewTag = ''
-        if($actualChannel -like '*preview*')
+        if($sasData.sasUrl)
         {
-            $previewTag = '-preview'
-        }
+            $packageUrl = [System.UriBuilder]::new($sasData.sasBase)
 
-        $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
-        $packageName = $packageName -replace '\${previewTag}', $previewTag
-        $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
-        $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
-        $packageUrl.Query = $sasData.sasQuery
-        if($allMeta.meta.Base64EncodePackageUrl)
-        {
-            $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.ToString())
-            $encodedUrl =[Convert]::ToBase64String($urlBytes)
-            $buildArgs.Add('PS_PACKAGE_URL_BASE64', $encodedUrl)
+            $previewTag = ''
+            if($actualChannel -like '*preview*')
+            {
+                $previewTag = '-preview'
+            }
+
+            $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+            $packageName = $packageName -replace '\${previewTag}', $previewTag
+            $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
+            $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
+            $packageUrl.Query = $sasData.sasQuery
+            if($allMeta.meta.Base64EncodePackageUrl)
+            {
+                $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.ToString())
+                $encodedUrl =[Convert]::ToBase64String($urlBytes)
+                $buildArgs.Add('PS_PACKAGE_URL_BASE64', $encodedUrl)
+            }
+            else
+            {
+                $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+            }
         }
         else
         {
+            $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
+
+            $previewTag = ''
+            if($actualChannel -like '*preview*')
+            {
+                $previewTag = '-preview'
+            }
+
+            $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+            $packageName = $packageName -replace '\${previewTag}', $previewTag
+            $containerName = 'v' + ($psversion -replace '~', '-')
+            $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
             $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
         }
-    }
-    else
-    {
-        $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
-
-        $previewTag = ''
-        if($actualChannel -like '*preview*')
-        {
-            $previewTag = '-preview'
-        }
-
-        $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
-        $packageName = $packageName -replace '\${previewTag}', $previewTag
-        $containerName = 'v' + ($psversion -replace '~', '-')
-        $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
-        $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
     }
 
     $testArgs = @{
