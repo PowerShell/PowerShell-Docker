@@ -29,11 +29,6 @@ jobs:
 
 - template: .vsts-ci/phase.yml
   parameters:
-    name: ubuntu1404
-    imagename: ubuntu14.04
-
-- template: .vsts-ci/phase.yml
-  parameters:
     name: ubuntu1804
     imagename: ubuntu18.04
     stable: true
