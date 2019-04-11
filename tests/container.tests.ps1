@@ -327,7 +327,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
         }
 
-        it "<Name> should have <command>" -TestCases $testdepsTestCases  {
+        it "<Name> should have <command>" -TestCases $testdepsTestCases -Skip:$script:skipLinuxRun {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
