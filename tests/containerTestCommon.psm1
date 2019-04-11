@@ -68,7 +68,7 @@ function Invoke-Docker
     $dockerExitCode = $LASTEXITCODE
     if($PassThru.IsPresent)
     {
-        Write-Verbose "passing through Docker results of length: $($result.length)..." -Verbose
+        Write-Verbose "passing through Docker results of length: $($result.length)..."
         return $result
     }
     elseif($dockerExitCode -ne 0 -and $FailureAction -eq 'error')

@@ -1,0 +1,13 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "osVersion": "Debian 9",
+    "tagTemplates": [
+        "debian-#shorttag#"
+    ],
+    "SubRepository": "test-deps",
+    "OptionalTests": [
+        "test-deps",
+        "test-deps-debian"
+    ]
+}

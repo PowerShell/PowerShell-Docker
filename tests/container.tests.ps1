@@ -303,21 +303,86 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
         }
     }
 
+    Context "default executables" {
+        BeforeAll{
+            #apt-utils ca-certificates curl wget apt-transport-https locales gnupg2 inetutils-ping git sudo less procps
+            $commands = @(
+                'locale-gen'
+                'update-ca-certificates'
+                'openssl'
+                'less'
+            )
+
+            $testdepsTestCases = @()
+            $script:linuxContainerRunTests | ForEach-Object {
+                $name = $_.Name
+                foreach($command in $commands)
+                {
+                    $testdepsTestCases += @{
+                        Name = $name
+                        Command = $command
+                    }
+                }
+            }
+
+        }
+
+        it "<Name> should have <command>" -TestCases $testdepsTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Command
+            )
+
+            $source = Get-DockerCommandSource -Name $name -command $Command
+            $source | Should -Not -BeNullOrEmpty
+        }
+    }
+
     Context "test-deps" {
         BeforeAll{
+            #apt-utils ca-certificates curl wget apt-transport-https locales gnupg2 inetutils-ping git sudo less procps
+            $commands = @(
+                'adduser'
+                'curl'
+                'ping'
+                'ps'
+                'su'
+                'sudo'
+                'tar'
+                'wget'
+                'hostname'
+                'find'
+            )
+
+            $debianCommands = @(
+                'apt'
+                'apt-get'
+            )
+
             $testdepsTestCases = @()
             $script:linuxContainerRunTests | Where-Object { $_.OptionalTests -contains 'test-deps' } | ForEach-Object {
-                $testdepsTestCases += @{
-                    Name = $_.Name
-                    Command = 'su'
+                $name = $_.Name
+                foreach($command in $commands)
+                {
+                    $testdepsTestCases += @{
+                        Name = $name
+                        Command = $command
+                    }
                 }
-                $testdepsTestCases += @{
-                    Name = $_.Name
-                    Command = 'sudo'
-                }
-                $testdepsTestCases += @{
-                    Name = $_.Name
-                    Command = 'adduser'
+            }
+
+            $script:linuxContainerRunTests | Where-Object { $_.OptionalTests -contains 'test-deps-debian' } | ForEach-Object {
+                $name = $_.Name
+                foreach($command in $debianCommands)
+                {
+                    $testdepsTestCases += @{
+                        Name = $name
+                        Command = $command
+                    }
                 }
             }
 
