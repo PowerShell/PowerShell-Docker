@@ -303,22 +303,59 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
         }
     }
 
+    Context "default executables" {
+        BeforeAll{
+            #apt-utils ca-certificates curl wget apt-transport-https locales gnupg2 inetutils-ping git sudo less procps
+            $commands = @(
+                'locale-gen'
+                'update-ca-certificates'
+                'openssl'
+                'less'
+            )
+
+            $testdepsTestCases = @()
+            $script:linuxContainerRunTests | ForEach-Object {
+                $name = $_.Name
+                foreach($command in $commands)
+                {
+                    $testdepsTestCases += @{
+                        Name = $name
+                        Command = $command
+                    }
+                }
+            }
+
+        }
+
+        it "<Name> should have <command>" -TestCases $testdepsTestCases  {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Command
+            )
+
+            $source = Get-DockerCommandSource -Name $name -command $Command
+            $source | Should -Not -BeNullOrEmpty
+        }
+    }
+
     Context "test-deps" {
         BeforeAll{
             #apt-utils ca-certificates curl wget apt-transport-https locales gnupg2 inetutils-ping git sudo less procps
             $commands = @(
                 'adduser'
                 'curl'
-                'less'
-                'locale-gen'
                 'ping'
                 'ps'
                 'su'
                 'sudo'
                 'tar'
-                'update-ca-certificates'
                 'wget'
                 'hostname'
+                'find'
             )
 
             $debianCommands = @(
