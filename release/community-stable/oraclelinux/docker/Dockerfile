@@ -19,9 +19,6 @@ ARG PS_INSTALL_VERSION=6
 # Define Args and Env needed to create links
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 
-# Download the RHEL7 PowerShell Core package and save it
-ADD ${PS_PACKAGE_URL} /tmp/powershell-linux.rpm
-
 # Define Args and Env needed to create links
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
@@ -33,9 +30,9 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
 
 # Installation
-RUN \
+RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell-linux.rpm \
     # install dependencies
-    yum install -y \
+    && yum install -y \
 	    # required for help in powershell
 	    less \
 	    epel-release \
