@@ -419,9 +419,14 @@ function Get-DockerImageMetaDataWrapper
     else
     {
         $fullRepository = $BaseRepositry
-        if($meta.SubRepository)
+        if ($meta.SubRepository)
         {
             $fullRepository += '/{0}' -f $meta.SubRepository
+        }
+        elseif ($TagData)
+        {
+            $subImageName = Split-Path -leaf -Path $DockerFileName
+            $fullRepository += '/{0}' -f $subImageName
         }
     }
 
