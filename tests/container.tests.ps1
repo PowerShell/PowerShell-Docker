@@ -1,5 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+Set-StrictMode -Off
 
 Import-module -Name "$PSScriptRoot\containerTestCommon.psm1" -Force
 $script:linuxContainerBuildTests = Get-LinuxContainer -Purpose 'Build'
@@ -242,26 +243,37 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
     }
 
     Context "Labels" {
-        $labelTestCases = @()
-        $script:linuxContainerRunTests | ForEach-Object {
-            $labelTestCases += @{
-                Name = $_.Name
-                Label = 'org.label-schema.version'
-                # The expected value is the version, but replace - or ~ with the regex for - or ~
-                ExpectedValue = $_.ExpectedVersion  -replace '[\-~]', '[\-~]'
-                Expectation = 'Match'
+        BeforeAll {
+            $labelTestCases = @()
+            $script:linuxContainerRunTests | ForEach-Object {
+                $labelTestCases += @{
+                    Name = $_.Name
+                    Label = 'org.label-schema.version'
+                    # The expected value is the version, but replace - or ~ with the regex for - or ~
+                    ExpectedValue = $_.ExpectedVersion  -replace '[\-~]', '[\-~]'
+                    Expectation = 'Match'
+                }
+                $labelTestCases += @{
+                    Name = $_.Name
+                    Label = 'org.label-schema.vcs-ref'
+                    ExpectedValue = '[0-9a-f]{7}'
+                    Expectation = 'match'
+                }
+                $labelTestCases += @{
+                    Name = $_.Name
+                    Label = 'org.label-schema.docker.cmd.devel'
+                    ExpectedValue = "docker run $($_.ImageName)"
+                    Expectation = 'BeExactly'
+                }
             }
-            $labelTestCases += @{
-                Name = $_.Name
-                Label = 'org.label-schema.vcs-ref'
-                ExpectedValue = '[0-9a-f]{7}'
-                Expectation = 'match'
-            }
-            $labelTestCases += @{
-                Name = $_.Name
-                Label = 'org.label-schema.docker.cmd.devel'
-                ExpectedValue = "docker run $($_.ImageName)"
-                Expectation = 'BeExactly'
+
+            $script:linuxContainerRunTests | Where-Object { $_.OptionalTests -contains 'test-deps-musl' } | ForEach-Object {
+                $labelTestCases += @{
+                    Name = $_.Name
+                    Label = 'com.azure.dev.pipelines.agent.handler.node.path'
+                    ExpectedValue = "/usr/local/bin/node"
+                    Expectation = 'BeExactly'
+                }
             }
         }
 
@@ -346,21 +358,29 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
         BeforeAll{
             #apt-utils ca-certificates curl wget apt-transport-https locales gnupg2 inetutils-ping git sudo less procps
             $commands = @(
-                'adduser'
-                'curl'
-                'ping'
-                'ps'
-                'su'
-                'sudo'
-                'tar'
-                'wget'
-                'hostname'
-                'find'
+                @{command = 'adduser'}
+                @{command = 'bash'}
+                @{command = 'curl'}
+                @{command = 'find'}
+                @{command = 'hostname'}
+                @{command = 'ping'}
+                @{command = 'ps'}
+                @{command = 'su'}
+                @{command = 'sudo'}
+                @{command = 'tar'}
+                @{command = 'wget'}
             )
 
             $debianCommands = @(
-                'apt'
-                'apt-get'
+                @{command = 'apt'}
+                @{command = 'apt-get'}
+            )
+
+            $muslCommands = @(
+                @{
+                    command = 'node'
+                    path = '/usr/local/bin/node'
+                }
             )
 
             $testdepsTestCases = @()
@@ -370,7 +390,8 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 {
                     $testdepsTestCases += @{
                         Name = $name
-                        Command = $command
+                        Command = $command.command
+                        ExpectedPath = $command.Path
                     }
                 }
             }
@@ -381,7 +402,20 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 {
                     $testdepsTestCases += @{
                         Name = $name
-                        Command = $command
+                        Command = $command.command
+                        ExpectedPath = $command.Path
+                    }
+                }
+            }
+
+            $script:linuxContainerRunTests | Where-Object { $_.OptionalTests -contains 'test-deps-musl' } | ForEach-Object {
+                $name = $_.Name
+                foreach($command in $muslCommands)
+                {
+                    $testdepsTestCases += @{
+                        Name = $name
+                        Command = $command.command
+                        ExpectedPath = $command.Path
                     }
                 }
             }
@@ -396,11 +430,17 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 $name,
                 [Parameter(Mandatory=$true)]
                 [string]
-                $Command
+                $Command,
+                [string]
+                $ExpectedPath
             )
 
             $source = Get-DockerCommandSource -Name $name -command $Command
-            $source | Should -Not -BeNullOrEmpty
+            $source | Should -Not -BeNullOrEmpty -Because "$command should be found"
+            if($ExpectedPath)
+            {
+                $source | Should -BeExactly $ExpectedPath  -Because "$command should be at $ExpectedPath"
+            }
         }
     }
 }
