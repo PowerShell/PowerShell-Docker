@@ -475,7 +475,7 @@ class DockerTestArgs
     [bool] $SkipWebCmdletTests
     [bool] $SkipGssNtlmSspTests
     [string] $BaseImage
-    [string] $OptionalTests
+    [string[]] $OptionalTests
 }
 
 function Get-TestParams
@@ -501,7 +501,7 @@ function Get-TestParams
         $BaseImage
     )
 
-    Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $($actualTagData.FromTag) Tag: $($actualTagData.ActualTag) PSversion: $psversion" -Verbose
+    Write-Verbose -Message "To be tested, repository: $($allMeta.FullRepository) fromTag: $($actualTagData.FromTag) Tag: $($actualTagData.ActualTag) PSversion: $psversion" -Verbose
     $contextPath = Join-Path -Path $allMeta.imagePath -ChildPath 'docker'
     $vcf_ref = git rev-parse --short HEAD
     $script:ErrorActionPreference = 'stop'
