@@ -390,8 +390,11 @@ function Get-DockerImageLabel
 function Get-DockerCommandSource
 {
     param(
+        [parameter(Mandatory)]
         [string] $Name,
-        [String] $Command
+        [parameter(Mandatory)]
+        [string] $Command,
+        [string] $CommandType = 'application'
     )
 
     $imageTag = ${Name}
@@ -404,7 +407,7 @@ function Get-DockerCommandSource
     $runParams += '-nologo'
     $runParams += '-noprofile'
     $runParams += '-c'
-    $runParams += "(Get-Command -name '$Command').Source"
+    $runParams += "(Get-Command -name '$Command' -CommandType '$CommandType').Source"
 
     return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
 }
