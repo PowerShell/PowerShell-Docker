@@ -9,5 +9,8 @@
     "OptionalTests": [
         "test-deps",
         "test-deps-musl"
-    ]
+    ],
+    "TestProperties": {
+        "size": 212
+    }
 }

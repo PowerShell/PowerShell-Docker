@@ -443,6 +443,35 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             }
         }
     }
+
+    Context "Size" {
+        BeforeAll{
+            $sizeTestCases = @($script:linuxContainerRunTests | ForEach-Object {
+                $size = $_.TestProperties.size
+                @{
+                    Name = $_.Name
+                    ExpectedSize = $size
+                }
+            })
+        }
+
+        it "Verify size of <name>" -TestCases $sizeTestCases  -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+                [int]$ExpectedSize
+            )
+
+            $sizeMb = Get-DockerImageSize -name $name
+            Write-Verbose "image is $sizeMb MiB" -Verbose
+            if($ExpectedSize -and !$env:RELEASE_DEFINITIONID)
+            {
+                # allow for a 5% increase without an error
+                $sizeMb | Should -BeLessOrEqual ($ExpectedSize * 1.05) -Because "$name is set to be $ExpectedSize in meta.json"
+            }
+        }
+    }
 }
 
 Describe "Windows Containers" -Tags 'Behavior', 'Windows' {

@@ -141,6 +141,7 @@ function Get-LinuxContainer
                 ImageName = $testArgs.BuildArgs.IMAGE_NAME
                 SkipPull = $skipPull
                 OptionalTests = $testArgs.OptionalTests
+                TestProperties = $testArgs.TestProperties
             }
         }
     }
@@ -410,6 +411,22 @@ function Get-DockerCommandSource
     $runParams += "(Get-Command -name '$Command' -CommandType '$CommandType').Source"
 
     return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
+}
+
+# get the size of an image
+function Get-DockerImageSize
+{
+    param(
+        [parameter(Mandatory)]
+        [string] $Name
+    )
+
+    $runParams = @($Name, '--format={{.Size }}')
+
+    $sizeString = Invoke-Docker -Command @('image','inspect') -Params $runParams -SuppressHostOutput -PassThru
+    $size = 0
+    $null = [int]::TryParse($sizeString, [ref] $size)
+    return ($size / 1mb)
 }
 
 # Builds a Docker image

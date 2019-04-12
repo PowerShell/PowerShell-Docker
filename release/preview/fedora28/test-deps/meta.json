@@ -4,7 +4,7 @@
     "osVersion": "Fedora 28",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "fedora-#shorttag#"
+        "preview-fedora-#shorttag#"
     ],
     "SubRepository": "test-deps",
     "OptionalTests": [

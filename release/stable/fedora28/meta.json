@@ -8,5 +8,8 @@
         "#psversion#-fedora-#tag#",
         "fedora-#shorttag#"
     ],
-    "SubImage": "test-deps"
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 586
+    }
 }

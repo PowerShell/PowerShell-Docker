@@ -159,6 +159,9 @@ class DockerImageMetaData {
 
     [string[]]
     $OptionalTests
+
+    [PSCustomObject]
+    $TestProperties = ([PSCustomObject]@{})
 }
 
 class ShortTagMetaData {
@@ -476,6 +479,7 @@ class DockerTestArgs
     [bool] $SkipGssNtlmSspTests
     [string] $BaseImage
     [string[]] $OptionalTests
+    [PSCustomObject] $TestProperties
 }
 
 function Get-TestParams
@@ -603,6 +607,7 @@ function Get-TestParams
         SkipGssNtlmSspTests = $allMeta.meta.SkipGssNtlmSspTests
         BaseImage = $BaseImage
         OptionalTests = $allMeta.meta.OptionalTests
+        TestProperties = $allMeta.meta.TestProperties
     }
 
     return [DockerTestParams] @{

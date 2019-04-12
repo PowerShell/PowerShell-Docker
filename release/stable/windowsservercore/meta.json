@@ -6,5 +6,8 @@
     "tagTemplates": [
         "#psversion#-windowsservercore-#tag#",
         "windowsservercore-#shorttag#"
-    ]    
+    ],
+    "TestProperties": {
+        "size": 1
+    }
 }

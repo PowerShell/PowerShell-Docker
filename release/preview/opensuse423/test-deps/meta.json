@@ -9,5 +9,8 @@
     "SubRepository": "test-deps",
     "OptionalTests": [
         "test-deps"
-    ]
+    ],
+    "TestProperties": {
+        "size": 536
+    }
 }

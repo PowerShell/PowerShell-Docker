@@ -64,7 +64,7 @@ param(
     $All,
 
     [string]
-    $ImageName = 'powershell.local',
+    $ImageName = 'ps.local',
 
     [string]
     $Repository = 'powershell',

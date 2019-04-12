@@ -9,5 +9,8 @@
         "#psversion#-nanoserver-#tag#",
         "preview-nanoserver-#shorttag#"
     ],
-    "Base64EncodePackageUrl": true
+    "Base64EncodePackageUrl": true,
+    "TestProperties": {
+        "size": 1
+    }
 }
