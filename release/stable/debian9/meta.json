@@ -8,5 +8,8 @@
         "#psversion#-debian-#tag#",
         "debian-#shorttag#"
     ],
-    "SubImage": "test-deps"
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 314
+    }
 }

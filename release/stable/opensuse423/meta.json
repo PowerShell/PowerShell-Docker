@@ -8,5 +8,8 @@
         "#psversion#-opensuse-#tag#",
         "opensuse-#shorttag#"
     ],
-    "SubImage": "test-deps"
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 524
+    }
 }

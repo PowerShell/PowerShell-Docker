@@ -1,16 +1,16 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "osVersion": "OpenSuse 42.3",
-    "SkipGssNtlmSspTests": true,
+    "osVersion": "Fedora 28",
+    "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "opensuse-#shorttag#"
+        "fedora-#shorttag#"
     ],
     "SubRepository": "test-deps",
     "OptionalTests": [
         "test-deps"
     ],
     "TestProperties": {
-        "size": 536
+        "size": 602
     }
 }

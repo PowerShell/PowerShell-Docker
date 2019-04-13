@@ -7,5 +7,9 @@
     "tagTemplates": [
         "#psversion#-fedora-#tag#",
         "fedora-#shorttag#"
-    ]
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 586
+    }
 }

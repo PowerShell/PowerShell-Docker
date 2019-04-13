@@ -9,5 +9,8 @@
     "OptionalTests": [
         "test-deps",
         "test-deps-debian"
-    ]
+    ],
+    "TestProperties": {
+        "size": 316
+    }
 }

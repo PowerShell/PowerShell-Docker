@@ -159,6 +159,9 @@ class DockerImageMetaData {
 
     [string[]]
     $OptionalTests
+
+    [PSCustomObject]
+    $TestProperties = ([PSCustomObject]@{})
 }
 
 class ShortTagMetaData {
@@ -419,9 +422,14 @@ function Get-DockerImageMetaDataWrapper
     else
     {
         $fullRepository = $BaseRepositry
-        if($meta.SubRepository)
+        if ($meta.SubRepository)
         {
             $fullRepository += '/{0}' -f $meta.SubRepository
+        }
+        elseif ($TagData)
+        {
+            $subImageName = Split-Path -leaf -Path $DockerFileName
+            $fullRepository += '/{0}' -f $subImageName
         }
     }
 
@@ -470,7 +478,8 @@ class DockerTestArgs
     [bool] $SkipWebCmdletTests
     [bool] $SkipGssNtlmSspTests
     [string] $BaseImage
-    [string] $OptionalTests
+    [string[]] $OptionalTests
+    [PSCustomObject] $TestProperties
 }
 
 function Get-TestParams
@@ -496,7 +505,7 @@ function Get-TestParams
         $BaseImage
     )
 
-    Write-Verbose -Message "Adding the following to the list to be tested, fromTag: $($actualTagData.FromTag) Tag: $($actualTagData.ActualTag) PSversion: $psversion" -Verbose
+    Write-Verbose -Message "To be tested, repository: $($allMeta.FullRepository) fromTag: $($actualTagData.FromTag) Tag: $($actualTagData.ActualTag) PSversion: $psversion" -Verbose
     $contextPath = Join-Path -Path $allMeta.imagePath -ChildPath 'docker'
     $vcf_ref = git rev-parse --short HEAD
     $script:ErrorActionPreference = 'stop'
@@ -598,6 +607,7 @@ function Get-TestParams
         SkipGssNtlmSspTests = $allMeta.meta.SkipGssNtlmSspTests
         BaseImage = $BaseImage
         OptionalTests = $allMeta.meta.OptionalTests
+        TestProperties = $allMeta.meta.TestProperties
     }
 
     return [DockerTestParams] @{

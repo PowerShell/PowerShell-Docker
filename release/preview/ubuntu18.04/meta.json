@@ -7,5 +7,8 @@
     "tagTemplates": [
         "#psversion#-ubuntu-#tag#",
         "preview-ubuntu-#shorttag#"
-    ]
+    ],
+    "TestProperties": {
+        "size": 355
+    }
 }

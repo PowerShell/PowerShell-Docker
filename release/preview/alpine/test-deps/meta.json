@@ -1,16 +1,16 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "osVersion": "OpenSuse 42.3",
     "SkipGssNtlmSspTests": true,
+    "osVersion": "Alpine 3.8",
     "tagTemplates": [
-        "opensuse-#shorttag#"
+        "preview-alpine-#shorttag#"
     ],
-    "SubRepository": "test-deps",
     "OptionalTests": [
-        "test-deps"
+        "test-deps",
+        "test-deps-musl"
     ],
     "TestProperties": {
-        "size": 536
+        "size": 212
     }
 }
