@@ -1,4 +1,4 @@
-# Docker image file that describes an Debian 9image with PowerShell and test dependencies
+# Docker image file that describes an Debian 9 image with PowerShell and test dependencies
 ARG BaseImage=mcr.microsoft.com/powershell:debian-9
 
 FROM ${BaseImage}
