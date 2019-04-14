@@ -10,5 +10,6 @@
     ],
     "TestProperties": {
         "size": 395
-    }
+    },
+    "SubImage": "test-deps"
 }
