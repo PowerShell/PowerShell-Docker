@@ -1,5 +1,5 @@
 # Docker image file that describes an Ubuntu image with PowerShell and test dependencies
-ARG BaseImage=mcr.microsoft.com/powershell:ubuntu-16.04
+ARG BaseImage=mcr.microsoft.com/powershell:ubuntu-18.04
 
 FROM ${BaseImage}
 
@@ -12,7 +12,7 @@ RUN apt-get update \
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:ubuntu-16.04
+ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:ubuntu-18.04
 ARG PS_VERSION=6.2.0
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
