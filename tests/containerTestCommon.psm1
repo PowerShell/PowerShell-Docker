@@ -429,6 +429,30 @@ function Get-DockerImageSize
     return ($size / 1mb)
 }
 
+# get the size of an image
+function Get-DockerImagePwshPermissions
+{
+    param(
+        [parameter(Mandatory)]
+        [string] $Name
+    )
+
+    $imageTag = ${Name}
+
+    $runParams = @()
+    $runParams += '--rm'
+
+    $runParams += $imageTag
+    $runParams += 'pwsh'
+    $runParams += '-nologo'
+    $runParams += '-noprofile'
+    $runParams += '-c'
+    $runParams += "ls -l /opt/microsoft/powershell/6/pwsh"
+
+    $result = Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
+    return ($result) -split ' ' | select-object -First 1
+}
+
 # Builds a Docker image
 function Invoke-DockerBuild
 {
