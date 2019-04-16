@@ -142,6 +142,7 @@ function Get-LinuxContainer
                 SkipPull = $skipPull
                 OptionalTests = $testArgs.OptionalTests
                 TestProperties = $testArgs.TestProperties
+                Channel = $testArgs.Channel
             }
         }
     }
@@ -175,6 +176,9 @@ function Get-WindowsContainer
                 SkipGssNtlmSspTests = $testArgs.SkipGssNtlmSspTests
                 ImageName = $testArgs.BuildArgs.IMAGE_NAME
                 SkipPull = $skipPull
+                OptionalTests = $testArgs.OptionalTests
+                TestProperties = $testArgs.TestProperties
+                Channel = $testArgs.Channel
             }
         }
     }
@@ -434,7 +438,8 @@ function Get-DockerImagePwshPermissions
 {
     param(
         [parameter(Mandatory)]
-        [string] $Name
+        [string] $Name,
+        [string] $Path = '/opt/microsoft/powershell/6/pwsh'
     )
 
     $imageTag = ${Name}
@@ -447,9 +452,10 @@ function Get-DockerImagePwshPermissions
     $runParams += '-nologo'
     $runParams += '-noprofile'
     $runParams += '-c'
-    $runParams += "ls -l /opt/microsoft/powershell/6/pwsh"
+    $runParams += "ls -l $Path"
 
     $result = Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
+    Write-Verbose $result -Verbose
     return ($result) -split ' ' | select-object -First 1
 }
 

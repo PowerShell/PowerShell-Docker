@@ -322,19 +322,29 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 $script:linuxContainerRunTests | ForEach-Object {
                     @{
                         Name = $_.Name
+                        Channel = $_.Channel
                     }
                 }
             )
         }
 
-        it "The permissions for pwsh should be correct in <Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
+        it "The permissions for pwsh should be correct in <channel>-<Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
-                $name
+                $name,
+                [string]
+                $Channel
             )
 
-            $permissions = Get-DockerImagePwshPermissions -Name $name
+            $path = '/opt/microsoft/powershell/6/pwsh'
+
+            if($Channel -eq 'preview')
+            {
+                $path = '/opt/microsoft/powershell/6-preview/pwsh'
+            }
+
+            $permissions = Get-DockerImagePwshPermissions -Name $name -Path $path
             $permissions | Should -Match '^[\-rw]{3}x([\-rw]{2}x){2}$' -Because 'Everyone should be able to execute'
         }
     }
