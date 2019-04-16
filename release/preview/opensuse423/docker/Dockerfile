@@ -41,7 +41,7 @@ FROM ${imageRepo}:${fromTag}
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links
-ARG PS_INSTALL_VERSION=6
+ARG PS_INSTALL_VERSION=6-preview
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
     # Define ENVs for Localization/Globalization
