@@ -70,6 +70,8 @@ RUN apk add --no-cache \
     \
     # Create the pwsh-preview symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
+    # Give all user execute permissions
+    && chmod a+x ${PS_INSTALL_FOLDER}/pwsh \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
