@@ -4,7 +4,9 @@ ARG BaseImage=mcr.microsoft.com/powershell:centos-7
 FROM ${BaseImage}
 
 # Install dependencies and clean up
-RUN yum install -y sudo \
+RUN yum install -y \
+        sudo \
+        wget \
     && yum clean all
 
 # Define args needed only for the labels

@@ -20,13 +20,14 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
 RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
     && dnf install -y /tmp/powershell.rpm \
     && dnf install -y \
-	# less is needed for help
-	less \
+    # less is needed for help
+    less \
     # Needed to run localdef
         glibc-locale-source \
     # Invoke-WebRequest doesn't work correctly without this
-        compat-openssl10 \
-	gssntlmssp \
+    compat-openssl10 \
+    ca-certificates \
+    gssntlmssp \
     && dnf upgrade-minimal -y --security \
     && dnf clean all \
     && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
