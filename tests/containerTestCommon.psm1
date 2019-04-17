@@ -408,7 +408,7 @@ function Get-DockerCommandSource
     $runParams += '-nologo'
     $runParams += '-noprofile'
     $runParams += '-c'
-    $runParams += "(Get-Command -name '$Command' -CommandType '$CommandType').Source"
+    $runParams += "(Get-Command -name '$Command' -CommandType '$CommandType' -ErrorAction Ignore).Source"
 
     return Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
 }

@@ -8,6 +8,9 @@ RUN zypper --non-interactive update --skip-interactive \
     && zypper --non-interactive install \
          sudo \
          tar \
+         curl \
+         wget \
+         hostname \
     # clean package manager cache
     && zypper clean -a \
     # remove package manager log file
