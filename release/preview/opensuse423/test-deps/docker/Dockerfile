@@ -7,6 +7,7 @@ FROM ${BaseImage}
 RUN zypper --non-interactive update --skip-interactive \
     && zypper --non-interactive install \
          sudo \
+         tar \
     # clean package manager cache
     && zypper clean -a \
     # remove package manager log file
