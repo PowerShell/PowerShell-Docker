@@ -480,6 +480,7 @@ class DockerTestArgs
     [string] $BaseImage
     [string[]] $OptionalTests
     [PSCustomObject] $TestProperties
+    [string] $Channel
 }
 
 function Get-TestParams
@@ -596,6 +597,7 @@ function Get-TestParams
         }
     }
 
+    Write-Verbose "ac: $actualChannel" -Verbose
     $testArgs = @{
         tags = $actualTagData.ActualTags
         BuildArgs = $buildArgs
@@ -608,6 +610,7 @@ function Get-TestParams
         BaseImage = $BaseImage
         OptionalTests = $allMeta.meta.OptionalTests
         TestProperties = $allMeta.meta.TestProperties
+        Channel = $actualChannel
     }
 
     return [DockerTestParams] @{

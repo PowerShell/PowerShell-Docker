@@ -315,6 +315,40 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
         }
     }
 
+    Context "permissions" {
+        BeforeAll{
+
+            $permissionsTestCases = @(
+                $script:linuxContainerRunTests | ForEach-Object {
+                    @{
+                        Name = $_.Name
+                        Channel = $_.Channel
+                    }
+                }
+            )
+        }
+
+        it "The permissions for pwsh should be correct in <channel>-<Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+                [string]
+                $Channel
+            )
+
+            $path = '/opt/microsoft/powershell/6/pwsh'
+
+            if($Channel -eq 'preview')
+            {
+                $path = '/opt/microsoft/powershell/6-preview/pwsh'
+            }
+
+            $permissions = Get-DockerImagePwshPermissions -Name $name -Path $path
+            $permissions | Should -Match '^[\-rw]{3}x([\-rw]{2}x){2}$' -Because 'Everyone should be able to execute'
+        }
+    }
+
     Context "default executables" {
         BeforeAll{
             #apt-utils ca-certificates curl wget apt-transport-https locales gnupg2 inetutils-ping git sudo less procps

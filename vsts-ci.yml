@@ -63,7 +63,7 @@ jobs:
     name: debian9
     imagename: debian9
     stable: true
-    preview: false
+    preview: true
 
 - template: .vsts-ci/phase.yml
   parameters:

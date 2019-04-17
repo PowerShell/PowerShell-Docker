@@ -142,6 +142,7 @@ function Get-LinuxContainer
                 SkipPull = $skipPull
                 OptionalTests = $testArgs.OptionalTests
                 TestProperties = $testArgs.TestProperties
+                Channel = $testArgs.Channel
             }
         }
     }
@@ -175,6 +176,9 @@ function Get-WindowsContainer
                 SkipGssNtlmSspTests = $testArgs.SkipGssNtlmSspTests
                 ImageName = $testArgs.BuildArgs.IMAGE_NAME
                 SkipPull = $skipPull
+                OptionalTests = $testArgs.OptionalTests
+                TestProperties = $testArgs.TestProperties
+                Channel = $testArgs.Channel
             }
         }
     }
@@ -427,6 +431,32 @@ function Get-DockerImageSize
     $size = 0
     $null = [int]::TryParse($sizeString, [ref] $size)
     return ($size / 1mb)
+}
+
+# get the size of an image
+function Get-DockerImagePwshPermissions
+{
+    param(
+        [parameter(Mandatory)]
+        [string] $Name,
+        [string] $Path = '/opt/microsoft/powershell/6/pwsh'
+    )
+
+    $imageTag = ${Name}
+
+    $runParams = @()
+    $runParams += '--rm'
+
+    $runParams += $imageTag
+    $runParams += 'pwsh'
+    $runParams += '-nologo'
+    $runParams += '-noprofile'
+    $runParams += '-c'
+    $runParams += "ls -l $Path"
+
+    $result = Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
+    Write-Verbose $result -Verbose
+    return ($result) -split ' ' | select-object -First 1
 }
 
 # Builds a Docker image
