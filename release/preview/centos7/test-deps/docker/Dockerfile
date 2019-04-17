@@ -7,6 +7,7 @@ FROM ${BaseImage}
 RUN yum install -y \
         sudo \
         wget \
+        openssl \
     && yum clean all
 
 # Define args needed only for the labels

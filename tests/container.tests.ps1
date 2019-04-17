@@ -320,8 +320,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             #apt-utils ca-certificates curl wget apt-transport-https locales gnupg2 inetutils-ping git sudo less procps
             $commands = @(
                 #'locale-gen'
-                'update-ca-certificates'
-                'openssl'
+                # debian 'update-ca-certificates'
                 'less'
             )
 
@@ -369,6 +368,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 @{command = 'sudo'}
                 @{command = 'tar'}
                 @{command = 'wget'}
+                @{command = 'openssl'}
             )
 
             $debianCommands = @(
