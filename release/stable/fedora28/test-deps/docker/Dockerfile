@@ -4,7 +4,13 @@ ARG BaseImage=mcr.microsoft.com/powershell:fedora-28
 FROM ${BaseImage}
 
 # Install dependencies and clean up
-RUN dnf install -y sudo \
+RUN dnf install -y \
+        sudo \
+        findutils \
+        hostname \
+        iputils \
+        wget \
+        procps-ng \
     && dnf clean all
 
 # Define args needed only for the labels
