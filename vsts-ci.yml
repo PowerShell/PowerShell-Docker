@@ -145,6 +145,7 @@ jobs:
     vmImage: vs2017-win2016
     preview: false
     ciParameter: '-CI'
+    continueonerror: true
 
 # Use the TagFilter to filter to 1809 because the docker instance inside the agent only supports 1809
 - template: .vsts-ci/phase.yml

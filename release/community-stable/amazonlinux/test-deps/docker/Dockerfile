@@ -18,6 +18,12 @@ RUN \
       sudo \
       # add su
       util-linux \
+      iputils \
+      hostname \
+      procps \
+      wget \
+      openssl \
+      tar \
     && yum clean all \
     # remove cache folders and files
     && rm -rf /var/cache/yum

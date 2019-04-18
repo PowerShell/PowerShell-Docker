@@ -353,9 +353,8 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
         BeforeAll{
             #apt-utils ca-certificates curl wget apt-transport-https locales gnupg2 inetutils-ping git sudo less procps
             $commands = @(
-                'locale-gen'
-                'update-ca-certificates'
-                'openssl'
+                #'locale-gen'
+                # debian 'update-ca-certificates'
                 'less'
             )
 
@@ -392,7 +391,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
         BeforeAll{
             #apt-utils ca-certificates curl wget apt-transport-https locales gnupg2 inetutils-ping git sudo less procps
             $commands = @(
-                @{command = 'adduser'}
+                #@{command = 'adduser'}
                 @{command = 'bash'}
                 @{command = 'curl'}
                 @{command = 'find'}
@@ -403,6 +402,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 @{command = 'sudo'}
                 @{command = 'tar'}
                 @{command = 'wget'}
+                @{command = 'openssl'}
             )
 
             $debianCommands = @(
