@@ -1,20 +1,20 @@
 # escape=`
 # Args used by from statements must be defined here:
 ARG fromTag=1709
-ARG WindowsServerCoreVersion=latest
-ARG WindowsServerCoreRepo=mcr.microsoft.com/windows/servercore
+ARG InstallerVersion=nanoserver
+ARG InstallerRepo=mcr.microsoft.com/powershell
 ARG NanoServerRepo=mcr.microsoft.com/windows/nanoserver
 
 # Use server core as an installer container to extract PowerShell,
 # As this is a multi-stage build, this stage will eventually be thrown away
-FROM ${WindowsServerCoreRepo}:$WindowsServerCoreVersion  AS installer-env
+FROM ${InstallerRepo}:$InstallerVersion  AS installer-env
 
 # Arguments for installing PowerShell, must be defined in the container they are used
 ARG PS_VERSION=6.1.0
 
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
 
-SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 ARG PS_PACKAGE_URL_BASE64
 
