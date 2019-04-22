@@ -61,17 +61,17 @@ To build an image run `./build.ps1 -build -name <ImageFolderName>`.
 For example to build Ubuntu 16.04/xenial, which is in `./release/ubuntu16.04`:
 
 ```sh
-PS /powershell-docker> ./build.ps1 -Build -Name ubuntu14.04
-VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.0.2-ubuntu-14.04 PSversion: 6.0.2
+PS /powershell-docker> ./build.ps1 -Build -Name ubuntu16.04
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.0.2-ubuntu-16.04 PSversion: 6.0.2
 VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.0.2-ubuntu-trusty PSversion: 6.0.2
 VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.0.2-ubuntu-trusty-20180531 PSversion: 6.0.2
-VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.1.0-preview.2-ubuntu-14.04 PSversion: 6.1.0~preview.2
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.1.0-preview.2-ubuntu-16.04 PSversion: 6.1.0~preview.2
 VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.1.0-preview.2-ubuntu-trusty PSversion: 6.1.0~preview.2
 VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.1.0-preview.2-ubuntu-trusty-20180531 PSversion: 6.1.0~preview.2
-VERBOSE: image name: powershell.local:6.0.2-ubuntu-14.04
+VERBOSE: image name: powershell.local:6.0.2-ubuntu-16.04
 VERBOSE: image name: powershell.local:6.0.2-ubuntu-trusty
 VERBOSE: image name: powershell.local:6.0.2-ubuntu-trusty-20180531
-VERBOSE: image name: powershell.local:6.1.0-preview.2-ubuntu-14.04
+VERBOSE: image name: powershell.local:6.1.0-preview.2-ubuntu-16.04
 VERBOSE: image name: powershell.local:6.1.0-preview.2-ubuntu-trusty
 VERBOSE: image name: powershell.local:6.1.0-preview.2-ubuntu-trusty-20180531
 ```
@@ -79,7 +79,7 @@ VERBOSE: image name: powershell.local:6.1.0-preview.2-ubuntu-trusty-20180531
 ### Run the Docker image you built
 
 ```sh
-PS /powershell-docker> docker run -it --rm powershell.local:6.1.0-preview.2-ubuntu-14.04 pwsh -c '$psversiontable'
+PS /powershell-docker> docker run -it --rm powershell.local:6.1.0-preview.2-ubuntu-14.06 pwsh -c '$psversiontable'
 
 Name                           Value
 ----                           -----
