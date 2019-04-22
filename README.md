@@ -79,7 +79,7 @@ VERBOSE: image name: powershell.local:6.1.0-preview.2-ubuntu-trusty-20180531
 ### Run the Docker image you built
 
 ```sh
-PS /powershell-docker> docker run -it --rm powershell.local:6.1.0-preview.2-ubuntu-14.06 pwsh -c '$psversiontable'
+PS /powershell-docker> docker run -it --rm powershell.local:6.1.0-preview.2-ubuntu-16.04 pwsh -c '$psversiontable'
 
 Name                           Value
 ----                           -----
