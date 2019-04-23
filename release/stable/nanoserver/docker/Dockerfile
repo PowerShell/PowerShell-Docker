@@ -32,8 +32,9 @@ RUN Write-host "Verifying valid Version..."; `
     } `
     Write-host "downloading: $url"; `
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12; `
-    Invoke-WebRequest -Uri $url -outfile /powershell.zip -verbose; `
-    Expand-Archive powershell.zip -DestinationPath \PowerShell
+    New-Item -ItemType Directory /installer > $null ; `
+    Invoke-WebRequest -Uri $url -outfile /installer/powershell.zip -verbose; `
+    Expand-Archive /installer/powershell.zip -DestinationPath \PowerShell
 
 # Install PowerShell into NanoServer
 FROM ${NanoServerRepo}:${fromTag}
