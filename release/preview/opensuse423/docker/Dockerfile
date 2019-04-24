@@ -64,8 +64,8 @@ RUN zypper --non-interactive update --skip-interactive \
     # Create the pwsh symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
     && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
-    # Give all user execute permissions
-    && chmod a+x ${PS_INSTALL_FOLDER}/pwsh \
+    # Give all user execute permissions and remove write permissions for others
+    && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     # clean package manager cache
     && zypper clean -a \
     # remove package manager log file
