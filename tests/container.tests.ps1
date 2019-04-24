@@ -328,7 +328,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             )
         }
 
-        it "The permissions for pwsh should be correct in <channel>-<Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
+        it "pwsh should have execute permissions for all in <channel>-<Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
@@ -346,6 +346,25 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
             $permissions = Get-DockerImagePwshPermissions -Name $name -Path $path
             $permissions | Should -Match '^[\-rw]{3}x([\-rw]{2}x){2}$' -Because 'Everyone should be able to execute'
+        }
+        it "pwsh should NOT have write permissions for others in <channel>-<Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+                [string]
+                $Channel
+            )
+
+            $path = '/opt/microsoft/powershell/6/pwsh'
+
+            if($Channel -eq 'preview')
+            {
+                $path = '/opt/microsoft/powershell/6-preview/pwsh'
+            }
+
+            $permissions = Get-DockerImagePwshPermissions -Name $name -Path $path
+            $permissions | Should -Match '^[\-rwx]{4}[\-rwx]{3}[\-rx]{3}$' -Because 'Others should not be able to write'
         }
     }
 
