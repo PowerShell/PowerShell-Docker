@@ -69,8 +69,8 @@ RUN \
     && apt-get install -y /tmp/powershell.deb \
     # remove powershell package
     && rm -f /tmp/powershell.deb \
-    # Give all user execute permissions
-    && chmod a+x ${PS_INSTALL_FOLDER}/pwsh \
+    # Give all user execute permissions and remove write permissions for others
+    && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
