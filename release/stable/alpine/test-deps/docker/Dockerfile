@@ -12,6 +12,9 @@ ENV NODE_VERSION 10.15.3
 ENV YARN_VERSION=1.13.0
 ENV NVM_DIR="/root/.nvm"
 
+# workaround for Alpine to run in Azure DevOps
+ENV NODE_NO_WARNINGS=1
+
 # Copy node and yarn into image
 COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=node /opt/yarn-v${YARN_VERSION} /opt/yarn-v${YARN_VERSION}
