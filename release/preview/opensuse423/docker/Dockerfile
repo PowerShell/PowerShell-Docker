@@ -5,7 +5,7 @@
 
 # Define arg(s) needed for the From statement
 ARG fromTag=leap
-ARG imageRepo=opensuse
+ARG imageRepo=opensuse/leap
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
