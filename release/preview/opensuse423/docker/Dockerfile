@@ -4,7 +4,7 @@
 # effectively removing the tar.gz and packages that are not needed from the final image.
 
 # Define arg(s) needed for the From statement
-ARG fromTag=leap
+ARG fromTag=42.3
 ARG imageRepo=opensuse/leap
 
 FROM ${imageRepo}:${fromTag} AS installer-env
