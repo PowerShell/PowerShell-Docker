@@ -4,7 +4,7 @@
 # return objects representing the tags we need to base the opensuse image on Docker
 
 # The versions of opensuse we care about
-$shortTags = @('42.3')
+$shortTags = @('leap')
 
 $parent = Join-Path -Path $PSScriptRoot -ChildPath '..'
 $repoRoot = Join-Path -path (Join-Path -Path $parent -ChildPath '..') -ChildPath '..'
