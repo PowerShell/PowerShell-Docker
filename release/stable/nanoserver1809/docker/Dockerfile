@@ -70,7 +70,7 @@ ENV ProgramFiles="C:\Program Files" `
     WindowsPATH="C:\Windows\system32;C:\Windows"
 
     # Set the path
-ENV PATH="$WindowsPATH;${ProgramFiles}\PowerShell"
+ENV PATH="$WindowsPATH;${ProgramFiles}\PowerShell;"
 
 COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell"]
 
