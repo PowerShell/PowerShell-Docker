@@ -36,7 +36,7 @@ RUN apt-get update \
     && locale-gen $LANG && update-locale \
     # remove powershell package
     && rm /tmp/powershell.deb \
-    && ln -sf /opt/microsoft/powershell/6-preview/pwsh /usr/bin/pwsh \
+    && ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
