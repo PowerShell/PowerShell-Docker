@@ -341,7 +341,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
             if($Channel -eq 'preview')
             {
-                $path = '/opt/microsoft/powershell/6-preview/pwsh'
+                $path = '/opt/microsoft/powershell/7-preview/pwsh'
             }
 
             $permissions = Get-DockerImagePwshPermissions -Name $name -Path $path
@@ -360,7 +360,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
             if($Channel -eq 'preview')
             {
-                $path = '/opt/microsoft/powershell/6-preview/pwsh'
+                $path = '/opt/microsoft/powershell/7-preview/pwsh'
             }
 
             $permissions = Get-DockerImagePwshPermissions -Name $name -Path $path
