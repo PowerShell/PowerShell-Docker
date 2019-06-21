@@ -606,7 +606,6 @@ function Get-TestParams
         }
     }
 
-    Write-Verbose "ac: $actualChannel" -Verbose
     $testArgs = @{
         tags = $actualTagData.ActualTags
         BuildArgs = $buildArgs
