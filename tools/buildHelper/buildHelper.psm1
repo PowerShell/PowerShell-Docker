@@ -370,7 +370,10 @@ function Get-DockerImageMetaDataWrapper
         $BaseImage,
 
         [string]
-        $BaseRepositry
+        $BaseRepositry,
+
+        [switch]
+        $Strict
     )
 
     $imagePath = Join-Path -Path $ChannelPath -ChildPath $dockerFileName
@@ -405,6 +408,12 @@ function Get-DockerImageMetaDataWrapper
     {
         # Get the tag data for the image
         $tagDataFromScript = @(& $scriptPath -CI:$CI.IsPresent @getTagsExtraParams | Where-Object {$_.FromTag})
+        Write-Verbose "tdfs count:$($tagDataFromScript.count)-$($Strict.IsPresent)"
+        if($tagDataFromScript.count -eq 0 -and $Strict.IsPresent)
+        {
+            throw "Did not get tag data from script for $scriptPath!"
+        }
+
         if($TagFilter)
         {
             $tagDataFromScript = @($tagDataFromScript | Where-Object { $_.FromTag -match $TagFilter })

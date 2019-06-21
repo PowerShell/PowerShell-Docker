@@ -237,7 +237,8 @@ End {
                 -Version $windowsVersion `
                 -ImageName $ImageName `
                 -LinuxVersion $linuxVersion `
-                -BaseRepositry $Repository
+                -BaseRepositry $Repository `
+                -Strict:$CheckForDuplicateTags.IsPresent
 
             $nameForMessage = Split-Path -Leaf -Path $dockerFileName
             $message = "Channel: $nameForMessage does not exist.  Not every image exists in every channel.  Skipping."
@@ -276,7 +277,9 @@ End {
                             -LinuxVersion $linuxVersion `
                             -TagData $allMeta.TagData `
                             -BaseImage $actualTagData.ActualTags[0] `
-                            -BaseRepositry $Repository
+                            -BaseRepositry $Repository `
+                            -Strict:$CheckForDuplicateTags.IsPresent
+
 
                         $toBuild += $subImageAllMeta
                     }
