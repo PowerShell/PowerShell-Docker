@@ -11,4 +11,4 @@ $repoRoot = Join-Path -path (Join-Path -Path $parent -ChildPath '..') -ChildPath
 $modulePath = Join-Path -Path $repoRoot -ChildPath 'tools\getDockerTags'
 Import-Module $modulePath
 
-Get-DockerTags -ShortTags $shortTags -Image "debian" -FullTagFilter 'stretch-\d{8}[\.\d{1}]?-slim' -AlternativeShortTag '9'
+Get-DockerTags -ShortTags $shortTags -Image "debian" -FullTagFilter 'stretch-\d{8}[\.\d{1}]?-slim' -AlternativeShortTag '9' -SkipShortTagFilter

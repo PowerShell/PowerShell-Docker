@@ -114,30 +114,33 @@ function Get-DockerTags
                     Sort-Object -Descending |
                         Select-Object -First 1
 
-        # Return the short form of the tag
-        $results += [UpstreamDockerTagData] @{
-            Type = 'Short'
-            Tag = $shortTag
-            FromTag = $fullTag
-        }
-
-        if($AlternativeShortTag)
+        if($fullTag)
         {
             # Return the short form of the tag
             $results += [UpstreamDockerTagData] @{
                 Type = 'Short'
-                Tag = $AlternativeShortTag
+                Tag = $shortTag
                 FromTag = $fullTag
             }
-        }
 
-        if(!$OnlyShortTags.IsPresent)
-        {
-            # Return the full form of the tag
-            $results += [UpstreamDockerTagData] @{
-                Type = 'Full'
-                Tag = $fullTag
-                FromTag = $fullTag
+            if($AlternativeShortTag)
+            {
+                # Return the short form of the tag
+                $results += [UpstreamDockerTagData] @{
+                    Type = 'Short'
+                    Tag = $AlternativeShortTag
+                    FromTag = $fullTag
+                }
+            }
+
+            if(!$OnlyShortTags.IsPresent)
+            {
+                # Return the full form of the tag
+                $results += [UpstreamDockerTagData] @{
+                    Type = 'Full'
+                    Tag = $fullTag
+                    FromTag = $fullTag
+                }
             }
         }
     }
