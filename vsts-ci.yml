@@ -144,7 +144,7 @@ jobs:
     imagename: nanoserver1809
     vmImage: windows-2019
     preview: false
-    ciParameter: '-CI'
+    ciParameter: '-CI -TagFilter 1809'
     continueonerror: false
 
 # Use the TagFilter to filter to 1809 because the docker instance inside the agent only supports 1809
