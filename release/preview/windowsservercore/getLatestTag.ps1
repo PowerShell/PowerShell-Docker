@@ -16,4 +16,4 @@ Import-Module $modulePath -Force
 # The versions of nanoserver we care about
 $shortTags = @('1803','1809','1903')
 
-Get-DockerTags -ShortTags $shortTags -Image "mcr.microsoft.com/windows/servercore" -FullTagFilter '\d{4}_KB\d{7}' -Mcr
+Get-DockerTags -ShortTags $shortTags -Image "mcr.microsoft.com/windows/servercore" -FullTagFilter '\d{4}[-_]KB\d{7}' -Mcr
