@@ -6,7 +6,9 @@
 function Get-DockerTagsList
 {
     param(
+        [Parameter(Mandatory)]
         [string] $Url,
+        [Parameter(Mandatory)]
         [ValidateSet('name', 'tags')]
         [string] $PropertyName
     )
@@ -24,6 +26,10 @@ function Get-DockerTagsList
             elseif($results.$PropertyName)
             {
                 $results.$propertyName | ForEach-Object {Write-Output $_}
+                $nextUrl = $null
+            }
+            else
+            {
                 $nextUrl = $null
             }
         }
@@ -149,5 +155,6 @@ function Get-DockerTags
 }
 
 Export-ModuleMember -Function @(
-    'Get-DockerTags'
+    'Get-DockerTags',
+    'Get-DockerTagsList'
 )
