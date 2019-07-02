@@ -3,4 +3,4 @@
 
 # Dummy docker image to trigger dependabot PRs
 
-FROM fedora:28
+FROM fedora:30
