@@ -1,0 +1,36 @@
+version: 1
+
+# update_schedule: live is only supported on javascript, ruby:bundler, python, php:composer, dotnet:nuget, rust:cargo, elixir:hex
+
+update_configs:
+  - package_manager: "docker"
+    directory: "/release/preview/alpine/dependabot"
+    update_schedule: "daily"
+
+  - package_manager: "docker"
+    directory: "/release/preview/centos7/dependabot"
+    update_schedule: "daily"
+
+  - package_manager: "docker"
+    directory: "/release/preview/debian9/dependabot"
+    update_schedule: "daily"
+
+  - package_manager: "docker"
+    directory: "/release/preview/fedora28/dependabot"
+    update_schedule: "daily"
+
+  - package_manager: "docker"
+    directory: "/release/preview/nanoserver1809/dependabot"
+    update_schedule: "daily"
+
+  - package_manager: "docker"
+    directory: "/release/preview/opensuse423/dependabot"
+    update_schedule: "daily"
+
+  - package_manager: "docker"
+    directory: "/release/preview/ubuntu18.04/dependabot"
+    update_schedule: "daily"
+
+  - package_manager: "docker"
+    directory: "/release/preview/windowsservercore/dependabot"
+    update_schedule: "daily"
