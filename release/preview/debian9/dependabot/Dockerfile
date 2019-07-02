@@ -3,4 +3,4 @@
 
 # Dummy docker image to trigger dependabot PRs
 
-FROM debian:stretch
+FROM debian:9.9
