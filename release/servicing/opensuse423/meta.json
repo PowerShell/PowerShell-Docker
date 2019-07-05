@@ -6,5 +6,8 @@
     "SkipGssNtlmSspTests": true,
     "tagTemplates": [
         "#psversion#-opensuse-#tag#"
-    ]
+    ],
+    "TestProperties": {
+        "size": 524
+    }
 }

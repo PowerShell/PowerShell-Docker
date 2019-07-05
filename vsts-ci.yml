@@ -40,9 +40,17 @@ jobs:
 
 - template: .vsts-ci/phase.yml
   parameters:
+    name: fedora
+    imagename: fedora
+    stable: false
+    preview: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
     name: fedora28
     imagename: fedora28
     stable: true
+    preview: false
 
 - template: .vsts-ci/phase.yml
   parameters:
