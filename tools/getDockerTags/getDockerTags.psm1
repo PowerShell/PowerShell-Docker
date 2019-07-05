@@ -106,7 +106,7 @@ function Get-DockerTags
 
     if(!$tags)
     {
-        throw 'no results'
+        throw 'no results: '+$Image
     }
 
     foreach($shortTag in $ShortTags)
