@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# return objects representing the tags we need to base the xenial image on
+# return objects representing the tags we need to base the alpnie image on
 
-# The versions of xenial we care about
+# The versions of alpine we care about, for this dockerfile
 $shortTags = @('3.8')
 
 $parent = Join-Path -Path $PSScriptRoot -ChildPath '..'
