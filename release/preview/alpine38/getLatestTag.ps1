@@ -11,4 +11,4 @@ $repoRoot = Join-Path -path (Join-Path -Path $parent -ChildPath '..') -ChildPath
 $modulePath = Join-Path -Path $repoRoot -ChildPath 'tools\getDockerTags'
 Import-Module $modulePath
 
-Get-DockerTags -ShortTags $shortTags -Image "alpine" -FullTagFilter '^3.8$' -OnlyShortTags
+Get-DockerTags -ShortTags $shortTags -Image "alpine" -FullTagFilter '^3.\d$' -OnlyShortTags

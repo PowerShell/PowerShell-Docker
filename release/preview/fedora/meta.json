@@ -2,7 +2,7 @@
     "IsLinux" : true,
     "UseLinuxVersion": false,
     "PackageFormat": "powershell${previewTag}-${PS_VERSION}-1.rhel.7.x86_64.rpm",
-    "osVersion": "Fedora 28",
+    "osVersion": "Fedora",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "#psversion#-fedora-#tag#",

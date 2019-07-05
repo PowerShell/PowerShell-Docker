@@ -57,6 +57,20 @@ jobs:
     name: alpine
     imagename: alpine
     stable: true
+    preview: false
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: alpine
+    imagename: alpine38
+    stable: false
+    preview: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: alpine
+    imagename: alpine39
+    stable: false
     preview: true
 
 - template: .vsts-ci/phase.yml
