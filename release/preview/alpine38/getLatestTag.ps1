@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-# return objects representing the tags we need to base the alpnie image on
+# return objects representing the tags we need to base the Alpine image on
 
-# The versions of alpine we care about, for this dockerfile
+# The versions of Alpine we care about, for this dockerfile
 $shortTags = @('3.8')
 
 $parent = Join-Path -Path $PSScriptRoot -ChildPath '..'

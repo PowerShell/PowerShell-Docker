@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "osVersion": "Fedora 28",
+    "osVersion": "Fedora ${fromTag}",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "preview-fedora-#shorttag#"
