@@ -4,7 +4,7 @@ version: 1
 
 update_configs:
   - package_manager: "docker"
-    directory: "/release/preview/alpine/dependabot"
+    directory: "/release/preview/alpine39/dependabot"
     update_schedule: "daily"
 
   - package_manager: "docker"
@@ -16,7 +16,7 @@ update_configs:
     update_schedule: "daily"
 
   - package_manager: "docker"
-    directory: "/release/preview/fedora28/dependabot"
+    directory: "/release/preview/fedora/dependabot"
     update_schedule: "daily"
 
   - package_manager: "docker"
