@@ -4,7 +4,7 @@
 # Docker image file that describes an Alpine3.8 image with PowerShell installed from .tar.gz file(s)
 
 # Define arg(s) needed for the From statement
-ARG fromTag=3.8
+ARG fromTag=3.9
 ARG imageRepo=alpine
 
 FROM ${imageRepo}:${fromTag} AS installer-env
