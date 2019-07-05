@@ -441,11 +441,11 @@ End {
     if($GenerateTagsYaml.IsPresent)
     {
         Write-Output "repos:"
-        foreach($repo in $tagGroups.Keys)
+        foreach($repo in $tagGroups.Keys | Sort-Object)
         {
             Write-Output "  - repoName: $repo"
             Write-Output "    tagGroups:"
-            foreach($tag in $tagGroups.$repo)
+            foreach($tag in $tagGroups.$repo | Sort-Object -Property dockerfile)
             {
                 Write-Output "    - tags: [$($tag.Tags -join ', ')]"
                 Write-Output "      osVersion: $($tag.osVersion)"
