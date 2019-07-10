@@ -31,7 +31,7 @@ RUN zypper --non-interactive install \
 ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
 
 # Unzip the Linux tar.gz
-RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
+RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER} -v
 
 # ------ Second stage ------
 # Start a new stage so we lose all the tar.gz layers from the final image
