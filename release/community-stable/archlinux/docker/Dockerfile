@@ -55,7 +55,7 @@ RUN \
     # create powershell folder
     && mkdir -p ${PS_INSTALL_FOLDER} \
     # uncompress powershell linux tar file
-    && tar zxf /tmp/powershell-linux.tar.gz -C ${PS_INSTALL_FOLDER} \
+    && tar zxf /tmp/powershell-linux.tar.gz -C ${PS_INSTALL_FOLDER} -v \
     # remove powershell linux tar file
     && rm -f /tmp/powershell-linux.tar.gz \
     # Create the pwsh symbolic link that points to powershell
