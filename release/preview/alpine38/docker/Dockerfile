@@ -25,7 +25,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 RUN mkdir -p ${PS_INSTALL_FOLDER}
 
 # Unzip the Linux tar.gz
-RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
+RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER} -v
 
 # Start a new stage so we lose all the tar.gz layers from the final image
 FROM ${imageRepo}:${fromTag}
