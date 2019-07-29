@@ -89,6 +89,13 @@ jobs:
 
 - template: .vsts-ci/phase.yml
   parameters:
+    name: debian10
+    imagename: debian10
+    stable: false
+    preview: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
     name: kaliRolling
     imagename: kali-rolling
     stable: false
