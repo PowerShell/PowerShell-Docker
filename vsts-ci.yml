@@ -94,14 +94,14 @@ jobs:
     stable: false
     preview: true
 
-- template: .vsts-ci/phase.yml
-  parameters:
-    name: kaliRolling
-    imagename: kali-rolling
-    stable: false
-    preview: false
-    communityStable: true
-    continueonerror: false
+#- template: .vsts-ci/phase.yml
+#  parameters:
+#    name: kaliRolling
+#    imagename: kali-rolling
+#    stable: false
+#    preview: false
+#    communityStable: true
+#    continueonerror: false
 
 - template: .vsts-ci/phase.yml
   parameters:
