@@ -240,6 +240,21 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             $gssNtlmSspPath = Get-LinuxGssNtlmSsp -Name $Name
             $gssNtlmSspPath | Should -Not -BeNullOrEmpty
         }
+
+        it "Has POWERSHELL_DISTRIBUTION_CHANNEL environment variable defined" -TestCases $runTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $ExpectedVersion
+            )
+
+            $psDistChannel = Get-PowerShellDistibutionChannel -TestContext $testContext -Name $Name
+            $psDistChannel | Should -BeLike "PSDocker-*"
+        }
     }
 
     Context "Labels" {
@@ -590,6 +605,21 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
             #TODO: Run the base image and make sure the path is included
 
             $path | should -Match ([System.Text.RegularExpressions.Regex]::Escape("C:\Windows\system32"))
+        }
+
+        it "Has POWERSHELL_DISTRIBUTION_CHANNEL environment variable defined" -TestCases $runTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $ExpectedVersion
+            )
+
+            $psDistChannel = Get-PowerShellDistibutionChannel -TestContext $testContext -Name $Name
+            $psDistChannel | Should -BeLike "PSDocker-*"
         }
     }
 

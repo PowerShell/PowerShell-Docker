@@ -311,6 +311,28 @@ function Get-ContainerPath
     return (Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru)
 }
 
+function Get-PowerShellDistibutionChannelVariable
+{
+    param(
+        [HashTable] $TestContext,
+        [string] $Name
+    )
+
+    $imageTag = ${Name}
+
+    $runParams = @()
+    $runParams += '--rm'
+
+    $runParams += $imageTag
+    $runParams += 'pwsh'
+    $runParams += '-nologo'
+    $runParams += '-noprofile'
+    $runParams += '-c'
+    $runParams += '$env:POWERSHELL_DISTRIBUTION_CHANNEL'
+
+    return (Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru)
+}
+
 function Get-MetadataUsingContainer
 {
     param(
