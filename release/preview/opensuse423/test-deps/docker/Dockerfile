@@ -16,6 +16,8 @@ RUN zypper --non-interactive update --skip-interactive \
     # remove package manager log file
     && rm -f /var/log/zypp/history /var/log/zypper.log
 
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-OpenSUSE-42.3
+
 # Define args needed only for the labels
 ARG VCS_REF="none"
 ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:centos7

@@ -49,8 +49,8 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
-    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
-
+    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OpenSUSE-42.3
 
 # Install dependencies
 RUN zypper --non-interactive update --skip-interactive \

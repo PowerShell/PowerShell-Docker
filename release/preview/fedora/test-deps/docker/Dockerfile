@@ -13,6 +13,8 @@ RUN dnf install -y \
         procps-ng \
     && dnf clean all
 
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Fedora-28
+
 # Define args needed only for the labels
 ARG VCS_REF="none"
 ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:fedora-28
