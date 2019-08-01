@@ -277,7 +277,8 @@ End {
                             -TagData $allMeta.TagData `
                             -BaseImage $actualTagData.ActualTags[0] `
                             -BaseRepositry $Repository `
-                            -Strict:$CheckForDuplicateTags.IsPresent
+                            -Strict:$CheckForDuplicateTags.IsPresent `
+                            -FromTag $tagGroup.Name
 
                         $toBuild += $subImageAllMeta
                     }
