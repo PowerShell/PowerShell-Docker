@@ -383,7 +383,10 @@ function Get-DockerImageMetaDataWrapper
         $BaseRepositry,
 
         [switch]
-        $Strict
+        $Strict,
+
+        [string]
+        $FromTag
     )
 
     $imagePath = Join-Path -Path $ChannelPath -ChildPath $dockerFileName
@@ -439,7 +442,7 @@ function Get-DockerImageMetaDataWrapper
                     [UpstreamImageTagData]@{
                         Type='Full'
                         Tag=$tagName
-                        FromTag = $BaseImage
+                        FromTag = $FromTag
                     }
                 )
             }
