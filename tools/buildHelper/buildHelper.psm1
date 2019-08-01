@@ -162,6 +162,9 @@ class DockerImageMetaData {
 
     [PSCustomObject]
     $TestProperties = ([PSCustomObject]@{})
+
+    [PSCustomObject]
+    $TagMapping
 }
 
 class ShortTagMetaData {
@@ -333,6 +336,13 @@ class DockerImageFullMetaData
     [string] $FullRepository
 }
 
+class UpstreamImageTagData
+{
+    [string] $Type
+    [string] $Tag
+    [string] $FromTag
+}
+
 # Get the meta data and the tag data for an image
 function Get-DockerImageMetaDataWrapper
 {
@@ -417,6 +427,22 @@ function Get-DockerImageMetaDataWrapper
         if($TagFilter)
         {
             $tagDataFromScript = @($tagDataFromScript | Where-Object { $_.FromTag -match $TagFilter })
+        }
+    }
+    elseif ($meta.TagMapping) {
+        foreach($regex in $meta.TagMapping.PSObject.Properties.Name)
+        {
+            if($BaseImage -match $regex)
+            {
+                $tagName = $meta.TagMapping.$regex
+                $tagDataFromScript = @(
+                    [UpstreamImageTagData]@{
+                        Type='Full'
+                        Tag=$tagName
+                        FromTag = $BaseImage
+                    }
+                )
+            }
         }
     }
     else

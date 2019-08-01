@@ -4,7 +4,7 @@
     "osVersion": "Fedora ${fromTag}",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "preview-fedora-#shorttag#"
+        "#tag#"
     ],
     "SubRepository": "test-deps",
     "OptionalTests": [
@@ -12,5 +12,10 @@
     ],
     "TestProperties": {
         "size": 602
+    },
+    "TagMapping": {
+        "^.*-fedora-28$" : "preview-fedora-28",
+        "^.*-fedora-29$" : "preview-fedora-29",
+        "^.*-fedora-30$" : "preview-fedora-30"
     }
 }

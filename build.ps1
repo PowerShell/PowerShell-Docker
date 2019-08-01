@@ -199,7 +199,6 @@ End {
     $dupeTagIssues = @()
 
     $toBuild = @()
-    $builtSubImages = @()
     foreach ($actualChannel in $Channels) {
         if ($PSCmdlet.ParameterSetName -match '.*ByName')
         {
@@ -265,31 +264,22 @@ End {
                     {
                         $actualTagData = $allMeta.ActualTagDataByGroup.$tagGroup
                         $SubImagePath = Join-Path -Path $dockerFileName -ChildPath $allMeta.Meta.SubImage
-                        if($builtSubImages -notcontains $SubImagePath)
-                        {
-                            Write-Verbose -Message "getting subimage - fromtag: $($tagGroup.Name) - subimage: $($allMeta.Meta.SubImage)"
-                            $subImageAllMeta = Get-DockerImageMetaDataWrapper `
-                                -DockerFileName $SubImagePath `
-                                -CI:$CI.IsPresent `
-                                -IncludeKnownIssues:$IncludeKnownIssues.IsPresent `
-                                -ChannelPath $channelPath `
-                                -TagFilter $TagFilter `
-                                -Version $windowsVersion `
-                                -ImageName $ImageName `
-                                -LinuxVersion $linuxVersion `
-                                -TagData $allMeta.TagData `
-                                -BaseImage $actualTagData.ActualTags[0] `
-                                -BaseRepositry $Repository `
-                                -Strict:$CheckForDuplicateTags.IsPresent
+                        Write-Verbose -Message "getting subimage - fromtag: $($tagGroup.Name) - subimage: $($allMeta.Meta.SubImage)"
+                        $subImageAllMeta = Get-DockerImageMetaDataWrapper `
+                            -DockerFileName $SubImagePath `
+                            -CI:$CI.IsPresent `
+                            -IncludeKnownIssues:$IncludeKnownIssues.IsPresent `
+                            -ChannelPath $channelPath `
+                            -TagFilter $TagFilter `
+                            -Version $windowsVersion `
+                            -ImageName $ImageName `
+                            -LinuxVersion $linuxVersion `
+                            -TagData $allMeta.TagData `
+                            -BaseImage $actualTagData.ActualTags[0] `
+                            -BaseRepositry $Repository `
+                            -Strict:$CheckForDuplicateTags.IsPresent
 
-
-                            $toBuild += $subImageAllMeta
-                            $builtSubImages += $SubImagePath
-                        }
-                        else
-                        {
-                            Write-Verbose -Message "already got subimage - fromtag: $($tagGroup.Name) - subimage: $($allMeta.Meta.SubImage)"
-                        }
+                        $toBuild += $subImageAllMeta
                     }
                 }
             }
