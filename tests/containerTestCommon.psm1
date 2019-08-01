@@ -226,6 +226,9 @@ function Test-SkipLinux
         'Windows*' {
             return $true
         }
+        'Docker Desktop' {
+            return $false
+        }
         default {
             throw "Unknown Docker os '$os'"
         }
