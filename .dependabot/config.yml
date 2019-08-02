@@ -12,7 +12,7 @@ update_configs:
     update_schedule: "daily"
 
   - package_manager: "docker"
-    directory: "/release/preview/debian9/dependabot"
+    directory: "/release/preview/debian10/dependabot"
     update_schedule: "daily"
 
   - package_manager: "docker"
