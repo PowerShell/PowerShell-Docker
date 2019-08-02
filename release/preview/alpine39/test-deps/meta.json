@@ -4,7 +4,7 @@
     "SkipGssNtlmSspTests": true,
     "osVersion": "Alpine ${fromTag}",
     "tagTemplates": [
-        "preview-alpine-#shorttag#"
+        "#tag#"
     ],
     "OptionalTests": [
         "test-deps",
@@ -12,5 +12,9 @@
     ],
     "TestProperties": {
         "size": 212
+    },
+    "TagMapping": {
+        "^.*-alpine-3.9$" : "preview-alpine-3.9",
+        "^.*-alpine-3.10$" : "preview-alpine-3.10"
     }
 }
