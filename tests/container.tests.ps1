@@ -645,6 +645,10 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
                 $Channel
             )
 
+            if ($Channel -ne 'preview') {
+                Set-ItResult -Skipped -Because "Test is not applicable to $Channel"
+            }
+
             $psDistChannel = Get-PowerShellDistibutionChannel -TestContext $testContext -Name $Name
             $psDistChannel | Should -BeLike "PSDocker-*"
         }
