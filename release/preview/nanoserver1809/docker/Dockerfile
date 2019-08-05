@@ -39,6 +39,8 @@ RUN Write-host "Verifying valid Version..."; `
 # Install PowerShell into NanoServer
 FROM ${NanoServerRepo}:${fromTag}
 
+ARG fromTag=1709
+
 ARG VCS_REF="none"
 ARG PS_VERSION=6.2.0-rc.1
 ARG IMAGE_NAME=mcr.microsoft.com/powershell

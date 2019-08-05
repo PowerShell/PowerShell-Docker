@@ -3,6 +3,8 @@ ARG BaseImage=mcr.microsoft.com/powershell:fedora-28
 
 FROM ${BaseImage}
 
+ARG fromTag=28
+
 # Install dependencies and clean up
 RUN dnf install -y \
         sudo \
@@ -13,7 +15,7 @@ RUN dnf install -y \
         procps-ng \
     && dnf clean all
 
-ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Fedora-28
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Fedora-${fromTag}
 
 # Define args needed only for the labels
 ARG VCS_REF="none"

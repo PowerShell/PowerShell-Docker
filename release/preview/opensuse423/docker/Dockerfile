@@ -37,6 +37,8 @@ RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER} -v
 # Start a new stage so we lose all the tar.gz layers from the final image
 FROM ${imageRepo}:${fromTag}
 
+ARG fromTag=42.3
+
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
@@ -50,7 +52,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OpenSUSE-42.3
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OpenSUSE-${fromTag}
 
 # Install dependencies
 RUN zypper --non-interactive update --skip-interactive \
