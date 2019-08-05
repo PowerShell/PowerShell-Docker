@@ -311,7 +311,7 @@ function Get-ContainerPath
     return (Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru)
 }
 
-function Get-PowerShellDistibutionChannelVariable
+function Get-PowerShellDistibutionChannel
 {
     param(
         [HashTable] $TestContext,

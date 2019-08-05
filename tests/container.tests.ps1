@@ -159,6 +159,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             $runTestCases += @{
                 Name = $_.Name
                 ExpectedVersion = $_.ExpectedVersion
+                Channel = $_.Channel
             }
         }
 
@@ -186,6 +187,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
     }
 
     Context "Run Powershell" {
+
         it "Get PSVersion table from <Name> should be <ExpectedVersion>" -TestCases $runTestCases -Skip:$script:skipLinuxRun {
             param(
                 [Parameter(Mandatory=$true)]
@@ -194,7 +196,11 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $ExpectedVersion
+                $ExpectedVersion,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Channel
             )
 
             $actualVersion = Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name
@@ -222,7 +228,11 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $ExpectedVersion
+                $ExpectedVersion,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Channel
             )
 
             $culture = Get-UICultureUsingContainer -Name $Name
@@ -249,8 +259,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $ExpectedVersion
+                $ExpectedVersion,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Channel
             )
+
+            if ($Channel -ne 'preview') {
+                Set-ItResult -Skipped -Because "Test is not applicable to $Channel"
+            }
 
             $psDistChannel = Get-PowerShellDistibutionChannel -TestContext $testContext -Name $Name
             $psDistChannel | Should -BeLike "PSDocker-*"
@@ -550,6 +568,7 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
             $runTestCases += @{
                 Name = $_.Name
                 ExpectedVersion = $_.ExpectedVersion
+                Channel = $_.Channel
             }
         }
 
@@ -574,7 +593,11 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $ExpectedVersion
+                $ExpectedVersion,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Channel
             )
 
             Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
@@ -607,7 +630,7 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
             $path | should -Match ([System.Text.RegularExpressions.Regex]::Escape("C:\Windows\system32"))
         }
 
-        it "Has POWERSHELL_DISTRIBUTION_CHANNEL environment variable defined" -TestCases $runTestCases -Skip:$script:skipLinuxRun {
+        it "Has POWERSHELL_DISTRIBUTION_CHANNEL environment variable defined" -TestCases $runTestCases -Skip:$script:skipWindowsRun {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
@@ -615,7 +638,11 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $ExpectedVersion
+                $ExpectedVersion,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Channel
             )
 
             $psDistChannel = Get-PowerShellDistibutionChannel -TestContext $testContext -Name $Name
