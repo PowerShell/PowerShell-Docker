@@ -226,6 +226,9 @@ function Test-SkipLinux
         'Windows*' {
             return $true
         }
+        'Docker Desktop' {
+            return $false
+        }
         default {
             throw "Unknown Docker os '$os'"
         }
@@ -304,6 +307,28 @@ function Get-ContainerPath
     $runParams += '-noprofile'
     $runParams += '-c'
     $runParams += '$env:PATH'
+
+    return (Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru)
+}
+
+function Get-PowerShellDistibutionChannel
+{
+    param(
+        [HashTable] $TestContext,
+        [string] $Name
+    )
+
+    $imageTag = ${Name}
+
+    $runParams = @()
+    $runParams += '--rm'
+
+    $runParams += $imageTag
+    $runParams += 'pwsh'
+    $runParams += '-nologo'
+    $runParams += '-noprofile'
+    $runParams += '-c'
+    $runParams += '$env:POWERSHELL_DISTRIBUTION_CHANNEL'
 
     return (Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru)
 }

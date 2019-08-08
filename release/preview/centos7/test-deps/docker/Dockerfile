@@ -10,6 +10,8 @@ RUN yum install -y \
         openssl \
     && yum clean all
 
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-CentOS-7
+
 # Define args needed only for the labels
 ARG VCS_REF="none"
 ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:centos-7

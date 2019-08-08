@@ -3,6 +3,8 @@ ARG BaseImage=mcr.microsoft.com/powershell:opensuse-42.3
 
 FROM ${BaseImage}
 
+ARG fromTag=42.3
+
 # Install dependencies and clean up
 RUN zypper --non-interactive update --skip-interactive \
     && zypper --non-interactive install \
@@ -15,6 +17,8 @@ RUN zypper --non-interactive update --skip-interactive \
     && zypper clean -a \
     # remove package manager log file
     && rm -f /var/log/zypp/history /var/log/zypper.log
+
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-OpenSUSE-${fromTag}
 
 # Define args needed only for the labels
 ARG VCS_REF="none"

@@ -39,6 +39,8 @@ RUN Write-host "Verifying valid Version..."; `
 # Install PowerShell into NanoServer
 FROM ${NanoServerRepo}:${fromTag}
 
+ARG fromTag=1709
+
 ARG VCS_REF="none"
 ARG PS_VERSION=6.2.0-rc.1
 ARG IMAGE_NAME=mcr.microsoft.com/powershell
@@ -67,7 +69,8 @@ ENV ProgramFiles="C:\Program Files" `
     # Persist %PSCORE% ENV variable for user convenience
     PSCORE="$ProgramFiles\PowerShell\pwsh.exe" `
     # Set the default windows path so we can use it
-    WindowsPATH="C:\Windows\system32;C:\Windows"
+    WindowsPATH="C:\Windows\system32;C:\Windows" `
+    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-NanoServer-${fromTag}"
 
     # Set the path
 ENV PATH="$WindowsPATH;${ProgramFiles}\PowerShell;"
