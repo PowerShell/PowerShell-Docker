@@ -34,3 +34,7 @@ update_configs:
   - package_manager: "docker"
     directory: "/release/preview/windowsservercore/dependabot"
     update_schedule: "daily"
+
+  - package_manager: "docker"
+    directory: "/release/preview/alpine38/dependabot"
+    update_schedule: "daily"
