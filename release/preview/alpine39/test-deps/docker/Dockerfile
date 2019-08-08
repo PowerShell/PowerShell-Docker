@@ -10,7 +10,7 @@ FROM ${BaseImage}
 
 ARG fromTag=3.9
 
-ENV NODE_VERSION 10.15.3 \
+ENV NODE_VERSION=10.15.3 \
     YARN_VERSION=1.13.0 \
     NVM_DIR="/root/.nvm" \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Alpine-${fromTag}

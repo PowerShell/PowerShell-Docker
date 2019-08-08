@@ -8,7 +8,7 @@ FROM node:10.15.3-alpine as node
 
 FROM ${BaseImage}
 
-ENV NODE_VERSION 10.15.3 \
+ENV NODE_VERSION=10.15.3 \
     YARN_VERSION=1.13.0 \
     NVM_DIR="/root/.nvm" \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Alpine-3.8
