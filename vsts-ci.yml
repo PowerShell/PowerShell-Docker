@@ -119,7 +119,7 @@ jobs:
     stable: false
     preview: false
     communityStable: true
-    continueonerror: false
+    continueonerror: true
 
 
 - template: .vsts-ci/phase.yml
