@@ -33,6 +33,8 @@ ARG IMAGE_NAME=pshorg/powershellcommunity/test-deps:amazonlinux-2.0.20181114
 ARG VCS_REF="none"
 ARG PS_VERSION=6.1.0
 
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-AmazonLinux-7
+
 # Add label last as it's just metadata and uses a lot of parameters
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
