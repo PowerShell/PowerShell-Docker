@@ -27,7 +27,8 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     # Set up PowerShell module analysis cache path
-    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
+    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache  \
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OracleLinux-${fromTag}
 
 # Installation
 RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell-linux.rpm \

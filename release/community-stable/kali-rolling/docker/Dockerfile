@@ -41,10 +41,11 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Set up PowerShell module analysis cache path
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     # Opt out of SocketsHttpHandler in DotNet Core 2.1 to use HttpClientHandler
-    # with installed libcurl4 package to resolve 
+    # with installed libcurl4 package to resolve
     # Invoke-WebRequest : Authentication failed" issue when executing using
     # docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [Invoke-WebRequest] [-Uri <HTTPS URL>]
-    DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0
+    DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0 \
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-KaliLinux-${fromTag}
 
 # Installation
 RUN \

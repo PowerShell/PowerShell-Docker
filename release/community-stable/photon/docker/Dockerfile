@@ -59,7 +59,8 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0 \
     # Set terminal to linux because there is no xterm library in Photon image
     # when docker allocate pseudo-tty
-    TERM=linux
+    TERM=linux \
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Photon-${fromTag}
 
 # Installation
 RUN \
