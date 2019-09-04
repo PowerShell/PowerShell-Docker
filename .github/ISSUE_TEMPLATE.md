@@ -12,6 +12,7 @@ If it's not a bug, please remove the template and elaborate the issue in your ow
 -->
 
 ## Steps to reproduce
+<!-- Please include any docker commands you used to run the image -->
 
 ```powershell
 
