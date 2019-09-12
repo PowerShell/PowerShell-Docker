@@ -1,7 +1,4 @@
-# escape=`
-# Args used by from statements must be defined here:
-ARG fromTag=1709
-ARG InstallerVersion=nanoserver
+nose
 ARG InstallerRepo=mcr.microsoft.com/powershell
 ARG NanoServerRepo=mcr.microsoft.com/windows/nanoserver
 
