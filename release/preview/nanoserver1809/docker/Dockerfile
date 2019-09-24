@@ -72,8 +72,19 @@ ENV ProgramFiles="C:\Program Files" `
     WindowsPATH="C:\Windows\system32;C:\Windows" `
     POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-NanoServer-${fromTag}"
 
-    # Set the path
-ENV PATH="$WindowsPATH;${ProgramFiles}\PowerShell;"
+### Begin workaround ###
+# Note that changing user on nanoserver is not recommended
+# See, https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-containers/container-base-images#base-image-differences
+# But we are working around a bug introduced in the nanoserver image introduced in 1809
+# Without this, PowerShell Direct will fail
+# this command sholud be like this: https://github.com/PowerShell/PowerShell-Docker/blob/f81009c42c96af46aef81eb1515efae0ef29ad5f/release/preview/nanoserver/docker/Dockerfile#L76
+USER ContainerAdministrator
+
+# This is basically the correct code except for the /M
+RUN setx PATH "%PATH%;%ProgramFiles%\PowerShell;" /M
+
+USER ContainerUser
+### End workaround ###
 
 COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell"]
 
