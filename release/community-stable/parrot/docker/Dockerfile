@@ -69,7 +69,8 @@ RUN \
     # clean to remove unused stuff
     && apt autoremove \
     # install powershell package
-    && apt-get install -y --no-install-recommends /tmp/powershell.deb \
+    && apt-get install -y --no-install-recommends --allow-downgrades \
+        /tmp/powershell.deb \
     # remove powershell package
     && rm -f /tmp/powershell.deb \
     # Give all user execute permissions and remove write permissions for others
