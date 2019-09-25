@@ -66,10 +66,8 @@ RUN \
     && dpkg -i /tmp/libicu57_57.1-6+deb9u2_amd64.deb \
     # remove libicu57 package
     && rm -f /tmp/libicu57_57.1-6+deb9u2_amd64.deb \
-    # clean to remove unused stuff
-    && apt autoremove \
     # install powershell package
-    && apt-get install -y --no-install-recommends --allow-downgrades \
+    && apt-get install -y --allow-downgrades \
         /tmp/powershell.deb \
     # remove powershell package
     && rm -f /tmp/powershell.deb \
