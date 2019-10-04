@@ -36,14 +36,14 @@ jobs:
 - template: .vsts-ci/phase.yml
   parameters:
     name: centos7
-    stable: false
-    preview: true
     imagename: centos7
 
 - template: .vsts-ci/phase.yml
   parameters:
     name: centos8
     imagename: centos8
+    stable: false
+    preview: true
 
 - template: .vsts-ci/phase.yml
   parameters:
