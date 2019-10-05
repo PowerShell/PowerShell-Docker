@@ -8,7 +8,7 @@ update_configs:
     update_schedule: "daily"
 
   - package_manager: "docker"
-    directory: "/release/preview/centos7/dependabot"
+    directory: "/release/preview/centos8/dependabot"
     update_schedule: "daily"
 
   - package_manager: "docker"
