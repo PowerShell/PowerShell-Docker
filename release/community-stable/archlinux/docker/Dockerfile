@@ -53,6 +53,8 @@ RUN \
       openssl-1.0 \
       # required for uncompressing tar files
       tar \
+      # ntlm remoting
+      gss-ntlmssp \
     # create powershell folder
     && mkdir -p ${PS_INSTALL_FOLDER} \
     # uncompress powershell linux tar file
