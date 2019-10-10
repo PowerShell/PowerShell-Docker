@@ -4,12 +4,14 @@
         "organization": "powershell",
         "project": "docker",
         "build_targets": {
-            "CI": "Docker-PR"
+            "CI": "docker-PR",
+            "secretscan": "Docker-CI-Secret-Scan",
         },
         "authorized_users": [
             "SteveL-MSFT",
             "TravisEz13",
-            "anmenaga"
+            "anmenaga",
+            "RDIL"
         ],
     },
     "failures": {
