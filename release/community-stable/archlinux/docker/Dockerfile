@@ -11,7 +11,7 @@ ARG imageRepo=archlinux/base
 FROM ${imageRepo}:${fromTag} AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=6.2.3
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
@@ -77,9 +77,6 @@ RUN \
     # upgrade distro
     && pacman -Syyu --noconfirm \
     # clean downloaded packages
-    # create /var/cache/pacman/pkg directory to prevent pacman -Scc generating
-    # an error output about this missing directory
-    && mkdir /var/cache/pacman/pkg \
     && yes | pacman -Scc
 
 # Define args needed only for the labels
