@@ -2,7 +2,7 @@
     "IsLinux" : true,
     "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
     "SkipGssNtlmSspTests": true,
-    "SkipWebCmdletTests": true,
+    "SkipWebCmdletTests": false,
     "tagTemplates": [
         "#psversion#-clearlinux-#tag#",
         "clearlinux-#shorttag#"
