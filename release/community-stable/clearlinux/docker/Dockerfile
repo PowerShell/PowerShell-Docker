@@ -35,8 +35,10 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 
 # Installation
 RUN \
+    # generate trust store
+    clrtrust generate -f \
     # install dependencies
-    swupd bundle-add \
+    && swupd bundle-add \
       # required libstdc++.so.6
       # required bundle to make less executable
       os-core-dev \
@@ -78,8 +80,10 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-ClearLinux-${fromTag}
 
 RUN \
+    # generate trust store
+    clrtrust generate -f \
     # install dependencies
-    swupd bundle-add \
+    && swupd bundle-add \
       # required package for International Components for Unicode
       runtime-libs-boost \
     # Create the pwsh symbolic link that points to powershell
