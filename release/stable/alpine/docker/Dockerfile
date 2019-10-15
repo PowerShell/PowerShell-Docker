@@ -21,11 +21,9 @@ ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
 # define the folder we will be installing PowerShell to
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 
-# Create the install folder
-RUN mkdir -p ${PS_INSTALL_FOLDER}
-
-# Unzip the Linux tar.gz
-RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER} -v
+# Create the install folder, unzip the Linux tar.gz
+RUN mkdir -p ${PS_INSTALL_FOLDER} \
+    && tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER} -v
 
 # Start a new stage so we lose all the tar.gz layers from the final image
 FROM ${imageRepo}:${fromTag}
@@ -48,6 +46,19 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 RUN apk add --no-cache \
     ca-certificates \
     less \
+    # gss-ntlmssp build tools
+    git \
+    mit-krb5 \
+    krb5-dev \
+    krb5-devel \
+    libtool \
+    libxml2 \
+    pkgconfig \
+    openssl-devel \
+    build-base \
+    gcc \
+    wget \
+    autoconf \
     \
     # PSReadline/console dependencies
     ncurses-terminfo-base \
@@ -69,6 +80,14 @@ RUN apk add --no-cache \
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
     # Give all user execute permissions and remove write permissions for others
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
+    # you most likely thought we were going to run PowerShell now
+    # that would be wrong, we're taking a break to build NTLM remoting
+    # libraries. Have patience.
+    && git clone https://github.com/RDIL/gss-ntlmssp.git --branch=master \
+    && cd gss-ntlmssp \
+    && autoconf -f -i \
+    && ./configure \
+    && make \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
