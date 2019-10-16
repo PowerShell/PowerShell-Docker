@@ -23,7 +23,7 @@ ARG PS_INSTALL_VERSION=6
 ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
 
 # Define Args for the needed to add the package
-ARG DEBIAN_PACKAGE_URL=http://ftp.us.debian.org/debian/pool/main/i/icu/libicu57_57.1-6+deb9u2_amd64.deb
+ARG DEBIAN_PACKAGE_URL=hhttps://raw.githubusercontent.com/PowerShell/PowerShell-Docker/master/libs/57_57.1-6+deb9u3_amd64.deb
 
 # Download the libicu57 Debian package and save it
 ADD ${DEBIAN_PACKAGE_URL} /tmp/libicu57_57.1-6+deb9u2_amd64.deb
