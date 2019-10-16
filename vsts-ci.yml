@@ -135,7 +135,7 @@ jobs:
     stable: false
     preview: false
     communityStable: true
-    continueonerror: true
+    continueonerror: false
 
 - template: .vsts-ci/phase.yml
   parameters:
@@ -144,6 +144,7 @@ jobs:
     stable: false
     preview: false
     communityStable: true
+    continueonerror: false
 
 - template: .vsts-ci/phase.yml
   parameters:
@@ -152,6 +153,7 @@ jobs:
     stable: false
     preview: false
     communityStable: true
+    continueonerror: false
 
 - template: .vsts-ci/phase.yml
   parameters:
@@ -169,6 +171,7 @@ jobs:
     stable: false
     preview: false
     communityStable: true
+    continueonerror: false
 
 
 # The -CI filters to LTSC-2016 for nanoserver by default, which is the only thing that works on Hosted VS2017
