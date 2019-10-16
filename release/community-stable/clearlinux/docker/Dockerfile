@@ -20,7 +20,7 @@ ARG PS_INSTALL_VERSION=6
 ADD ${PS_PACKAGE_URL} /tmp/powershell-linux.tar.gz
 
 # Define Args for the needed to add the package
-ARG GNU_LINUX_LESS_PACKAGE_URL=https://ftp.gnu.org/gnu/less/less-530.tar.gz
+ARG GNU_LINUX_LESS_PACKAGE_URL=https://raw.githubusercontent.com/PowerShell/PowerShell-Docker/master/libs/less-530.tar.gz
 
 # Download the less tar.gz and save it
 ADD ${GNU_LINUX_LESS_PACKAGE_URL} /tmp/less.tar.gz
