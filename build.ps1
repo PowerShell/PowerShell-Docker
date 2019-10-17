@@ -177,10 +177,9 @@ Begin {
     if ($PSCmdlet.ParameterSetName -notin 'GenerateTagsYaml', 'DupeCheckAll' -and $Channel.Count -gt 1)
     {
         throw "Multiple Channels are not supported in this parameter set"
-
-        # We are using the Channel parameter, so assign the variable to that
     }
 
+    # We are using the Channel parameter, so assign the variable to that
     $Channels = $Channel
 
     $sasData = $null
@@ -244,14 +243,10 @@ End {
             $message = "Channel: $nameForMessage does not exist.  Not every image exists in every channel.  Skipping."
             if(!$allMeta)
             {
+                Write-Warning $message
                 if($CI.IsPresent -and !$GetTags.IsPresent)
                 {
-                    Write-Warning $message
                     throw $message
-                }
-                else
-                {
-                    Write-Warning $message
                 }
             }
             else
