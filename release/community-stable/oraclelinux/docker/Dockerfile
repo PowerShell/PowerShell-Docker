@@ -5,13 +5,13 @@
 # installed from RHEL7 PowerShell package
 
 # Define arg(s) needed for the From statement
-ARG fromTag=7.5
+ARG fromTag=latest
 ARG imageRepo=oraclelinux
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=6.2.3
 ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
@@ -31,12 +31,16 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OracleLinux-${fromTag}
 
 # Installation
-RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell-linux.rpm \
+RUN \
+    # download PowerShell rpm package
+    curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell-linux.rpm \
     # install dependencies
     && yum install -y \
 	    # required for help in powershell
 	    less \
+      # install EPEL repository
 	    epel-release \
+      # install gssntlmssp package from EPEL repository
 	    gssntlmssp \
     # install powershell package
     && yum install -y /tmp/powershell-linux.rpm \
@@ -58,8 +62,7 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell-linux.rpm \
     # clean cached data
     && yum clean all \
     # remove cache folders and files
-    && rm -rf /var/cache/yum \
-    && find /. -name 'gssntlmssp.so' -exec echo {} \;
+    && rm -rf /var/cache/yum
 
 # Define args needed only for the labels
 ARG IMAGE_NAME=pshorg/powershellcommunity:oraclelinux-7.5
