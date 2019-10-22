@@ -40,7 +40,7 @@ RUN \
     && yum install -y \
 	    # required for help in PowerShell
 	    less \
-	    # install gssntlmssp package from EPEL repository
+      # install gssntlmssp package from EPEL repository
       gssntlmssp \
     # install powershell package
     && yum install -y /tmp/powershell-linux.rpm \
