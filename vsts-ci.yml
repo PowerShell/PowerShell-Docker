@@ -103,6 +103,13 @@ jobs:
 
 - template: .vsts-ci/phase.yml
   parameters:
+    name: arm32v7
+    imagename: arm32v7
+    stable: false
+    preview: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
     name: kaliRolling
     imagename: kali-rolling
     stable: false

@@ -156,24 +156,30 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
         $testContext = Get-TestContext -type Linux
         $runTestCases = @()
         $script:linuxContainerRunTests | ForEach-Object {
+            $Arm32 = [bool] $_.TestProperties.Arm32
             $runTestCases += @{
                 Name = $_.Name
                 ExpectedVersion = $_.ExpectedVersion
                 Channel = $_.Channel
+                Arm32 = $Arm32
             }
         }
 
         $webTestCases = @()
         $script:linuxContainerRunTests | Where-Object {$_.SkipWebCmdletTests -ne $true} | ForEach-Object {
+            $Arm32 = [bool] $_.TestProperties.Arm32
             $webTestCases += @{
                 Name = $_.Name
+                Arm32 = $Arm32
             }
         }
 
         $gssNtlmSspTestCases = @()
         $script:linuxContainerRunTests | Where-Object {$_.SkipGssNtlmSspTests -ne $true} | ForEach-Object {
+            $Arm32 = [bool] $_.TestProperties.Arm32
             $gssNtlmSspTestCases += @{
                 Name = $_.Name
+                Arm32 = $Arm32
             }
         }
     }
@@ -200,8 +206,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $actualVersion = Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name
             $actualVersion | should -be $ExpectedVersion
@@ -211,8 +225,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
-                $name
+                $name,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $metadataString = Get-MetadataUsingContainer -Name $Name
             $metadataString | Should -Not -BeNullOrEmpty
@@ -232,8 +254,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $culture = Get-UICultureUsingContainer -Name $Name
             $culture | Should -Not -BeNullOrEmpty
@@ -244,8 +274,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
-                $name
+                $name,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $gssNtlmSspPath = Get-LinuxGssNtlmSsp -Name $Name
             $gssNtlmSspPath | Should -Not -BeNullOrEmpty
@@ -263,8 +301,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             if ($Channel -ne 'preview') {
                 Set-ItResult -Skipped -Because "Test is not applicable to $Channel"
@@ -353,9 +399,11 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
             $permissionsTestCases = @(
                 $script:linuxContainerRunTests | ForEach-Object {
+                    $Arm32 = [bool] $_.TestProperties.Arm32
                     @{
                         Name = $_.Name
                         Channel = $_.Channel
+                        Arm32 = $Arm32
                     }
                 }
             )
@@ -367,8 +415,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 [string]
                 $name,
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $path = '/opt/microsoft/powershell/6/pwsh'
 
@@ -386,8 +442,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 [string]
                 $name,
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $path = '/opt/microsoft/powershell/6/pwsh'
 
@@ -412,12 +476,14 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
             $testdepsTestCases = @()
             $script:linuxContainerRunTests | ForEach-Object {
+                $Arm32 = [bool] $_.TestProperties.Arm32
                 $name = $_.Name
                 foreach($command in $commands)
                 {
                     $testdepsTestCases += @{
                         Name = $name
                         Command = $command
+                        Arm32 = $Arm32
                     }
                 }
             }
@@ -431,8 +497,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 $name,
                 [Parameter(Mandatory=$true)]
                 [string]
-                $Command
+                $Command,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $source = Get-DockerCommandSource -Name $name -command $Command
             $source | Should -Not -BeNullOrEmpty
