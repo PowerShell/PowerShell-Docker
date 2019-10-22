@@ -47,7 +47,7 @@ COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershe
 
 RUN \
   apt-get update \
-  && apt-get install --no-install-recommends ca-certificates libunwind8 libssl1.0 libicu60 wget --yes
+  && apt-get install --no-install-recommends ca-certificates libunwind8 libssl1.0 libicu60 less --yes
 
     # Give all user execute permissions and remove write permissions for others
 RUN chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
