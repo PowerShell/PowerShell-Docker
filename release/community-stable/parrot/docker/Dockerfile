@@ -58,6 +58,7 @@ RUN \
       locales \
       # required to support NTLM for PSRemoting
       gss-ntlmssp \
+      resolvconf \
     # enable en_US.UTF-8 locale
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     # generate locale
@@ -66,8 +67,15 @@ RUN \
     && dpkg -i /tmp/libicu57_57.1-6+deb9u3_amd64.deb \
     # remove libicu57 package
     && rm -f /tmp/libicu57_57.1-6+deb9u3_amd64.deb \
+    # upgrade distro
+    && apt-get dist-upgrade -y \
+    # clean downloaded packages
+    && apt-get clean \
+    # remove package list
+    && rm -rf /var/lib/apt/lists/*
+
     # install powershell package
-    && apt-get install -y /tmp/powershell.deb \
+RUN apt-get install -y /tmp/powershell.deb \
     # remove powershell package
     && rm -f /tmp/powershell.deb \
     # Give all user execute permissions and remove write permissions for others
@@ -83,8 +91,6 @@ RUN \
             Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
             Start-Sleep -Seconds 6 ; \
           }" \
-    # upgrade distro
-    && apt-get dist-upgrade -y \
     # clean downloaded packages
     && apt-get clean \
     # remove package list
