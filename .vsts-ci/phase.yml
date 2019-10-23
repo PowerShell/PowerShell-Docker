@@ -60,6 +60,15 @@ jobs:
       condition: succeededOrFailed()
       continueOnError: ${{ parameters.continueonerror }}
 
+  - powershell: |
+      $files = @(Get-ChildItem -Recurse test*.xml)
+      if($files.count -eq 0) {
+        throw 'no test results found'
+      }
+    displayName: Make sure we got test results
+    condition: succeededOrFailed()
+    continueOnError: ${{ parameters.continueonerror }}
+
   - task: PublishTestResults@2
     condition: succeededOrFailed()
     displayName: Publish $(ImageName) Test Results **\test*.xml
