@@ -143,6 +143,7 @@ function Get-LinuxContainer
                 OptionalTests = $testArgs.OptionalTests
                 TestProperties = $testArgs.TestProperties
                 Channel = $testArgs.Channel
+                UseAcr = $testArgs.UseAcr
             }
         }
     }

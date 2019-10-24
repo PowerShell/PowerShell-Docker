@@ -522,6 +522,7 @@ class DockerTestArgs
     [string[]] $OptionalTests
     [PSCustomObject] $TestProperties
     [string] $Channel
+    [bool] $UseAcr
 }
 
 function Get-TestParams
@@ -651,6 +652,7 @@ function Get-TestParams
         OptionalTests = $allMeta.meta.OptionalTests
         TestProperties = $allMeta.meta.TestProperties
         Channel = $actualChannel
+        UseAcr = $allMeta.meta.UseAcr
     }
 
     return [DockerTestParams] @{
