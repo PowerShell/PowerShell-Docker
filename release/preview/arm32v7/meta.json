@@ -4,6 +4,7 @@
     "PackageFormat": "powershell-${PS_VERSION}-linux-arm32.tar.gz",
     "osVersion": "Ubuntu 18.04 ARM 32v7",
     "SkipGssNtlmSspTests": true,
+    "UseAcr": true,
     "tagTemplates": [
         "#psversion#-arm32v7-ubuntu-#tag#",
         "preview-arm32v7-ubuntu-#shorttag#"
