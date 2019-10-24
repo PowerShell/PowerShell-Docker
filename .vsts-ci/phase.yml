@@ -28,12 +28,6 @@ jobs:
       condition: ne(variables['ACR'], 'no')
 
   - ${{ if eq(parameters.useacr, 'true') }}:
-    - pwsh: |
-        $namespace = '$(releaseTag)'.ToLowerInvariant()
-        Write-Host "##vso[task.setvariable variable=dockerNamespace;]$namespace"
-      displayName: 'Set dockerNamespace'
-
-  - ${{ if eq(parameters.useacr, 'true') }}:
     - pwsh: 'Get-ChildItem env:'
       displayName: 'Capture Environment'
 

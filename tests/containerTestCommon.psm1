@@ -512,13 +512,16 @@ function Invoke-DockerBuild
         $UseAcr
     )
 
+    Write-Verbose "useAcr:$($UseAcr.IsPresent)" -Verbose
+
+    Write-Verbose "ACR_NAME:${env:ACR_NAME}" -Verbose
 
     $buildArgNames = $BuildArgs | Get-Member -Type NoteProperty | Select-Object -ExpandProperty Name
 
     $buildArgList = @()
 
     $extraParams = @{}
-    if($env:ACR_NAME -and $UseAcr)
+    if($env:ACR_NAME -and $UseAcr.IsPresent)
     {
         $extraParams.Add('UseAcr',$true)
         $buildArgList += @(
