@@ -1,0 +1,202 @@
+name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
+
+resources:
+- repo: self
+  clean: true
+
+variables:
+  POWERSHELL_TELEMETRY_OPTOUT: 1
+
+jobs:
+
+- job: Set_Build_Name
+  pool:
+    vmImage: ubuntu-16.04
+  displayName: Check For Duplicate Tags
+  steps:
+  - pwsh:  Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhss"))"
+    displayName: Set Build Name for Non-PR
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+
+  - pwsh: ./build.ps1 -CheckForDuplicateTags -Channel stable, preview, servicing
+    displayName: Check for Duplicate Tags
+    condition: succeededOrFailed()
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: ubuntu1604
+    imagename: ubuntu16.04
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: ubuntu1804
+    imagename: ubuntu18.04
+    stable: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: centos7
+    imagename: centos7
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: centos8
+    imagename: centos8
+    stable: false
+    preview: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: fedora
+    imagename: fedora
+    stable: false
+    preview: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: fedora28
+    imagename: fedora28
+    stable: true
+    preview: false
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: alpine
+    imagename: alpine
+    stable: true
+    preview: false
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: alpine38
+    imagename: alpine38
+    stable: false
+    preview: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: alpine39
+    imagename: alpine39
+    stable: false
+    preview: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: opensuse423
+    imagename: opensuse423
+    stable: true
+    preview: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: debian9
+    imagename: debian9
+    stable: true
+    preview: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: debian10
+    imagename: debian10
+    stable: false
+    preview: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: arm32v7
+    imagename: arm32v7
+    stable: false
+    preview: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: kaliRolling
+    imagename: kali-rolling
+    stable: false
+    preview: false
+    communityStable: true
+    continueonerror: false
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: archlinux
+    imagename: archlinux
+    stable: false
+    preview: false
+    communityStable: true
+    continueonerror: false
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: blackArch
+    imagename: blackarch
+    stable: false
+    preview: false
+    communityStable: true
+    continueonerror: false
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: parrot
+    imagename: parrot
+    stable: false
+    preview: false
+    communityStable: true
+    continueonerror: false
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: amazonLinux
+    imagename: amazonlinux
+    stable: false
+    preview: false
+    communityStable: true
+    continueonerror: false
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: oracleLinux
+    imagename: oraclelinux
+    stable: false
+    preview: false
+    communityStable: true
+    continueonerror: false
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: clearLinux
+    imagename: clearlinux
+    stable: false
+    preview: false
+    communityStable: true
+    continueonerror: true
+
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: photon
+    imagename: photon
+    stable: false
+    preview: false
+    communityStable: true
+    continueonerror: false
+
+
+# The -CI filters to LTSC-2016 for nanoserver by default, which is the only thing that works on Hosted VS2017
+# Skipping previews on windows due to how long it takes to build on windows
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: nanoserver_1809
+    imagename: nanoserver1809
+    vmImage: windows-2019
+    preview: false
+    ciParameter: '-CI -TagFilter 1809'
+    continueonerror: false
+
+# Use the TagFilter to filter to 1809 because the docker instance inside the agent only supports 1809
+- template: .vsts-ci/phase.yml
+  parameters:
+    name: windowsservercore_1809
+    vmImage: windows-2019
+    imagename: windowsservercore
+    preview: false
+    ciParameter: '-CI -TagFilter 1809'
