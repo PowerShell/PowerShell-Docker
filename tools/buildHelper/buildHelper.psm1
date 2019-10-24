@@ -165,6 +165,9 @@ class DockerImageMetaData {
 
     [PSCustomObject]
     $TagMapping
+
+    [bool]
+    $UseAcr = $false
 }
 
 class ShortTagMetaData {
