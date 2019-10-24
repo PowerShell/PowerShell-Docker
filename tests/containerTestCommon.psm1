@@ -506,7 +506,10 @@ function Invoke-DockerBuild
         $OSType,
 
         [switch]
-        $SkipPull
+        $SkipPull,
+
+        [switch]
+        $UseAcr
     )
 
 
@@ -515,7 +518,7 @@ function Invoke-DockerBuild
     $buildArgList = @()
 
     $extraParams = @{}
-    if($env:ACR_NAME)
+    if($env:ACR_NAME -and $UseAcr)
     {
         $extraParams.Add('UseAcr',$true)
         $buildArgList += @(

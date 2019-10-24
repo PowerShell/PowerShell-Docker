@@ -22,6 +22,7 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
                 Path = $_.Path
                 BuildArgs = $_.BuildArgs
                 SkipPull = $_.SkipPull
+                UseAcr = [bool]$_.UseAcr
             }
         }
     }
@@ -45,10 +46,13 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
             $BuildArgs,
 
             [bool]
-            $SkipPull
+            $SkipPull,
+
+            [bool]
+            $UseAcr
         )
 
-        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType linux -SkipPull:$SkipPull
+        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType linux -SkipPull:$SkipPull -UseAcr:$UseAcr
     }
 }
 
@@ -88,7 +92,7 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
             $SkipPull
         )
 
-        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType windows -SkipPull:$SkipPull
+        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType windows -SkipPull:$SkipPull -UseAcr
     }
 }
 
