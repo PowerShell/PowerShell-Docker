@@ -27,7 +27,7 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
         }
     }
 
-    it "<Name> builds from '<path>'" -TestCases $buildTestCases -Skip:$script:skipLinux {
+    it "<Name> builds from '<path>' - UseAcr:<UseAcr>" -TestCases $buildTestCases -Skip:$script:skipLinux {
         param(
             [Parameter(Mandatory=$true)]
             [string]
