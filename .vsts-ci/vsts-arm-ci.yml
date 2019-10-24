@@ -26,3 +26,11 @@ jobs:
     stable: false
     preview: true
     useacr: true
+
+- template: phase.yml
+  parameters:
+    name: centos7
+    imagename: centos7
+    stable: false
+    preview: true
+    useacr: true
