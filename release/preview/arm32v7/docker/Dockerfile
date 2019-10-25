@@ -31,13 +31,13 @@ RUN echo 'in task' \
         && export url="${PS_PACKAGE_URL}"; \
     fi \
     && echo "url: $url" \
-    && wget "$url" \
+    && wget -O /tmp/powershell.tar.gz "$url" \
     && echo 'task done'
 
+RUN ls -l /tmp/powershell.tar.gz
 
-RUN ls -l ${PS_PACKAGE}
     # Unzip the Linux tar.gz
-RUN tar zxf "./${PS_PACKAGE}" -C ${PS_INSTALL_FOLDER}
+RUN tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
 
 FROM ${imageRepo}:${fromTag} AS final-image
 
