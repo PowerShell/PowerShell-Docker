@@ -22,7 +22,6 @@ jobs:
   - powershell: |
       Write-Host "##vso[task.setvariable variable=ACR_NAME;]$env:ACR_NAME_VAR"
     displayName: 'Enable ACR'
-    condition: ne(variables['ACR'], 'no')
 
   - powershell: |
       $version = '$(releaseTag)' -replace '^v', ''
