@@ -335,18 +335,21 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                     # The expected value is the version, but replace - or ~ with the regex for - or ~
                     ExpectedValue = $_.ExpectedVersion  -replace '[\-~]', '[\-~]'
                     Expectation = 'Match'
+                    UseAcr = [bool]$_.UseAcr
                 }
                 $labelTestCases += @{
                     Name = $_.Name
                     Label = 'org.label-schema.vcs-ref'
                     ExpectedValue = '[0-9a-f]{7}'
                     Expectation = 'match'
+                    UseAcr = [bool]$_.UseAcr
                 }
                 $labelTestCases += @{
                     Name = $_.Name
                     Label = 'org.label-schema.docker.cmd.devel'
                     ExpectedValue = "docker run $($_.ImageName)"
                     Expectation = 'BeExactly'
+                    UseAcr = [bool]$_.UseAcr
                 }
             }
 
@@ -377,8 +380,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 [Parameter(Mandatory=$true)]
                 [ValidateSet('Match','BeExactly')]
                 [string]
-                $Expectation
+                $Expectation,
+
+                [switch]
+                $UseAcr
             )
+
+            if($env:ACR_NAME -and $UseAcr.IsPresent)
+            {
+                Set-ItResult -Pending -Because "Image is missing when building using ACR"
+            }
 
             $labelValue = Get-DockerImageLabel -Name $Name -Label $Label
             $labelValue | Should -Not -BeNullOrEmpty
