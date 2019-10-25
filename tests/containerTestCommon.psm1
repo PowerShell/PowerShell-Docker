@@ -513,10 +513,6 @@ function Invoke-DockerBuild
         $UseAcr
     )
 
-    Write-Verbose "useAcr:$($UseAcr.IsPresent)" -Verbose
-
-    Write-Verbose "ACR_NAME:${env:ACR_NAME}" -Verbose
-
     $buildArgNames = $BuildArgs | Get-Member -Type NoteProperty | Select-Object -ExpandProperty Name
 
     $buildArgList = @()
@@ -544,7 +540,7 @@ function Invoke-DockerBuild
     foreach($argName in $buildArgNames)
     {
         $value = $BuildArgs.$argName
-        if($env:ACR_NAME -and $value -match '&')
+        if($UseAcr.IsPresent -and $env:ACR_NAME -and $value -match '&')
         {
             throw "$argName contains '&' and this is not allowed in ACR using the az cli"
         }
