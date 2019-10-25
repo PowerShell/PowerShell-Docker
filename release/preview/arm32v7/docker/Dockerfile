@@ -11,17 +11,33 @@ ENV PS_PACKAGE=powershell-${PS_VERSION}-linux-arm32.tar.gz
 ENV PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7-preview
 
-# Download the Linux tar.gz and save it
-ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
-
 # define the folder we will be installing PowerShell to
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 
 # Create the install folder
 RUN mkdir -p ${PS_INSTALL_FOLDER}
 
-# Unzip the Linux tar.gz
-RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
+ARG PS_PACKAGE_URL_BASE64
+
+RUN apt-get update \
+    && apt-get install --no-install-recommends ca-certificates wget --yes
+
+RUN echo 'in task' \
+    && if [ -n "${PS_PACKAGE_URL_BASE64}" ]; then \
+        echo 'using base64' \
+        && export url=$(echo "${PS_PACKAGE_URL_BASE64}" | base64 --decode --input -);\
+    else \
+        echo 'using unencoded' \
+        && export url="${PS_PACKAGE_URL}"; \
+    fi \
+    && echo "url: $url" \
+    && wget "$url" \
+    && echo 'task done'
+
+
+RUN ls -l ${PS_PACKAGE}
+    # Unzip the Linux tar.gz
+RUN tar zxf "./${PS_PACKAGE}" -C ${PS_INSTALL_FOLDER}
 
 FROM ${imageRepo}:${fromTag} AS final-image
 
