@@ -27,11 +27,11 @@ If you are new to PowerShell and want to learn more, see the [getting started][]
 
 ## How to Use This Image
 
-See our [Docker examples](https://github.com/PowerShell/PowerShell/tree/master/docker#examples).
+See our [Docker examples](https://github.com/PowerShell/PowerShell-Docker#examples).
 
 ## Configuration
 
-See our [Docker examples](https://github.com/PowerShell/PowerShell/tree/master/docker#examples).
+See our [Docker examples](https://github.com/PowerShell/PowerShell-Docker#examples).
 
 ## Full Tag Listing
 

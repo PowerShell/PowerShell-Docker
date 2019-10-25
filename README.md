@@ -32,9 +32,9 @@ The Dockerfiles in the community folder were contributed by the community and ar
 To run PowerShell from using a container:
 
 ```sh
-$ docker run -it microsoft/powershell
-Unable to find image 'microsoft/powershell:latest' locally
-latest: Pulling from microsoft/powershell
+$ docker run -it mcr.microsoft.com/powershell
+Unable to find image 'mcr.microsoft.com/powershell:latest' locally
+latest: Pulling from mcr.microsoft.com/powershell
 cad964aed91d: Already exists
 3a80a22fea63: Already exists
 50de990d7957: Already exists
@@ -44,7 +44,7 @@ adf6ad28fa0e: Pull complete
 10db13a8ca02: Pull complete
 75bdb54ff5ae: Pull complete
 Digest: sha256:92c79c5fcdaf3027626643aef556344b8b4cbdaccf8443f543303319949c7f3a
-Status: Downloaded newer image for microsoft/powershell:latest
+Status: Downloaded newer image for mcr.microsoft.com/powershell:latest
 PowerShell
 Copyright (c) Microsoft Corporation. All rights reserved.
 
