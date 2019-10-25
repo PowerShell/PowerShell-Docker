@@ -25,7 +25,7 @@ RUN apt-get update \
 RUN echo 'in task' \
     && if [ -n "${PS_PACKAGE_URL_BASE64}" ]; then \
         echo 'using base64' \
-        && export url=$(echo "${PS_PACKAGE_URL_BASE64}" | base64 --decode --input -);\
+        && export url=$(echo "${PS_PACKAGE_URL_BASE64}" | base64 --decode -);\
     else \
         echo 'using unencoded' \
         && export url="${PS_PACKAGE_URL}"; \
