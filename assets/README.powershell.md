@@ -33,6 +33,11 @@ See our [Docker examples](https://github.com/PowerShell/PowerShell/tree/master/d
 
 See our [Docker examples](https://github.com/PowerShell/PowerShell/tree/master/docker#examples).
 
+## Related Repos
+
+- [PowerShell-test-deps](https://store.docker.com/images/microsoft-powershell-test-deps/):
+  PowerShell with Test Dependencies
+
 ## Full Tag Listing
 
 Tags go here.
