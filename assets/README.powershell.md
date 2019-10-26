@@ -48,8 +48,10 @@ For our support policy, see [PowerShell Core Support Lifecycle](https://docs.mic
 
 ## Feedback
 
-- To give feedback for PowerShell Core, file an issue at [PowerShell/Powershell](https://github.com/PowerShell/PowerShell/issues/new/choose)
-- To give feedback for how the images are built, file an issue at [PowerShell/PowerShell-Docker](https://github.com/PowerShell/PowerShell-Docker/issues/new/choose)
+- To give feedback for PowerShell Core,
+  file an issue at [PowerShell/Powershell](https://github.com/PowerShell/PowerShell/issues/new/choose)
+- To give feedback for how the images are built,
+  file an issue at [PowerShell/PowerShell-Docker](https://github.com/PowerShell/PowerShell-Docker/issues/new/choose)
 
 ## License
 
