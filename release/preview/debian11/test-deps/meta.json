@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "osVersion": "Debian 11",
+    "osVersion": "Debian 11 (Testing)",
     "tagTemplates": [
         "preview-debian-#shorttag#"
     ],
