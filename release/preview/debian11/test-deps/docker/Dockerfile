@@ -19,7 +19,7 @@ ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Debian-11
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:debian-9
+ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:debian-11
 ARG PS_VERSION=6.2.0
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
