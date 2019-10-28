@@ -10,6 +10,45 @@ ARG imageRepo=archlinux/base
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
+RUN \
+    # create a builduser
+    useradd builduser -m \
+    # delete the builduser password
+    && passwd -d builduser \
+    # enable builduser to sudo without password
+    && printf 'root ALL=(ALL) ALL\n' | tee -a /etc/sudoers \
+    # update package database
+    && pacman -Syy \
+    # install dependencies
+    && pacman -S --noconfirm \
+      # required sudo
+      sudo \
+      # required for uncompressing tar files
+      tar \
+      # required to clone gss-ntlmssp git repository
+      git \
+      # required to make gss-ntlmssp binary package
+      base-devel \
+      libwbclient \
+      docbook-xsl \
+      doxygen \
+    # change current root path to tmp directory path
+    && cd /tmp \
+    # clone the gss-ntlmssp package repository
+    && git clone https://aur.archlinux.org/gss-ntlmssp.git \
+    # change the cloned gss-ntlmssp package repository directory permission
+    && chmod 777 /tmp/gss-ntlmssp/ \
+    # change current path to gss-ntlmssp package repository folder path
+    && cd gss-ntlmssp \
+    # utilise sudo to builduser in order to make the gss-ntlmssp package
+    && sudo -u builduser bash -c makepkg -s --noconfirm
+
+# Start a new stage so we lose all the tar.gz layers from the final image
+FROM ${imageRepo}:${fromTag}
+
+# Copy only the files we need from the previous stage
+COPY --from=installer-env ["/tmp/gss-ntlmssp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.xz", "/tmp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.xz"]
+
 # Define Args for the needed to add the package
 ARG PS_VERSION=6.2.3
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
@@ -53,6 +92,8 @@ RUN \
       openssl-1.0 \
       # required for uncompressing tar files
       tar \
+    # install gss-ntlmssp package from the previous stage
+    && pacman -U --noconfirm /tmp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.xz \
     # create powershell folder
     && mkdir -p ${PS_INSTALL_FOLDER} \
     # uncompress powershell linux tar file
