@@ -16,6 +16,10 @@ update_configs:
     update_schedule: "daily"
 
   - package_manager: "docker"
+    directory: "/release/preview/debian11/dependabot"
+    update_schedule: "daily"
+
+  - package_manager: "docker"
     directory: "/release/preview/fedora/dependabot"
     update_schedule: "daily"
 
