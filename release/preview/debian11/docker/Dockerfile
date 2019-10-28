@@ -41,7 +41,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Debian-10
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Debian-11
 
 # Install dependencies and clean up
 RUN apt-get update \
