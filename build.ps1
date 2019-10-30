@@ -125,7 +125,6 @@ param(
     [switch]
     $IncludeKnownIssues,
 
-    [Parameter(Mandatory, ParameterSetName="SkipPesterInstall")]
     [switch]
     $SkipPesterInstall
 )
@@ -413,7 +412,7 @@ End {
             $extraParams.Add('Tags', $tags)
         }
 
-        if((Get-Module -ListAvailable pester -ErrorAction Ignore -Force))
+        if((Get-Module -ListAvailable pester -ErrorAction Ignore -Force) && !$SkipPesterInstall.IsPresent)
         {
             Install-Module -Name pester -Scope CurrentUser -Force
         }
