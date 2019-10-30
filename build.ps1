@@ -123,7 +123,7 @@ param(
     $ServicingVersion,
 
     [switch]
-    $IncludeKnownIssues
+    $IncludeKnownIssues,
 
     [switch]
     $SkipPesterInstall
