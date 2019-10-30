@@ -19,40 +19,40 @@ jobs:
   displayName: ${{ parameters.jobName }}
 
   steps:
-  - powershell: |
+  - pwsh: |
       Write-Host "##vso[task.setvariable variable=ACR_NAME;]$env:ACR_NAME_VAR"
     displayName: 'Enable ACR'
 
-  - powershell: |
+  - pwsh: |
       $version = '$(releaseTag)' -replace '^v', ''
       Write-Host "##vso[task.setvariable variable=Version;]$version"
     displayName: 'Set Version'
 
-  - powershell: |
+  - pwsh: |
       $namespace = '$(releaseTag)'.ToLowerInvariant()
       Write-Host "##vso[task.setvariable variable=dockerNamespace;]$namespace"
     displayName: 'Set dockerNamespace'
 
-  - powershell: 'Get-ChildItem env:'
+  - pwsh: 'Get-ChildItem env:'
     displayName: 'Capture Environment'
 
-  - powershell: 'docker login $(dockerHost) -u $(dockerUserName) -p $(dockerKey)'
+  - pwsh: 'docker login $(dockerHost) -u $(dockerUserName) -p $(dockerKey)'
     displayName: 'docker login'
 
-  - powershell: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
+  - pwsh: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
     displayName: 'az login'
 
-  - powershell: |
+  - pwsh: |
       az account set --subscription $(StorageSubscriptionName)
       $querystring = az storage account generate-sas --account-name $(StorageAccount) --services b --resource-types o --expiry ((get-date).AddDays(2).ToString("yyyy-MM-dd")) --permission r --https-only | convertfrom-json
       $url = "https://$(StorageAccount).blob.core.windows.net/?$querystring"
       Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
     displayName: 'Set SasUrl variable'
 
-  - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
+  - pwsh: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
     displayName: 'Install Pester'
 
-  - powershell: |
+  - pwsh: |
       az account set --subscription $(AcrSubscriptionName)
       $extraParams = @{}
       if($env:ACR -eq 'no')
@@ -82,11 +82,11 @@ jobs:
       }
     displayName: 'Build All $(Channel)'
 
-  - powershell: 'docker logout $(dockerHost)'
+  - pwsh: 'docker logout $(dockerHost)'
     displayName: 'docker logout'
     condition: always()
 
-  - powershell: 'az logout'
+  - pwsh: 'az logout'
     displayName: 'az logout'
 
   - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0

@@ -35,47 +35,47 @@ jobs:
     - pwsh: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
       displayName: 'az login'
 
-  - powershell: Install-module pester -Scope CurrentUser -Force
+  - pwsh: Install-module pester -Scope CurrentUser -Force
     displayName: Install Pester
     condition: succeededOrFailed()
 
   - ${{ if eq(parameters.stable, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'stable' -TestLogPostfix '$(ImageName)-stable' ${{ parameters.ciParameter }} -Repository stable/powershell
+    - pwsh: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'stable' -TestLogPostfix '$(ImageName)-stable' ${{ parameters.ciParameter }} -Repository stable/powershell
       displayName: $(ImageName) Stable
       condition: succeededOrFailed()
       continueOnError: ${{ parameters.continueonerror }}
 
   - ${{ if eq(parameters.preview, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'preview' -TestLogPostfix '$(ImageName)-preview' ${{ parameters.ciParameter }} -Repository preview/powershell
+    - pwsh: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'preview' -TestLogPostfix '$(ImageName)-preview' ${{ parameters.ciParameter }} -Repository preview/powershell
       displayName: $(ImageName) Preview
       condition: succeededOrFailed()
       continueOnError: ${{ parameters.continueonerror }}
 
   - ${{ if eq(parameters.servicing, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'servicing' -TestLogPostfix '$(ImageName)-servicing' ${{ parameters.ciParameter }} -Repository servicing/powershell
+    - pwsh: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'servicing' -TestLogPostfix '$(ImageName)-servicing' ${{ parameters.ciParameter }} -Repository servicing/powershell
       displayName: $(ImageName) Servicing
       condition: succeededOrFailed()
       continueOnError: ${{ parameters.continueonerror }}
 
   - ${{ if eq(parameters.communityStable, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'community-stable' -TestLogPostfix '$(ImageName)-stable' ${{ parameters.ciParameter }} -Repository stable/powershell
+    - pwsh: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'community-stable' -TestLogPostfix '$(ImageName)-stable' ${{ parameters.ciParameter }} -Repository stable/powershell
       displayName: $(ImageName) Stable
       condition: succeededOrFailed()
       continueOnError: ${{ parameters.continueonerror }}
 
   - ${{ if eq(parameters.communityPreview, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'community-preview' -TestLogPostfix '$(ImageName)-preview' ${{ parameters.ciParameter }} -Repository preview/powershell
+    - pwsh: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'community-preview' -TestLogPostfix '$(ImageName)-preview' ${{ parameters.ciParameter }} -Repository preview/powershell
       displayName: $(ImageName) Preview
       condition: succeededOrFailed()
       continueOnError: ${{ parameters.continueonerror }}
 
   - ${{ if eq(parameters.communityServicing, 'true') }}:
-    - powershell: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'community-servicing' -TestLogPostfix '$(ImageName)-servicing' ${{ parameters.ciParameter }} -Repository servicing/powershell
+    - pwsh: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'community-servicing' -TestLogPostfix '$(ImageName)-servicing' ${{ parameters.ciParameter }} -Repository servicing/powershell
       displayName: $(ImageName) Servicing
       condition: succeededOrFailed()
       continueOnError: ${{ parameters.continueonerror }}
 
-  - powershell: |
+  - pwsh: |
       $files = @(Get-ChildItem -Recurse test*.xml)
       if($files.count -eq 0) {
         throw 'no test results found'

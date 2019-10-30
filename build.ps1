@@ -1,3 +1,4 @@
+#!/usr/bin/pwsh
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
@@ -251,7 +252,6 @@ End {
             }
             else
             {
-
                 $toBuild += $allMeta
                 if($allMeta.Meta.SubImage)
                 {

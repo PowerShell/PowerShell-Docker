@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "PackageFormat": "powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm",
-    "SkipGssNtlmSspTests": true,
+    "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "#psversion#-amazonlinux-#tag#",
         "amazonlinux-#shorttag#"
