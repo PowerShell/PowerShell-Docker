@@ -124,6 +124,9 @@ param(
 
     [switch]
     $IncludeKnownIssues
+
+    [switch]
+    $SkipPesterInstall
 )
 
 DynamicParam {
@@ -409,6 +412,10 @@ End {
             $extraParams.Add('Tags', $tags)
         }
 
+        if(!$SkipPesterInstall)
+        {
+            Install-Module -Name pester -Scope CurrentUser -Force
+        }
         Write-Verbose -Message "logging to $logPath" -Verbose
         $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml @extraParams
         if(!$results -or $results.FailedCount -gt 0 -or !$results.PassedCount)
