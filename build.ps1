@@ -126,7 +126,7 @@ param(
     $IncludeKnownIssues,
 
     [switch]
-    $SkipPesterInstall
+    $ForcePesterInstall
 )
 
 DynamicParam {
@@ -412,7 +412,7 @@ End {
             $extraParams.Add('Tags', $tags)
         }
 
-        if((Get-Module -ListAvailable pester -ErrorAction Ignore -Force) -or !$SkipPesterInstall.IsPresent)
+        if((Get-Module -ListAvailable pester -ErrorAction Ignore -Force) -or !$ForcePesterInstall.IsPresent)
         {
             Install-Module -Name pester -Scope CurrentUser -Force
         }
