@@ -412,7 +412,7 @@ End {
             $extraParams.Add('Tags', $tags)
         }
 
-        if(!$SkipPesterInstall)
+        if((get-module -listavailable pester -erroraction ignore))
         {
             Install-Module -Name pester -Scope CurrentUser -Force
         }
