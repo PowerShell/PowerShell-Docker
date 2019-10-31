@@ -1,0 +1,36 @@
+name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
+
+resources:
+- repo: self
+  clean: true
+
+variables:
+  POWERSHELL_TELEMETRY_OPTOUT: 1
+
+jobs:
+
+- job: Set_Build_Name
+  pool:
+    vmImage: ubuntu-16.04
+  displayName: Set Build Name
+  condition: ne(variables['Build.Reason'], 'PullRequest')
+  steps:
+  - pwsh:  Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhss"))"
+    displayName: Set Build Name for Non-PR
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+
+- template: phase.yml
+  parameters:
+    name: arm32v7
+    imagename: arm32v7
+    stable: false
+    preview: true
+    useacr: true
+
+- template: phase.yml
+  parameters:
+    name: centos7
+    imagename: centos7
+    stable: false
+    preview: true
+    useacr: true

@@ -143,6 +143,7 @@ function Get-LinuxContainer
                 OptionalTests = $testArgs.OptionalTests
                 TestProperties = $testArgs.TestProperties
                 Channel = $testArgs.Channel
+                UseAcr = $testArgs.UseAcr
             }
         }
     }
@@ -506,16 +507,18 @@ function Invoke-DockerBuild
         $OSType,
 
         [switch]
-        $SkipPull
-    )
+        $SkipPull,
 
+        [switch]
+        $UseAcr
+    )
 
     $buildArgNames = $BuildArgs | Get-Member -Type NoteProperty | Select-Object -ExpandProperty Name
 
     $buildArgList = @()
 
     $extraParams = @{}
-    if($env:ACR_NAME)
+    if($env:ACR_NAME -and $UseAcr.IsPresent)
     {
         $extraParams.Add('UseAcr',$true)
         $buildArgList += @(
@@ -537,7 +540,7 @@ function Invoke-DockerBuild
     foreach($argName in $buildArgNames)
     {
         $value = $BuildArgs.$argName
-        if($env:ACR_NAME -and $value -match '&')
+        if($UseAcr.IsPresent -and $env:ACR_NAME -and $value -match '&')
         {
             throw "$argName contains '&' and this is not allowed in ACR using the az cli"
         }

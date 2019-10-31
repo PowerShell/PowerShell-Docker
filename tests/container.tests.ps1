@@ -22,11 +22,12 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
                 Path = $_.Path
                 BuildArgs = $_.BuildArgs
                 SkipPull = $_.SkipPull
+                UseAcr = [bool]$_.UseAcr
             }
         }
     }
 
-    it "<Name> builds from '<path>'" -TestCases $buildTestCases -Skip:$script:skipLinux {
+    it "<Name> builds from '<path>' - UseAcr:<UseAcr>" -TestCases $buildTestCases -Skip:$script:skipLinux {
         param(
             [Parameter(Mandatory=$true)]
             [string]
@@ -45,10 +46,13 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
             $BuildArgs,
 
             [bool]
-            $SkipPull
+            $SkipPull,
+
+            [bool]
+            $UseAcr
         )
 
-        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType linux -SkipPull:$SkipPull
+        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType linux -SkipPull:$SkipPull -UseAcr:$UseAcr
     }
 }
 
@@ -88,7 +92,7 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
             $SkipPull
         )
 
-        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType windows -SkipPull:$SkipPull
+        Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType windows -SkipPull:$SkipPull -UseAcr
     }
 }
 
@@ -156,24 +160,30 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
         $testContext = Get-TestContext -type Linux
         $runTestCases = @()
         $script:linuxContainerRunTests | ForEach-Object {
+            $Arm32 = [bool] $_.TestProperties.Arm32
             $runTestCases += @{
                 Name = $_.Name
                 ExpectedVersion = $_.ExpectedVersion
                 Channel = $_.Channel
+                Arm32 = $Arm32
             }
         }
 
         $webTestCases = @()
         $script:linuxContainerRunTests | Where-Object {$_.SkipWebCmdletTests -ne $true} | ForEach-Object {
+            $Arm32 = [bool] $_.TestProperties.Arm32
             $webTestCases += @{
                 Name = $_.Name
+                Arm32 = $Arm32
             }
         }
 
         $gssNtlmSspTestCases = @()
         $script:linuxContainerRunTests | Where-Object {$_.SkipGssNtlmSspTests -ne $true} | ForEach-Object {
+            $Arm32 = [bool] $_.TestProperties.Arm32
             $gssNtlmSspTestCases += @{
                 Name = $_.Name
+                Arm32 = $Arm32
             }
         }
     }
@@ -200,8 +210,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $actualVersion = Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name
             $actualVersion | should -be $ExpectedVersion
@@ -211,8 +229,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
-                $name
+                $name,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $metadataString = Get-MetadataUsingContainer -Name $Name
             $metadataString | Should -Not -BeNullOrEmpty
@@ -232,8 +258,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $culture = Get-UICultureUsingContainer -Name $Name
             $culture | Should -Not -BeNullOrEmpty
@@ -244,8 +278,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
-                $name
+                $name,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $gssNtlmSspPath = Get-LinuxGssNtlmSsp -Name $Name
             $gssNtlmSspPath | Should -Not -BeNullOrEmpty
@@ -263,8 +305,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             if ($Channel -ne 'preview') {
                 Set-ItResult -Skipped -Because "Test is not applicable to $Channel"
@@ -285,18 +335,21 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                     # The expected value is the version, but replace - or ~ with the regex for - or ~
                     ExpectedValue = $_.ExpectedVersion  -replace '[\-~]', '[\-~]'
                     Expectation = 'Match'
+                    UseAcr = [bool]$_.UseAcr
                 }
                 $labelTestCases += @{
                     Name = $_.Name
                     Label = 'org.label-schema.vcs-ref'
                     ExpectedValue = '[0-9a-f]{7}'
                     Expectation = 'match'
+                    UseAcr = [bool]$_.UseAcr
                 }
                 $labelTestCases += @{
                     Name = $_.Name
                     Label = 'org.label-schema.docker.cmd.devel'
                     ExpectedValue = "docker run $($_.ImageName)"
                     Expectation = 'BeExactly'
+                    UseAcr = [bool]$_.UseAcr
                 }
             }
 
@@ -327,8 +380,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 [Parameter(Mandatory=$true)]
                 [ValidateSet('Match','BeExactly')]
                 [string]
-                $Expectation
+                $Expectation,
+
+                [switch]
+                $UseAcr
             )
+
+            if($env:ACR_NAME -and $UseAcr.IsPresent)
+            {
+                Set-ItResult -Pending -Because "Image is missing when building using ACR"
+            }
 
             $labelValue = Get-DockerImageLabel -Name $Name -Label $Label
             $labelValue | Should -Not -BeNullOrEmpty
@@ -353,9 +414,11 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
             $permissionsTestCases = @(
                 $script:linuxContainerRunTests | ForEach-Object {
+                    $Arm32 = [bool] $_.TestProperties.Arm32
                     @{
                         Name = $_.Name
                         Channel = $_.Channel
+                        Arm32 = $Arm32
                     }
                 }
             )
@@ -367,8 +430,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 [string]
                 $name,
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $path = '/opt/microsoft/powershell/6/pwsh'
 
@@ -386,8 +457,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 [string]
                 $name,
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $path = '/opt/microsoft/powershell/6/pwsh'
 
@@ -412,12 +491,14 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
             $testdepsTestCases = @()
             $script:linuxContainerRunTests | ForEach-Object {
+                $Arm32 = [bool] $_.TestProperties.Arm32
                 $name = $_.Name
                 foreach($command in $commands)
                 {
                     $testdepsTestCases += @{
                         Name = $name
                         Command = $command
+                        Arm32 = $Arm32
                     }
                 }
             }
@@ -431,8 +512,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 $name,
                 [Parameter(Mandatory=$true)]
                 [string]
-                $Command
+                $Command,
+
+                [Bool]
+                $Arm32
             )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
 
             $source = Get-DockerCommandSource -Name $name -command $Command
             $source | Should -Not -BeNullOrEmpty

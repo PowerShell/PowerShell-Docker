@@ -22,7 +22,6 @@ jobs:
   - pwsh: |
       Write-Host "##vso[task.setvariable variable=ACR_NAME;]$env:ACR_NAME_VAR"
     displayName: 'Enable ACR'
-    condition: ne(variables['ACR'], 'no')
 
   - pwsh: |
       $version = '$(releaseTag)' -replace '^v', ''
