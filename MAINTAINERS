@@ -9,45 +9,45 @@
 #
 [Org]
 
-	[Org."Core maintainers"]
+    [Org."Core maintainers"]
 
-	# The Core maintainers are the ghostbusters of the project: when there's a problem others
-	# can't solve, they show up and fix it with bizarre devices and weaponry.
-	# They have final say on technical implementation and coding style.
-	# They are ultimately responsible for quality in all its forms: usability polish,
-	# bugfixes, performance, stability, etc. When ownership  can cleanly be passed to
-	# a subsystem, they are responsible for doing so and holding the
-	# subsystem maintainers accountable. If ownership is unclear, they are the de facto owners.
+    # The Core maintainers are the ghostbusters of the project: when there's a problem others
+    # can't solve, they show up and fix it with bizarre devices and weaponry.
+    # They have final say on technical implementation and coding style.
+    # They are ultimately responsible for quality in all its forms: usability polish,
+    # bugfixes, performance, stability, etc. When ownership  can cleanly be passed to
+    # a subsystem, they are responsible for doing so and holding the
+    # subsystem maintainers accountable. If ownership is unclear, they are the de facto owners.
 
-		people = [
-			"TravisEz13",
-			"anmenega"
-		]
+    people = [
+        "TravisEz13"
+    ]
 
-	[Org.Curators]
+    [Org.Curators]
 
-	# The curators help ensure that incoming issues and pull requests are properly triaged and
-	# that our various contribution and reviewing processes are respected. With their knowledge of
-	# the repository activity, they can also guide contributors to relevant material or
-	# discussions.
-	#
-	# They are neither code nor docs reviewers, so they are never expected to merge. They can
-	# however:
-	# - close an issue or pull request when it's an exact duplicate
-	# - close an issue or pull request when it's inappropriate or off-topic
+    # The curators help ensure that incoming issues and pull requests are properly triaged and
+    # that our various contribution and reviewing processes are respected. With their knowledge of
+    # the repository activity, they can also guide contributors to relevant material or
+    # discussions.
+    # They are never expected to merge. They can however:
+    # - close an issue or pull request when it's an exact duplicate
+    # - close an issue or pull request when it's inappropriate or off-topic
+    # - make initial reviews for issues such as syntax errors and basic issues in code/docs
 
-		people = [
-			"RDIL"
-		]
+    people = [
+        "RDIL"
+    ]
 
-	[Org.Alumni]
+    [Org.Alumni]
 
-	# This list contains maintainers that are no longer active on the project.
-	# It is thanks to these people that the project has become what it is today.
-	# Thank you!
+    # This list contains maintainers that are no longer active, or only slightly
+    # active on the project.
+    # It is thanks to these people that the project has become what it is today.
+    # Thank you!
 
-		people = [
-		]
+    people = [
+        "anmenega"
+    ]
 
 [people]
 
@@ -55,29 +55,29 @@
 # All other sections should refer to people by their canonical key
 # in the people section.
 
-	# ADD YOURSELF HERE IN ALPHABETICAL ORDER (First name)
+    # ADD YOURSELF HERE IN ALPHABETICAL ORDER (First name)
 
-  [people.adityapatwardhan]
-  Name = "Aditya Patwardhan"
-  Email = ""
-  GitHub = "adityapatwardhan"
+    [people.adityapatwardhan]
+        Name = "Aditya Patwardhan"
+        Email = ""
+        GitHub = "adityapatwardhan"
 
-	[people.andrew]
-	Name = "Andrew Menagarishvili"
-	Email = ""
-	GitHub = "anmenaga"
+    [people.andrew]
+        Name = "Andrew Menagarishvili"
+        Email = ""
+        GitHub = "anmenaga"
 
-  [people.rdil]
-  Name = "Reece Dunham"
-  Email = "me@rdil.rocks"
-  GitHub = "RDIL"
+    [people.rdil]
+        Name = "Reece Dunham"
+        Email = "me@rdil.rocks"
+        GitHub = "RDIL"
 
-  [people.kiazhi]
-  Name = "Ryen Tang"
-  Email = "Ryen.Tang@outlook.sg"
-  GitHub = "kiazhi"
+    [people.kiazhi]
+        Name = "Ryen Tang"
+        Email = "Ryen.Tang@outlook.sg"
+        GitHub = "kiazhi"
 
-  [people.travisez13]
-  Name = "Travis Plunk"
-  Email = "github@ez13.net"
-  GitHub = "TravisEz13"
+    [people.travisez13]
+        Name = "Travis Plunk"
+        Email = "github@ez13.net"
+        GitHub = "TravisEz13"
