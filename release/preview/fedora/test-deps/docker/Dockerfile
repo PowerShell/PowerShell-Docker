@@ -3,7 +3,7 @@ ARG BaseImage=mcr.microsoft.com/powershell:fedora-28
 
 FROM ${BaseImage}
 
-ARG fromTag=28
+ARG fromTag=30
 
 # Install dependencies and clean up
 RUN dnf install -y \
@@ -19,8 +19,8 @@ ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Fedora-${fromTag}
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:fedora-28
-ARG PS_VERSION=6.2.0
+ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:fedora-30
+ARG PS_VERSION=6.2.3
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
