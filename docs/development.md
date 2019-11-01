@@ -18,7 +18,8 @@ For example, the `stable` Ubuntu 16.04 image is in `release/stable/ubuntu16.04`.
 In this folder, there are 4 items:
 
 * `docker` - A folder containing the `Dockerfile` to build the image and any other files needed in the Docker build context.
-* `test-deps` - Directory for a sub-image. See the [`test-deps` image purpose](./index.md#test-dep-images).
+* `test-deps` (official images only) - Directory for a sub-image. See the [`test-deps` image purpose](./index.md#test-dep-images).
+* `dependabot` (optional) - in this directory you can put a dummy `Dockerfile` for [Dependabot](https://dependabot.com) to auto-bump the version. See [Dependabot](#dependabot).
 * `meta.json` - See [this section](#metadata-files) later.
 * `getLatestTag.ps1` - This script should use the `Get-DockerTags` command from `tools\getDockerTags` to get the tags that should be used as the tag in the `FROM` statement in the Dockerfile.
 
@@ -152,3 +153,27 @@ This file *is **required*** for all containers. Here is the bare minimum:
 ```
 
 You should also add [tags](#tags) as a field.
+
+## Dependabot
+
+This repository has [Dependabot](https://dependabot.com) enabled on it.
+
+The PRs opened for automatic base-image-version bumps will be closed, but the version will most likely get increased.
+
+### Adding to a new Image
+
+You will need to put a `Dockerfile` in the `dependabot` directory of your image, simply containing:
+
+```dockerfile
+FROM my-base-image:1.0.0
+```
+
+You will also need to add an entry in the `/.dependabot/config.yml` file. Here is a template for that:
+
+```yaml
+- package_manager: "docker"
+    directory: "/release/theChannelHere/theImageHere/dependabot"
+    update_schedule: "daily"
+```
+
+> **Do not use `latest` as the base**, as this makes the whole purpose invalid!
