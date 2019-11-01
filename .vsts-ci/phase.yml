@@ -32,8 +32,12 @@ jobs:
       displayName: 'Capture Environment'
 
   - ${{ if eq(parameters.useacr, 'true') }}:
-    - pwsh: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
+    - pwsh: 'az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
       displayName: 'az login'
+
+  - pwsh: Install-module pester -Scope CurrentUser -Force
+    displayName: Install Pester
+    condition: succeededOrFailed()
 
   - ${{ if eq(parameters.stable, 'true') }}:
     - pwsh: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'stable' -TestLogPostfix '$(ImageName)-stable' ${{ parameters.ciParameter }} -Repository stable/powershell
