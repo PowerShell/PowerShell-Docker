@@ -411,7 +411,7 @@ End {
             $extraParams.Add('Tags', $tags)
         }
 
-        if((Get-Module -ListAvailable pester -ErrorAction Ignore) -or $ForcePesterInstall.IsPresent)
+        if(!(Get-Module -ListAvailable pester -ErrorAction Ignore) -or $ForcePesterInstall.IsPresent)
         {
             Install-Module -Name pester -Scope CurrentUser -Force
         }
