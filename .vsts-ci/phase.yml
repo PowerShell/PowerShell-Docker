@@ -32,7 +32,7 @@ jobs:
       displayName: 'Capture Environment'
 
   - ${{ if eq(parameters.useacr, 'true') }}:
-    - pwsh: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
+    - pwsh: 'az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
       displayName: 'az login'
 
   - pwsh: Install-module pester -Scope CurrentUser -Force
