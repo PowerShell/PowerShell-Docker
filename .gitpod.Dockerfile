@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/powershell:latest
 USER root
 
 RUN apt-get update \
-    && sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian \
+    && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian \
         $(lsb_release -cs) \
         stable" \
     && apt-get --yes install \
