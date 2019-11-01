@@ -20,7 +20,8 @@
     # subsystem maintainers accountable. If ownership is unclear, they are the de facto owners.
 
     people = [
-        "TravisEz13"
+        "TravisEz13",
+        "anmenega"
     ]
 
     [Org.Curators]
@@ -40,13 +41,11 @@
 
     [Org.Alumni]
 
-    # This list contains maintainers that are no longer active, or only slightly
-    # active on the project.
+    # This list contains maintainers that are no longer active.
     # It is thanks to these people that the project has become what it is today.
     # Thank you!
 
     people = [
-        "anmenega"
     ]
 
 [people]
