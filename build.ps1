@@ -126,7 +126,7 @@ param(
     $IncludeKnownIssues,
 
     [switch]
-    $RequirePesterInstall
+    $ForcePesterInstall
 )
 
 DynamicParam {
@@ -134,7 +134,6 @@ DynamicParam {
     $buildHelperPath = Join-Path -Path $PSScriptRoot -ChildPath 'tools/buildHelper'
 
     Import-Module $buildHelperPath -Force
-
 
     # Get the names of the builds.
     $releasePath = Join-Path -Path $PSScriptRoot -ChildPath 'release'
@@ -412,7 +411,7 @@ End {
             $extraParams.Add('Tags', $tags)
         }
 
-        if((Get-Module -ListAvailable pester -ErrorAction Ignore -Force) -or $RequirePesterInstall.IsPresent)
+        if((Get-Module -ListAvailable pester -ErrorAction Ignore) -or $ForcePesterInstall.IsPresent)
         {
             Install-Module -Name pester -Scope CurrentUser -Force
         }
