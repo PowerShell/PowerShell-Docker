@@ -20,10 +20,6 @@ jobs:
   pool:
     vmImage: ${{ parameters.vmImage }}
   steps:
-  - powershell: Install-module pester -Scope CurrentUser -Force
-    displayName: Install Pester
-    condition: succeededOrFailed()
-
   - ${{ if eq(parameters.stable, 'true') }}:
     - powershell: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'stable' -TestLogPostfix '$(ImageName)-stable' ${{ parameters.ciParameter }} -Repository stable/powershell
       displayName: $(ImageName) Stable
