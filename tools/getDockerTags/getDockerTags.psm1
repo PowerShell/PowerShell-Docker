@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+#Requires -Version 6.2
 # function to deal with pagination
 # which does not happen according to spec'ed behavior
 function Get-DockerTagsList
@@ -17,7 +18,7 @@ function Get-DockerTagsList
         $nextUrl = $Url
         while($nextUrl)
         {
-            $results = Invoke-RestMethod $nextUrl
+            $results = Invoke-RestMethod $nextUrl -MaximumRetryCount 5 -RetryIntervalSec 12
             if($results.results)
             {
                 $results.results.$PropertyName | ForEach-Object {Write-Output $_}
