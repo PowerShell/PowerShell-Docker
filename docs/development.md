@@ -144,7 +144,7 @@ Tags you can use:
 
 ## Metadata Files
 
-This file *is **required*** for Linux containers. Here is the bare minimum:
+This file *is **required*** for all containers. Here is the bare minimum:
 
 ```json
 {
