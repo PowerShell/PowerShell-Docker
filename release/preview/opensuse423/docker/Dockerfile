@@ -23,7 +23,8 @@ RUN mkdir -p ${PS_INSTALL_FOLDER}
 
 # Install dependencies
 RUN zypper --non-interactive update --skip-interactive \
-    && zypper addrepo https://download.opensuse.org/repositories/home:savornicesei/openSUSE_Tumbleweed/home:savornicesei.repo \
+    && zypper addrepo --yes \
+        https://download.opensuse.org/repositories/home:savornicesei/openSUSE_Tumbleweed/home:savornicesei.repo \
     && zypper refresh
 
 RUN zypper --non-interactive install \
