@@ -22,7 +22,7 @@ jobs:
     displayName: Check for Duplicate Tags
     condition: succeededOrFailed()
 
-- job: Secret Scan
+- job: Set_Build_Name
   pool: 'Hosted VS2017'
   displayName: Secret Scan
 
@@ -41,7 +41,7 @@ jobs:
     continueOnError: true
 
   - task: securedevelopmentteam.vss-secure-development-tools.build-task-postanalysis.PostAnalysis@1
-    displayName: 'Check for failures'
+    displayName: 'Check for Failures'
     inputs:
       CredScan: true
       ToolLogsNotFoundAction: Error
