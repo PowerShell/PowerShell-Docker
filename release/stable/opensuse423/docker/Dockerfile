@@ -22,7 +22,9 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 RUN mkdir -p ${PS_INSTALL_FOLDER}
 
 # Install dependencies
-RUN zypper --non-interactive update --skip-interactive
+RUN zypper --non-interactive update --skip-interactive \
+    && zypper addrepo https://download.opensuse.org/repositories/home:savornicesei/openSUSE_Tumbleweed/home:savornicesei.repo \
+    && zypper refresh
 
 RUN zypper --non-interactive install \
         tar
