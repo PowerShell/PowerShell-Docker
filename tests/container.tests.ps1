@@ -27,7 +27,7 @@ Describe "Build Linux Containers" -Tags 'Build', 'Linux' {
         }
     }
 
-    it "<Name> builds from '<path>' - UseAcr:<UseAcr>" -TestCases $buildTestCases -Skip:$script:skipLinux {
+    it "can build image <Name> from '<path>' - UseAcr:<UseAcr>" -TestCases $buildTestCases -Skip:$script:skipLinux {
         param(
             [Parameter(Mandatory=$true)]
             [string]
@@ -70,7 +70,7 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
         }
     }
 
-    it "<Name> builds from '<path>'" -TestCases $buildTestCases -skip:$script:skipWindows {
+    it "can build image <Name> from '<path>'" -TestCases $buildTestCases -skip:$script:skipWindows {
         param(
             [Parameter(Mandatory=$true)]
             [string]
@@ -187,7 +187,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             }
         }
     }
-    AfterAll{
+    AfterAll {
         # prune unused volumes
         $null=Invoke-Docker -Command 'volume', 'prune' -Params '--force' -SuppressHostOutput
     }
@@ -197,8 +197,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
     }
 
     Context "Run Powershell" {
-
-        it "Get PSVersion table from <Name> should be <ExpectedVersion>" -TestCases $runTestCases -Skip:$script:skipLinuxRun {
+        it "PSVersion table from <Name> should contain <ExpectedVersion>" -TestCases $runTestCases -Skip:$script:skipLinuxRun {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
@@ -363,7 +362,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             }
         }
 
-        it "Image <Name> should have label: <Label>, with value: <ExpectedValue>" -TestCases $labelTestCases -Skip:$script:skipLinuxRun {
+        it "Image <Name> should have label <Label> with value: <ExpectedValue>" -TestCases $labelTestCases -Skip:$script:skipLinuxRun {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
@@ -410,8 +409,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
     }
 
     Context "permissions" {
-        BeforeAll{
-
+        BeforeAll {
             $permissionsTestCases = @(
                 $script:linuxContainerRunTests | ForEach-Object {
                     $Arm32 = [bool] $_.TestProperties.Arm32
@@ -451,6 +449,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             $permissions = Get-DockerImagePwshPermissions -Name $name -Path $path
             $permissions | Should -Match '^[\-rw]{3}x([\-rw]{2}x){2}$' -Because 'Everyone should be able to execute'
         }
+
         it "pwsh should NOT have write permissions for others in <channel>-<Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
             param(
                 [Parameter(Mandatory=$true)]
@@ -481,7 +480,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
     }
 
     Context "default executables" {
-        BeforeAll{
+        BeforeAll {
             #apt-utils ca-certificates curl wget apt-transport-https locales gnupg2 inetutils-ping git sudo less procps
             $commands = @(
                 #'locale-gen'
@@ -620,7 +619,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
     }
 
     Context "Size" {
-        BeforeAll{
+        BeforeAll {
             $sizeTestCases = @($script:linuxContainerRunTests | ForEach-Object {
                 $size = $_.TestProperties.size
                 @{
@@ -837,7 +836,7 @@ Describe "Push Linux Containers" -Tags 'Linux', 'Push' {
 }
 
 Describe "Push Windows Containers" -Tags 'Windows', 'Push' {
-    BeforeAll{
+    BeforeAll {
         $pushTestCases = @()
         $script:windowsContainerRunTests | ForEach-Object {
             $pushTestCases += @{
