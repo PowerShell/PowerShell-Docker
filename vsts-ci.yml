@@ -22,7 +22,7 @@ jobs:
     displayName: Check for Duplicate Tags
     condition: succeededOrFailed()
 
-- job: Set_Build_Name
+- job: Secret_Scan
   pool: 'Hosted VS2017'
   displayName: Secret Scan
 
