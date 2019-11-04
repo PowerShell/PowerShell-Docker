@@ -1,7 +1,7 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# Gets the Current version of PowerShell from the PowerShell repo
+# Gets the current version of PowerShell from the PowerShell repo
 # or formats the version based on the parameters
 
 function Get-PowerShellVersion
