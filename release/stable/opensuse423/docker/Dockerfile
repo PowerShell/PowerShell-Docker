@@ -22,8 +22,8 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 RUN mkdir -p ${PS_INSTALL_FOLDER}
 
 # Install dependencies
-RUN zypper --non-interactive update --skip-interactive \
-    && zypper addrepo --yes \
+RUN zypper -n update --skip-interactive \
+    && zypper addrepo -n \
         https://download.opensuse.org/repositories/home:savornicesei/openSUSE_Tumbleweed/home:savornicesei.repo \
     && zypper refresh
 
@@ -56,8 +56,8 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 
 
 # Install dependencies
-RUN zypper --non-interactive update --skip-interactive \
-    && zypper --non-interactive install \
+RUN zypper -n update --skip-interactive \
+    && zypper -n install \
         glibc-locale \
         glibc-i18ndata \
         libicu \
