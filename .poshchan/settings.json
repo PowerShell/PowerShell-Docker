@@ -4,8 +4,7 @@
         "organization": "powershell",
         "project": "docker",
         "build_targets": {
-            "CI": "docker-PR",
-            "secretscan": "Docker-CI-Secret-Scan",
+            "CI": "docker-PR"
         },
         "authorized_users": [
             "SteveL-MSFT",
