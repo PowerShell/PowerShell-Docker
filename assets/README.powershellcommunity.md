@@ -4,7 +4,9 @@
 
 ## Docker pull command
 
-`docker pull pshorg/powershellcommunity`
+```bash
+$ docker pull pshorg/powershellcommunity
+```
 
 ## Tags
 
