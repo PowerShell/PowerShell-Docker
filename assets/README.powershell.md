@@ -62,7 +62,7 @@ PowerShell is licensed under the [MIT license][].
 By requesting and using the Container OS image for Windows containers, you acknowledge, understand,
 and consent to the Supplemental License Terms available on Docker Hub:
 
-- [Window Server Core](https://store.docker.com/_/windowsservercore)
+- [Windows Server Core](https://store.docker.com/_/windowsservercore)
 - [Nano Server](https://store.docker.com/_/nanoserver)
 
 [Third-Party Software Notices and Information](https://github.com/PowerShell/PowerShell/blob/master/ThirdPartyNotices.txt)
