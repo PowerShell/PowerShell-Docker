@@ -23,7 +23,7 @@ RUN mkdir -p ${PS_INSTALL_FOLDER}
 
 # Install dependencies
 RUN zypper --non-interactive update --skip-interactive \
-    && zypper -n addrepo \
+    && zypper --non-interactive addrepo \
         https://download.opensuse.org/repositories/home:savornicesei/openSUSE_Tumbleweed/home:savornicesei.repo \
     && zypper refresh
 
@@ -58,7 +58,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OpenSUSE-${fromTag}
 
 # Install dependencies
-RUN zypper -n update --skip-interactive \
+RUN zypper --non-interactive update --skip-interactive \
     && zypper -n install \
         glibc-locale \
         glibc-i18ndata \
