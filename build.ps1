@@ -243,7 +243,7 @@ End {
                 -Strict:$CheckForDuplicateTags.IsPresent
 
             $nameForMessage = Split-Path -Leaf -Path $dockerFileName
-            $message = "Channel: $nameForMessage does not exist.  Not every image exists in every channel.  Skipping."
+            $message = "$nameForMessage does not exist in every channel. Skipping."
             if(!$allMeta)
             {
                 Write-Warning $message
