@@ -59,7 +59,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 
 # Install dependencies
 RUN zypper --non-interactive update --skip-interactive \
-    && zypper -n install \
+    && zypper --non-interactive install \
         glibc-locale \
         glibc-i18ndata \
         libicu \
