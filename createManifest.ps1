@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 # Used to create a container manifest.
 # Prereq: you must login to $ContainerRegistery before running this script
 # default scenarios is to build a `latest` tag which will point to the `ubuntu-16.04` tag for linux
