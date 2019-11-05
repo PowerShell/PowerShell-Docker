@@ -35,7 +35,15 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
       gssntlmssp \
     && ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh \
     # For whatever reason FEDORA-2019-27e7b92407 has to be patched manually
-    && dnf upgrade -y libmodulemd1 \
+    # to do this, upgrade libmodulemd1, if it is installed
+    && pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          \$module = (dnf list installed libmodulemd1 | Select-String -SimpleMatch libmodulemd1);  \
+          if(\$module) { \
+             dnf upgrade -y libmodulemd1 \
+          }" \
     # This installs most security advisories
     && dnf upgrade-minimal -y --security \
     # query and install any remaining security advisories
