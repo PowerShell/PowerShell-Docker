@@ -22,21 +22,40 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
 # Install dependencies and clean up
 RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
     && dnf install -y /tmp/powershell.rpm \
-    && dnf install -y \
-    # less is needed for help
-    less \
-    # Needed to run localdef
-        glibc-locale-source \
-    # Invoke-WebRequest doesn't work correctly without this
-    compat-openssl10 \
-    ca-certificates \
-    gssntlmssp \
-    && dnf upgrade-minimal -y --security \
-    && dnf clean all \
-    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # remove powershell package
     && rm /tmp/powershell.rpm \
+    && dnf install -y \
+    # less is needed for help
+      less \
+    # Needed to run localdef
+      glibc-locale-source \
+    # Invoke-WebRequest doesn't work correctly without this
+      compat-openssl10 \
+      ca-certificates \
+      gssntlmssp \
     && ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh \
+    # For whatever reason FEDORA-2019-27e7b92407 has to be patched manually
+    && dnf upgrade -y libmodulemd1 \
+    # This installs most security advisories
+    && dnf upgrade-minimal -y --security \
+    # query and install any remaining security advisories
+    && pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          (dnf updateinfo list -q --security) |  \
+              Foreach-Object { \
+                  \$advisory=(\$_ -split ' ')[0]; \
+                  Write-Host '******* Patching *********'; \
+                  Write-Host \$advisory; \
+                  Write-Host '************************'; \
+                  dnf upgrade -y --advisory=\$advisory \
+              }" \
+    && echo "verifying all security advisories are installed..." \
+    && dnf updateinfo list -q --security \
+    && echo "end - verifying all security advisories are installed..." \
+    && dnf clean all \
+    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
