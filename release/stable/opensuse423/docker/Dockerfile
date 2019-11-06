@@ -23,8 +23,11 @@ RUN mkdir -p ${PS_INSTALL_FOLDER}
 
 # Install dependencies
 RUN zypper --non-interactive update --skip-interactive \
+    # GSS-NTLMSSP is in this repository
     && zypper --non-interactive addrepo \
-        https://download.opensuse.org/repositories/home:savornicesei/openSUSE_Tumbleweed/home:savornicesei.repo \
+        https://download.opensuse.org/repositories/home:savornicesei/openSUSE_Leap_15.1/home:savornicesei.repo \
+        # install gpg without stdin errors
+        | echo 'a' \
     && zypper refresh
 
 RUN zypper --non-interactive install \
