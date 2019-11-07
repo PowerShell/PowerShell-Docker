@@ -22,6 +22,30 @@ jobs:
     displayName: Check for Duplicate Tags
     condition: succeededOrFailed()
 
+- job: Secret_Scan
+  pool: 'Hosted VS2017'
+  displayName: Secret Scan
+
+  steps:
+  - powershell:  Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhmmss"))"
+    displayName: Set Build Name for Non-PR
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+
+  - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
+    displayName: 'Scan for secrets'
+    inputs:
+      debugMode: false
+
+  - task: securedevelopmentteam.vss-secure-development-tools.build-task-publishsecurityanalysislogs.PublishSecurityAnalysisLogs@2
+    displayName: 'Publish Secret Scan Logs to Build Artifacts'
+    continueOnError: true
+
+  - task: securedevelopmentteam.vss-secure-development-tools.build-task-postanalysis.PostAnalysis@1
+    displayName: 'Check for Failures'
+    inputs:
+      CredScan: true
+      ToolLogsNotFoundAction: Error
+
 - template: .vsts-ci/phase.yml
   parameters:
     name: ubuntu1604
