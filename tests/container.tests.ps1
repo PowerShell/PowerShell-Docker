@@ -813,6 +813,7 @@ Describe "Push Linux Containers" -Tags 'Linux', 'Push' {
             $pushTestCases += @{
                 Tags = $_.Tags
                 Name = $_.Name
+                UseAcr = [bool]$_.UseAcr
             }
         }
     }
@@ -825,8 +826,16 @@ Describe "Push Linux Containers" -Tags 'Linux', 'Push' {
 
             [Parameter(Mandatory=$true)]
             [string[]]
-            $Tags
+            $Tags,
+
+            [switch]
+            $UseAcr
         )
+
+        if($env:ACR_NAME -and $UseAcr.IsPresent)
+        {
+            Set-ItResult -Pending -Because "Image is missing when building using ACR"
+        }
 
         foreach($tag in $tags) {
             Invoke-Docker -Command push -Params @(
