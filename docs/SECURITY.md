@@ -4,12 +4,12 @@
 
 These versions are currently being supported with security updates:
 
-| Version            | Supported           |
-| ------------------ | ------------------- |
-| Stable             | :white_check_mark:  |
-| Community Stable   | :white_check_mark:  |
-| Preview            | :white_check_mark:  |
-| Servicing          | Critical Isses Only |
+| Version            | Supported            |
+| ------------------ | -------------------- |
+| Stable             | :white_check_mark:   |
+| Community Stable   | :white_check_mark:   |
+| Preview            | :white_check_mark:   |
+| Servicing          | Critical Isseus Only |
 
 ## Reporting a Vulnerability
 
