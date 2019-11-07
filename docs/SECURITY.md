@@ -9,7 +9,7 @@ These versions are currently being supported with security updates:
 | Stable             | :white_check_mark:   |
 | Community Stable   | :white_check_mark:   |
 | Preview            | :white_check_mark:   |
-| Servicing          | Critical Isseus Only |
+| Servicing          | Critical Issues Only |
 
 ## Reporting a Vulnerability
 
