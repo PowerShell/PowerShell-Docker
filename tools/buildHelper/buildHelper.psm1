@@ -92,7 +92,7 @@ function Get-ImageList
 
     if ($Channel -in 'community-stable', 'all')
     {
-        Get-ChildItem -Path $communityStablePath -Directory | Select-Object -ExpandProperty Name | Where-Object { $dockerFileNames -notcontains "clearlinux" } | Write-Output
+        Get-ChildItem -Path $communityStablePath -Directory | Select-Object -ExpandProperty Name | Where-Object { $dockerFileNames -notcontains "clearlinux" } | Where-Object { $dockerFileNames -notcontains "parrot" } | Where-Object { $dockerFileNames -contains "kali" } | Write-Output
     }
 }
 
