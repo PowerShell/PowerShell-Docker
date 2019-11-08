@@ -92,7 +92,7 @@ function Get-ImageList
 
     if ($Channel -in 'community-stable', 'all')
     {
-        Get-ChildItem -Path $communityStablePath -Directory | Select-Object -ExpandProperty Name | Where-Object { $dockerFileNames -notcontains "clearlinux" } | Write-Output
+        Get-ChildItem -Path $communityStablePath -Directory | Select-Object -ExpandProperty Name | Write-Output
     }
 }
 
@@ -156,6 +156,9 @@ class DockerImageMetaData {
 
     [bool]
     $UseAcr = $false
+    
+    [bool]
+    $IsBroken = $false
 }
 
 class ShortTagMetaData {
@@ -391,6 +394,13 @@ function Get-DockerImageMetaDataWrapper
     }
 
     $meta = Get-DockerImageMetaData -Path $metaJsonPath
+
+    # if the image is broken and we shouldn't include known issues,
+    # do this
+    if(!$IncludeKnownIssues.IsPresent -and $meta.Broken -ne $null) {
+        return
+    }
+
     $tagsTemplates = $meta.tagTemplates
 
     $getTagsExtraParams = @{}
@@ -399,13 +409,10 @@ function Get-DockerImageMetaDataWrapper
     {
         $shortTags = @()
         foreach ($shortTag in $meta.ShortTags) {
-            if(!$shortTag.KnownIssue -or $IncludeKnownIssues.IsPresent)
-            {
-                $shortTags += $shortTag.Tag
-            }
+            $shortTags += $shortTag.Tag
         }
 
-        $getTagsExtraParams.Add('ShortTags',$shortTags)
+        $getTagsExtraParams.Add('ShortTags', $shortTags)
     }
 
     if(!$TagData)
@@ -423,7 +430,8 @@ function Get-DockerImageMetaDataWrapper
             $tagDataFromScript = @($tagDataFromScript | Where-Object { $_.FromTag -match $TagFilter })
         }
     }
-    elseif ($meta.TagMapping) {
+    elseif ($meta.TagMapping)
+    {
         foreach($regex in $meta.TagMapping.PSObject.Properties.Name)
         {
             if($BaseImage -match $regex)
