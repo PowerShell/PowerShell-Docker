@@ -11,7 +11,7 @@
         "test-deps"
     ],
     "TestProperties": {
-        "size": 602
+        "size": 632
     },
     "TagMapping": {
         "^.*-fedora-28$" : "preview-fedora-28",
