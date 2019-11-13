@@ -4,7 +4,7 @@
 # return objects representing the tags we need to base the parrot image on
 
 # The versions of parrot we care about
-$shortTags = @('4')
+$shortTags = @('latest')
 
 $parent = Join-Path -Path $PSScriptRoot -ChildPath '..'
 $repoRoot = Join-Path -path (Join-Path -Path $parent -ChildPath '..') -ChildPath '..'
