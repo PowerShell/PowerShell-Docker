@@ -836,12 +836,14 @@ Describe "Push Linux Containers" -Tags 'Linux', 'Push' {
             Set-ItResult -Pending -Because "Image is missing when building using ACR"
         }
 
-        if("clearlinux" -inotmatch $Name -and "parrot" -inotmatch $Name -and "kalirolling" -inotmatch $Name)
+        if("clearlinux" -imatch $Name -or "parrot" -imatch $Name -or "kalirolling" -imatch $Name)
         {
-            foreach($tag in $tags)
-            {
-                Invoke-Docker -Command push -Params @(${tag}) -SuppressHostOutput
-            }
+            Set-ItResult -Pending -Because "Image is broken"
+        }
+
+        foreach($tag in $tags)
+        {
+            Invoke-Docker -Command push -Params @(${tag}) -SuppressHostOutput
         }
     }
 }
