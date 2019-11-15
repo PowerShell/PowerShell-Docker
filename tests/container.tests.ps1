@@ -836,10 +836,12 @@ Describe "Push Linux Containers" -Tags 'Linux', 'Push' {
             Set-ItResult -Pending -Because "Image is missing when building using ACR"
         }
 
-        foreach($tag in $tags) {
-            Invoke-Docker -Command push -Params @(
-                    ${tag}
-                ) -SuppressHostOutput
+        if("clearlinux" -inotmatch $Name -and "parrot" -inotmatch $Name -and "kalirolling" -inotmatch $Name)
+        {
+            foreach($tag in $tags)
+            {
+                Invoke-Docker -Command push -Params @(${tag}) -SuppressHostOutput
+            }
         }
     }
 }
@@ -855,7 +857,7 @@ Describe "Push Windows Containers" -Tags 'Windows', 'Push' {
         }
     }
 
-    it "<Name> Pushes without error" -TestCases $pushTestCases  -skip:$script:skipWindowsRun {
+    it "<Name> Pushes without error" -TestCases $pushTestCases -skip:$script:skipWindowsRun {
         param(
             [Parameter(Mandatory=$true)]
             [string]
