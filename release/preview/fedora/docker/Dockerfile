@@ -43,9 +43,12 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
         -NoLogo \
         -NoProfile \
         -Command " \
-          \$module = (dnf list installed libmodulemd1 | Select-String -SimpleMatch libmodulemd1);  \
+          try { \$packageList = dnf list installed libmodulemd1} \
+          catch {}; \
+          \$module = (\$packageList | Select-String -SimpleMatch libmodulemd1);  \
           if(\$module) { \
-             dnf upgrade -y libmodulemd1 \
+            Write-Host '******* Patching *********'; \
+            dnf upgrade -y libmodulemd1 \
           }" \
     && echo "end - FEDORA-2019-27e7b92407" \
     # This installs most security advisories
