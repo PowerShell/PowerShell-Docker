@@ -45,12 +45,15 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
              dnf upgrade -y libmodulemd1 \
           }" \
     # This installs most security advisories
+    && echo "strating upgrade minimal" \
     && dnf upgrade-minimal -y --security \
+    && echo "end - upgrade minimal" \
     # query and install any remaining security advisories
     && pwsh \
         -NoLogo \
         -NoProfile \
         -Command " \
+          Write-Host '******* Getting security advisory list *********'; \
           (dnf updateinfo list -q --security) |  \
               Foreach-Object { \
                   \$advisory=(\$_ -split ' ')[0]; \
