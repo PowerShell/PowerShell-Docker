@@ -24,6 +24,7 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
     && dnf install -y /tmp/powershell.rpm \
     # remove powershell package
     && rm /tmp/powershell.rpm \
+    && echo "starting misc packages" \
     && dnf install -y \
     # less is needed for help
       less \
@@ -33,24 +34,33 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
       compat-openssl10 \
       ca-certificates \
       gssntlmssp \
+    && echo "end - misc packages" \
     && ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh \
+    && echo "starting FEDORA-2019-27e7b92407" \
     # For whatever reason FEDORA-2019-27e7b92407 has to be patched manually
     # to do this, upgrade libmodulemd1, if it is installed
     && pwsh \
         -NoLogo \
         -NoProfile \
         -Command " \
-          \$module = (dnf list installed libmodulemd1 | Select-String -SimpleMatch libmodulemd1);  \
+          try { \$packageList = dnf list installed libmodulemd1} \
+          catch {}; \
+          \$module = (\$packageList | Select-String -SimpleMatch libmodulemd1);  \
           if(\$module) { \
-             dnf upgrade -y libmodulemd1 \
+            Write-Host '******* Patching *********'; \
+            dnf upgrade -y libmodulemd1 \
           }" \
+    && echo "end - FEDORA-2019-27e7b92407" \
     # This installs most security advisories
+    && echo "starting upgrade minimal" \
     && dnf upgrade-minimal -y --security \
+    && echo "end - upgrade minimal" \
     # query and install any remaining security advisories
     && pwsh \
         -NoLogo \
         -NoProfile \
         -Command " \
+          Write-Host '******* Getting security advisory list *********'; \
           (dnf updateinfo list -q --security) |  \
               Foreach-Object { \
                   \$advisory=(\$_ -split ' ')[0]; \
