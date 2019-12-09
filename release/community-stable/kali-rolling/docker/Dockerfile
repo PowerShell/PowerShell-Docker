@@ -43,7 +43,7 @@ RUN \
     # Download the Kali repository package and save it
     wget -O /tmp/kali-archive-keyring_2018.2_all.deb --no-check-certificate ${KALI_REPO_KEY_PACKAGE_URL} \
     # install kali package to renew kali repository expired certificate in container image
-    apt-get install /tmp/kali-archive-keyring_2018.2_all.deb \
+    && apt-get install /tmp/kali-archive-keyring_2018.2_all.deb \
     # remove kali package
     && rm -f /tmp/kali-archive-keyring_2018.2_all.deb \
     # Download the libicu57 Debian package and save it
