@@ -55,9 +55,6 @@ ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
 
-# Download the PowerShell Core Linux tar.gz and save it
-ADD ${PS_PACKAGE_URL} /tmp/powershell-linux.tar.gz
-
 # Define Args and Env needed to create links
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
@@ -96,6 +93,8 @@ RUN \
     && pacman -U --noconfirm /tmp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.xz \
     # create powershell folder
     && mkdir -p ${PS_INSTALL_FOLDER} \
+    # Pull down the powershell linux tar file
+    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell-linux.tar.gz \ 
     # uncompress powershell linux tar file
     && tar zxf /tmp/powershell-linux.tar.gz -C ${PS_INSTALL_FOLDER} -v \
     # remove powershell linux tar file

@@ -8,7 +8,8 @@ RUN yum install -y \
         sudo \
         wget \
         openssl \
-    && yum clean all
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
