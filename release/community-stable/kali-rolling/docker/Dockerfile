@@ -41,7 +41,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 # Installation
 RUN \
     # Download the Kali repository package and save it
-    && wget -O /tmp/kali-archive-keyring_2018.2_all.deb --no-check-certificate ${KALI_REPO_KEY_PACKAGE_URL} \
+    wget -O /tmp/kali-archive-keyring_2018.2_all.deb --no-check-certificate ${KALI_REPO_KEY_PACKAGE_URL} \
     # install kali package to renew kali repository expired certificate in container image
     apt-get install /tmp/kali-archive-keyring_2018.2_all.deb \
     # remove kali package
