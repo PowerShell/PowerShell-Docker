@@ -20,7 +20,7 @@ ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Debian-9
 # Define args needed only for the labels
 ARG VCS_REF="none"
 ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:debian-9
-ARG PS_VERSION=6.2.0
+ARG PS_VERSION=6.2.3
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \

@@ -15,7 +15,7 @@ ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-CentOS-7
 # Define args needed only for the labels
 ARG VCS_REF="none"
 ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:centos-7
-ARG PS_VERSION=6.2.0
+ARG PS_VERSION=6.2.3
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \

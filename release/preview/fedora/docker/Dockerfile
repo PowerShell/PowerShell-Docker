@@ -4,8 +4,8 @@ ARG imageRepo=fedora
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=6.2.0-preview.2
-ARG PACKAGE_VERSION=6.2.0_preview.2
+ARG PS_VERSION=7.0.0-preview.1
+ARG PACKAGE_VERSION=7.0.0_preview.1
 ARG PS_PACKAGE=powershell-preview-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 

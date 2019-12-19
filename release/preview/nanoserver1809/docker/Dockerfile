@@ -10,7 +10,7 @@ ARG NanoServerRepo=mcr.microsoft.com/windows/nanoserver
 FROM ${InstallerRepo}:$InstallerVersion  AS installer-env
 
 # Arguments for installing PowerShell, must be defined in the container they are used
-ARG PS_VERSION=6.2.0-rc.1
+ARG PS_VERSION=7.0.0-rc.1
 
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
 
