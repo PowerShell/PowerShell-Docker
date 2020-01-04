@@ -66,6 +66,11 @@
         Email = ""
         GitHub = "anmenaga"
 
+    [people.mattlorimor]
+        Name = "Matthew Lorimor"
+        Email = "mattlorimor@gmail.com"
+        GitHub = "mattlorimor"
+
     [people.rdil]
         Name = "Reece Dunham"
         Email = "me@rdil.rocks"

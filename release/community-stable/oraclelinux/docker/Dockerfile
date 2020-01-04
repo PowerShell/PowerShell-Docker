@@ -39,7 +39,7 @@ RUN \
 	    # required for help in powershell
 	    less \
       # install EPEL repository
-	    epel-release \
+	    oracle-epel-release-el7 \
       # install gssntlmssp package from EPEL repository
 	    gssntlmssp \
     # install powershell package

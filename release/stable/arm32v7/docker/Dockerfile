@@ -13,6 +13,7 @@ RUN \
   && wget https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE} \
   && mkdir ~/powershell \
   && tar -xvf ./${PS_PACKAGE} -C ~/powershell \
+  && rm -rf ./${PS_PACKAGE} \
   && ln -s /root/powershell/pwsh /usr/bin/pwsh \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*

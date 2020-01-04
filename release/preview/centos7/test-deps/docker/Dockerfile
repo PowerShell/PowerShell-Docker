@@ -8,7 +8,8 @@ RUN yum install -y \
         sudo \
         wget \
         openssl \
-    && yum clean all
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-CentOS-7
 

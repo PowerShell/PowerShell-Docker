@@ -9,10 +9,6 @@ ARG PS_VERSION=6.1.0
 ARG PS_PACKAGE=powershell_${PS_VERSION}-1.debian.9_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
-RUN echo ${PS_PACKAGE_URL}
-# Download the Linux package and save it
-ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
-
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
@@ -22,8 +18,9 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
 
 # Install dependencies and clean up
 RUN apt-get update \
-    && apt install -y /tmp/powershell.deb \
     && apt-get install -y \
+    # curl is required to grab the Linux package
+        curl \
     # less is required for help in powershell
         less \
     # requied to setup the locale
@@ -31,6 +28,10 @@ RUN apt-get update \
     # required for SSL
         ca-certificates \
         gss-ntlmssp \
+    # Download the Linux package and save it
+    && echo ${PS_PACKAGE_URL} \
+    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb \
+    && apt-get install -y /tmp/powershell.deb \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \

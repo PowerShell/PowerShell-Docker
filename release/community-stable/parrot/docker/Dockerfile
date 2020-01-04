@@ -19,14 +19,8 @@ ARG PS_PACKAGE=powershell_${PS_VERSION}-1.debian.9_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=6
 
-# Download the Debian9 PowerShell Core package and save it
-ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
-
 # Define Args for the needed to add the package
 ARG DEBIAN_PACKAGE_URL=http://ftp.us.debian.org/debian/pool/main/i/icu/libicu57_57.1-6+deb9u3_amd64.deb
-
-# Download the libicu57 Debian package and save it
-ADD ${DEBIAN_PACKAGE_URL} /tmp/libicu57_57.1-6+deb9u3_amd64.deb
 
 # Define Args and Env needed to create links
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
@@ -64,12 +58,16 @@ RUN \
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     # generate locale
     && locale-gen && update-locale \
+    # Download the libicu57 Debian package and save it
+    && wget -O /tmp/libicu57_57.1-6+deb9u3_amd64.deb --no-check-certificate ${DEBIAN_PACKAGE_URL} \
     # install required libicu57 package
     && dpkg -i /tmp/libicu57_57.1-6+deb9u3_amd64.deb \
     # remove libicu57 package
     && rm -f /tmp/libicu57_57.1-6+deb9u3_amd64.deb \
     # upgrade distro
     && apt-get dist-upgrade -y \
+    # Download the Debian9 PowerShell Core package and save it
+    && wget -O /tmp/powershell.deb --no-check-certificate ${PS_PACKAGE_URL} \
     # install powershell package
     && apt-get install -y /tmp/powershell.deb \
     # remove powershell package
