@@ -144,6 +144,7 @@ function Get-LinuxContainer
                 TestProperties = $testArgs.TestProperties
                 Channel = $testArgs.Channel
                 UseAcr = $testArgs.UseAcr
+                IsBroken = $testArgs.IsBroken
             }
         }
     }
