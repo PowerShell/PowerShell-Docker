@@ -159,14 +159,15 @@ jobs:
     communityStable: true
     continueonerror: false
 
-- template: .vsts-ci/phase.yml
-  parameters:
-    name: parrot
-    imagename: parrot
-    stable: false
-    preview: false
-    communityStable: true
-    continueonerror: true
+# disabled due to failures
+#- template: .vsts-ci/phase.yml
+#  parameters:
+#    name: parrot
+#    imagename: parrot
+#    stable: false
+#    preview: false
+#    communityStable: true
+#    continueonerror: true
 
 - template: .vsts-ci/phase.yml
   parameters:

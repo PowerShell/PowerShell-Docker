@@ -49,7 +49,7 @@ jobs:
       Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
     displayName: 'Set SasUrl variable'
 
-  - pwsh: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
+  - pwsh: 'Install-module pester -Scope CurrentUser -Force'
     displayName: 'Install Pester'
 
   - pwsh: |

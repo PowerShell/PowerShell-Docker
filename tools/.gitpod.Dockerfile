@@ -3,5 +3,5 @@ FROM mcr.microsoft.com/powershell:latest
 USER root
 
 RUN apt-get update \
-    && apt-get --yes install docker \
+    && curl -fsSL https://get.docker.com | sh \
     && pwsh -NoLogo -NoProfile -c "install-module -Name Pester -Scope CurrentUser -force" 
