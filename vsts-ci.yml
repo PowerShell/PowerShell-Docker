@@ -187,14 +187,14 @@ jobs:
     communityStable: true
     continueonerror: false
 
-- template: .vsts-ci/phase.yml
-  parameters:
-    name: clearLinux
-    imagename: clearlinux
-    stable: false
-    preview: false
-    communityStable: true
-    continueonerror: true
+#- template: .vsts-ci/phase.yml
+#  parameters:
+#    name: clearLinux
+#    imagename: clearlinux
+#    stable: false
+#    preview: false
+#    communityStable: true
+#    continueonerror: true
 
 - template: .vsts-ci/phase.yml
   parameters:
