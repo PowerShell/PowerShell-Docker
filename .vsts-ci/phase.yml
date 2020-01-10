@@ -1,21 +1,21 @@
 parameters:
   name: ''
-  imagename: ''
   vmImage: 'ubuntu-16.04'
-  stable: 'true'
-  servicing: 'false'
-  preview: 'true'
-  communityStable: 'false'
-  communityPreview: 'false'
-  communityServicing: 'false'
   continueonerror: false
   ciParameter: '-CI'
   useacr: 'false'
+  matrix: ''
+  dependsOn: 'GenerateYaml'
+  jobName: 'Build'
+  maxParallel: 5
 
 jobs:
-- job: ${{ parameters.name }}
+- job: ${{ parameters.jobName }}
+  dependsOn: ${{ parameters.dependsOn }}
+  strategy:
+      matrix: $[ ${{ parameters.matrix }} ]
+      maxParallel: ${{ parameters.maxParallel }}
   variables:
-    ImageName: ${{ parameters.imagename }}
     ContinueOnError: ${{ parameters.continueonerror }}
 
   pool:
@@ -30,62 +30,39 @@ jobs:
   - ${{ if eq(parameters.useacr, 'true') }}:
     - pwsh: 'Get-ChildItem env:'
       displayName: 'Capture Environment'
+      condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - ${{ if eq(parameters.useacr, 'true') }}:
     - pwsh: 'az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
       displayName: 'az login'
+      condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-  - pwsh: Install-module pester -Scope CurrentUser -Force
-    displayName: Install Pester
-    condition: succeededOrFailed()
-
-  - ${{ if eq(parameters.stable, 'true') }}:
-    - pwsh: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'stable' -TestLogPostfix '$(ImageName)-stable' ${{ parameters.ciParameter }} -Repository stable/powershell
-      displayName: $(ImageName) Stable
-      condition: succeededOrFailed()
-      continueOnError: ${{ parameters.continueonerror }}
-
-  - ${{ if eq(parameters.preview, 'true') }}:
-    - pwsh: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'preview' -TestLogPostfix '$(ImageName)-preview' ${{ parameters.ciParameter }} -Repository preview/powershell
-      displayName: $(ImageName) Preview
-      condition: succeededOrFailed()
-      continueOnError: ${{ parameters.continueonerror }}
-
-  - ${{ if eq(parameters.servicing, 'true') }}:
-    - pwsh: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'servicing' -TestLogPostfix '$(ImageName)-servicing' ${{ parameters.ciParameter }} -Repository servicing/powershell
-      displayName: $(ImageName) Servicing
-      condition: succeededOrFailed()
-      continueOnError: ${{ parameters.continueonerror }}
-
-  - ${{ if eq(parameters.communityStable, 'true') }}:
-    - pwsh: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'community-stable' -TestLogPostfix '$(ImageName)-stable' ${{ parameters.ciParameter }} -Repository stable/powershell
-      displayName: $(ImageName) Stable
-      condition: succeededOrFailed()
-      continueOnError: ${{ parameters.continueonerror }}
-
-  - ${{ if eq(parameters.communityPreview, 'true') }}:
-    - pwsh: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'community-preview' -TestLogPostfix '$(ImageName)-preview' ${{ parameters.ciParameter }} -Repository preview/powershell
-      displayName: $(ImageName) Preview
-      condition: succeededOrFailed()
-      continueOnError: ${{ parameters.continueonerror }}
-
-  - ${{ if eq(parameters.communityServicing, 'true') }}:
-    - pwsh: ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel 'community-servicing' -TestLogPostfix '$(ImageName)-servicing' ${{ parameters.ciParameter }} -Repository servicing/powershell
-      displayName: $(ImageName) Servicing
-      condition: succeededOrFailed()
-      continueOnError: ${{ parameters.continueonerror }}
 
   - pwsh: |
+      if ( '$env:CHANNEL' -eq '' ) { exit }
+      Install-module pester -Scope CurrentUser -Force
+    displayName: Install Pester
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
+  - pwsh: |
+      ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel '$(Channel)' -TestLogPostfix '$(ImageName)-stable' ${{ parameters.ciParameter }} -Repository stable/powershell
+    displayName: $(ImageName) $(Channel)
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+    continueOnError: ${{ parameters.continueonerror }}
+
+
+  - pwsh: |
+      if ( '$env:CHANNEL' -eq '' ) { exit }
       $files = @(Get-ChildItem -Recurse test*.xml)
       if($files.count -eq 0) {
         throw 'no test results found'
       }
     displayName: Make sure we got test results
-    condition: succeededOrFailed()
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     continueOnError: ${{ parameters.continueonerror }}
 
   - task: PublishTestResults@2
-    condition: succeededOrFailed()
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     displayName: Publish $(ImageName) Test Results **\test*.xml
     continueOnError: ${{ parameters.continueonerror }}
     inputs:

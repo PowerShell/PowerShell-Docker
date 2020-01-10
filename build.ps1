@@ -30,6 +30,10 @@ param(
     [switch]
     $Pull,
 
+    [Parameter(Mandatory, ParameterSetName="GenerateMatrixJson")]
+    [switch]
+    $GenerateMatrixJson,
+
     [Parameter(Mandatory, ParameterSetName="GenerateTagsYaml")]
     [switch]
     $GenerateTagsYaml,
@@ -88,6 +92,7 @@ param(
     [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
     [Parameter(Mandatory, ParameterSetName="DupeCheckAll")]
     [Parameter(Mandatory, ParameterSetName="GenerateTagsYaml")]
+    [Parameter(Mandatory, ParameterSetName="GenerateMatrixJson")]
     [string[]]
     $Channel='stable',
 
@@ -107,16 +112,19 @@ param(
     [string]
     $Version,
 
+    [Parameter(ParameterSetName="GenerateMatrixJson")]
     [Parameter(ParameterSetName="GenerateTagsYaml")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
     $StableVersion,
 
+    [Parameter(ParameterSetName="GenerateMatrixJson")]
     [Parameter(ParameterSetName="GenerateTagsYaml")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
     $PreviewVersion,
 
+    [Parameter(ParameterSetName="GenerateMatrixJson")]
     [Parameter(ParameterSetName="GenerateTagsYaml")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
@@ -126,7 +134,12 @@ param(
     $IncludeKnownIssues,
 
     [switch]
-    $ForcePesterInstall
+    $ForcePesterInstall,
+
+    [Parameter(ParameterSetName="GenerateMatrixJson")]
+    [string]
+    [ValidateSet('All','OnlyAcr','NoAcr')]
+    $Acr
 )
 
 DynamicParam {
@@ -177,7 +190,7 @@ DynamicParam {
 }
 
 Begin {
-    if ($PSCmdlet.ParameterSetName -notin 'GenerateTagsYaml', 'DupeCheckAll' -and $Channel.Count -gt 1)
+    if ($PSCmdlet.ParameterSetName -notin 'GenerateMatrixJson', 'GenerateTagsYaml', 'DupeCheckAll' -and $Channel.Count -gt 1)
     {
         throw "Multiple Channels are not supported in this parameter set"
     }
@@ -240,7 +253,8 @@ End {
                 -ImageName $ImageName `
                 -LinuxVersion $linuxVersion `
                 -BaseRepositry $Repository `
-                -Strict:$CheckForDuplicateTags.IsPresent
+                -Strict:$CheckForDuplicateTags.IsPresent `
+                -Channel $actualChannel
 
             $nameForMessage = Split-Path -Leaf -Path $dockerFileName
             $message = "$nameForMessage does not exist in every channel. Skipping."
@@ -275,7 +289,8 @@ End {
                             -BaseImage $actualTagData.ActualTags[0] `
                             -BaseRepositry $Repository `
                             -Strict:$CheckForDuplicateTags.IsPresent `
-                            -FromTag $tagGroup.Name
+                            -FromTag $tagGroup.Name `
+                            -Channel $actualChannel
 
                         $toBuild += $subImageAllMeta
                     }
@@ -288,7 +303,10 @@ End {
     {
         foreach ($tagGroup in $allMeta.ActualTagDataByGroup.Keys)
         {
+            $dockerFileName = $allMeta.Name
             $actualTagData = $allMeta.ActualTagDataByGroup.$tagGroup
+            $actualChannel = $allMeta.Channel
+            $useAcr = $allMeta.meta.UseAcr
 
             if ($Build.IsPresent -or $Test.IsPresent)
             {
@@ -330,7 +348,17 @@ End {
                     }
                 }
             }
-            elseif ($GenerateTagsYaml.IsPresent) {
+            elseif ($GenerateTagsYaml.IsPresent -or $GenerateMatrixJson.IsPresent) {
+                if($Acr -eq 'OnlyAcr' -and !$useAcr)
+                {
+                    continue
+                }
+
+                if($Acr -eq 'NoAcr' -and $useAcr)
+                {
+                    continue
+                }
+
                 $tagGroup = "public/$($allMeta.FullRepository)"
                 $os = 'windows'
                 if($allMeta.meta.IsLinux)
@@ -356,10 +384,13 @@ End {
 
                     $tag = [PSCustomObject]@{
                         Architecture = $architecture
-                        OsVersion = $osVersion
-                        Os = $os
-                        Tags = $actualTagData.TagList
-                        Dockerfile = $dockerfile
+                        OsVersion    = $osVersion
+                        Os           = $os
+                        Tags         = $actualTagData.TagList
+                        Dockerfile   = $dockerfile
+                        Channel      = $actualChannel
+                        Name         = $dockerFileName
+                        UseAcr       = $UseAcr
                     }
 
                     $tagGroups[$tagGroup] += $tag
@@ -444,6 +475,50 @@ End {
                 Write-Output "      architecture: $($tag.architecture)"
                 Write-Output "      os: $($tag.os)"
                 Write-Output "      dockerfile: $($tag.dockerfile)"
+            }
+        }
+    }
+
+    if ($GenerateMatrixJson.IsPresent) {
+        $matrix = @{ }
+        foreach ($repo in $tagGroups.Keys | Sort-Object) {
+            $channelGroups = $tagGroups.$repo | Group-Object -Property Channel
+            foreach($channelGroup in $channelGroups)
+            {
+                $channelName = $channelGroup.Name
+                Write-Verbose "generating $channelName json"
+                $osGroups = $channelGroup.Group | Group-Object -Property os
+                foreach ($osGroup in $osGroups) {
+                    $osName = $osGroup.Name
+
+                    foreach ($tag in $osGroup.Group | Where-Object { $_.Name -notlike '*/*' } | Sort-Object -Property dockerfile) {
+                        if (-not $matrix.ContainsKey($channelName)) {
+                            $matrix.Add($channelName, @{ })
+                        }
+
+                        if (-not $matrix.$channelName.ContainsKey($osName)) {
+                            $matrix.$channelName.Add($osName, @{ })
+                        }
+
+                        if (-not $matrix.$channelName[$osName].ContainsKey($tag.Name)) {
+                            $matrix.$channelName[$osName].Add($tag.Name, @{
+                                    Channel   = $tag.Channel
+                                    ImageName = $tag.Name
+                                })
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach ($channelName in $matrix.Keys) {
+            foreach ($osName in $matrix.$channelName.Keys) {
+                $osMatrix = $matrix.$channelName.$osName
+                $yaml = $osMatrix | ConvertTo-Json -Compress
+                $variableName = "matrix_${channelName}_${osName}"
+                $command = "vso[task.setvariable variable=$variableName;isoutput=true]$($yaml|Out-String)"
+                Write-Verbose "sending command: '$command'"
+                Write-Host "##$command"
             }
         }
     }

@@ -156,7 +156,7 @@ class DockerImageMetaData {
 
     [bool]
     $UseAcr = $false
-    
+
     [bool]
     $IsBroken = $false
 }
@@ -328,6 +328,8 @@ class DockerImageFullMetaData
     [string] $PSVersion
     [string] $BaseImage
     [string] $FullRepository
+    [string] $Name
+    [string] $Channel
 }
 
 class UpstreamImageTagData
@@ -380,7 +382,10 @@ function Get-DockerImageMetaDataWrapper
         $Strict,
 
         [string]
-        $FromTag
+        $FromTag,
+
+        [string]
+        $Channel
     )
 
     $imagePath = Join-Path -Path $ChannelPath -ChildPath $dockerFileName
@@ -491,6 +496,8 @@ function Get-DockerImageMetaDataWrapper
         PSVersion = $psversion
         BaseImage = $BaseImage
         FullRepository = $fullRepository
+        Name = $dockerFileName
+        Channel = $Channel
     }
 }
 

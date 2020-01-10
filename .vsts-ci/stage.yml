@@ -1,0 +1,40 @@
+parameters:
+  channel: 'preview'
+  vmImage: 'ubuntu-16.04'
+  winCiParameter: '-CI -TagFilter 1809'
+  acr: 'NoAcr'
+  useacr: 'false'
+
+stages:
+  - stage: GenerateYaml_${{ parameters.channel }}
+    dependsOn: []
+    displayName: Build ${{ parameters.channel }}
+    jobs:
+    - job: GenerateYaml_${{ parameters.channel }}
+      pool:
+        vmImage: ubuntu-16.04
+      displayName: Generate Matrix YAML ${{ parameters.channel }}
+      steps:
+      - pwsh: |
+          ./build.ps1 -GenerateMatrixJson -Channel ${{ parameters.channel }} -Verbose -Acr ${{ parameters.acr }}
+        displayName: Generate Matrix YAML
+        condition: succeededOrFailed()
+        name: matrix
+      - pwsh: |
+          dir env:matrix_* | out-string -Width 1000
+        displayName: Capture Matrix YAML
+        condition: succeededOrFailed()
+    - template: phase.yml
+      parameters:
+        matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux']
+        dependsOn: GenerateYaml_${{ parameters.channel }}
+        jobName: Build_Linux
+        useacr: ${{ parameters.useacr }}
+    - template: phase.yml
+      parameters:
+        matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_windows']
+        dependsOn: GenerateYaml_${{ parameters.channel }}
+        jobName: Build_Win
+        vmImage: windows-2019
+        ciParameter: ${{ parameters.winCiParameter }}
+        useacr: ${{ parameters.useacr }}
