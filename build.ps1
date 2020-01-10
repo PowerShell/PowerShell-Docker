@@ -139,7 +139,13 @@ param(
     [Parameter(ParameterSetName="GenerateMatrixJson")]
     [string]
     [ValidateSet('All','OnlyAcr','NoAcr')]
-    $Acr
+    $Acr,
+
+    [Parameter(ParameterSetName="GenerateMatrixJson")]
+    [string]
+    [ValidateSet('All','Linux','Windows')]
+    $OsFilter
+
 )
 
 DynamicParam {
@@ -361,10 +367,18 @@ End {
 
                 $tagGroup = "public/$($allMeta.FullRepository)"
                 $os = 'windows'
-                if($allMeta.meta.IsLinux)
-                {
+                if ($allMeta.meta.IsLinux) {
                     $os = 'linux'
                 }
+
+                if ($osFilter -eq 'Linux' -and $os -ne 'linux') {
+                    continue
+                }
+
+                if ($osFilter -eq 'Windows' -and $os -ne 'windows') {
+                    continue
+                }
+
                 $architecture = 'amd64'
                 $imagePath = $allMeta.imagePath
                 $relativeImagePath = $imagePath -replace $PSScriptRoot

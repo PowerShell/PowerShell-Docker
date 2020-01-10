@@ -4,6 +4,7 @@ parameters:
   winCiParameter: '-CI -TagFilter 1809'
   acr: 'NoAcr'
   useacr: 'false'
+  osFilter: 'All'
 
 stages:
   - stage: GenerateYaml_${{ parameters.channel }}
@@ -16,7 +17,7 @@ stages:
       displayName: Generate Matrix YAML ${{ parameters.channel }}
       steps:
       - pwsh: |
-          ./build.ps1 -GenerateMatrixJson -Channel ${{ parameters.channel }} -Verbose -Acr ${{ parameters.acr }}
+          ./build.ps1 -GenerateMatrixJson -Channel ${{ parameters.channel }} -Verbose -Acr ${{ parameters.acr }} -OsFilter  ${{ parameters.osFilter }}
         displayName: Generate Matrix YAML
         condition: succeededOrFailed()
         name: matrix
