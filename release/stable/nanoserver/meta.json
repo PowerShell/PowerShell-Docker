@@ -10,6 +10,7 @@
         "nanoserver-#shorttag#"
     ],
     "Base64EncodePackageUrl": true,
+    "UseAcr": true,
     "TestProperties": {
         "size": 1
     }
