@@ -1,12 +1,16 @@
 parameters:
   pool: 'Hosted Ubuntu 1604'
-  channel: 'stable'
   jobName: 'none'
   releaseTag: ''
   ACR: 'no'
+  maxParallel: 5
 
 jobs:
 - job: ${{ parameters.jobName }}
+  dependsOn: ${{ parameters.dependsOn }}
+  strategy:
+      matrix: $[ ${{ parameters.matrix }} ]
+      maxParallel: ${{ parameters.maxParallel }}
   variables:
     dockerImage: 'powershell'
     Channel: ${{ parameters.channel }}
@@ -44,7 +48,7 @@ jobs:
 
   - pwsh: |
       az account set --subscription $(StorageSubscriptionName)
-      $querystring = az storage account generate-sas --account-name $(StorageAccount) --services b --resource-types o --expiry ((get-date).AddDays(2).ToString("yyyy-MM-dd")) --permission r --https-only | convertfrom-json
+      $querystring = az storage account generate-sas --account-name $(StorageAccount) --services b --resource-types o --expiry ((get-date).AddDays(1).ToString("yyyy-MM-dd")) --permission r --https-only | convertfrom-json
       $url = "https://$(StorageAccount).blob.core.windows.net/?$querystring"
       Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
     displayName: 'Set SasUrl variable'
@@ -74,7 +78,7 @@ jobs:
 
       if($env:$(Channel) -eq 'true')
       {
-        ./build.ps1 -Build -ImageName $(dockerHost) -All -Channel $(channel) @extraParams -version '$(Version)' -Repository $(dockerNamespace)/$(dockerImage)
+        ./build.ps1 -Build -ImageName $(dockerHost) -name '$(ImageName)' -Channel $(channel) -TestLogPostfix '$(ImageName)-$(Channel)' @extraParams -version '$(Version)' -Repository $(dockerNamespace)/$(dockerImage)
       }
       else
       {
