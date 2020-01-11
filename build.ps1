@@ -505,6 +505,7 @@ End {
                 foreach ($osGroup in $osGroups) {
                     $osName = $osGroup.Name
 
+                    # Filter out subimages.  We cannot directly build subimages.
                     foreach ($tag in $osGroup.Group | Where-Object { $_.Name -notlike '*/*' } | Sort-Object -Property dockerfile) {
                         if (-not $matrix.ContainsKey($channelName)) {
                             $matrix.Add($channelName, @{ })
@@ -528,9 +529,9 @@ End {
         foreach ($channelName in $matrix.Keys) {
             foreach ($osName in $matrix.$channelName.Keys) {
                 $osMatrix = $matrix.$channelName.$osName
-                $yaml = $osMatrix | ConvertTo-Json -Compress
+                $matrixJson = $osMatrix | ConvertTo-Json -Compress
                 $variableName = "matrix_${channelName}_${osName}"
-                $command = "vso[task.setvariable variable=$variableName;isoutput=true]$($yaml|Out-String)"
+                $command = "vso[task.setvariable variable=$variableName;isoutput=true]$($matrixJson)"
                 Write-Verbose "sending command: '$command'"
                 Write-Host "##$command"
             }
