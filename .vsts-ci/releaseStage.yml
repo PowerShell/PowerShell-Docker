@@ -38,3 +38,6 @@ stages:
         jobName: Build_Win
         vmImage: windows-2019
         ACR: yes
+        # failure rate is High in ACR for Windows and we have few images.
+        # No reason to stress the system.
+        maxParallel: 1
