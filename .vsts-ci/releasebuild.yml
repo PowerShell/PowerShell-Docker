@@ -7,117 +7,91 @@ resources:
 variables:
   POWERSHELL_TELEMETRY_OPTOUT: 1
 
-jobs:
-- template: releasePhase.yml
-  parameters:
-    channel: STABLE
-    jobName: stableLinux
-    releaseTag: $(stableReleaseTag)
-    pool: Hosted Ubuntu 1604
-    ACR: no
+stages:
+  - template: releaseStage.yml
+    parameters:
+      channel: stable
+  - template: releaseStage.yml
+    parameters:
+      channel: preview
 
-- template: releasePhase.yml
-  parameters:
-    channel: PREVIEW
-    jobName: previewLinux
-    releaseTag: $(previewReleaseTag)
-    pool: Hosted Ubuntu 1604
-    ACR: no
+  - stage: GenerateManifests
+    dependsOn:
+      - GenerateYaml_stable
+      - GenerateYaml_preview
+    jobs:
+    - job: PreviewManifestPhase
+      variables:
+        releaseTag: $(previewReleaseTag)
+        channel: PREVIEW
 
-- template: releasePhase.yml
-  parameters:
-    channel: STABLE
-    jobName: stableWindows
-    releaseTag: $(stableReleaseTag)
-    pool: Hosted VS2017
-    ACR: yes
+      displayName: Create Preview Manifest Lists
+      condition: succeededOrFailed()
+      pool:
+        name: PowerShell
+        timeoutInMinutes: 30
 
-- template: releasePhase.yml
-  parameters:
-    channel: PREVIEW
-    jobName: previewWindows
-    releaseTag: $(previewReleaseTag)
-    pool: Hosted VS2017
-    ACR: yes
+      steps:
+      - template: manifestSteps.yml
+    - job: StableManifestPhase
+      variables:
+        releaseTag: $(stableReleaseTag)
+        channel: STABLE
 
-- job: PreviewManifestPhase
-  variables:
-    releaseTag: $(previewReleaseTag)
-    channel: PREVIEW
+      displayName: Create Stable Manifest Lists
 
-  displayName: Create Preview Manifest Lists
+      condition: succeededOrFailed()
+      pool:
+        name: PowerShell
+        timeoutInMinutes: 30
 
-  dependsOn:
-   - previewLinux
-   - previewWindows
-  condition: succeededOrFailed()
-  pool:
-    name: PowerShell
-    timeoutInMinutes: 30
+      steps:
+      - template: manifestSteps.yml
+  - stage: GenerateTagsYaml
+    dependsOn: []
+    jobs:
+    - job: GenerateTagsYaml
 
-  steps:
-  - template: manifestSteps.yml
+      displayName: Generate Tags YAML
 
-- job: StableManifestPhase
-  variables:
-    releaseTag: $(stableReleaseTag)
-    channel: STABLE
+      condition: succeededOrFailed()
+      pool:
+        name: Hosted Ubuntu 1604
+        timeoutInMinutes: 30
 
-  displayName: Create Stable Manifest Lists
+      steps:
+      - powershell: |
+          $stableVersion = '$(stableReleaseTag)' -replace '^v', ''
+          Write-Host "##vso[task.setvariable variable=StableVersion;]$stableVersion"
+          $previewVersion = '$(previewReleaseTag)' -replace '^v', ''
+          Write-Host "##vso[task.setvariable variable=PreviewVersion;]$previewVersion"
+        displayName: 'Set Versions'
 
-  dependsOn:
-   - stableWindows
-   - stableLinux
-  condition: succeededOrFailed()
-  pool:
-    name: PowerShell
-    timeoutInMinutes: 30
+      - powershell: 'Get-ChildItem env:'
+        displayName: 'Capture Environment'
 
-  steps:
-  - template: manifestSteps.yml
+      - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
+        displayName: 'Install Pester'
 
-- job: GenerateTagsYaml
+      - powershell: |
+            $yaml = ./build.ps1 -GenerateTagsYaml -Channel stable, preview -StableVersion $(StableVersion) -PreviewVersion $(PreviewVersion)
+            $yaml | Out-File -Encoding ascii -Path ./tagsmetadata.yaml
+            Get-ChildItem -Path ./tagsmetadata.yaml | Select-Object -ExpandProperty FullName | ForEach-Object {
+                    Write-Host "##vso[artifact.upload containerfolder=artifacts;artifactname=artifacts]$_"
+                }
+        displayName: Generate Tags YAML
 
-  displayName: Generate Tags YAML
+      - powershell: |
+          $path = '$(SYSTEM.DEFAULTWORKINGDIRECTORY)/releaseTags.json'
+          @{
+            'previewReleaseTag' = '$(previewReleaseTag)'
+            'stableReleaseTag' = '$(stableReleaseTag)'
+          }|convertto-json | out-file -FilePath $path -Encoding ascii
+          Write-Host "##vso[artifact.upload containerfolder=releaseTags;artifactname=releaseTags]$path"
+        displayName: Save release Tags
 
-  condition: succeededOrFailed()
-  pool:
-    name: Hosted Ubuntu 1604
-    timeoutInMinutes: 30
-
-  steps:
-  - powershell: |
-      $stableVersion = '$(stableReleaseTag)' -replace '^v', ''
-      Write-Host "##vso[task.setvariable variable=StableVersion;]$stableVersion"
-      $previewVersion = '$(previewReleaseTag)' -replace '^v', ''
-      Write-Host "##vso[task.setvariable variable=PreviewVersion;]$previewVersion"
-    displayName: 'Set Versions'
-
-  - powershell: 'Get-ChildItem env:'
-    displayName: 'Capture Environment'
-
-  - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
-    displayName: 'Install Pester'
-
-  - powershell: |
-        $yaml = ./build.ps1 -GenerateTagsYaml -Channel stable, preview -StableVersion $(StableVersion) -PreviewVersion $(PreviewVersion)
-        $yaml | Out-File -Encoding ascii -Path ./tagsmetadata.yaml
-        Get-ChildItem -Path ./tagsmetadata.yaml | Select-Object -ExpandProperty FullName | ForEach-Object {
-                Write-Host "##vso[artifact.upload containerfolder=artifacts;artifactname=artifacts]$_"
-            }
-    displayName: Generate Tags YAML
-
-  - powershell: |
-      $path = '$(SYSTEM.DEFAULTWORKINGDIRECTORY)/releaseTags.json'
-      @{
-        'previewReleaseTag' = '$(previewReleaseTag)'
-        'stableReleaseTag' = '$(stableReleaseTag)'
-      }|convertto-json | out-file -FilePath $path -Encoding ascii
-      Write-Host "##vso[artifact.upload containerfolder=releaseTags;artifactname=releaseTags]$path"
-    displayName: Save release Tags
-
-  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
-    displayName: 'Component Detection'
-    inputs:
-      sourceScanPath: '$(Build.SourcesDirectory)'
-      snapshotForceEnabled: true
+      - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+        displayName: 'Component Detection'
+        inputs:
+          sourceScanPath: '$(Build.SourcesDirectory)'
+          snapshotForceEnabled: true

@@ -45,7 +45,7 @@ jobs:
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: |
-      ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel '$(Channel)' -TestLogPostfix '$(ImageName)-stable' ${{ parameters.ciParameter }} -Repository stable/powershell
+      ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel '$(Channel)' -TestLogPostfix '$(ImageName)-$(Channel)' ${{ parameters.ciParameter }} -Repository $(Channel)/powershell
     displayName: $(ImageName) $(Channel)
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     continueOnError: ${{ parameters.continueonerror }}

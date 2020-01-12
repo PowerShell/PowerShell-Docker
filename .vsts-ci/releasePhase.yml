@@ -1,19 +1,26 @@
 parameters:
-  pool: 'Hosted Ubuntu 1604'
-  channel: 'stable'
+  vmImage: 'ubuntu-16.04'
   jobName: 'none'
   releaseTag: ''
   ACR: 'no'
+  maxParallel: 5
+  dependsOn: []
 
 jobs:
 - job: ${{ parameters.jobName }}
+  dependsOn:
+    ${{ parameters.dependsOn }}
+  strategy:
+      matrix: $[ ${{ parameters.matrix }} ]
+      maxParallel: ${{ parameters.maxParallel }}
   variables:
     dockerImage: 'powershell'
     Channel: ${{ parameters.channel }}
     ACR: ${{ parameters.ACR }}
     releaseTag: ${{ parameters.releaseTag }}
 
-  pool: ${{ parameters.pool }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
   timeoutInMinutes: 135
 
   displayName: ${{ parameters.jobName }}
@@ -22,35 +29,56 @@ jobs:
   - pwsh: |
       Write-Host "##vso[task.setvariable variable=ACR_NAME;]$env:ACR_NAME_VAR"
     displayName: 'Enable ACR'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-  - pwsh: |
-      $version = '$(releaseTag)' -replace '^v', ''
-      Write-Host "##vso[task.setvariable variable=Version;]$version"
-    displayName: 'Set Version'
-
-  - pwsh: |
-      $namespace = '$(releaseTag)'.ToLowerInvariant()
+  - powershell: |
+      switch('$(Channel)') {
+        'stable' {
+          $releaseTag = '$(stableReleaseTag)'
+          $version = '$(stableReleaseTag)' -replace '^v', ''
+        }
+        'preview' {
+          $releaseTag = '$(previewReleaseTag)'
+          $version = '$(previewReleaseTag)' -replace '^v', ''
+        }
+        default {
+          throw "Unknown channel '$(Channel)'"
+        }
+      }
+      $namespace = $releaseTag.ToLowerInvariant()
       Write-Host "##vso[task.setvariable variable=dockerNamespace;]$namespace"
-    displayName: 'Set dockerNamespace'
+      $version = $releaseTag -replace '^v', ''
+      $command = "vso[task.setvariable variable=version]$version"
+      Write-Host $command
+      Write-Host "##$command"
+    displayName: 'Set Version'
+    name: get
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-  - pwsh: 'Get-ChildItem env:'
+  - pwsh: |
+      Get-ChildItem env: | Out-String -Width 1000
     displayName: 'Capture Environment'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: 'docker login $(dockerHost) -u $(dockerUserName) -p $(dockerKey)'
     displayName: 'docker login'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
     displayName: 'az login'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: |
       az account set --subscription $(StorageSubscriptionName)
-      $querystring = az storage account generate-sas --account-name $(StorageAccount) --services b --resource-types o --expiry ((get-date).AddDays(2).ToString("yyyy-MM-dd")) --permission r --https-only | convertfrom-json
+      $querystring = az storage account generate-sas --account-name $(StorageAccount) --services b --resource-types o --expiry ((get-date).AddDays(1).ToString("yyyy-MM-dd")) --permission r --https-only | convertfrom-json
       $url = "https://$(StorageAccount).blob.core.windows.net/?$querystring"
       Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
     displayName: 'Set SasUrl variable'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
     displayName: 'Install Pester'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: |
       az account set --subscription $(AcrSubscriptionName)
@@ -72,25 +100,21 @@ jobs:
         $extraParams.Add('SasUrl',$env:SASURL)
       }
 
-      if($env:$(Channel) -eq 'true')
-      {
-        ./build.ps1 -Build -ImageName $(dockerHost) -All -Channel $(channel) @extraParams -version '$(Version)' -Repository $(dockerNamespace)/$(dockerImage)
-      }
-      else
-      {
-        Write-Host 'Current channel disabled, skipping ...'
-      }
+      ./build.ps1 -Build -ImageName $(dockerHost) -name '$(ImageName)' -Channel $(channel) -TestLogPostfix '$(ImageName)-$(Channel)' @extraParams -version '$(Version)' -Repository $(dockerNamespace)/$(dockerImage)
     displayName: 'Build All $(Channel)'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: 'docker logout $(dockerHost)'
     displayName: 'docker logout'
-    condition: always()
+    condition: and( always(), ne(variables['Channel'],''))
 
   - pwsh: 'az logout'
     displayName: 'az logout'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
     displayName: 'Component Detection'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     inputs:
       sourceScanPath: '$(Build.SourcesDirectory)'
       snapshotForceEnabled: true
