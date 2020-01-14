@@ -313,18 +313,19 @@ End {
             $actualTagData = $allMeta.ActualTagDataByGroup.$tagGroup
             $actualChannel = $allMeta.Channel
             $useAcr = $allMeta.meta.UseAcr
+            $continueOnError = $allMeta.meta.ContinueOnError
 
             if ($Build.IsPresent -or $Test.IsPresent)
             {
                 $params = @{
-                    Dockerfile=$dockerFileName
-                    psversion=$allMeta.psversion
-                    SasData= $sasData
-                    actualChannel= $actualChannel
-                    actualTagData= $actualTagData
-                    actualVersion= $windowsVersion
-                    AllMeta= $allMeta
-                    CI=$CI.IsPresent
+                    Dockerfile    = $dockerFileName
+                    psversion     = $allMeta.psversion
+                    SasData       = $sasData
+                    actualChannel = $actualChannel
+                    actualTagData = $actualTagData
+                    actualVersion = $windowsVersion
+                    AllMeta       = $allMeta
+                    CI            = $CI.IsPresent
                 }
 
                 if($allMeta.BaseImage)
@@ -402,14 +403,15 @@ End {
                     }
 
                     $tag = [PSCustomObject]@{
-                        Architecture = $architecture
-                        OsVersion    = $osVersion
-                        Os           = $os
-                        Tags         = $actualTagData.TagList
-                        Dockerfile   = $dockerfile
-                        Channel      = $actualChannel
-                        Name         = $dockerFileName
-                        UseAcr       = $UseAcr
+                        Architecture    = $architecture
+                        OsVersion       = $osVersion
+                        Os              = $os
+                        Tags            = $actualTagData.TagList
+                        Dockerfile      = $dockerfile
+                        Channel         = $actualChannel
+                        Name            = $dockerFileName
+                        UseAcr          = $UseAcr
+                        ContinueOnError = $continueOnError
                     }
 
                     $tagGroups[$tagGroup] += $tag
@@ -523,9 +525,10 @@ End {
                         $jobName = $tag.Name -replace '-', '_'
                         if (-not $matrix.$channelName[$osName].ContainsKey($jobName)) {
                             $matrix.$channelName[$osName].Add($jobName, @{
-                                    Channel   = $tag.Channel
-                                    ImageName = $tag.Name
-                                    JobName   = $jobName
+                                    Channel         = $tag.Channel
+                                    ImageName       = $tag.Name
+                                    JobName         = $jobName
+                                    ContinueOnError = $tag.ContinueOnError
                                 })
                         }
                     }
