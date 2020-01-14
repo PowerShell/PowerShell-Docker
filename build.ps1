@@ -386,9 +386,14 @@ End {
                 $dockerfile = "https://github.com/PowerShell/PowerShell-Docker/blob/master$relativeImagePath/docker/Dockerfile"
 
                 $osVersion = $allMeta.meta.osVersion
-                if($osVersion)
+                if($osVersion -or $GenerateMatrixJson.IsPresent)
                 {
-                    $osVersion = $osVersion.replace('${fromTag}',$actualTagData.fromTag)
+                    if ($osVersion) {
+                        $osVersion = $osVersion.replace('${fromTag}', $actualTagData.fromTag)
+                    }
+                    else {
+                        $osVersion = ''
+                    }
 
                     if(!$tagGroups.ContainsKey($tagGroup))
                     {
@@ -515,10 +520,12 @@ End {
                             $matrix.$channelName.Add($osName, @{ })
                         }
 
-                        if (-not $matrix.$channelName[$osName].ContainsKey($tag.Name)) {
-                            $matrix.$channelName[$osName].Add($tag.Name, @{
+                        $jobName = $tag.Name -replace '-', '_'
+                        if (-not $matrix.$channelName[$osName].ContainsKey($jobName)) {
+                            $matrix.$channelName[$osName].Add($jobName, @{
                                     Channel   = $tag.Channel
                                     ImageName = $tag.Name
+                                    JobName   = $jobName
                                 })
                         }
                     }
