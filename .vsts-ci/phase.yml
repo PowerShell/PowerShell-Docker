@@ -59,13 +59,13 @@ jobs:
       }
     displayName: Make sure we got test results
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
-    continueOnError: $[ variables.continueonerror ]
+    continueOnError: $[ ${{ variables.continueonerror }} ]
 
 
   - task: PublishTestResults@2
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     displayName: Publish $(ImageName) Test Results **\test*.xml
-    continueOnError: $[ variables.continueonerror ]
+    continueOnError: $[ ${{ variables.continueonerror }} ]
 
     inputs:
       testRunner: NUnit
