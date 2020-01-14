@@ -48,7 +48,7 @@ jobs:
       ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel '$(Channel)' -TestLogPostfix '$(ImageName)-$(Channel)' ${{ parameters.ciParameter }} -Repository $(Channel)/powershell
     displayName: $(ImageName) $(Channel)
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
-    continueOnError: $[ variables.continueonerror ]
+    continueOnError: $[ ${{ variables.continueonerror }} ]
 
 
   - pwsh: |
