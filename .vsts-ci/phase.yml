@@ -37,7 +37,6 @@ jobs:
       displayName: 'az login'
       condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-
   - pwsh: |
       if ( '$env:CHANNEL' -eq '' ) { exit }
       Install-module pester -Scope CurrentUser -Force
@@ -49,7 +48,6 @@ jobs:
     displayName: $(ImageName) $(Channel)
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     continueOnError: ${{ parameters.continueonerror }}
-
 
   - pwsh: |
       if ( '$env:CHANNEL' -eq '' ) { exit }
