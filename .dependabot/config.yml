@@ -5,40 +5,44 @@ version: 1
 update_configs:
   - package_manager: "docker"
     directory: "/release/preview/alpine39/dependabot"
-    update_schedule: "daily"
+    update_schedule: "weekly"
+
+  - package_manager: "docker"
+    directory: "/release/preview/alpine311/dependabot"
+    update_schedule: "weekly"
 
   - package_manager: "docker"
     directory: "/release/preview/centos8/dependabot"
-    update_schedule: "daily"
+    update_schedule: "weekly"
 
   - package_manager: "docker"
     directory: "/release/preview/debian10/dependabot"
-    update_schedule: "daily"
+    update_schedule: "weekly"
 
   - package_manager: "docker"
     directory: "/release/preview/debian11/dependabot"
-    update_schedule: "daily"
+    update_schedule: "weekly"
 
   - package_manager: "docker"
     directory: "/release/preview/fedora/dependabot"
-    update_schedule: "daily"
+    update_schedule: "weekly"
 
   - package_manager: "docker"
     directory: "/release/preview/nanoserver1809/dependabot"
-    update_schedule: "daily"
+    update_schedule: "weekly"
 
   - package_manager: "docker"
     directory: "/release/preview/opensuse423/dependabot"
-    update_schedule: "daily"
+    update_schedule: "weekly"
 
   - package_manager: "docker"
     directory: "/release/preview/ubuntu18.04/dependabot"
-    update_schedule: "daily"
+    update_schedule: "weekly"
 
   - package_manager: "docker"
     directory: "/release/preview/windowsservercore/dependabot"
-    update_schedule: "daily"
+    update_schedule: "weekly"
 
   - package_manager: "docker"
     directory: "/release/preview/alpine38/dependabot"
-    update_schedule: "daily"
+    update_schedule: "weekly"
