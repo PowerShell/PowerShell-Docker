@@ -14,7 +14,6 @@
         "size": 212
     },
     "TagMapping": {
-        "^.*-alpine-3.9$" : "preview-alpine-3.9",
-        "^.*-alpine-3.10$" : "preview-alpine-3.10"
+        "^.*-alpine-3.11$" : "preview-alpine-3.11"
     }
 }

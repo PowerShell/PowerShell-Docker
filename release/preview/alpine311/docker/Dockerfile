@@ -30,7 +30,7 @@ RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER} -v
 # Start a new stage so we lose all the tar.gz layers from the final image
 FROM ${imageRepo}:${fromTag}
 
-ARG fromTag=3.9
+ARG fromTag=3.11
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
@@ -88,8 +88,8 @@ RUN apk add --no-cache \
           }"
 
 # Define args needed only for the labels
-ARG PS_VERSION=6.2.0-preview.2
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:preview-alpine-3.8
+ARG PS_VERSION=7.0.0-preview.1
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:preview-alpine-3.11
 ARG VCS_REF="none"
 
 # Add label last as it's just metadata and uses a lot of parameters
