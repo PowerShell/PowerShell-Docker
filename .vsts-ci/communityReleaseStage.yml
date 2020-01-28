@@ -32,3 +32,4 @@ stages:
         matrix: dependencies.GenerateYaml_${{ variables.jobName }}.outputs['matrix.matrix_${{ parameters.channel }}_linux']
         dependsOn: GenerateYaml_${{ variables.jobName }}
         jobName: Build_Linux
+        maxParallel: 2
