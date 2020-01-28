@@ -5,27 +5,8 @@ resources:
 variables:
   POWERSHELL_TELEMETRY_OPTOUT: 1
 
-jobs:
-- job: communityRelease
-  pool:
-    name: Hosted Ubuntu 1604
-  #Your build pipeline references an undefined variable named ‘dockerHost’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
-  #Your build pipeline references an undefined variable named ‘dockerImage’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
-  #Your build pipeline references an undefined variable named ‘dockerKey’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
-  #Your build pipeline references an undefined variable named ‘dockerNamespace’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
-  #Your build pipeline references an undefined variable named ‘dockerUserName’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
-
-  steps:
-  - powershell: 'docker login $(dockerHost) -u $(dockerUserName) -p "$(dockerKey)"'
-    displayName: 'docker login'
-
-  - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
-    displayName: 'Install Pester'
-
-  - powershell: |
-      ./build.ps1 -Build -ImageName $(dockerHost) -All -Channel community-stable -push -Repository $(dockerNamespace)/$(dockerImage)
-    displayName: Build
-
-  - powershell: 'docker logout $(dockerHost)'
-    displayName: 'docker logout'
-    condition: always()
+stages:
+  - template: communityReleaseStage.yml
+    parameters:
+      channel: community-stable
+      jobName: community_stable
