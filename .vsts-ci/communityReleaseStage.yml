@@ -1,16 +1,19 @@
 parameters:
   channel: 'preview'
+  jobName: ''
   vmImage: 'ubuntu-16.04'
   acr: 'All'
   useacr: 'false'
   osFilter: 'All'
 
 stages:
-  - stage: GenerateYaml_${{ parameters.channel }}
+  - stage: GenerateYaml_${{ coalesce(parameters.jobName, parameters.channel) }}
+    variables:
+      jobName: ${{ coalesce(parameters.jobName, parameters.channel) }}
     dependsOn: []
     displayName: Build ${{ parameters.channel }}
     jobs:
-    - job: GenerateYaml_${{ parameters.channel }}
+    - job: GenerateYaml_${{ variables.jobName }}
       pool:
         vmImage: ubuntu-16.04
       displayName: Generate Matrix YAML ${{ parameters.channel }}
@@ -26,7 +29,6 @@ stages:
         condition: succeededOrFailed()
     - template: communityReleasePhase.yml
       parameters:
-        matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux']
-        dependsOn:
-          - GenerateYaml_${{ parameters.channel }}
+        matrix: dependencies.GenerateYaml_${{ variables.jobName }}.outputs['matrix.matrix_${{ parameters.channel }}_linux']
+        dependsOn: GenerateYaml_${{ variables.jobName }}
         jobName: Build_Linux
