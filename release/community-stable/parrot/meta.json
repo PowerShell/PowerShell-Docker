@@ -6,5 +6,6 @@
     "tagTemplates": [
         "#psversion#-parrot-#tag#",
         "parrot-#shorttag#"
-    ]
+    ],
+    "continueOnError": true
 }

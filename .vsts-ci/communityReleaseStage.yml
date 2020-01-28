@@ -2,8 +2,7 @@ parameters:
   channel: 'preview'
   jobName: ''
   vmImage: 'ubuntu-16.04'
-  winCiParameter: '-CI -TagFilter 1809'
-  acr: 'NoAcr'
+  acr: 'All'
   useacr: 'false'
   osFilter: 'All'
 
@@ -28,17 +27,9 @@ stages:
           dir env:matrix_* | out-string -Width 1000
         displayName: Capture Matrix YAML
         condition: succeededOrFailed()
-    - template: phase.yml
+    - template: communityReleasePhase.yml
       parameters:
         matrix: dependencies.GenerateYaml_${{ variables.jobName }}.outputs['matrix.matrix_${{ parameters.channel }}_linux']
         dependsOn: GenerateYaml_${{ variables.jobName }}
         jobName: Build_Linux
-        useacr: ${{ parameters.useacr }}
-    - template: phase.yml
-      parameters:
-        matrix: dependencies.GenerateYaml_${{ variables.jobName }}.outputs['matrix.matrix_${{ parameters.channel }}_windows']
-        dependsOn: GenerateYaml_${{ variables.jobName }}
-        jobName: Build_Win
-        vmImage: windows-2019
-        ciParameter: ${{ parameters.winCiParameter }}
-        useacr: ${{ parameters.useacr }}
+        maxParallel: 2

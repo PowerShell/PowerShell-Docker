@@ -159,6 +159,9 @@ class DockerImageMetaData {
 
     [bool]
     $IsBroken = $false
+
+    [bool]
+    $ContinueOnError = $false
 }
 
 class ShortTagMetaData {

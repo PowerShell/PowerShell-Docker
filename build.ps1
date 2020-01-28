@@ -313,18 +313,19 @@ End {
             $actualTagData = $allMeta.ActualTagDataByGroup.$tagGroup
             $actualChannel = $allMeta.Channel
             $useAcr = $allMeta.meta.UseAcr
+            $continueOnError = $allMeta.meta.ContinueOnError
 
             if ($Build.IsPresent -or $Test.IsPresent)
             {
                 $params = @{
-                    Dockerfile=$dockerFileName
-                    psversion=$allMeta.psversion
-                    SasData= $sasData
-                    actualChannel= $actualChannel
-                    actualTagData= $actualTagData
-                    actualVersion= $windowsVersion
-                    AllMeta= $allMeta
-                    CI=$CI.IsPresent
+                    Dockerfile    = $dockerFileName
+                    psversion     = $allMeta.psversion
+                    SasData       = $sasData
+                    actualChannel = $actualChannel
+                    actualTagData = $actualTagData
+                    actualVersion = $windowsVersion
+                    AllMeta       = $allMeta
+                    CI            = $CI.IsPresent
                 }
 
                 if($allMeta.BaseImage)
@@ -386,9 +387,14 @@ End {
                 $dockerfile = "https://github.com/PowerShell/PowerShell-Docker/blob/master$relativeImagePath/docker/Dockerfile"
 
                 $osVersion = $allMeta.meta.osVersion
-                if($osVersion)
+                if($osVersion -or $GenerateMatrixJson.IsPresent)
                 {
-                    $osVersion = $osVersion.replace('${fromTag}',$actualTagData.fromTag)
+                    if ($osVersion) {
+                        $osVersion = $osVersion.replace('${fromTag}', $actualTagData.fromTag)
+                    }
+                    else {
+                        $osVersion = ''
+                    }
 
                     if(!$tagGroups.ContainsKey($tagGroup))
                     {
@@ -397,14 +403,15 @@ End {
                     }
 
                     $tag = [PSCustomObject]@{
-                        Architecture = $architecture
-                        OsVersion    = $osVersion
-                        Os           = $os
-                        Tags         = $actualTagData.TagList
-                        Dockerfile   = $dockerfile
-                        Channel      = $actualChannel
-                        Name         = $dockerFileName
-                        UseAcr       = $UseAcr
+                        Architecture    = $architecture
+                        OsVersion       = $osVersion
+                        Os              = $os
+                        Tags            = $actualTagData.TagList
+                        Dockerfile      = $dockerfile
+                        Channel         = $actualChannel
+                        Name            = $dockerFileName
+                        UseAcr          = $UseAcr
+                        ContinueOnError = $continueOnError
                     }
 
                     $tagGroups[$tagGroup] += $tag
@@ -460,6 +467,7 @@ End {
         {
             Install-Module -Name pester -Scope CurrentUser -Force
         }
+
         Write-Verbose -Message "logging to $logPath" -Verbose
         $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml @extraParams
         if(!$results -or $results.FailedCount -gt 0 -or !$results.PassedCount)
@@ -515,10 +523,13 @@ End {
                             $matrix.$channelName.Add($osName, @{ })
                         }
 
-                        if (-not $matrix.$channelName[$osName].ContainsKey($tag.Name)) {
-                            $matrix.$channelName[$osName].Add($tag.Name, @{
-                                    Channel   = $tag.Channel
-                                    ImageName = $tag.Name
+                        $jobName = $tag.Name -replace '-', '_'
+                        if (-not $matrix.$channelName[$osName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
+                            $matrix.$channelName[$osName].Add($jobName, @{
+                                    Channel         = $tag.Channel
+                                    ImageName       = $tag.Name
+                                    JobName         = $jobName
+                                    ContinueOnError = $tag.ContinueOnError
                                 })
                         }
                     }

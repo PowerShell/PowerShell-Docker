@@ -27,10 +27,9 @@ jobs:
       displayName: 'Enable ACR'
       condition: ne(variables['ACR'], 'no')
 
-  - ${{ if eq(parameters.useacr, 'true') }}:
-    - pwsh: 'Get-ChildItem env:'
-      displayName: 'Capture Environment'
-      condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+  - pwsh: 'Get-ChildItem env:'
+    displayName: 'Capture Environment'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - ${{ if eq(parameters.useacr, 'true') }}:
     - pwsh: 'az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
@@ -48,7 +47,7 @@ jobs:
       ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel '$(Channel)' -TestLogPostfix '$(ImageName)-$(Channel)' ${{ parameters.ciParameter }} -Repository $(Channel)/powershell
     displayName: $(ImageName) $(Channel)
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
-    continueOnError: ${{ parameters.continueonerror }}
+    continueOnError: ${{ variables.continueonerror }}
 
 
   - pwsh: |
@@ -59,12 +58,14 @@ jobs:
       }
     displayName: Make sure we got test results
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
-    continueOnError: ${{ parameters.continueonerror }}
+    continueOnError: ${{ variables.continueonerror }}
+
 
   - task: PublishTestResults@2
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     displayName: Publish $(ImageName) Test Results **\test*.xml
-    continueOnError: ${{ parameters.continueonerror }}
+    continueOnError: ${{ variables.continueonerror }}
+
     inputs:
       testRunner: NUnit
       testResultsFiles: '**\test*.xml'

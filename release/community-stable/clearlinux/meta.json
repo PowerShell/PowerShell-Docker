@@ -6,5 +6,6 @@
     "tagTemplates": [
         "#psversion#-clearlinux-#tag#",
         "clearlinux-#shorttag#"
-    ]
+    ],
+    "continueOnError": true
 }
