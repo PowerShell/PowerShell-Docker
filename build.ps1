@@ -467,6 +467,7 @@ End {
         {
             Install-Module -Name pester -Scope CurrentUser -Force
         }
+
         Write-Verbose -Message "logging to $logPath" -Verbose
         $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml @extraParams
         if(!$results -or $results.FailedCount -gt 0 -or !$results.PassedCount)
@@ -523,7 +524,7 @@ End {
                         }
 
                         $jobName = $tag.Name -replace '-', '_'
-                        if (-not $matrix.$channelName[$osName].ContainsKey($jobName)) {
+                        if (-not $matrix.$channelName[$osName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
                             $matrix.$channelName[$osName].Add($jobName, @{
                                     Channel         = $tag.Channel
                                     ImageName       = $tag.Name
