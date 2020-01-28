@@ -30,14 +30,3 @@ stages:
         dependsOn:
           - GenerateYaml_${{ parameters.channel }}
         jobName: Build_Linux
-    - template: communityReleasePhase.yml
-      parameters:
-        matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_windows']
-        dependsOn:
-          - GenerateYaml_${{ parameters.channel }}
-        jobName: Build_Win
-        vmImage: windows-2019
-        ACR: yes
-        # failure rate is High in ACR for Windows and we have few images.
-        # No reason to stress the system.
-        maxParallel: 1
