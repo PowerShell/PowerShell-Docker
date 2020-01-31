@@ -5,7 +5,6 @@
     "osVersion": "Fedora",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-fedora-#tag#",
         "lts-fedora-#shorttag#"
     ],
     "SubImage": "test-deps",

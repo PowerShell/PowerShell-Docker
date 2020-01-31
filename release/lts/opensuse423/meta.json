@@ -5,7 +5,6 @@
     "osVersion": "OpenSuse 42.3",
     "SkipGssNtlmSspTests": true,
     "tagTemplates": [
-        "#psversion#-opensuse-#tag#",
         "lts-opensuse-#shorttag#"
     ],
     "SubImage": "test-deps",

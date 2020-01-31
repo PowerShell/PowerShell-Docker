@@ -7,7 +7,6 @@
         {"Tag": "1903"}
     ],
     "tagTemplates": [
-        "#psversion#-nanoserver-#tag#",
         "lts-nanoserver-#shorttag#"
     ],
     "Base64EncodePackageUrl": true,

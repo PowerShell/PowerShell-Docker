@@ -5,7 +5,6 @@
     "osVersion": "Ubuntu 16.04",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-ubuntu-#tag#",
         "lts-ubuntu-#shorttag#"
     ],
     "TestProperties": {

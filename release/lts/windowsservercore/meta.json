@@ -4,7 +4,6 @@
     "osVersion": "Windows Server Core, version ${fromTag}",
     "Base64EncodePackageUrl": true,
     "tagTemplates": [
-        "#psversion#-windowsservercore-#tag#",
         "lts-windowsservercore-#shorttag#"
     ],
     "TestProperties": {
