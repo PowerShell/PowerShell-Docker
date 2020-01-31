@@ -1,0 +1,15 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "osVersion": "OpenSuse 42.3",
+    "SkipGssNtlmSspTests": true,
+    "tagTemplates": [
+        "#psversion#-opensuse-#tag#",
+        "lts-opensuse-#shorttag#"
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 524
+    }
+}
