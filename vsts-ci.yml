@@ -34,7 +34,7 @@ stages:
       - pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhss"))"
         displayName: Set Build Name for Non-PR
         condition: ne(variables['Build.Reason'], 'PullRequest')
-      - pwsh: ./build.ps1 -CheckForDuplicateTags -Channel stable, preview, servicing
+      - pwsh: ./build.ps1 -CheckForDuplicateTags -Channel stable, preview, servicing, lts
         displayName: Check for Duplicate Tags
         condition: succeededOrFailed()
 
