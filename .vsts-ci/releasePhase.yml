@@ -41,6 +41,10 @@ jobs:
           $releaseTag = '$(previewReleaseTag)'
           $version = '$(previewReleaseTag)' -replace '^v', ''
         }
+        'lts' {
+          $releaseTag = '$(ltsReleaseTag)'
+          $version = '$(ltsReleaseTag)' -replace '^v', ''
+        }
         default {
           throw "Unknown channel '$(Channel)'"
         }

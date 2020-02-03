@@ -298,10 +298,13 @@ function Get-Versions
         $PreviewVersion,
 
         [string]
-        $StableVersion
+        $StableVersion,
+
+        [string]
+        $LtsVersion
     )
 
-    Write-Verbose "Getting Version for $Channel - servicing: $ServicingVersion; Preview: $PreviewVersion; stable: $stableVersion"
+    Write-Verbose "Getting Version for $Channel - servicing: $ServicingVersion; Preview: $PreviewVersion; stable: $stableVersion; stable: $ltsVersion"
 
     $versionExtraParams = @{}
 
@@ -316,8 +319,8 @@ function Get-Versions
             $linuxVersion = Get-PowerShellVersion -Linux -Servicing @versionExtraParams
         }
         'lts$' {
-            if($StableVersion){
-                $versionExtraParams['Version'] = $StableVersion
+            if($LtsVersion){
+                $versionExtraParams['Version'] = $LtsVersion
             }
 
             $windowsVersion = Get-PowerShellVersion -Lts @versionExtraParams
