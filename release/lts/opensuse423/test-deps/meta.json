@@ -1,0 +1,16 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "osVersion": "OpenSuse 42.3",
+    "SkipGssNtlmSspTests": true,
+    "tagTemplates": [
+        "lts-opensuse-#shorttag#"
+    ],
+    "SubRepository": "test-deps",
+    "OptionalTests": [
+        "test-deps"
+    ],
+    "TestProperties": {
+        "size": 536
+    }
+}

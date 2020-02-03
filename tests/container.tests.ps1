@@ -441,7 +441,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
             $path = '/opt/microsoft/powershell/6/pwsh'
 
-            if($Channel -eq 'preview')
+            if($Channel -eq 'preview' -or $Channel -eq 'lts')
             {
                 $path = '/opt/microsoft/powershell/7-preview/pwsh'
             }
@@ -469,7 +469,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
             $path = '/opt/microsoft/powershell/6/pwsh'
 
-            if($Channel -eq 'preview')
+            if($Channel -eq 'preview' -or $Channel -eq 'lts')
             {
                 $path = '/opt/microsoft/powershell/7-preview/pwsh'
             }

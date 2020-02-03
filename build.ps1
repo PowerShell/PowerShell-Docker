@@ -83,7 +83,7 @@ param(
     [string]
     $TagFilter,
 
-    [ValidateSet('stable','preview','servicing','community-stable','community-preview','community-servicing')]
+    [ValidateSet('stable','preview','servicing','community-stable','community-preview','community-servicing','lts')]
     [Parameter(Mandatory, ParameterSetName="TestByName")]
     [Parameter(Mandatory, ParameterSetName="TestAll")]
     [Parameter(ParameterSetName="localBuildByName")]

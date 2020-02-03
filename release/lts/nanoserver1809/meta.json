@@ -1,0 +1,16 @@
+{
+    "IsLinux" : false,
+    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip",
+    "osVersion": "Nano Server, version ${fromTag}",
+    "shortTags": [
+        {"Tag": "1809"},
+        {"Tag": "1903"}
+    ],
+    "tagTemplates": [
+        "lts-nanoserver-#shorttag#"
+    ],
+    "Base64EncodePackageUrl": true,
+    "TestProperties": {
+        "size": 1
+    }
+}

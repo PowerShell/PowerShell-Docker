@@ -1,0 +1,15 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion" : false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "osVersion": "Debian 11 (Testing)",
+    "SkipGssNtlmSspTests": false,
+    "tagTemplates": [
+        "lts-debian-#shorttag#"
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 314
+    }
+}
+

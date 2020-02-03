@@ -1,0 +1,16 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "osVersion": "Ubuntu 18.04",
+    "tagTemplates": [
+        "lts-ubuntu-#shorttag#"
+    ],
+    "SubRepository": "test-deps",
+    "OptionalTests": [
+        "test-deps",
+        "test-deps-debian"
+    ],
+    "TestProperties": {
+        "size": 358
+    }
+}
