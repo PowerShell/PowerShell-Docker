@@ -45,7 +45,7 @@ jobs:
 
   - pwsh: |
       $extraParams = @{}
-      if($env:ACR -ne 'no')
+      if($env:ACR_NAME)
       {
         Write-Host 'Using ACR, will NOT test behavior...'
         $extraParams.Add('SkipTest',$true)
