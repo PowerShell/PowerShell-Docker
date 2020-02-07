@@ -4,7 +4,7 @@
 # return objects representing the tags we need to base the fedora image on
 
 # The versions of fedora we care about
-$shortTags = @('28','29','30')
+$shortTags = @('30')
 
 $parent = Join-Path -Path $PSScriptRoot -ChildPath '..'
 $repoRoot = Join-Path -path (Join-Path -Path $parent -ChildPath '..') -ChildPath '..'
