@@ -4,7 +4,8 @@
     "osVersion": "Nano Server, version ${fromTag}",
     "shortTags": [
         {"Tag": "1809"},
-        {"Tag": "1903"}
+        {"Tag": "1903"},
+        {"Tag": "1909"}
     ],
     "tagTemplates": [
         "#psversion#-nanoserver-#tag#",
