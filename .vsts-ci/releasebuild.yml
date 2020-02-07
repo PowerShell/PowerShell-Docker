@@ -1,4 +1,4 @@
-name: s_$(stableReleaseTag)_p_$(previewReleaseTag)_l_$(ltsReleaseTag):$(Rev:_rr)
+name: s_$(stableReleaseTag)_p_$(previewReleaseTag)_l_$(ltsReleaseTag)$(Rev:_rr)
 
 resources:
 - repo: self
