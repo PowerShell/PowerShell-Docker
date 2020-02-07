@@ -14,8 +14,6 @@
         "size": 632
     },
     "TagMapping": {
-        "^.*-fedora-28$" : "lts-fedora-28",
-        "^.*-fedora-29$" : "lts-fedora-29",
         "^.*-fedora-30$" : "lts-fedora-30"
     }
 }
