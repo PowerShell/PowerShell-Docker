@@ -44,7 +44,14 @@ jobs:
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: |
-      ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel '$(Channel)' -TestLogPostfix '$(ImageName)-$(Channel)' ${{ parameters.ciParameter }} -Repository $(Channel)/powershell
+      $extraParams = @{}
+      if($env:ACR -ne 'no')
+      {
+        Write-Host 'Using ACR, will NOT test behavior...'
+        $extraParams.Add('SkipTest',$true)
+      }
+
+      ./build.ps1 -build -name '$(ImageName)' -IncludeKnownIssues -Channel '$(Channel)' -TestLogPostfix '$(ImageName)-$(Channel)' @extraParams ${{ parameters.ciParameter }} -Repository $(Channel)/powershell
     displayName: $(ImageName) $(Channel)
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     continueOnError: ${{ variables.continueonerror }}
