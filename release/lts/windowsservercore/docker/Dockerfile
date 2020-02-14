@@ -6,7 +6,7 @@ ARG WindowsServerCoreRepo=mcr.microsoft.com/windows/servercore
 # As this is a multi-stage build, this stage will eventually be thrown away
 FROM ${WindowsServerCoreRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=7.0.0-preview.1
+ARG PS_VERSION=7.0.0
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/PowerShell-${PS_VERSION}-win-x64.zip
 
 SHELL ["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "-command"]
@@ -66,7 +66,7 @@ CMD ["pwsh.exe"]
 
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:windowsservercore
 ARG VCS_REF="none"
-ARG PS_VERSION=6.2.0-preview.4
+ARG PS_VERSION=7.0.0
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" `

@@ -10,10 +10,10 @@ ARG imageRepo=alpine
 FROM ${imageRepo}:${fromTag} AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=7.0.0-preview.1
+ARG PS_VERSION=7.0.0
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-alpine-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=7-preview
+ARG PS_INSTALL_VERSION=7
 
 # Download the Linux tar.gz and save it
 ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
@@ -34,7 +34,7 @@ FROM ${imageRepo}:${fromTag}
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links
-ARG PS_INSTALL_VERSION=7-preview
+ARG PS_INSTALL_VERSION=7
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
     # Define ENVs for Localization/Globalization
@@ -86,8 +86,8 @@ RUN apk add --no-cache \
           }"
 
 # Define args needed only for the labels
-ARG PS_VERSION=6.2.0-preview.2
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:preview-alpine-3.8
+ARG PS_VERSION=6.2.0
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:alpine-3.8
 ARG VCS_REF="none"
 
 # Add label last as it's just metadata and uses a lot of parameters

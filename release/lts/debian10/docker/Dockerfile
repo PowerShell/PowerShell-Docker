@@ -8,7 +8,7 @@ FROM ${imageRepo}:${fromTag} AS installer-env
 ARG PS_VERSION=6.2.3
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=7-preview
+ARG PS_INSTALL_VERSION=7
 
 # Download the Linux tar.gz and save it
 ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
@@ -25,14 +25,14 @@ RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 # Start a new stage so we lose all the tar.gz layers from the final image
 FROM ${imageRepo}:${fromTag}
 
-ARG PS_VERSION=6.2.0-preview.3
-ARG PS_INSTALL_VERSION=7-preview
+ARG PS_VERSION=7.0.0
+ARG PS_INSTALL_VERSION=7
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links
-ARG PS_INSTALL_VERSION=7-preview
+ARG PS_INSTALL_VERSION=7
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
     # Define ENVs for Localization/Globalization

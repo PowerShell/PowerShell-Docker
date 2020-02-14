@@ -9,7 +9,7 @@ FROM ${imageRepo}:${fromTag} AS installer-env
 ARG PS_VERSION=6.2.3
 ENV PS_PACKAGE=powershell-${PS_VERSION}-linux-arm32.tar.gz
 ENV PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=7-preview
+ARG PS_INSTALL_VERSION=7
 
 # define the folder we will be installing PowerShell to
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
@@ -42,7 +42,7 @@ RUN tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
 FROM ${imageRepo}:${fromTag} AS final-image
 
 # Define Args and Env needed to create links
-ARG PS_INSTALL_VERSION=7-preview
+ARG PS_INSTALL_VERSION=7
 ARG PS_VERSION=6.2.3
 
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
@@ -72,7 +72,7 @@ RUN chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:preview-arm32v7-ubuntu-bionic
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:arm32v7-ubuntu-bionic
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \

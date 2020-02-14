@@ -4,9 +4,9 @@ ARG imageRepo=centos
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=7.0.0-preview.1
-ARG PACKAGE_VERSION=7.0.0_preview.1
-ARG PS_PACKAGE=powershell-preview-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
+ARG PS_VERSION=7.0.0
+ARG PACKAGE_VERSION=7.0.0
+ARG PS_PACKAGE=powershell-lts-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 ARG fromTag=7
@@ -72,4 +72,4 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
-CMD [ "pwsh-preview" ]
+CMD [ "pwsh" ]

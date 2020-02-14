@@ -1,5 +1,5 @@
 # Docker image file that describes an Debian image with PowerShell and test dependencies
-ARG BaseImage=mcr.microsoft.com/powershell:preview-debian-10
+ARG BaseImage=mcr.microsoft.com/powershell:debian-10
 
 FROM ${BaseImage}
 
