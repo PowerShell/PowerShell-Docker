@@ -5,5 +5,9 @@
     "osVersion": "CentOS 7",
     "tagTemplates": [
         "#psversion#-centos-#tag#"
-    ]
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 550
+    }
 }

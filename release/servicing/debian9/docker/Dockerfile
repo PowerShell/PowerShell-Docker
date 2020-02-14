@@ -1,11 +1,10 @@
 # Docker image file that describes an Debian 9 image with PowerShell installed from Microsoft APT Repo
-ARG fromTag=stretch
+ARG fromTag=stretch-slim
 ARG imageRepo=debian
-
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=6.2.0
 ARG PS_PACKAGE=powershell_${PS_VERSION}-1.debian.9_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
