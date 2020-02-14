@@ -122,6 +122,12 @@ param(
     [Parameter(ParameterSetName="GenerateTagsYaml")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
+    $LtsVersion,
+
+    [Parameter(ParameterSetName="GenerateMatrixJson")]
+    [Parameter(ParameterSetName="GenerateTagsYaml")]
+    [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
+    [string]
     $PreviewVersion,
 
     [Parameter(ParameterSetName="GenerateMatrixJson")]
@@ -236,6 +242,7 @@ End {
             ServicingVersion = if($Version) {$Version} else {$ServicingVersion}
             PreviewVersion = if($Version) {$Version} else {$PreviewVersion}
             StableVersion = if($Version) {$Version} else {$StableVersion}
+            LtsVersion = if($Version) {$Version} else {$LtsVersion}
         }
 
         # Get Versions
