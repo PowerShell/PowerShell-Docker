@@ -412,11 +412,23 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
         BeforeAll {
             $permissionsTestCases = @(
                 $script:linuxContainerRunTests | ForEach-Object {
+                    $path = '/opt/microsoft/powershell/6/pwsh'
+                    switch -RegEx ($_.Channel)
+                    {
+                        '(stable|lts)' {
+                            $path = '/opt/microsoft/powershell/7/pwsh'
+                        }
+                        'preview' {
+                            $path = '/opt/microsoft/powershell/7-preview/pwsh'
+                        }
+                    }
+
                     $Arm32 = [bool] $_.TestProperties.Arm32
                     @{
                         Name = $_.Name
                         Channel = $_.Channel
                         Arm32 = $Arm32
+                        Path = $path
                     }
                 }
             )
@@ -431,23 +443,15 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 $Channel,
 
                 [Bool]
-                $Arm32
+                $Arm32,
+
+                [string]
+                $Path
             )
 
             if($Arm32)
             {
                 Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
-            }
-
-            $path = '/opt/microsoft/powershell/6/pwsh'
-            switch -RegEx ($Channel)
-            {
-                '(stable|lts)' {
-                    $path = '/opt/microsoft/powershell/7/pwsh'
-                }
-                'preview' {
-                    $path = '/opt/microsoft/powershell/7-preview/pwsh'
-                }
             }
 
             $permissions = Get-DockerImagePwshPermissions -Name $name -Path $path
@@ -463,19 +467,15 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 $Channel,
 
                 [Bool]
-                $Arm32
+                $Arm32,
+
+                [string]
+                $Path
             )
 
             if($Arm32)
             {
                 Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
-            }
-
-            $path = '/opt/microsoft/powershell/6/pwsh'
-
-            if($Channel -eq 'preview' -or $Channel -eq 'lts')
-            {
-                $path = '/opt/microsoft/powershell/7-preview/pwsh'
             }
 
             $permissions = Get-DockerImagePwshPermissions -Name $name -Path $path
