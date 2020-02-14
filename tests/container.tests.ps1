@@ -440,10 +440,14 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             }
 
             $path = '/opt/microsoft/powershell/6/pwsh'
-
-            if($Channel -eq 'preview' -or $Channel -eq 'lts')
+            switch -RegEx ($Channel)
             {
-                $path = '/opt/microsoft/powershell/7-preview/pwsh'
+                '(stable|lts)' {
+                    $path = '/opt/microsoft/powershell/7/pwsh'
+                }
+                'preview' {
+                    $path = '/opt/microsoft/powershell/7-preview/pwsh'
+                }
             }
 
             $permissions = Get-DockerImagePwshPermissions -Name $name -Path $path

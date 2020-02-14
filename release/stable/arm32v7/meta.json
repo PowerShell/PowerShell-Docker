@@ -1,0 +1,17 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-arm32.tar.gz",
+    "osVersion": "Ubuntu 18.04 ARM 32v7",
+    "SkipGssNtlmSspTests": true,
+    "Base64EncodePackageUrl": true,
+    "UseAcr": true,
+    "tagTemplates": [
+        "#psversion#-arm32v7-ubuntu-#tag#",
+        "arm32v7-ubuntu-#shorttag#"
+    ],
+    "TestProperties": {
+        "size": 550,
+        "Arm32": true
+    }
+}

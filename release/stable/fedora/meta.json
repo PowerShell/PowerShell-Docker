@@ -1,0 +1,15 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm",
+    "osVersion": "Fedora",
+    "SkipGssNtlmSspTests": false,
+    "tagTemplates": [
+        "#psversion#-fedora-#tag#",
+        "fedora-#shorttag#"
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 632
+    }
+}

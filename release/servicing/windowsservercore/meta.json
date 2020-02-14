@@ -5,5 +5,8 @@
     "Base64EncodePackageUrl": true,
     "tagTemplates": [
         "#psversion#-windowsservercore-#tag#"
-    ]
+    ],
+    "TestProperties": {
+        "size": 1
+    }
 }
