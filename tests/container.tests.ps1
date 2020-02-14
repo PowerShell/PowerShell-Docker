@@ -434,6 +434,32 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             )
         }
 
+        it "pwsh should be at <Path> in <channel>-<Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+                [string]
+                $Channel,
+
+                [Bool]
+                $Arm32,
+
+                [string]
+                $Path
+            )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
+
+            $paths = @(Get-DockerCommandSource -Name $name -Path 'pwsh')
+            $paths.count | Should -BeGreaterOrEqual 1
+            $pwshPath = $paths | Where-Object { $_ -like '*microsoft*' }
+            $pwshPath | Should -Be $Path
+        }
+
         it "pwsh should have execute permissions for all in <channel>-<Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
             param(
                 [Parameter(Mandatory=$true)]
