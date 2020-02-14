@@ -1,12 +1,16 @@
-# Docker image file that describes an Ubuntu16.04 image with PowerShell installed from Microsoft APT Repo
-ARG fromTag=16.04
-ARG imageRepo=ubuntu
+# Docker image file that describes an CentOS7 image with PowerShell installed from Microsoft YUM Repo
+ARG fromTag=8
+ARG imageRepo=centos
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=6.2.0
-ARG PS_PACKAGE=powershell_${PS_VERSION}-1.ubuntu.16.04_amd64.deb
+ARG PS_VERSION=7.0.0
+ARG PACKAGE_VERSION=7.0.0
+ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
+
+ARG fromTag=7
+ARG imageRepo=centos
 
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
@@ -14,30 +18,27 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Ubuntu-16.04
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-CentOS-${fromTag}
 
 # Install dependencies and clean up
-RUN apt-get update \
-    && apt-get install -y \
-    # curl is required to grab the Linux package
-        curl \
-    # less is required for help in powershell
-        less \
-    # requied to setup the locale
-        locales \
-    # required for SSL
-        ca-certificates \
-        gss-ntlmssp \
-    # Download the Linux package and save it
-    && echo ${PS_PACKAGE_URL} \
-    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb \
-    && apt-get install -y /tmp/powershell.deb \
-    && apt-get dist-upgrade -y \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && locale-gen $LANG && update-locale \
+RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
+    && yum install -y /tmp/powershell.rpm \
+    # Required for gssntlmssp
+    && yum install -y epel-release \
+    # Update now that we have epel-release
+    && yum update -y \
+    # Install libraries for NTLM support
+    && yum install -y \
+      gssntlmssp \
+      # less is required for help in powershell
+      less \
+      # clear is part of ncurses which is used by clear
+      ncurses \
+    && yum upgrade-minimal -y --security \
+    && yum clean all \
     # remove powershell package
-    && rm /tmp/powershell.deb \
+    && rm /tmp/powershell.rpm \
+    && ln -sf /opt/microsoft/powershell/7/pwsh /usr/bin/pwsh \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
@@ -52,7 +53,7 @@ RUN apt-get update \
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:ubuntu16.04
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:centos-7
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \

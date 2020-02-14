@@ -1,26 +1,42 @@
-# Docker image file that describes an Debian 9 image with PowerShell and test dependencies
-ARG BaseImage=mcr.microsoft.com/powershell:debian-9
+# Docker image file that describes an Alpine image with PowerShell and test dependencies
+
+ARG BaseImage=mcr.microsoft.com/powershell:alpine-3.9
+
+FROM node:10.15.3-alpine as node
+
+# Do nothing, just added to borrow the already built node files.
 
 FROM ${BaseImage}
 
-# Install dependencies and clean up
-RUN apt-get update \
-    && apt-get install -y \
-        sudo \
-        curl \
-        wget \
-        iputils-ping \
-        iputils-tracepath \
-        procps \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+ARG fromTag=3.9
 
-ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Debian-9
+ENV NODE_VERSION=10.15.3 \
+    YARN_VERSION=1.13.0 \
+    NVM_DIR="/root/.nvm" \
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Alpine-${fromTag}
+
+# workaround for Alpine to run in Azure DevOps
+ENV NODE_NO_WARNINGS=1
+
+# Copy node and yarn into image
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+COPY --from=node /opt/yarn-v${YARN_VERSION} /opt/yarn-v${YARN_VERSION}
+
+RUN apk add --no-cache --virtual .pipeline-deps readline linux-pam \
+    && apk add \
+        bash \
+        sudo \
+        shadow \
+        openssl \
+        curl \
+    && apk del .pipeline-deps \
+    && ln -s /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
+    && ln -s /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:debian-9
-ARG PS_VERSION=7.0.0
+ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:alpine-3.8
+ARG PS_VERSION=6.2.3
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
@@ -36,7 +52,8 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       org.label-schema.docker.cmd="docker run ${IMAGE_NAME} pwsh -c '$psversiontable'" \
       org.label-schema.docker.cmd.devel="docker run ${IMAGE_NAME}" \
       org.label-schema.docker.cmd.test="docker run ${IMAGE_NAME} pwsh -c Invoke-Pester" \
-      org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
+      org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help" \
+      com.azure.dev.pipelines.agent.handler.node.path="/usr/local/bin/node"
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c

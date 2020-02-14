@@ -1,26 +1,22 @@
-# Docker image file that describes an Debian 9 image with PowerShell and test dependencies
-ARG BaseImage=mcr.microsoft.com/powershell:debian-9
+# Docker image file that describes an CentOS7 image with PowerShell installed from Microsoft YUM Repo
+ARG BaseImage=mcr.microsoft.com/powershell:centos-7
 
 FROM ${BaseImage}
 
 # Install dependencies and clean up
-RUN apt-get update \
-    && apt-get install -y \
+RUN yum install -y \
         sudo \
-        curl \
         wget \
-        iputils-ping \
-        iputils-tracepath \
-        procps \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+        openssl \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
-ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Debian-9
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-CentOS-7
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:debian-9
-ARG PS_VERSION=7.0.0
+ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:centos-7
+ARG PS_VERSION=6.2.3
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \

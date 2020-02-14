@@ -1,26 +1,26 @@
-# Docker image file that describes an Debian 9 image with PowerShell and test dependencies
-ARG BaseImage=mcr.microsoft.com/powershell:debian-9
+# Docker image file that describes an Fedora 28 image with PowerShell and test dependencies
+ARG BaseImage=mcr.microsoft.com/powershell:fedora-28
 
 FROM ${BaseImage}
 
-# Install dependencies and clean up
-RUN apt-get update \
-    && apt-get install -y \
-        sudo \
-        curl \
-        wget \
-        iputils-ping \
-        iputils-tracepath \
-        procps \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+ARG fromTag=28
 
-ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Debian-9
+# Install dependencies and clean up
+RUN dnf install -y \
+        sudo \
+        findutils \
+        hostname \
+        iputils \
+        wget \
+        procps-ng \
+    && dnf clean all
+
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Fedora-${fromTag}
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:debian-9
-ARG PS_VERSION=7.0.0
+ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:fedora-28
+ARG PS_VERSION=6.2.3
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
