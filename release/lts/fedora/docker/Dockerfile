@@ -4,9 +4,9 @@ ARG imageRepo=fedora
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=7.0.0-preview.1
-ARG PACKAGE_VERSION=7.0.0_preview.1
-ARG PS_PACKAGE=powershell-preview-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
+ARG PS_VERSION=7.0.0
+ARG PACKAGE_VERSION=7.0.0
+ARG PS_PACKAGE=powershell-lts-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 ARG fromTag=28
@@ -35,7 +35,6 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
       ca-certificates \
       gssntlmssp \
     && echo "end - misc packages" \
-    && ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh \
     && echo "starting FEDORA-2019-27e7b92407" \
     # For whatever reason FEDORA-2019-27e7b92407 has to be patched manually
     # to do this, upgrade libmodulemd1, if it is installed
@@ -108,4 +107,4 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
-CMD [ "pwsh-preview" ]
+CMD [ "pwsh" ]

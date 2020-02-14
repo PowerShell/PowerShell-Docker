@@ -4,8 +4,8 @@ ARG imageRepo=debian
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=7.0.0-preview.1
-ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.debian.9_amd64.deb
+ARG PS_VERSION=7.0.0
+ARG PS_PACKAGE=powershell-lts_${PS_VERSION}-1.debian.9_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 # Define ENVs for Localization/Globalization
@@ -41,7 +41,6 @@ RUN apt-get update \
     && locale-gen && update-locale \
     # remove powershell package
     && rm /tmp/powershell.deb \
-    && ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \

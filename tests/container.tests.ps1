@@ -412,14 +412,55 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
         BeforeAll {
             $permissionsTestCases = @(
                 $script:linuxContainerRunTests | ForEach-Object {
+                    $path = '/opt/microsoft/powershell/6/pwsh'
+                    switch -RegEx ($_.Channel)
+                    {
+                        'stable' {
+                            $path = '/opt/microsoft/powershell/7/pwsh'
+                        }
+                        'lts' {
+                            $path = '/opt/microsoft/powershell/7-lts/pwsh'
+                        }
+                        'preview' {
+                            $path = '/opt/microsoft/powershell/7-preview/pwsh'
+                        }
+                    }
+
                     $Arm32 = [bool] $_.TestProperties.Arm32
                     @{
                         Name = $_.Name
                         Channel = $_.Channel
                         Arm32 = $Arm32
+                        Path = $path
                     }
                 }
             )
+        }
+
+        it "pwsh should be at <Path> in <channel>-<Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+                [string]
+                $Channel,
+
+                [Bool]
+                $Arm32,
+
+                [string]
+                $Path
+            )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is flaky on QEMU"
+            }
+
+            $paths = @(Get-DockerCommandSource -Name $name -Command 'pwsh')
+            $paths.count | Should -BeGreaterOrEqual 1
+            $pwshPath = $paths | Where-Object { $_ -like '*microsoft*' }
+            $pwshPath | Should -Be $Path
         }
 
         it "pwsh should have execute permissions for all in <channel>-<Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
@@ -431,23 +472,15 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 $Channel,
 
                 [Bool]
-                $Arm32
+                $Arm32,
+
+                [string]
+                $Path
             )
 
             if($Arm32)
             {
                 Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
-            }
-
-            $path = '/opt/microsoft/powershell/6/pwsh'
-            switch -RegEx ($Channel)
-            {
-                '(stable|lts)' {
-                    $path = '/opt/microsoft/powershell/7/pwsh'
-                }
-                'preview' {
-                    $path = '/opt/microsoft/powershell/7-preview/pwsh'
-                }
             }
 
             $permissions = Get-DockerImagePwshPermissions -Name $name -Path $path
@@ -463,19 +496,15 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 $Channel,
 
                 [Bool]
-                $Arm32
+                $Arm32,
+
+                [string]
+                $Path
             )
 
             if($Arm32)
             {
                 Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
-            }
-
-            $path = '/opt/microsoft/powershell/6/pwsh'
-
-            if($Channel -eq 'preview' -or $Channel -eq 'lts')
-            {
-                $path = '/opt/microsoft/powershell/7-preview/pwsh'
             }
 
             $permissions = Get-DockerImagePwshPermissions -Name $name -Path $path
