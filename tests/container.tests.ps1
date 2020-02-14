@@ -454,7 +454,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
             }
 
-            $paths = @(Get-DockerCommandSource -Name $name -Path 'pwsh')
+            $paths = @(Get-DockerCommandSource -Name $name -Command 'pwsh')
             $paths.count | Should -BeGreaterOrEqual 1
             $pwshPath = $paths | Where-Object { $_ -like '*microsoft*' }
             $pwshPath | Should -Be $Path
