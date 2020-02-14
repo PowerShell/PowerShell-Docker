@@ -454,7 +454,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
 
             if($Arm32)
             {
-                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+                Set-ItResult -Pending -Because "Arm32 is flaky on QEMU"
             }
 
             $paths = @(Get-DockerCommandSource -Name $name -Command 'pwsh')
