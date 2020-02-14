@@ -35,7 +35,6 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
       ca-certificates \
       gssntlmssp \
     && echo "end - misc packages" \
-    && ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh \
     && echo "starting FEDORA-2019-27e7b92407" \
     # For whatever reason FEDORA-2019-27e7b92407 has to be patched manually
     # to do this, upgrade libmodulemd1, if it is installed

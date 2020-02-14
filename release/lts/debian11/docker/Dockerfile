@@ -73,6 +73,8 @@ RUN apt-get update \
 RUN chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     # Create the pwsh symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    # Create the pwsh-lts symbolic link that points to powershell
+    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-lts \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
