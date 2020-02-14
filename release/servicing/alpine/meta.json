@@ -6,9 +6,5 @@
     "tagTemplates": [
         "#psversion#-alpine-#tag#"
     ],
-    "SkipGssNtlmSspTests": true,
-    "SubImage": "test-deps",
-    "TestProperties": {
-        "size": 165
-    }
+    "SkipGssNtlmSspTests": true
 }

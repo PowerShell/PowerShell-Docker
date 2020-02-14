@@ -1,26 +1,25 @@
-# Docker image file that describes an Debian 9image with PowerShell and test dependencies
-ARG BaseImage=mcr.microsoft.com/powershell:debian-9
+# Docker image file that describes an OpenSuse 42.3image with PowerShell installed and Test Dependecies
+ARG BaseImage=mcr.microsoft.com/powershell:opensuse-42.3
 
 FROM ${BaseImage}
 
 # Install dependencies and clean up
-RUN apt-get update \
-    && apt-get install -y \
-        sudo \
-        curl \
-        wget \
-        iputils-ping \
-        iputils-tracepath \
-        procps \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Debian-9
+RUN zypper --non-interactive update --skip-interactive \
+    && zypper --non-interactive install \
+         sudo \
+         tar \
+         curl \
+         wget \
+         hostname \
+    # clean package manager cache
+    && zypper clean -a \
+    # remove package manager log file
+    && rm -f /var/log/zypp/history /var/log/zypper.log
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:debian-9
-ARG PS_VERSION=6.2.3
+ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:centos7
+ARG PS_VERSION=6.2.0
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \

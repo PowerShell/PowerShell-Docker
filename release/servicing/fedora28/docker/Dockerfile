@@ -1,12 +1,11 @@
-# Docker image file that describes an Debian 9 image with PowerShell installed from Microsoft APT Repo
-ARG fromTag=stretch
-ARG imageRepo=debian
-
+# Docker image file that describes Fedora 28 image with PowerShell installed from Microsoft YUM Repo
+ARG fromTag=28
+ARG imageRepo=fedora
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
 ARG PS_VERSION=6.1.0
-ARG PS_PACKAGE=powershell_${PS_VERSION}-1.debian.9_amd64.deb
+ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 # Define ENVs for Localization/Globalization
@@ -17,30 +16,21 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
 
 # Install dependencies and clean up
-RUN apt-get update \
-    && apt-get install -y \
-    # curl is required to grab the Linux package
-        curl \
-    # less is required for help in powershell
-        less \
-    # requied to setup the locale
-        locales \
-    # required for SSL
-        ca-certificates \
-        gss-ntlmssp \
-    # Download the Linux package and save it
-    && echo ${PS_PACKAGE_URL} \
-    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb \
-    && apt-get install -y /tmp/powershell.deb \
-    && apt-get dist-upgrade -y \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    # enable en_US.UTF-8 locale
-    && sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
-    # generate locale
-    && locale-gen && update-locale \
+RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
+    && dnf install -y /tmp/powershell.rpm \
+    && dnf install -y \
+	# less is needed for help
+	less \
+    # Needed to run localdef
+        glibc-locale-source \
+    # Invoke-WebRequest doesn't work correctly without this
+        compat-openssl10 \
+	gssntlmssp \
+    && dnf upgrade-minimal -y --security \
+    && dnf clean all \
+    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # remove powershell package
-    && rm /tmp/powershell.deb \
+    && rm /tmp/powershell.rpm \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
@@ -55,7 +45,7 @@ RUN apt-get update \
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell:debian-9
+ARG IMAGE_NAME=mcr.microsoft.com/powershell:fedora28
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \

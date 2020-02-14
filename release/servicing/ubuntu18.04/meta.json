@@ -6,9 +6,5 @@
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "#psversion#-ubuntu-#tag#"
-    ],
-    "TestProperties": {
-        "size": 355
-    },
-    "SubImage": "test-deps"
+    ]
 }

@@ -5,8 +5,10 @@
     "osVersion": "OpenSuse 42.3",
     "SkipGssNtlmSspTests": true,
     "tagTemplates": [
-        "#psversion#-opensuse-#tag#"
+        "#psversion#-opensuse-#tag#",
+        "opensuse-#shorttag#"
     ],
+    "SubImage": "test-deps",
     "TestProperties": {
         "size": 524
     }

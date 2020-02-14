@@ -17,5 +17,4 @@ $repoRoot = Join-Path -path (Join-Path -Path $parent -ChildPath '..') -ChildPath
 $modulePath = Join-Path -Path $repoRoot -ChildPath 'tools\getDockerTags'
 Import-Module $modulePath
 
-Get-DockerTags -ShortTags $shortTags -Image "mcr.microsoft.com/windows/nanoserver" -FullTagFilter '\d{4}[-_]KB\d{7}([\-_]amd64)?$' -Mcr
-
+Get-DockerTags -ShortTags $shortTags -Image "mcr.microsoft.com/windows/nanoserver" -FullTagFilter '\d{4}_KB\d{7}(_amd64)?$' -Mcr
