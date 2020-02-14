@@ -13,7 +13,7 @@ FROM ${imageRepo}:${fromTag} AS installer-env
 ARG PS_VERSION=7.0.0
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-alpine-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=7
+ARG PS_INSTALL_VERSION=7-lts
 
 # Download the Linux tar.gz and save it
 ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
@@ -34,7 +34,7 @@ FROM ${imageRepo}:${fromTag}
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links
-ARG PS_INSTALL_VERSION=7
+ARG PS_INSTALL_VERSION=7-lts
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
     # Define ENVs for Localization/Globalization
