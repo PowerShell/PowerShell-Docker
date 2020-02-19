@@ -416,7 +416,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                     switch -RegEx ($_.Channel)
                     {
                         'stable' {
-                            $path = '/opt/microsoft/powershell/7/pwsh'
+                            $path = '/opt/microsoft/powershell/6/pwsh'
                         }
                         'lts' {
                             $path = '/opt/microsoft/powershell/7-lts/pwsh'
