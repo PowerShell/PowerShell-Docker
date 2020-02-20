@@ -1,0 +1,14 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-lts_${PS_VERSION}-1.ubuntu.18.04_amd64.deb",
+    "osVersion": "Ubuntu 18.04",
+    "SkipGssNtlmSspTests": false,
+    "tagTemplates": [
+        "lts-ubuntu-#shorttag#"
+    ],
+    "TestProperties": {
+        "size": 355
+    },
+    "SubImage": "test-deps"
+}

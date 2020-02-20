@@ -1,0 +1,13 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-lts-${PS_VERSION}-1.rhel.7.x86_64.rpm",
+    "osVersion": "CentOS 7",
+    "tagTemplates": [
+        "lts-centos-#shorttag#"
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 550
+    }
+}

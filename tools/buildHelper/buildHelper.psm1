@@ -16,17 +16,24 @@ function Get-PowerShellVersion
         [Parameter(Mandatory, ParameterSetName='Servicing', HelpMessage="Gets the servicing version.  Without this it gets the current stable version.")]
         [switch] $Servicing,
 
+        [Parameter(Mandatory, ParameterSetName="ExplicitVersionLts", HelpMessage="Gets the preview version.  Without this it gets the current stable version.")]
+        [Parameter(Mandatory, ParameterSetName='Lts', HelpMessage="Gets the lts version.  Without this it gets the current stable version.")]
+        [switch] $Lts,
+
         [Parameter(ParameterSetName="LookupVersion",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
         [Parameter(ParameterSetName="ExplicitVersion",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
         [Parameter(ParameterSetName="ExplicitVersionPreview",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
         [Parameter(ParameterSetName="ExplicitVersionServicing",HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
+        [Parameter(ParameterSetName="ExplicitVersionLts", HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
         [Parameter(ParameterSetName='Servicing', HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
         [Parameter(ParameterSetName='Preview', HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
+        [Parameter(ParameterSetName='Lts', HelpMessage="Gets the linux package (docker tags use the standard format) format of the version.  This only applies to preview versions, but is always safe to use for linux packages.")]
         [switch] $Linux,
 
         [Parameter(Mandatory,ParameterSetName="ExplicitVersion", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
         [Parameter(Mandatory,ParameterSetName="ExplicitVersionServicing", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
         [Parameter(Mandatory,ParameterSetName="ExplicitVersionPreview", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
+        [Parameter(Mandatory, ParameterSetName="ExplicitVersionLts", HelpMessage="Don't lookup version, just transform this standardized version based on the other parameters.")]
         [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
         [string]
         $Version
@@ -40,6 +47,15 @@ function Get-PowerShellVersion
         }
         elseif ($Servicing.IsPresent) {
             $metaData.ServicingReleaseTag
+        }
+        elseif ($Lts.IsPresent) {
+            $ltsReleaseTag = $metaData.LtsReleaseTag
+            if (-not $ltsReleaseTag) {
+                $metaData.PreviewReleaseTag
+            }
+            else {
+                $ltsReleaseTag
+            }
         }
         else {
             $metaData.StableReleaseTag
@@ -63,7 +79,7 @@ function Get-ImageList
 {
     param(
         [Parameter(HelpMessage="Filters returned list to stable or preview images. Default to all images.")]
-        [ValidateSet('stable','preview','servicing','all','community-stable')]
+        [ValidateSet('stable','preview','servicing','all','community-stable','lts')]
         [string[]]
         $Channel='all'
     )
@@ -71,6 +87,7 @@ function Get-ImageList
     # Get the names of the builds.
     $releasePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\release'
     $stablePath = Join-Path -Path $releasePath -ChildPath 'stable'
+    $ltsPath = Join-Path -Path $releasePath -ChildPath 'lts'
     $previewPath = Join-Path -Path $releasePath -ChildPath 'preview'
     $servicingPath = Join-Path -Path $releasePath -ChildPath 'servicing'
     $communityStablePath = Join-Path -Path $releasePath -ChildPath 'community-stable'
@@ -83,6 +100,11 @@ function Get-ImageList
     if ($Channel -in 'servicing', 'all')
     {
         Get-ChildItem -Path $servicingPath -Directory | Select-Object -ExpandProperty Name | Write-Output
+    }
+
+    if ($Channel -in 'lts', 'all')
+    {
+        Get-ChildItem -Path $ltsPath -Directory | Select-Object -ExpandProperty Name | Write-Output
     }
 
     if ($Channel -in 'preview', 'all')
@@ -276,10 +298,13 @@ function Get-Versions
         $PreviewVersion,
 
         [string]
-        $StableVersion
+        $StableVersion,
+
+        [string]
+        $LtsVersion
     )
 
-    Write-Verbose "Getting Version for $Channel - servicing: $ServicingVersion; Preview: $PreviewVersion; stable: $stableVersion"
+    Write-Verbose "Getting Version for $Channel - servicing: $ServicingVersion; Preview: $PreviewVersion; stable: $stableVersion; stable: $ltsVersion"
 
     $versionExtraParams = @{}
 
@@ -292,6 +317,14 @@ function Get-Versions
 
             $windowsVersion = Get-PowerShellVersion -Servicing @versionExtraParams
             $linuxVersion = Get-PowerShellVersion -Linux -Servicing @versionExtraParams
+        }
+        'lts$' {
+            if($LtsVersion){
+                $versionExtraParams['Version'] = $LtsVersion
+            }
+
+            $windowsVersion = Get-PowerShellVersion -Lts @versionExtraParams
+            $linuxVersion = Get-PowerShellVersion -Lts -Linux @versionExtraParams
         }
         'preview$' {
             if($PreviewVersion){
@@ -606,7 +639,7 @@ function Get-TestParams
             $packageUrl = [System.UriBuilder]::new($sasData.sasBase)
 
             $previewTag = ''
-            if($actualChannel -like '*preview*')
+            if($psversion -like '*-*')
             {
                 $previewTag = '-preview'
             }
@@ -632,7 +665,7 @@ function Get-TestParams
             $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
 
             $previewTag = ''
-            if($actualChannel -like '*preview*')
+            if($psversion -like '*-*')
             {
                 $previewTag = '-preview'
             }

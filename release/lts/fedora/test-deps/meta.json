@@ -1,0 +1,19 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "osVersion": "Fedora ${fromTag}",
+    "SkipGssNtlmSspTests": false,
+    "tagTemplates": [
+        "#tag#"
+    ],
+    "SubRepository": "test-deps",
+    "OptionalTests": [
+        "test-deps"
+    ],
+    "TestProperties": {
+        "size": 632
+    },
+    "TagMapping": {
+        "^.*-fedora-30$" : "lts-fedora-30"
+    }
+}

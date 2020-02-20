@@ -20,4 +20,3 @@ stages:
       acr: OnlyAcr
       useacr: true
       winCiParameter: ''
-      osFilter: Linux

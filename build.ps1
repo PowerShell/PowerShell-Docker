@@ -83,7 +83,7 @@ param(
     [string]
     $TagFilter,
 
-    [ValidateSet('stable','preview','servicing','community-stable','community-preview','community-servicing')]
+    [ValidateSet('stable','preview','servicing','community-stable','community-preview','community-servicing','lts')]
     [Parameter(Mandatory, ParameterSetName="TestByName")]
     [Parameter(Mandatory, ParameterSetName="TestAll")]
     [Parameter(ParameterSetName="localBuildByName")]
@@ -117,6 +117,12 @@ param(
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
     $StableVersion,
+
+    [Parameter(ParameterSetName="GenerateMatrixJson")]
+    [Parameter(ParameterSetName="GenerateTagsYaml")]
+    [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
+    [string]
+    $LtsVersion,
 
     [Parameter(ParameterSetName="GenerateMatrixJson")]
     [Parameter(ParameterSetName="GenerateTagsYaml")]
@@ -236,6 +242,7 @@ End {
             ServicingVersion = if($Version) {$Version} else {$ServicingVersion}
             PreviewVersion = if($Version) {$Version} else {$PreviewVersion}
             StableVersion = if($Version) {$Version} else {$StableVersion}
+            LtsVersion = if($Version) {$Version} else {$LtsVersion}
         }
 
         # Get Versions
