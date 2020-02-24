@@ -1,6 +1,6 @@
 # Docker image file that describes an Alpine image with PowerShell and test dependencies
 
-ARG BaseImage=mcr.microsoft.com/powershell:alpine-3.9
+ARG BaseImage=mcr.microsoft.com/powershell:alpine-3.11
 
 FROM node:10.18.1-alpine as node
 
@@ -8,7 +8,7 @@ FROM node:10.18.1-alpine as node
 
 FROM ${BaseImage}
 
-ARG fromTag=3.9
+ARG fromTag=3.11
 
 ENV NODE_VERSION=10.18.1 \
     YARN_VERSION=1.21.1 \
@@ -35,7 +35,7 @@ RUN apk add --no-cache --virtual .pipeline-deps readline linux-pam \
 
 # Define args needed only for the labels
 ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:alpine-3.8
+ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:alpine-3.11
 ARG PS_VERSION=6.2.3
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
