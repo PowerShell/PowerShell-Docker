@@ -80,7 +80,7 @@ stages:
         displayName: 'Install Pester'
 
       - powershell: |
-            $yaml = ./build.ps1 -GenerateTagsYaml -Channel stable, preview -StableVersion $(StableVersion) -PreviewVersion $(PreviewVersion) -LtsVersion $(LtsVersion)
+            $yaml = ./build.ps1 -GenerateTagsYaml -Channel stable, preview, lts -StableVersion $(StableVersion) -PreviewVersion $(PreviewVersion) -LtsVersion $(LtsVersion)
             $yaml | Out-File -Encoding ascii -Path ./tagsmetadata.yaml
             Get-ChildItem -Path ./tagsmetadata.yaml | Select-Object -ExpandProperty FullName | ForEach-Object {
                     Write-Host "##vso[artifact.upload containerfolder=artifacts;artifactname=artifacts]$_"
