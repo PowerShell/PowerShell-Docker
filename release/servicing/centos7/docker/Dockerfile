@@ -4,8 +4,8 @@ ARG imageRepo=centos
 
 FROM ${imageRepo}:${fromTag} AS installer-env
 
-ARG PS_VERSION=6.1.1
-ARG PACKAGE_VERSION=6.1.1
+ARG PS_VERSION=6.2.0
+ARG PACKAGE_VERSION=6.2.0
 ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
@@ -24,9 +24,10 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
     # Update now that we have epel-release
     && yum update -y \
     # Install libraries for NTLM support
-    && yum install -y gssntlmssp \
-	# less is required for help in powershell
-	less \
+    && yum install -y \
+      gssntlmssp \
+      # less is required for help in powershell
+      less \
     && yum upgrade-minimal -y --security \
     && yum clean all \
     && localedef --charmap=UTF-8 --inputfile=en_US $LANG \

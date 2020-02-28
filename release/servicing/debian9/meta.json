@@ -6,5 +6,9 @@
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "#psversion#-debian-#tag#"
-    ]
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 314
+    }
 }

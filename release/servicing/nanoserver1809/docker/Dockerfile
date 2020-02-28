@@ -7,10 +7,10 @@ ARG NanoServerRepo=mcr.microsoft.com/windows/nanoserver
 
 # Use server core as an installer container to extract PowerShell,
 # As this is a multi-stage build, this stage will eventually be thrown away
-FROM ${WindowsServerCoreRepo}:$WindowsServerCoreVersion  AS installer-env
+FROM ${InstallerRepo}:$InstallerVersion  AS installer-env
 
 # Arguments for installing PowerShell, must be defined in the container they are used
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=6.2.0
 
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
 
@@ -40,7 +40,7 @@ RUN Write-host "Verifying valid Version..."; `
 FROM ${NanoServerRepo}:${fromTag}
 
 ARG VCS_REF="none"
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=6.2.0
 ARG IMAGE_NAME=mcr.microsoft.com/powershell
 
 LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
@@ -69,8 +69,19 @@ ENV ProgramFiles="C:\Program Files" `
     # Set the default windows path so we can use it
     WindowsPATH="C:\Windows\system32;C:\Windows"
 
-    # Set the path
-ENV PATH="$WindowsPATH;${ProgramFiles}\PowerShell;"
+### Begin workaround ###
+# Note that changing user on nanoserver is not recommended
+# See, https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-containers/container-base-images#base-image-differences
+# But we are working around a bug introduced in the nanoserver image introduced in 1809
+# Without this, PowerShell Direct will fail
+# this command sholud be like this: https://github.com/PowerShell/PowerShell-Docker/blob/f81009c42c96af46aef81eb1515efae0ef29ad5f/release/preview/nanoserver/docker/Dockerfile#L76
+USER ContainerAdministrator
+
+# This is basically the correct code except for the /M
+RUN setx PATH "%PATH%;%ProgramFiles%\PowerShell;" /M
+
+USER ContainerUser
+### End workaround ###
 
 COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell"]
 
