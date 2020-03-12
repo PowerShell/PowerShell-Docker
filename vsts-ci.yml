@@ -28,7 +28,7 @@ stages:
     jobs:
     - job: CheckForDuplicateTags
       pool:
-        vmImage: ubuntu-16.04
+        vmImage: ubuntu-18.04
       displayName: Check For Duplicate Tags
       steps:
       - pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhss"))"
