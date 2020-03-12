@@ -14,7 +14,7 @@ FROM ${imageRepo}:${fromTag} AS installer-env
 ARG PS_VERSION=6.2.3
 ARG PS_PACKAGE=powershell_${PS_VERSION}-1.debian.9_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=6
+ARG PS_INSTALL_VERSION=7
 
 # Define Args for the needed to add the package
 ARG KALI_REPO_KEY_PACKAGE_URL=https://http.kali.org/kali/pool/main/k/kali-archive-keyring/kali-archive-keyring_2018.2_all.deb

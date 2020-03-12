@@ -14,7 +14,7 @@ FROM ${imageRepo}:${fromTag} AS installer-env
 ARG PS_VERSION=6.2.3
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=6
+ARG PS_INSTALL_VERSION=7
 
 # Define Args and Env needed to create links
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
@@ -43,7 +43,7 @@ COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershe
 
 # Define Args and Env needed to create links
 ARG PS_VERSION=6.1.0
-ARG PS_INSTALL_VERSION=6
+ARG PS_INSTALL_VERSION=7
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
     # Define ENVs for Localization/Globalization
