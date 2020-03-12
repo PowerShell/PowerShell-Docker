@@ -32,10 +32,6 @@ update_configs:
     update_schedule: "weekly"
 
   - package_manager: "docker"
-    directory: "/release/preview/opensuse423/dependabot"
-    update_schedule: "weekly"
-
-  - package_manager: "docker"
     directory: "/release/preview/ubuntu18.04/dependabot"
     update_schedule: "weekly"
 
