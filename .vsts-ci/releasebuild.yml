@@ -32,7 +32,7 @@ stages:
       displayName: Create Preview Manifest Lists
       condition: succeededOrFailed()
       pool:
-        name: PowerShell
+        name: Package ES Standard Build
         timeoutInMinutes: 30
 
       steps:
@@ -46,7 +46,7 @@ stages:
 
       condition: succeededOrFailed()
       pool:
-        name: PowerShell
+        name: Package ES Standard Build
         timeoutInMinutes: 30
 
       steps:
