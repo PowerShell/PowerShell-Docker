@@ -32,11 +32,12 @@ stages:
       displayName: Create Preview Manifest Lists
       condition: succeededOrFailed()
       pool:
-        name: Package ES Standard Build
+        vmImage: windows-latest
         timeoutInMinutes: 30
 
       steps:
       - template: manifestSteps.yml
+
     - job: StableManifestPhase
       variables:
         releaseTag: $(stableReleaseTag)
@@ -46,11 +47,12 @@ stages:
 
       condition: succeededOrFailed()
       pool:
-        name: Package ES Standard Build
+        vmImage: windows-latest
         timeoutInMinutes: 30
 
       steps:
       - template: manifestSteps.yml
+
   - stage: GenerateTagsYaml
     dependsOn: []
     jobs:
