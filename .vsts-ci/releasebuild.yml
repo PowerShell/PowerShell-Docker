@@ -37,6 +37,7 @@ stages:
 
       steps:
       - template: manifestSteps.yml
+
     - job: StableManifestPhase
       variables:
         releaseTag: $(stableReleaseTag)
@@ -51,6 +52,7 @@ stages:
 
       steps:
       - template: manifestSteps.yml
+
   - stage: GenerateTagsYaml
     dependsOn: []
     jobs:
