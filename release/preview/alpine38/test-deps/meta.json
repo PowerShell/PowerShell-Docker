@@ -11,6 +11,6 @@
         "test-deps-musl"
     ],
     "TestProperties": {
-        "size": 212
+        "size": 225
     }
 }
