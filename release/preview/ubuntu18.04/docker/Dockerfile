@@ -74,3 +74,4 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
 CMD [ "pwsh-preview" ]
+
