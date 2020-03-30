@@ -1,5 +1,47 @@
 # Development
 
+## Building the images
+
+To build an image run `./build.ps1 -build -name <ImageFolderName>`.
+
+### Example
+
+For example to build Ubuntu 16.04/xenial, which is in `./release/stable/ubuntu16.04`:
+
+```sh
+PS /powershell-docker> ./build.ps1 -Build -Name ubuntu16.04
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.0.2-ubuntu-16.04 PSversion: 6.0.2
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.0.2-ubuntu-trusty PSversion: 6.0.2
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.0.2-ubuntu-trusty-20180531 PSversion: 6.0.2
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.1.0-preview.2-ubuntu-16.04 PSversion: 6.1.0~preview.2
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.1.0-preview.2-ubuntu-trusty PSversion: 6.1.0~preview.2
+VERBOSE: lauching build with fromTag: trusty-20180531 Tag: 6.1.0-preview.2-ubuntu-trusty-20180531 PSversion: 6.1.0~preview.2
+VERBOSE: image name: powershell.local:6.0.2-ubuntu-16.04
+VERBOSE: image name: powershell.local:6.0.2-ubuntu-trusty
+VERBOSE: image name: powershell.local:6.0.2-ubuntu-trusty-20180531
+VERBOSE: image name: powershell.local:6.1.0-preview.2-ubuntu-16.04
+VERBOSE: image name: powershell.local:6.1.0-preview.2-ubuntu-trusty
+VERBOSE: image name: powershell.local:6.1.0-preview.2-ubuntu-trusty-20180531
+```
+
+### Run the Docker image you built
+
+```sh
+PS /powershell-docker> docker run -it --rm powershell.local:6.1.0-preview.2-ubuntu-16.04 pwsh -c '$psversiontable'
+
+Name                           Value
+----                           -----
+PSVersion                      6.0.2
+PSEdition                      Core
+GitCommitId                    v6.0.2
+OS                             Linux 4.9.87-linuxkit-aufs #1 SMP Wed Mar 14 15:12:16 UTC 2018
+Platform                       Unix
+PSCompatibleVersions           {1.0, 2.0, 3.0, 4.0...}
+PSRemotingProtocolVersion      2.3
+SerializationVersion           1.1.0.1
+WSManStackVersion              3.0
+```
+
 ## Adding new Docker image
 
 ### Folder structure
