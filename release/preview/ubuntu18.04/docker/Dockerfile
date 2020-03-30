@@ -77,4 +77,3 @@ ENTRYPOINT [ "pwsh-entrypoint.sh" ]
 
 # Use PowerShell as the default shell
 CMD [ "pwsh-preview" ]
-
