@@ -71,7 +71,10 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       org.label-schema.docker.cmd.test="docker run ${IMAGE_NAME} pwsh -c Invoke-Pester" \
       org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
 
+ADD ./pwsh-entrypoint.sh /usr/local/bin/pwsh-entrypoint.sh
+
+ENTRYPOINT [ "pwsh-entrypoint.sh" ]
+
 # Use PowerShell as the default shell
-# Use array to avoid Docker prepending /bin/sh -c
 CMD [ "pwsh-preview" ]
 
