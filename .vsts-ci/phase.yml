@@ -46,6 +46,7 @@ jobs:
       curl -fsSL https://github.com/RDIL/dockerlint/releases/download/0.1.0-alpha3/dockerlint.tar.xz -o dockerlint.tar.xz
       tar xf dockerlint.tar.xz
       ls
+      echo -----
       ls dockerlint
       ./dockerlint/dockerlint --dockerfile release/$Channel/${ImageName}/docker/Dockerfile
     displayName: Run dockerlint tool
