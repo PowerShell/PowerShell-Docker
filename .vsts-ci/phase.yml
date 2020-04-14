@@ -1,6 +1,6 @@
 parameters:
   name: ''
-  vmImage: 'ubuntu-16.04'
+  vmImage: 'ubuntu-18.04'
   continueonerror: false
   ciParameter: '-CI'
   useacr: 'false'
@@ -36,12 +36,23 @@ jobs:
       displayName: 'az login'
       condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-
   - pwsh: |
       if ( '$env:CHANNEL' -eq '' ) { exit }
       Install-module pester -Scope CurrentUser -Force
     displayName: Install Pester
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
+  - bash: |
+      curl -fsSL https://github.com/RDIL/dockerlint/releases/download/0.1.0-alpha3/dockerlint.tar.xz -o dockerlint.tar.xz
+      tar xsf dockerlint.tar.xz
+      cp dockerlint/dockerlint dockerlint
+    displayName: Download dockerlint tool
+    condition: succeededOrFailed()
+
+  - bash: |
+      ./dockerlint --dockerfile release/${Channel}/${ImageName}/docker/Dockerfile
+    displayName: Run dockerlint tool
+    condition: succeededOrFailed()
 
   - pwsh: |
       $extraParams = @{}
@@ -56,7 +67,6 @@ jobs:
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     continueOnError: ${{ variables.continueonerror }}
 
-
   - pwsh: |
       if ( '$env:CHANNEL' -eq '' ) { exit }
       $files = @(Get-ChildItem -Recurse test*.xml)
@@ -66,7 +76,6 @@ jobs:
     displayName: Make sure we got test results
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     continueOnError: ${{ variables.continueonerror }}
-
 
   - task: PublishTestResults@2
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
