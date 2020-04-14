@@ -49,7 +49,8 @@ jobs:
     condition: succeededOrFailed()
 
   - bash: |
-      ./dockerlint/dockerlint --dockerfile release/${Channel}/${ImageName}/docker/Dockerfile
+      chmod +x dockerlint/dockerlint
+      ./dockerlint/dockerlint --dockerfile release/$Channel/${ImageName}/docker/Dockerfile
     displayName: Run dockerlint tool
     condition: succeeded()
 
