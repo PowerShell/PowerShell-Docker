@@ -45,12 +45,11 @@ jobs:
   - bash: |
       curl -fsSL https://github.com/RDIL/dockerlint/releases/download/0.1.0-alpha3/dockerlint.tar.xz -o dockerlint.tar.xz
       tar xsf dockerlint.tar.xz
-      cp dockerlint/dockerlint dockerlint
     displayName: Download dockerlint tool
     condition: succeededOrFailed()
 
   - bash: |
-      ./dockerlint --dockerfile release/${Channel}/${ImageName}/docker/Dockerfile
+      dockerlint/dockerlint --dockerfile release/${Channel}/${ImageName}/docker/Dockerfile
     displayName: Run dockerlint tool
     condition: succeeded()
 
