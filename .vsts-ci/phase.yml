@@ -52,7 +52,7 @@ jobs:
   - bash: |
       ./dockerlint --dockerfile release/${Channel}/${ImageName}/docker/Dockerfile
     displayName: Run dockerlint tool
-    condition: succeededOrFailed()
+    condition: succeeded()
 
   - pwsh: |
       $extraParams = @{}
