@@ -78,7 +78,7 @@ stages:
       - powershell: 'Get-ChildItem env:'
         displayName: 'Capture Environment'
 
-      - powershell: 'Install-module pester -Scope CurrentUser -Force -SkipPublisherCheck'
+      - powershell: 'Install-module pester -Scope CurrentUser -Force'
         displayName: 'Install Pester'
 
       - powershell: |

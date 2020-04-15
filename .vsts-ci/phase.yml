@@ -56,7 +56,6 @@ jobs:
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     continueOnError: ${{ variables.continueonerror }}
 
-
   - pwsh: |
       if ( '$env:CHANNEL' -eq '' ) { exit }
       $files = @(Get-ChildItem -Recurse test*.xml)
@@ -66,7 +65,6 @@ jobs:
     displayName: Make sure we got test results
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     continueOnError: ${{ variables.continueonerror }}
-
 
   - task: PublishTestResults@2
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))

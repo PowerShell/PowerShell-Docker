@@ -24,6 +24,7 @@ $ docker pull pshorg/powershellcommunity
   * Tags: `blackarch-2018.10.01` , `6.1.1-blackarch-2018.10.01`
   * Dockerfile: [/release/community-stable/blackarch/docker/Dockerfile][blackarch-linux-stable-dockerfile]
   * Example: `docker pull pshorg/powershellcommunity:blackarch-2018.10.01`
+<!-- Broken
 * **[Clear Linux][clear-linux-uri]**
   * Tags: `clearlinux-base` , `6.1.1-clearlinux-base`
   * Dockerfile: [/release/community-stable/clearlinux/docker/Dockerfile][clear-linux-stable-dockerfile]
@@ -32,14 +33,17 @@ $ docker pull pshorg/powershellcommunity
   * Tags: `kali-kali-rolling` , `6.1.1-kali-kali-rolling`
   * Dockerfile: [/release/community-stable/kali-rolling/docker/Dockerfile][kali-linux-stable-dockerfile]
   * Example: `docker pull pshorg/powershellcommunity:kali-kali-rolling`
+-->
 * **[Oracle Linux][oracle-linux-uri]**
   * Tags: `oraclelinux-7.5` , `6.1.1-oraclelinux-7.5`
   * Dockerfile: [/release/community-stable/oraclelinux/docker/Dockerfile][oracle-linux-stable-dockerfile]
   * Example: `docker pull pshorg/powershellcommunity:oraclelinux-7.5`
+<!-- Broken
 * **[Parrot Linux][parrotsec-linux-uri]**
   * Tags: `parrot-4.2.2` , `6.1.1-parrot-4.2.2`
   * Dockerfile: [/release/community-stable/parrot/docker/Dockerfile][parrotsec-linux-stable-dockerfile]
   * Example: `docker pull pshorg/powershellcommunity:parrot-4.2.2`
+-->
 * **[Photon Linux][parrotsec-linux-uri]**
   * Tags: `photon-2.0` , `6.1.1-photon-2.0`
   * Dockerfile: [/release/community-stable/photon/docker/Dockerfile][photon-linux-stable-dockerfile]
