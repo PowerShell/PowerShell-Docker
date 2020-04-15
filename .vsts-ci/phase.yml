@@ -48,7 +48,7 @@ jobs:
     displayName: Download dockerlint
     condition: succeeded()
 
-  - pwsh: Start-Process -FilePath dockerlint -ArgumentList "--dockerfile release/'$(Channel)'/'$(ImageName)'/docker/Dockerfile" -Wait -NoNewWindow
+  - bash: ./dockerlint --dockerfile release/$Channel/$ImageName/docker/Dockerfile
     displayName: Run dockerlint
     condition: succeeded()
 
