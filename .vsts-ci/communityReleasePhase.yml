@@ -38,11 +38,7 @@ jobs:
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: |
-      $extraParams = @{}
-      Write-Host 'Not in ACR, will push...'
-      $extraParams.Add('Push',$true)
-
-      ./build.ps1 -Build -ImageName $(dockerHost) -name '$(ImageName)' -Channel $(channel) -TestLogPostfix '$(ImageName)-$(Channel)' @extraParams -Repository $(dockerNamespace)/$(dockerImage)
+      ./build.ps1 -Build -ImageName $(dockerHost) -name '$(ImageName)' -Channel $(channel) -TestLogPostfix '$(ImageName)-$(Channel)' -Push -Repository $(dockerNamespace)/$(dockerImage)
     displayName: 'Build'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
