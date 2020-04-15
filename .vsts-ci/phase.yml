@@ -46,6 +46,7 @@ jobs:
     inputs:
       versionSpec: '3.8'
     displayName: Setup Python engine
+    condition: ne(variables['AGENT_OS'], 'Windows_NT')
 
   - bash: |
       git clone https://github.com/RDIL/dockerlint.git
@@ -55,11 +56,11 @@ jobs:
       make
       cd ..
     displayName: Download dockerlint
-    condition: succeeded()
+    condition: ne(variables['AGENT_OS'], 'Windows_NT')
 
   - bash: python3 dockerlint/main.py -d release/${CHANNEL}/${IMAGENAME}/docker/Dockerfile
     displayName: Run dockerlint
-    condition: succeeded()
+    condition: ne(variables['AGENT_OS'], 'Windows_NT')
 
   - pwsh: |
       $extraParams = @{}
