@@ -50,9 +50,9 @@ jobs:
   - bash: |
       git clone https://github.com/RDIL/dockerlint.git
       cd dockerlint
-      git checkout 0.1.0-alpha3
+      git checkout 0.1.0-alpha5
       make install-deps
-      make build-packages
+      make
       cd ..
     displayName: Download dockerlint
     condition: succeeded()
