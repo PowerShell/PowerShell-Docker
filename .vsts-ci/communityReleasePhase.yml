@@ -13,7 +13,7 @@ jobs:
       matrix: $[ ${{ parameters.matrix }} ]
       maxParallel: ${{ parameters.maxParallel }}
   variables:
-    dockerImage: 'powershell'
+    dockerImage: 'powershellcommunity'
     Channel: ${{ parameters.channel }}
     ACR: ${{ parameters.ACR }}
     releaseTag: ${{ parameters.releaseTag }}
