@@ -60,7 +60,7 @@ jobs:
 
   - bash: python3 dockerlint/main.py -d release/${CHANNEL}/${IMAGENAME}/docker/Dockerfile
     displayName: Run dockerlint
-    condition: ne(variables['AGENT_OS'], 'Windows_NT')
+    condition: and( succeeded(), ne(variables['AGENT_OS'], 'Windows_NT'))
 
   - pwsh: |
       $extraParams = @{}
