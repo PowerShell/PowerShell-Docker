@@ -49,13 +49,15 @@ jobs:
 
   - bash: |
       git clone https://github.com/RDIL/dockerlint.git
+      cd dockerlint
       git checkout 0.1.0-alpha3
       make install-deps
       make build-packages
+      cd ..
     displayName: Download dockerlint
     condition: succeeded()
 
-  - bash: python3 main.py -d release/$Channel/$ImageName/docker/Dockerfile
+  - bash: python3 dockerlint/main.py -d release/$Channel/$ImageName/docker/Dockerfile
     displayName: Run dockerlint
     condition: succeeded()
 
