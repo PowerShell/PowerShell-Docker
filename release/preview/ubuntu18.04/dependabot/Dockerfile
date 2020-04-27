@@ -3,4 +3,4 @@
 
 # Dummy docker image to trigger dependabot PRs
 
-FROM ubuntu:18.04
+FROM ubuntu:20.04
