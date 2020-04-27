@@ -58,7 +58,7 @@ jobs:
     displayName: Download dockerlint
     condition: succeeded()
 
-  - bash: python3 dockerlint/main.py -d release/${CHANNEL}/${IMAGENAME}/docker/Dockerfile
+  - bash: python dockerlint/main.py -d release/${CHANNEL}/${IMAGENAME}/docker/Dockerfile
     displayName: Run dockerlint
     condition: and( succeeded(), ne(variables['AGENT_OS'], 'Windows_NT'))
 
