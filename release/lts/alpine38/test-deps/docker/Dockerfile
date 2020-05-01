@@ -2,14 +2,14 @@
 
 ARG BaseImage=mcr.microsoft.com/powershell:alpine-3.8
 
-FROM node:10.15.3-alpine as node
+FROM node:14.0.0-alpine as node
 
 # Do nothing, just added to borrow the already built node files.
 
 FROM ${BaseImage}
 
-ENV NODE_VERSION=10.15.3 \
-    YARN_VERSION=1.13.0 \
+ENV NODE_VERSION=14.0.0 \
+    YARN_VERSION=1.22.4 \
     NVM_DIR="/root/.nvm" \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Alpine-3.8
 
