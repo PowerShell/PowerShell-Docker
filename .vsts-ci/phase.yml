@@ -51,7 +51,7 @@ jobs:
   - bash: |
       git clone https://github.com/RDIL/dockerlint.git
       cd dockerlint
-      git checkout 0.1.0-beta2
+      git checkout junit
       make install-deps
       make
       cd ..
