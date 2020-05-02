@@ -58,7 +58,7 @@ jobs:
     displayName: Download dockerlint
     condition: succeeded()
 
-  - bash: python dockerlint/main.py -d release/${CHANNEL}/${IMAGENAME}/docker/Dockerfile
+  - bash: python dockerlint/main.py -d release/${CHANNEL}/${IMAGENAME}/docker/Dockerfile -R
     displayName: Run dockerlint
     condition: succeeded()
 
