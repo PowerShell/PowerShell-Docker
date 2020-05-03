@@ -95,3 +95,14 @@ jobs:
       testResultsFiles: '**\test*.xml'
       testRunTitle: $(ImageName)
       mergeTestResults: true
+ 
+  - task: PublishTestResults@2
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+    displayName: Publish $(ImageName) dockerlint Results
+    continueOnError: ${{ variables.continueonerror }}
+
+    inputs:
+      testRunner: JUnit
+      testResultsFiles: 'dockerlint.test_RESULTS.xml'
+      testRunTitle: $(ImageName) dockerlint
+      mergeTestResults: true
