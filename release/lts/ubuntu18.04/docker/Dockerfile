@@ -18,7 +18,7 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
 
 # Install dependencies and clean up
 RUN apt-get update \
-    && apt-get install -y \
+    && apt-get install --no-install-recommends -y \
     # curl is required to grab the Linux package
         curl \
     # less is required for help in powershell
