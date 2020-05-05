@@ -43,7 +43,7 @@ RUN \
     # update package list
     apt-get update \
     # install dependencies
-    && apt-get install -y \
+    && apt-get install --no-install-recommends -y \
       # required for HttpClientHandler
       libcurl4 \
       # required for help in powershell
@@ -69,7 +69,7 @@ RUN \
     # Download the Debian9 PowerShell Core package and save it
     && wget -O /tmp/powershell.deb --no-check-certificate ${PS_PACKAGE_URL} \
     # install powershell package
-    && apt-get install -y /tmp/powershell.deb \
+    && apt-get install --no-install-recommends -y /tmp/powershell.deb \
     # remove powershell package
     && rm -f /tmp/powershell.deb \
     # Give all user execute permissions and remove write permissions for others

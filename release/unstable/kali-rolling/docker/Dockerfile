@@ -43,7 +43,7 @@ RUN \
     # Download the Kali repository package and save it
     wget -O /tmp/kali-archive-keyring_2018.2_all.deb --no-check-certificate ${KALI_REPO_KEY_PACKAGE_URL} \
     # install kali package to renew kali repository expired certificate in container image
-    && apt-get install /tmp/kali-archive-keyring_2018.2_all.deb \
+    && apt-get install --no-install-recommends /tmp/kali-archive-keyring_2018.2_all.deb \
     # remove kali package
     && rm -f /tmp/kali-archive-keyring_2018.2_all.deb \
     # Download the libicu57 Debian package and save it
@@ -55,7 +55,7 @@ RUN \
     # update package list
     && apt-get update \
     # install dependencies
-    && apt-get install -y \
+    && apt-get install --no-install-recommends -y \
       # required for HttpClientHandler
       libcurl4 \
       # required for SSL
@@ -73,7 +73,7 @@ RUN \
     # download the powershell package
     && wget -O /tmp/powershell.deb --no-check-certificate ${PS_PACKAGE_URL} \
     # install powershell package
-    && apt-get install -y /tmp/powershell.deb \
+    && apt-get install --no-install-recommends -y /tmp/powershell.deb \
     # remove powershell package
     && rm -f /tmp/powershell.deb \
     # intialize powershell module cache
