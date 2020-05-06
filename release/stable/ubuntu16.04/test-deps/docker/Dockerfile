@@ -5,7 +5,7 @@ FROM ${BaseImage}
 
 # Install dependencies and clean up
 RUN apt-get update \
-    && apt-get install -no-install-recommends -y \
+    && apt-get install --no-install-recommends -y \
         sudo \
         curl \
         wget \
