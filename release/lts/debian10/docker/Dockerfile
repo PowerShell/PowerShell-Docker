@@ -45,7 +45,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 
 # Install dependencies and clean up
 RUN apt-get update \
-    && apt-get install -y \
+    && apt-get install --no-install-recommends -y \
     # less is required for help in powershell
         less \
     # requied to setup the locale
