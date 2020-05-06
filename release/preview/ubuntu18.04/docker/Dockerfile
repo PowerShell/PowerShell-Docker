@@ -31,7 +31,7 @@ RUN apt-get update \
     # Download the Linux package and save it
     && echo ${PS_PACKAGE_URL} \
     && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb \
-    && apt-get install -y /tmp/powershell.deb \
+    && apt-get install --no-install-recommends -y /tmp/powershell.deb \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
