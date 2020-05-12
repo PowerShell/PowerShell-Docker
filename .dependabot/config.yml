@@ -32,7 +32,7 @@ update_configs:
     update_schedule: "weekly"
 
   - package_manager: "docker"
-    directory: "/release/preview/ubuntu18.04/dependabot"
+    directory: "/release/preview/ubuntu20.04/docker"
     update_schedule: "weekly"
 
   - package_manager: "docker"

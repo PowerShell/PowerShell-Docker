@@ -7,7 +7,7 @@ parameters:
 
 stages:
   - stage: GenerateYaml_${{ parameters.channel }}
-    dependsOn: []
+    dependsOn: ['GenerateFullTag']
     displayName: Build ${{ parameters.channel }}
     jobs:
     - job: GenerateYaml_${{ parameters.channel }}

@@ -8,6 +8,25 @@ variables:
   POWERSHELL_TELEMETRY_OPTOUT: 1
 
 stages:
+  - stage: GenerateFullTag
+    displayName: Generate Full Tag
+    jobs:
+    - job: GenerateFullTag
+
+      displayName: Generate Full Tag
+
+      condition: succeededOrFailed()
+      pool:
+        vmImage: ubuntu-latest
+        timeoutInMinutes: 30
+
+      steps:
+      - pwsh: |
+          $path = '$(SYSTEM.DEFAULTWORKINGDIRECTORY)/BuildMeta.json'
+          @{
+            FullTag = (Get-Date).ToString("yyyyMMdd")
+          } | ConvertTo-Json | Out-File -Encoding utf8NoBOM -FilePath ./BuildMeta.json
+          Write-Host "##vso[artifact.upload containerfolder=buildMeta;artifactname=buildMeta]$path"
   - template: releaseStage.yml
     parameters:
       channel: stable
@@ -54,7 +73,7 @@ stages:
       - template: manifestSteps.yml
 
   - stage: GenerateTagsYaml
-    dependsOn: []
+    dependsOn: ['GenerateFullTag']
     jobs:
     - job: GenerateTagsYaml
 
@@ -66,6 +85,25 @@ stages:
         timeoutInMinutes: 30
 
       steps:
+      - task: DownloadBuildArtifacts@0
+        displayName: 'Download Build Artifacts'
+        inputs:
+          downloadType: specific
+          itemPattern: buildMeta/**/*.json
+      - powershell: |
+          $json = Get-ChildItem $(System.ArtifactsDirectory)/buildmeta.json -recurse -File
+          if($json.Count -ge 1)
+          {
+            $jsonText = Get-Content -Path $json.FullName
+            $fullTag = ($jsonText | ConvertFrom-Json).FullTag
+            Write-Verbose "setting FULL_TAG to $fullTag" -verbose
+            Write-Host "##vso[task.setvariable variable=FULL_TAG;]$fullTag"
+          }
+          else{
+            Write-Verbose "Did not find buildmeta json" -verbose
+          }
+        displayName: Set FULL_TAG variable
+
       - powershell: |
           $stableVersion = '$(stableReleaseTag)' -replace '^v', ''
           Write-Host "##vso[task.setvariable variable=StableVersion;]$stableVersion"

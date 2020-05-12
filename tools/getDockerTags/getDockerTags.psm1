@@ -41,6 +41,37 @@ function Get-DockerTagsList
     }
 }
 
+function Get-DockerTagList
+{
+    param(
+        [Parameter(Mandatory)]
+        [string[]] $ShortTag,
+        [Parameter(Mandatory)]
+        [string] $fullTag
+    )
+    $results = @()
+
+    foreach($tag in $ShortTag)
+    {
+        $results += [UpstreamDockerTagData] @{
+            Type = 'Short'
+            Tag = $tag
+            FromTag = 'notUsed'
+        }
+    }
+
+    # Return the full form of the tag
+    $results += [UpstreamDockerTagData] @{
+        Type = 'Full'
+        Tag = $fullTag
+        FromTag = 'notUsed'
+    }
+
+    Write-Verbose "returning $($results.count)" -Verbose
+
+    return $results
+}
+
 class UpstreamDockerTagData
 {
     [string] $Type
@@ -156,6 +187,7 @@ function Get-DockerTags
 }
 
 Export-ModuleMember -Function @(
-    'Get-DockerTags',
+    'Get-DockerTags'
     'Get-DockerTagsList'
+    'Get-DockerTagList'
 )

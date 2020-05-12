@@ -26,6 +26,25 @@ jobs:
   displayName: ${{ parameters.jobName }}
 
   steps:
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download Build Artifacts'
+    inputs:
+      downloadType: specific
+      itemPattern: buildMeta/**/*.json
+  - powershell: |
+      $json = Get-ChildItem $(System.ArtifactsDirectory)/buildmeta.json -recurse -File
+      if($json.Count -ge 1)
+      {
+        $jsonText = Get-Content -Path $json.FullName
+        $fullTag = ($jsonText | ConvertFrom-Json).FullTag
+        Write-Verbose "setting FULL_TAG to $fullTag" -verbose
+        Write-Host "##vso[task.setvariable variable=FULL_TAG;]$fullTag"
+      }
+      else{
+        Write-Verbose "Did not find buildmeta json" -verbose
+      }
+    displayName: Set FULL_TAG variable
+
   - pwsh: |
       Write-Host "##vso[task.setvariable variable=ACR_NAME;]$env:ACR_NAME_VAR"
     displayName: 'Enable ACR'

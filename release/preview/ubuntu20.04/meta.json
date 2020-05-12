@@ -1,0 +1,18 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "osVersion": "Ubuntu 20.04",
+    "SkipGssNtlmSspTests": false,
+    "shortTags": [
+        {"Tag": "20.04"}
+    ],
+    "tagTemplates": [
+        "#psversion#-ubuntu-#tag#",
+        "preview-ubuntu-#shorttag#"
+    ],
+    "TestProperties": {
+        "size": 355
+    },
+    "SubImage": "test-deps"
+}
