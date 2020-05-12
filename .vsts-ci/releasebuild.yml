@@ -89,7 +89,7 @@ stages:
         displayName: 'Download Build Artifacts'
         inputs:
           downloadType: specific
-          itemPattern: BuildMeta/**/*.json
+          itemPattern: buildMeta/**/*.json
       - powershell: |
           $json = Get-ChildItem $(System.ArtifactsDirectory)/buildmeta.json -recurse -File
           if($json.Count -gt 1)
