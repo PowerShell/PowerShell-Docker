@@ -10,6 +10,7 @@ variables:
 stages:
   - stage: GenerateFullTag
     displayName: Generate Full Tag
+    jobs:
     - job: GenerateFullTag
 
       displayName: Generate Full Tag
