@@ -92,7 +92,7 @@ stages:
           itemPattern: buildMeta/**/*.json
       - powershell: |
           $json = Get-ChildItem $(System.ArtifactsDirectory)/buildmeta.json -recurse -File
-          if($json.Count -gt 1)
+          if($json.Count -ge 1)
           {
             $jsonText = Get-Content -Path $json.FullName
             $fullTag = ($jsonText | ConvertFrom-Json).FullTag
