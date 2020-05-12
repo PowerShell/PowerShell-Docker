@@ -4,6 +4,11 @@
 # Gets the current version of PowerShell from the PowerShell repo
 # or formats the version based on the parameters
 
+$parent = Join-Path -Path $PSScriptRoot -ChildPath '..'
+$repoRoot = Join-Path -path $parent -ChildPath '..'
+$modulePath = Join-Path -Path $repoRoot -ChildPath 'tools\getDockerTags'
+Import-Module $modulePath -Force
+
 function Get-PowerShellVersion
 {
     [CmdletBinding(DefaultParameterSetName='Default')]
@@ -428,10 +433,11 @@ function Get-DockerImageMetaDataWrapper
     $scriptPath = Join-Path -Path $imagePath -ChildPath 'getLatestTag.ps1'
     $metaJsonPath = Join-Path -Path $imagePath -ChildPath 'meta.json'
 
-    # skip an image if it doesn't exist
-    if(!(Test-Path $scriptPath) -and !$TagData)
-    {
-        return
+    if ($env:FULL_TAG) {
+        $fullTag = $env:FULL_TAG
+    }
+    else {
+        $fullTag = (Get-Date).ToString("yyyyMMdd")
     }
 
     $meta = Get-DockerImageMetaData -Path $metaJsonPath
@@ -458,17 +464,24 @@ function Get-DockerImageMetaDataWrapper
 
     if(!$TagData)
     {
-        # Get the tag data for the image
-        $tagDataFromScript = @(& $scriptPath -CI:$CI.IsPresent @getTagsExtraParams | Where-Object {$_.FromTag})
-        Write-Verbose "tdfs count:$($tagDataFromScript.count)-$($Strict.IsPresent)"
-        if($tagDataFromScript.count -eq 0 -and $Strict.IsPresent)
+        if((Test-Path $scriptPath) )
         {
-            throw "Did not get tag data from script for $scriptPath!"
-        }
+            # Get the tag data for the image
+            $tagDataFromScript = @(& $scriptPath -CI:$CI.IsPresent @getTagsExtraParams | Where-Object {$_.FromTag})
+            Write-Verbose "tdfs count:$($tagDataFromScript.count)-$($Strict.IsPresent)"
+            if($tagDataFromScript.count -eq 0 -and $Strict.IsPresent)
+            {
+                throw "Did not get tag data from script for $scriptPath!"
+            }
 
-        if($TagFilter)
-        {
-            $tagDataFromScript = @($tagDataFromScript | Where-Object { $_.FromTag -match $TagFilter })
+            if($TagFilter)
+            {
+                $tagDataFromScript = @($tagDataFromScript | Where-Object { $_.FromTag -match $TagFilter })
+            }
+        }
+        else {
+            Write-Verbose "getting docker tag list" -Verbose
+            $tagDataFromScript = Get-DockerTagList -ShortTag $shortTags -FullTag $fullTag
         }
     }
     elseif ($meta.TagMapping)
