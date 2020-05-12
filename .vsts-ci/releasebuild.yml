@@ -22,11 +22,11 @@ stages:
 
       steps:
       - pwsh: |
-        $path = '$(SYSTEM.DEFAULTWORKINGDIRECTORY)/BuildMeta.json'
-        @{
-           FullTag = (Get-Date).ToString("yyyyMMdd")
-        } | ConvertTo-Json | Out-File -Encoding utf8NoBOM -FilePath ./BuildMeta.json
-        Write-Host "##vso[artifact.upload containerfolder=buildMeta;artifactname=buildMeta]$path"
+          $path = '$(SYSTEM.DEFAULTWORKINGDIRECTORY)/BuildMeta.json'
+          @{
+            FullTag = (Get-Date).ToString("yyyyMMdd")
+          } | ConvertTo-Json | Out-File -Encoding utf8NoBOM -FilePath ./BuildMeta.json
+          Write-Host "##vso[artifact.upload containerfolder=buildMeta;artifactname=buildMeta]$path"
   - template: releaseStage.yml
     parameters:
       channel: stable
