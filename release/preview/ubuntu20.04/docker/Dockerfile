@@ -1,5 +1,5 @@
-# Docker image file that describes an Ubuntu18.04 image with PowerShell installed from Microsoft APT Repo
-FROM debian:bullseye-slim AS installer-env
+# Docker image file that describes an Ubuntu20.04 image with PowerShell installed from Microsoft APT Repo
+FROM ubuntu:20.04 AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=6.2.4
