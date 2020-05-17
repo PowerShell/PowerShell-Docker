@@ -54,7 +54,7 @@ Hello, World!
 
 ## Known Issues
 
-[Known Issues](https://github.com/PowerShell/PowerShell-Docker/wiki/Known-Issues)
+See [Known Issues](https://github.com/PowerShell/PowerShell-Docker/wiki/Known-Issues)
 
 ## Developing and Contributing
 
