@@ -6,6 +6,7 @@ resources:
 
 variables:
   POWERSHELL_TELEMETRY_OPTOUT: 1
+  DOCKER_RELEASE: true
 
 stages:
   - stage: GenerateFullTag

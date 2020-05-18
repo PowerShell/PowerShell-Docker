@@ -670,6 +670,10 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 [int]$ExpectedSize
             )
 
+            if ($env:DOCKER_RELEASE) {
+                Set-ItResult -Skipped -Because "Test only used in CI"
+            }
+
             $sizeMb = Get-DockerImageSize -name $name
             Write-Verbose "image is $sizeMb MiB" -Verbose
             if($ExpectedSize -and !$env:RELEASE_DEFINITIONID)
