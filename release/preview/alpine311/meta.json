@@ -10,6 +10,6 @@
     "SkipGssNtlmSspTests": true,
     "SubImage": "test-deps",
     "TestProperties": {
-        "size": 175
+        "size": 210
     }
 }
