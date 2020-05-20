@@ -4,11 +4,7 @@
 # Docker image file that describes an Parrot image with PowerShell
 # installed from Debian9 PowerShell package
 
-# Define arg(s) needed for the From statement
-ARG fromTag=latest
-ARG imageRepo=parrotsec/core
-
-FROM ${imageRepo}:${fromTag} AS installer-env
+FROM parrotsec/core:latest AS installer-env
 
 # Clear the entrypoint in parrotsec/parrot-core image
 ENTRYPOINT [ ]
