@@ -52,31 +52,9 @@ PS /> Write-Host "Hello, World!"
 Hello, World!
 ```
 
-## NanoServer-Insider Release Notes
+## Known Issues
 
-Please be sure to use a build from the Windows Insider program, either [Windows Server Insider](https://www.microsoft.com/en-us/software-download/windowsinsiderpreviewserver) or the [Windows 10 Insider](https://insider.windows.com/GettingStarted),
-as your Container host before trying to pull this image. Otherwise, pulling this image will **fail**.
-
-Read more about the changes coming to Nano Server in future releases of Windows Server Insider [here](https://docs.microsoft.com/en-us/windows-server/get-started/nano-in-semi-annual-channel).
-
-### This is pre-release software
-
-Windows Server Insider Preview builds may be substantially modified before they are commercially released. Microsoft makes no warranties, express or implied, with respect to the information provided here.
-Some product features and functionality may require additional hardware or software. These builds are for testing purposes only. Microsoft is not obligated to provide any support services for this preview software.
-
-For more information see [Using Insider Container Images](https://github.com/Microsoft/Virtualization-Documentation/blob/live/virtualization/windowscontainers/quick-start/Using-Insider-Container-Images.md)
-and [Build and run an application with or without .NET Core 2.0 or PowerShell Core 6](https://github.com/Microsoft/Virtualization-Documentation/blob/live/virtualization/windowscontainers/quick-start/Nano-RS3-.NET-Core-and-PS.md).
-
-### Known Issues
-
-#### PowerShell Get only works with CurrentUser Scope
-
-Due to [known issues with the nano-server-insider](https://github.com/Microsoft/Virtualization-Documentation/blob/live/virtualization/windowscontainers/quick-start/Insider-Known-Issues.md#build-16237),
-you must specify `-Scope CurrentUser` when using `Install-Module`.  Example:
-
-```powershell
-Install-Module <ModuleName> -Scope CurrentUser
-```
+See [Known Issues](https://github.com/PowerShell/PowerShell-Docker/wiki/Known-Issues)
 
 ## Developing and Contributing
 
