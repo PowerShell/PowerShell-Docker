@@ -38,12 +38,12 @@ $ docker pull pshorg/powershellcommunity
   * Tags: `oraclelinux-7.5` , `6.1.1-oraclelinux-7.5`
   * Dockerfile: [/release/community-stable/oraclelinux/docker/Dockerfile][oracle-linux-stable-dockerfile]
   * Example: `docker pull pshorg/powershellcommunity:oraclelinux-7.5`
-<!-- Broken
+
 * **[Parrot Linux][parrotsec-linux-uri]**
-  * Tags: `parrot-4.2.2` , `6.1.1-parrot-4.2.2`
+  * Tags: `parrotsec-latest` , `7.0.1-parrotsec-latest`
   * Dockerfile: [/release/community-stable/parrot/docker/Dockerfile][parrotsec-linux-stable-dockerfile]
-  * Example: `docker pull pshorg/powershellcommunity:parrot-4.2.2`
--->
+  * Example: `docker pull pshorg/powershellcommunity:parrotsec-latest`
+
 * **[Photon Linux][parrotsec-linux-uri]**
   * Tags: `photon-2.0` , `6.1.1-photon-2.0`
   * Dockerfile: [/release/community-stable/photon/docker/Dockerfile][photon-linux-stable-dockerfile]
@@ -55,7 +55,7 @@ $ docker pull pshorg/powershellcommunity
 [clear-linux-stable-dockerfile]: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/community-stable/clearlinux/docker/Dockerfile
 [kali-linux-stable-dockerfile]: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/community-stable/kali-rolling/docker/Dockerfile
 [oracle-linux-stable-dockerfile]: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/community-stable/oraclelinux/docker/Dockerfile
-[parrotsec-linux-stable-dockerfile]: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/community-stable/parrot/docker/Dockerfile
+[parrotsec-linux-stable-dockerfile]: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/community-stable/parrotsec/docker/Dockerfile
 [photon-linux-stable-dockerfile]: https://github.com/PowerShell/PowerShell-Docker/blob/master/release/community-stable/photon/docker/Dockerfile
 
 [amazon-linux-uri]: https://aws.amazon.com/amazon-linux-2/

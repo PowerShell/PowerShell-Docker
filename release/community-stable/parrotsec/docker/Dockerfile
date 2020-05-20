@@ -82,7 +82,7 @@ RUN \
     && rm -rf /var/lib/apt/lists/*
 
 # Define args needed only for the labels
-ARG IMAGE_NAME=pshorg/powershellcommunity:parrot-latest
+ARG IMAGE_NAME=pshorg/powershellcommunity:parrotsec-latest
 ARG VCS_REF="none"
 
 # Add label last as it's just metadata and uses a lot of parameters

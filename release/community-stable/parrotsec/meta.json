@@ -2,10 +2,8 @@
     "IsLinux" : true,
     "PackageFormat": "powershell_${PS_VERSION}-1.debian.11_amd64.deb",
     "SkipGssNtlmSspTests": false,
-    "IsBroken": false,
     "tagTemplates": [
-        "#psversion#-parrot-#tag#",
-        "parrot-#shorttag#"
-    ],
-    "continueOnError": true
+        "#psversion#-parrotsec-#tag#",
+        "parrotsec-#shorttag#"
+    ]
 }
