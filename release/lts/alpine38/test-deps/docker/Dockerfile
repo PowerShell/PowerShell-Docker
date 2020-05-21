@@ -2,7 +2,7 @@
 
 ARG BaseImage=mcr.microsoft.com/powershell:alpine-3.8
 
-FROM node:14.0.0-alpine as node
+FROM node:14.3.0-alpine as node
 
 # Do nothing, just added to borrow the already built node files.
 
