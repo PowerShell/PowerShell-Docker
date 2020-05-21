@@ -11,7 +11,7 @@
         "test-deps-musl"
     ],
     "TestProperties": {
-        "size": 263
+        "size": 296
     },
     "TagMapping": {
         "^.*-alpine-3.9$" : "preview-alpine-3.9",
