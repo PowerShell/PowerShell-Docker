@@ -1,0 +1,12 @@
+{
+    "IsLinux" : true,
+    "PackageFormat": "powershell_${PS_VERSION}-1.debian.11_amd64.deb",
+    "SkipGssNtlmSspTests": false,
+    "shortTags": [
+        {"Tag": "latest"}
+    ],
+    "tagTemplates": [
+        "#psversion#-kalilinux-#tag#",
+        "kalilinux"
+    ]
+}
