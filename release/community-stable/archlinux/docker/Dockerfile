@@ -5,10 +5,7 @@
 # installed from full PowerShell linux tar.gz package
 
 # Define arg(s) needed for the From statement
-ARG fromTag=latest
-ARG imageRepo=archlinux/base
-
-FROM ${imageRepo}:${fromTag} AS installer-env
+FROM archlinux:latest AS installer-env
 
 RUN \
     # create a builduser
@@ -23,8 +20,6 @@ RUN \
     && pacman -S --noconfirm \
       # required sudo
       sudo \
-      # required for uncompressing tar files
-      tar \
       # required to clone gss-ntlmssp git repository
       git \
       # required to make gss-ntlmssp binary package
@@ -44,13 +39,13 @@ RUN \
     && sudo -u builduser bash -c makepkg -s --noconfirm
 
 # Start a new stage so we lose all the tar.gz layers from the final image
-FROM ${imageRepo}:${fromTag}
+FROM archlinux:latest
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/tmp/gss-ntlmssp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.xz", "/tmp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.xz"]
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=6.2.3
+ARG PS_VERSION=7.0.1
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
@@ -69,7 +64,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Invoke-WebRequest : Authentication failed" issue when executing using
     # docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [Invoke-WebRequest] [-Uri <HTTPS URL>]
     DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0 \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-ArchLinux-${fromTag}
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-ArchLinux-latest
 
 # Installation
 RUN \
@@ -81,14 +76,10 @@ RUN \
     && pacman -Syy \
     # install dependencies
     && pacman -S --noconfirm \
-      # required for updating Arch Linux keyring
-      archlinux-keyring \
       # required for International Components for Unicode
       core/icu \
       # required for SSL
       openssl-1.0 \
-      # required for uncompressing tar files
-      tar \
     # install gss-ntlmssp package from the previous stage
     && pacman -U --noconfirm /tmp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.xz \
     # create powershell folder
@@ -120,7 +111,7 @@ RUN \
     && yes | pacman -Scc
 
 # Define args needed only for the labels
-ARG IMAGE_NAME=pshorg/powershellcommunity:archlinux-2018.10.01
+ARG IMAGE_NAME=pshorg/powershellcommunity:archlinux-latest
 ARG VCS_REF="none"
 
 # Add label last as it's just metadata and uses a lot of parameters
