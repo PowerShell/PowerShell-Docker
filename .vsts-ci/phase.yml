@@ -38,7 +38,7 @@ jobs:
 
   - pwsh: |
       if ( '$env:CHANNEL' -eq '' ) { exit }
-      Install-module pester -Scope CurrentUser -Force
+      Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
     displayName: Install Pester
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
@@ -95,7 +95,7 @@ jobs:
       testResultsFiles: '**\test*.xml'
       testRunTitle: $(ImageName)
       mergeTestResults: true
- 
+
   - task: PublishTestResults@2
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     displayName: Publish $(ImageName) dockerlint Results
