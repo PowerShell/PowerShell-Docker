@@ -99,7 +99,7 @@ jobs:
     displayName: 'Set SasUrl variable'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-  - pwsh: 'Install-module pester -Scope CurrentUser -Force'
+  - pwsh: Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
     displayName: 'Install Pester'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 

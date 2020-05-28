@@ -472,7 +472,7 @@ End {
 
         if(!(Get-Module -ListAvailable pester -ErrorAction Ignore) -or $ForcePesterInstall.IsPresent)
         {
-            Install-Module -Name pester -Scope CurrentUser -Force
+            Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
         }
 
         Write-Verbose -Message "logging to $logPath" -Verbose
