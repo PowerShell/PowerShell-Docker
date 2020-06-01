@@ -694,68 +694,6 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
             $psDistChannel | Should -BeLike "PSDocker-*"
         }
     }
-
-    Context "Labels" {
-        $labelTestCases = @()
-        $script:windowsContainerRunTests | ForEach-Object {
-            $labelTestCases += @{
-                Name = $_.Name
-                Label = 'org.label-schema.version'
-                # The expected value is the version, but replace - or ~ with the regex for - or ~
-                ExpectedValue = $_.ExpectedVersion  -replace '[\-~]', '[\-~]'
-                Expectation = 'Match'
-            }
-            $labelTestCases += @{
-                Name = $_.Name
-                Label = 'org.label-schema.vcs-ref'
-                ExpectedValue = '[0-9a-f]{7}'
-                Expectation = 'match'
-            }
-            $labelTestCases += @{
-                Name = $_.Name
-                Label = 'org.label-schema.docker.cmd.devel'
-                ExpectedValue = "docker run $($_.ImageName)"
-                Expectation = 'BeExactly'
-            }
-        }
-
-        it "Image <Name> should have label: <Label>, with value: <ExpectedValue>" -TestCases $labelTestCases -Skip:$script:skipWindowsRun {
-            param(
-                [Parameter(Mandatory=$true)]
-                [string]
-                $name,
-
-                [Parameter(Mandatory=$true)]
-                [string[]]
-                $Label,
-
-                [Parameter(Mandatory=$true)]
-                [string]
-                $ExpectedValue,
-
-                [Parameter(Mandatory=$true)]
-                [ValidateSet('Match','BeExactly')]
-                [string]
-                $Expectation
-            )
-
-            $labelValue = Get-DockerImageLabel -Name $Name -Label $Label
-            $labelValue | Should -Not -BeNullOrEmpty
-
-            switch($Expectation)
-            {
-                'Match' {
-                    $labelValue | Should -Match "'$ExpectedValue'"
-                }
-                'BeExactly' {
-                    $labelValue | Should -BeExactly "'$ExpectedValue'"
-                }
-                default {
-                    throw "Unexpected expactation '$Expectation'"
-                }
-            }
-        }
-    }
 }
 
 Describe "Push Linux Containers" -Tags 'Linux', 'Push' {
