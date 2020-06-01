@@ -113,10 +113,6 @@ LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
       org.label-schema.vendor="PowerShell" \
       org.label-schema.vcs-ref=${VCS_REF} \
       org.label-schema.version=${PS_VERSION} \
-      org.label-schema.schema-version="1.0" \
-      org.label-schema.docker.cmd="docker run ${IMAGE_NAME} pwsh -c '$psversiontable'" \
-      org.label-schema.docker.cmd.devel="docker run ${IMAGE_NAME}" \
-      org.label-schema.docker.cmd.test="docker run ${IMAGE_NAME} pwsh -c Invoke-Pester" \
-      org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
+      org.label-schema.schema-version="1.0"
 
 CMD [ "pwsh" ]
