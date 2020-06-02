@@ -39,22 +39,6 @@ RUN Write-host "Verifying valid Version..."; `
 # Install PowerShell into NanoServer
 FROM ${NanoServerRepo}:${fromTag}
 
-ARG VCS_REF="none"
-ARG PS_VERSION=6.2.0
-ARG IMAGE_NAME=mcr.microsoft.com/powershell
-
-LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" `
-      readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" `
-      description="This Dockerfile will install the latest release of PowerShell." `
-      org.label-schema.usage="https://github.com/PowerShell/PowerShell/tree/master/docker#run-the-docker-image-you-built" `
-      org.label-schema.url="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" `
-      org.label-schema.vcs-url="https://github.com/PowerShell/PowerShell-Docker" `
-      org.label-schema.name="powershell" `
-      org.label-schema.vcs-ref=${VCS_REF} `
-      org.label-schema.vendor="PowerShell" `
-      org.label-schema.version=${PS_VERSION} `
-      org.label-schema.schema-version="1.0"
-
 # Copy PowerShell Core from the installer container
 ENV ProgramFiles="C:\Program Files" `
     # set a fixed location for the Module analysis cache
