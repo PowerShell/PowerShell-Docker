@@ -113,34 +113,6 @@ ARG PS_VERSION=6.0.4
 ARG IMAGE_NAME=mcr.microsoft.com/powershell:ubuntu16.04
 ```
 
-* A `VCS_REF` argument should be defined, and used wherever the `git` commit hash is needed.
-
-  For example:
-
-```dockerfile
-ARG VCS_REF="none"
-```
-
-* The following labels should be applied to all images:
-
-```dockerfile
-LABEL maintainer="PowerShell Team <powershellteam@hotmail.com>" \
-      readme.md="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
-      description="This Dockerfile will install the latest release of PowerShell." \
-      org.label-schema.usage="https://github.com/PowerShell/PowerShell/tree/master/docker#run-the-docker-image-you-built" \
-      org.label-schema.url="https://github.com/PowerShell/PowerShell/blob/master/docker/README.md" \
-      org.label-schema.vcs-url="https://github.com/PowerShell/PowerShell-Docker" \
-      org.label-schema.name="powershell" \
-      org.label-schema.vendor="PowerShell" \
-      org.label-schema.vcs-ref=${VCS_REF} \
-      org.label-schema.version=${PS_VERSION} \
-      org.label-schema.schema-version="1.0" \
-      org.label-schema.docker.cmd="docker run ${IMAGE_NAME} pwsh -c '$psversiontable'" \
-      org.label-schema.docker.cmd.devel="docker run ${IMAGE_NAME}" \
-      org.label-schema.docker.cmd.test="docker run ${IMAGE_NAME} pwsh -c Invoke-Pester" \
-      org.label-schema.docker.cmd.help="docker run ${IMAGE_NAME} pwsh -c Get-Help"
-```
-
 ## Testing
 
 You should not have to write any specific tests for your image,
@@ -150,18 +122,7 @@ The CI definition is here at `vsts-ci.yml`.
 
 ### Template
 
-Here is a template for an image build job:
-
-```yaml
-- template: .vsts-ci/phase.yml
-  parameters:
-    name: insertImageNameHere
-    imagename: insertImageNameHere
-    stable: false
-    preview: false
-    communityStable: true
-    continueonerror: false
-```
+TODO: Update this
 
 ## Tags
 

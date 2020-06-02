@@ -33,11 +33,6 @@ RUN apk add --no-cache --virtual .pipeline-deps readline linux-pam \
     && ln -s /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
     && ln -s /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg
 
-# Define args needed only for the labels
-ARG VCS_REF="none"
-ARG IMAGE_NAME=mcr.microsoft.com/powershell/test-deps:alpine-3.8
-ARG PS_VERSION=6.2.3
-
 LABEL com.azure.dev.pipelines.agent.handler.node.path="/usr/local/bin/node"
 
 # Use PowerShell as the default shell

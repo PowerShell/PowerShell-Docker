@@ -605,7 +605,6 @@ function Get-TestParams
 
     Write-Verbose -Message "To be tested, repository: $($allMeta.FullRepository) fromTag: $($actualTagData.FromTag) Tag: $($actualTagData.ActualTag) PSversion: $psversion" -Verbose
     $contextPath = Join-Path -Path $allMeta.imagePath -ChildPath 'docker'
-    $vcf_ref = git rev-parse --short HEAD
     $script:ErrorActionPreference = 'stop'
     Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
     if ($allMeta.meta.IsLinux) {
@@ -644,7 +643,6 @@ function Get-TestParams
     $buildArgs['fromTag'] = $actualTagData.FromTag
     $buildArgs['PS_VERSION'] = $psversion
     $buildArgs['PACKAGE_VERSION'] = $packageVersion
-    $buildArgs['VCS_REF'] = $vcf_ref
     $buildArgs['IMAGE_NAME'] = $imageNameParam
     $buildArgs['BaseImage'] = $BaseImage
 
