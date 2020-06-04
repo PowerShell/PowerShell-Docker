@@ -29,14 +29,14 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Invoke-WebRequest : Authentication failed" issue when executing using
     # docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [Invoke-WebRequest] [-Uri <HTTPS URL>]
     DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0 \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Parrot-${fromTag}
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-ParrotSec-latest
 
 # Installation
 RUN \
     # update package list
-    apt-get update \
+    apt update \
     # install dependencies
-    && apt-get install --no-install-recommends -y \
+    && apt install --no-install-recommends -y \
       # required for HttpClientHandler
       libcurl4 \
       # required for help in powershell
@@ -52,11 +52,11 @@ RUN \
     # generate locale
     && locale-gen && update-locale \
     # upgrade distro
-    && apt-get dist-upgrade -y \
+    && parrot-upgrade \
     # Download the Debian9 PowerShell Core package and save it
     && wget -O /tmp/powershell.deb --no-check-certificate ${PS_PACKAGE_URL} \
     # install powershell package
-    && apt-get install --no-install-recommends -y /tmp/powershell.deb \
+    && apt install --no-install-recommends -y /tmp/powershell.deb \
     # remove powershell package
     && rm -f /tmp/powershell.deb \
     # Give all user execute permissions and remove write permissions for others
@@ -73,7 +73,7 @@ RUN \
             Start-Sleep -Seconds 6 ; \
           }" \
     # clean downloaded packages
-    && apt-get clean \
+    && apt autoremove \
     # remove package list
     && rm -rf /var/lib/apt/lists/*
 
