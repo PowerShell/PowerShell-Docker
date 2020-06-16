@@ -5,42 +5,42 @@
 # installed from RHEL7 PowerShell package
 
 # Define arg(s) needed for the From statement
-ARG fromTag=latest
-ARG imageRepo=amazonlinux
-
-FROM ${imageRepo}:${fromTag} AS installer-env
+FROM amazonlinux:latest AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=6.2.3
+ARG PS_VERSION=7.0.1
 ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
 
 # Define Args and Env needed to create links
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
-
-# Define Args and Env needed to create links
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
-    \
+ENV \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     # Set up PowerShell module analysis cache path
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-AmazonLinux-${fromTag}
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-AmazonLinux-latest
 
 # Installation
 RUN \
     # download PowerShell rpm package
     curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell-linux.rpm \
-    # install EPEL repository
-    && yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
+    # update package list
+    && yum update -y \
     # install dependencies
     && yum install -y \
-	    # required for help in PowerShell
+    	# required for help in PowerShell
 	    less \
-	    # install gssntlmssp package from EPEL repository
+      # install EPEL repository
+      https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
+    # update package list from EPEL repository
+    && yum update -y \
+    # install dependencies from EPEL repository
+    && yum install -y \
+	    # install gssntlmssp package
 	    gssntlmssp \
     # install powershell package
     && yum install -y /tmp/powershell-linux.rpm \
