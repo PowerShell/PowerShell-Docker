@@ -5,13 +5,10 @@
 # installed from RHEL7 PowerShell package
 
 # Define arg(s) needed for the From statement
-ARG fromTag=latest
-ARG imageRepo=oraclelinux
-
-FROM ${imageRepo}:${fromTag} AS installer-env
+FROM oraclelinux:latest AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=6.2.3
+ARG PS_VERSION=7.0.1
 ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
@@ -28,19 +25,25 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     LANG=en_US.UTF-8 \
     # Set up PowerShell module analysis cache path
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache  \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OracleLinux-${fromTag}
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OracleLinux-latest
 
 # Installation
 RUN \
     # download PowerShell rpm package
     curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell-linux.rpm \
+    # update package list
+    && yum update \
     # install dependencies
     && yum install -y \
-	    # required for help in powershell
+      # required for help in powershell
 	    less \
       # install EPEL repository
 	    oracle-epel-release-el7 \
-      # install gssntlmssp package from EPEL repository
+    # update package list from EPEL repository
+    && yum update \
+    # install dependencies from EPEL repository
+    && yum install -y \
+      # install gssntlmssp package
 	    gssntlmssp \
     # install powershell package
     && yum install -y /tmp/powershell-linux.rpm \
