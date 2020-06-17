@@ -33,15 +33,15 @@ RUN \
     # install dependencies
     && yum install -y \
     	# required for help in PowerShell
-	    less \
+      less \
       # install EPEL repository
       https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
     # update package list from EPEL repository
     && yum update -y \
     # install dependencies from EPEL repository
     && yum install -y \
-	    # install gssntlmssp package
-	    gssntlmssp \
+      # install gssntlmssp package
+      gssntlmssp \
     # install powershell package
     && yum install -y /tmp/powershell-linux.rpm \
     # remove powershell package
