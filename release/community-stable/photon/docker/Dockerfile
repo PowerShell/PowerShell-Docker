@@ -5,13 +5,10 @@
 # installed from full PowerShell linux tar.gz package
 
 # Define arg(s) needed for the From statement
-ARG fromTag=2.0-20181017
-ARG imageRepo=photon
-
-FROM ${imageRepo}:${fromTag} AS installer-env
+FROM photon:latest AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=6.2.3
+ARG PS_VERSION=7.0.1
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
@@ -36,13 +33,13 @@ RUN \
     && tar zxf /tmp/powershell-linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
 # Start a new stage so we lose all the tar.gz layers from the final image
-FROM ${imageRepo}:${fromTag}
+FROM photon:latest
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links
-ARG PS_VERSION=6.1.0
+ARG PS_VERSION=7.0.1
 ARG PS_INSTALL_VERSION=7
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
@@ -57,10 +54,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Invoke-WebRequest : Authentication failed" issue when executing using
     # docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [Invoke-WebRequest] [-Uri <HTTPS URL>]
     DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0 \
-    # Set terminal to linux because there is no xterm library in Photon image
-    # when docker allocate pseudo-tty
-    TERM=linux \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Photon-${fromTag}
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Photon-latest
 
 # Installation
 RUN \
@@ -76,6 +70,8 @@ RUN \
       icu \
       # required for help in powershell
       less \
+      # required for xterm library
+      ncurses-terminfo-6.1-2.ph3.x86_64 \
     # generate locale
     && locale-gen.sh \
     # create the pwsh symbolic link that points to powershell
