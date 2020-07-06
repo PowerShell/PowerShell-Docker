@@ -1,10 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-ARG fromTag=bionic
-ARG imageRepo=arm32v7/ubuntu
-
-FROM ${imageRepo}:${fromTag} AS installer-env
+FROM arm32v7/ubuntu:bionic AS installer-env
 
 ARG PS_VERSION=6.2.3
 ENV PS_PACKAGE=powershell-${PS_VERSION}-linux-arm32.tar.gz
@@ -39,7 +36,7 @@ RUN ls -l /tmp/powershell.tar.gz
     # Unzip the Linux tar.gz
 RUN tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
 
-FROM ${imageRepo}:${fromTag} AS final-image
+FROM arm32v7/ubuntu:bionic AS final-image
 
 # Define Args and Env needed to create links
 ARG PS_INSTALL_VERSION=7-preview

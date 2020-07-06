@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "osVersion": "Fedora ${fromTag}",
+    "osVersion": "Fedora 31",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "#tag#"
