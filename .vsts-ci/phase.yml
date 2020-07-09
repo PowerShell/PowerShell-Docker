@@ -49,16 +49,11 @@ jobs:
     condition: succeeded()
 
   - bash: |
-      git clone https://github.com/RDIL/dockerlint.git
-      cd dockerlint
-      git checkout 0.2.1
-      make install-deps
-      make
-      cd ..
+      python -m pip install --upgrade dockerlint==0.3.0
     displayName: Download dockerlint
     condition: succeeded()
 
-  - bash: python dockerlint/main.py -d release/${CHANNEL}/${IMAGENAME}/docker/Dockerfile -R
+  - bash: python -m dockerlint -d release/${CHANNEL}/${IMAGENAME}/docker/Dockerfile -R
     displayName: Run dockerlint
     condition: succeeded()
 
