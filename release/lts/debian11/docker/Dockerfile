@@ -53,7 +53,7 @@ RUN apt-get update \
     # required for SSL
         ca-certificates \
         gss-ntlmssp \
-        libicu63 \
+        libicu67 \
         libssl1.1 \
         libc6 \
         libgcc1 \
