@@ -32,11 +32,12 @@ foreach($tag in $TagList)
 {
     $ammend = ""
     if (!$first) {
-        $ammend = '--ammend'
+        $amend = '--amend'
     }
 
     Write-Verbose -Message "running: docker manifest create $ammend $ContainerRegistry/${Image}:$ManifestTag $ContainerRegistry/${Image}:$tag" -Verbose
-    docker manifest create $ammend $ContainerRegistry/${Image}:$ManifestTag "$ContainerRegistry/${Image}:$tag"
+    docker manifest create $amend $ContainerRegistry/${Image}:$ManifestTag "$ContainerRegistry/${Image}:$tag"
+    $first = $false
 }
 
 # Create the manifest
