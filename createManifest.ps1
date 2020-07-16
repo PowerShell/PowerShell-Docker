@@ -26,14 +26,21 @@ param(
     $TagList = ('ubuntu-16.04', 'windowsservercore')
 )
 
+$first = $true
 $manifestList = @()
 foreach($tag in $TagList)
 {
-    $manifestList += "$ContainerRegistry/${Image}:$tag"
+    $ammend = ""
+    if (!$first) {
+        $amend = '--amend'
+    }
+
+    Write-Verbose -Message "running: docker manifest create $ammend $ContainerRegistry/${Image}:$ManifestTag $ContainerRegistry/${Image}:$tag" -Verbose
+    docker manifest create $amend $ContainerRegistry/${Image}:$ManifestTag "$ContainerRegistry/${Image}:$tag"
+    $first = $false
 }
 
 # Create the manifest
-docker manifest create $ContainerRegistry/${Image}:$ManifestTag $manifestList
 
 # Inspect (print) the manifest
 docker manifest inspect $ContainerRegistry/${Image}:$ManifestTag
