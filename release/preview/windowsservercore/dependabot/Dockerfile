@@ -3,4 +3,4 @@
 
 # Dummy docker image to trigger dependabot PRs
 
-FROM mcr.microsoft.com/windows/servercore:1903
+FROM mcr.microsoft.com/windows/servercore:2004
