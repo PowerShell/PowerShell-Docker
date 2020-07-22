@@ -32,7 +32,10 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 RUN \
     # install dependencies
     swupd bundle-add \
+      # required for help in PowerShell
       less \
+      # required for SSH
+      openssh-client \
     # create powershell folder
     && mkdir -p ${PS_INSTALL_FOLDER} \
     # uncompress powershell linux tar file
