@@ -53,6 +53,7 @@ RUN pwsh `
         -NoLogo `
         -NoProfile `
         -Command " `
+          \$Env:POWERSHELL_TELEMETRY_OPTOUT=1; \
           $stopTime = (get-date).AddMinutes(15); `
           $ErrorActionPreference = 'Stop' ; `
           $ProgressPreference = 'SilentlyContinue' ; `

@@ -42,6 +42,7 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
         -NoLogo \
         -NoProfile \
         -Command " \
+          \$Env:POWERSHELL_TELEMETRY_OPTOUT=1; \
           try { \$packageList = dnf list installed libmodulemd1} \
           catch {}; \
           \$module = (\$packageList | Select-String -SimpleMatch libmodulemd1);  \
@@ -59,6 +60,7 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
         -NoLogo \
         -NoProfile \
         -Command " \
+          \$Env:POWERSHELL_TELEMETRY_OPTOUT=1; \
           Write-Host '******* Getting security advisory list *********'; \
           (dnf updateinfo list -q --security) |  \
               Foreach-Object { \
@@ -78,6 +80,7 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
         -NoLogo \
         -NoProfile \
         -Command " \
+          \$Env:POWERSHELL_TELEMETRY_OPTOUT=1; \
           \$ErrorActionPreference = 'Stop' ; \
           \$ProgressPreference = 'SilentlyContinue' ; \
           while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
