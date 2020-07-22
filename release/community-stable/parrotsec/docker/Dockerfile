@@ -15,7 +15,7 @@ ARG PS_PACKAGE=powershell_${PS_VERSION}-1.debian.11_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
 
-# Download the PowerShell Core Linux tar.gz and save it
+# Download the PowerShell Core Linux .deb and save it
 ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
 
 # Define Args and Env needed to create links

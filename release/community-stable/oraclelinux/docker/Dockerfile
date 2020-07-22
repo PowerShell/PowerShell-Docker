@@ -13,7 +13,7 @@ ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
 
-# Download the PowerShell Core Linux .deb and save it
+# Download the PowerShell Core Linux .rpm and save it
 ADD ${PS_PACKAGE_URL} /tmp/powershell-linux.rpm
 
 # Define Args and Env needed to create links
