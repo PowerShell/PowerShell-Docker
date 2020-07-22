@@ -12,6 +12,9 @@ ARG PS_PACKAGE=powershell_${PS_VERSION}-1.debian.11_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
 
+# Download the PowerShell Core Linux .deb and save it
+ADD ${PS_PACKAGE_URL} /tmp/powershell.deb
+
 # Define Args and Env needed to create links
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
@@ -44,14 +47,14 @@ RUN \
       locales \
       # required to support NTLM for PSRemoting
       gss-ntlmssp \
-      wget \
+      # required for International Components for Unicode
       libicu63 \
+      # required for SSH
+      openssh-client \
     # enable en_US.UTF-8 locale
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     # generate locale
     && locale-gen && update-locale \
-    # download the powershell package
-    && wget -O /tmp/powershell.deb --no-check-certificate ${PS_PACKAGE_URL} \
     # install powershell package
     && apt-get install --no-install-recommends -y /tmp/powershell.deb \
     # remove powershell package
