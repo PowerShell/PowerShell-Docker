@@ -463,7 +463,8 @@ function Get-DockerImagePwshPermissions
     $runParams += "ls -l $Path"
 
     $result = Invoke-Docker -Command run -Params $runParams -SuppressHostOutput -PassThru
-    Write-Verbose $result -Verbose
+    # $result may be an array
+    $result | Write-Verbose -Verbose
     return ($result) -split ' ' | select-object -First 1
 }
 
