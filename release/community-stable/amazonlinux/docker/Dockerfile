@@ -34,6 +34,8 @@ RUN \
     && yum install -y \
     	# required for help in PowerShell
       less \
+      # required for SSH
+      openssh-clients \
       # install EPEL repository
       https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
     # update package list from EPEL repository
