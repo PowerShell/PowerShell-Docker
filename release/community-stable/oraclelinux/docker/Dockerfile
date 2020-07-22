@@ -13,6 +13,9 @@ ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
 
+# Download the PowerShell Core Linux .deb and save it
+ADD ${PS_PACKAGE_URL} /tmp/powershell-linux.rpm
+
 # Define Args and Env needed to create links
 ENV \
     PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
@@ -26,14 +29,14 @@ ENV \
 
 # Installation
 RUN \
-    # download PowerShell rpm package
-    curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell-linux.rpm \
     # update package list
-    && yum update \
+    yum update \
     # install dependencies
     && yum install -y \
       # required for help in powershell
 	    less \
+      # required for SSH
+      openssh-clients \
       # install EPEL repository
 	    oracle-epel-release-el7 \
     # update package list from EPEL repository
