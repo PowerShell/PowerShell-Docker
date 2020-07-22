@@ -72,6 +72,8 @@ RUN \
       less \
       # required for xterm library
       ncurses-terminfo-6.1-2.ph3.x86_64 \
+      # required for SSH
+      openssh-clients \
     # generate locale
     && locale-gen.sh \
     # create the pwsh symbolic link that points to powershell
