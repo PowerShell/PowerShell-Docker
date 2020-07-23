@@ -42,7 +42,7 @@ RUN \
 FROM archlinux:latest
 
 # Copy only the files we need from the previous stage
-COPY --from=installer-env ["/tmp/gss-ntlmssp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.xz", "/tmp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.xz"]
+COPY --from=installer-env ["/tmp/gss-ntlmssp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.zst", "/tmp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.zst"]
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.0.1
@@ -83,7 +83,7 @@ RUN \
       # required for SSH
       openssh \
     # install gss-ntlmssp package from the previous stage
-    && pacman -U --noconfirm /tmp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.xz \
+    && pacman -U --noconfirm /tmp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.zst \
     # create powershell folder
     && mkdir -p ${PS_INSTALL_FOLDER} \
     # download the powershell linux compressed package
