@@ -80,11 +80,13 @@ RUN \
       core/icu \
       # required for SSL
       openssl-1.0 \
+      # required for SSH
+      openssh \
     # install gss-ntlmssp package from the previous stage
     && pacman -U --noconfirm /tmp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.xz \
     # create powershell folder
     && mkdir -p ${PS_INSTALL_FOLDER} \
-    # Pull down the powershell linux tar file
+    # download the powershell linux compressed package
     && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell-linux.tar.gz \
     # uncompress powershell linux tar file
     && tar zxf /tmp/powershell-linux.tar.gz -C ${PS_INSTALL_FOLDER} -v \
