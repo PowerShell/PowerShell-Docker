@@ -26,14 +26,14 @@ ENV \
 
 # Installation
 RUN \
-    # download PowerShell rpm package
-    curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell-linux.rpm \
     # update package list
-    && yum update -y \
+    yum update -y \
     # install dependencies
     && yum install -y \
     	# required for help in PowerShell
       less \
+      # required for SSH
+      openssh-clients \
       # install EPEL repository
       https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
     # update package list from EPEL repository
@@ -42,6 +42,8 @@ RUN \
     && yum install -y \
       # install gssntlmssp package
       gssntlmssp \
+    # download the powershell package
+    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell-linux.rpm \
     # install powershell package
     && yum install -y /tmp/powershell-linux.rpm \
     # remove powershell package
