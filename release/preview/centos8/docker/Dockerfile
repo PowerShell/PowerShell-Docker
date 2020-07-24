@@ -34,6 +34,8 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
       less \
       # clear is part of ncurses which is used by clear
       ncurses \
+      # PowerShell remoting over SSH dependencies
+      openssh-clients \
     && yum upgrade-minimal -y --security \
     && yum clean all \
     # remove powershell package
