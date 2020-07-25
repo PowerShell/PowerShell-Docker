@@ -42,26 +42,6 @@ jobs:
     displayName: Install Pester
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.8'
-    displayName: Setup Python engine
-    condition: succeeded()
-
-  - bash: |
-      git clone https://github.com/RDIL/dockerlint.git
-      cd dockerlint
-      git checkout 0.2.1
-      make install-deps
-      make
-      cd ..
-    displayName: Download dockerlint
-    condition: succeeded()
-
-  - bash: python dockerlint/main.py -d release/${CHANNEL}/${IMAGENAME}/docker/Dockerfile -R
-    displayName: Run dockerlint
-    condition: succeeded()
-
   - pwsh: |
       $extraParams = @{}
       if($env:ACR_NAME)
@@ -94,15 +74,4 @@ jobs:
       testRunner: NUnit
       testResultsFiles: '**\test*.xml'
       testRunTitle: $(ImageName)
-      mergeTestResults: true
-
-  - task: PublishTestResults@2
-    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
-    displayName: Publish $(ImageName) dockerlint Results
-    continueOnError: ${{ variables.continueonerror }}
-
-    inputs:
-      testRunner: JUnit
-      testResultsFiles: 'dockerlint.test_RESULTS.xml'
-      testRunTitle: $(ImageName) dockerlint
       mergeTestResults: true
