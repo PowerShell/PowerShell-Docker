@@ -3,4 +3,4 @@
 
 # Dummy docker image to trigger dependabot PRs
 
-FROM alpine:3.10.0
+FROM alpine:3.12.0
