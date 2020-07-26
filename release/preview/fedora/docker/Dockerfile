@@ -1,6 +1,6 @@
 # Docker image file that describes Fedora 31 image with PowerShell installed from Microsoft YUM Repo
 
-FROM fedora:31 AS installer-env
+FROM fedora:32 AS installer-env
 
 ARG PS_VERSION=7.0.0-preview.1
 ARG PACKAGE_VERSION=7.0.0_preview.1
