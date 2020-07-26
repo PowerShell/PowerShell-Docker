@@ -1,0 +1,54 @@
+version: 2
+
+# update_schedule: live is only supported on javascript, ruby:bundler, python, php:composer, dotnet:nuget, rust:cargo, elixir:hex
+
+updates:
+  - package-ecosystem: "docker"
+    directory: "/release/preview/alpine39/dependabot"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/release/preview/alpine311/docker"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/release/preview/centos8/dependabot"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/release/preview/debian10/dependabot"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/release/preview/debian11/dependabot"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/release/preview/fedora/docker"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/release/preview/nanoserver1809/dependabot"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/release/preview/ubuntu20.04/docker"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/release/preview/windowsservercore/dependabot"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/release/preview/alpine38/dependabot"
+    schedule:
+      interval: "weekly"
