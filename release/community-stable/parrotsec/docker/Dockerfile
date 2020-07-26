@@ -38,23 +38,25 @@ RUN \
     # install dependencies
     && apt install --no-install-recommends -y \
       # required for HttpClientHandler
-      libcurl4 \
+      curl \
       # required for help in powershell
       less \
       # required to setup the locale
       locales \
       # required to support NTLM for PSRemoting
       gss-ntlmssp \
-      wget \
+      # required for International Components for Unicode
       libicu63 \
+      # required for SSH
+      openssh-client \
     # enable en_US.UTF-8 locale
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     # generate locale
     && locale-gen && update-locale \
     # upgrade distro
     && parrot-upgrade \
-    # Download the Debian9 PowerShell Core package and save it
-    && wget -O /tmp/powershell.deb --no-check-certificate ${PS_PACKAGE_URL} \
+    # download the powershell package
+    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb \
     # install powershell package
     && apt install --no-install-recommends -y /tmp/powershell.deb \
     # remove powershell package
