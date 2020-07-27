@@ -60,6 +60,8 @@ RUN zypper --non-interactive update --skip-interactive \
         libicu \
         openssl \
         less \
+        # PowerShell remoting over SSH dependencies
+        openssh-clients \
     && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # Create the pwsh symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
