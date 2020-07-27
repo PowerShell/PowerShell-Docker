@@ -66,6 +66,9 @@ RUN apk add --no-cache \
     && apk -X https://dl-cdn.alpinelinux.org/alpine/edge/main add --no-cache \
     lttng-ust \
     \
+    # PowerShell remoting over SSH dependencies
+    openssh-client \
+    \
     # Create the pwsh symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
     \
