@@ -28,7 +28,7 @@ RUN apt-get update \
         ca-certificates \
         gss-ntlmssp \
     # PowerShell remoting over SSH dependencies
-        openssh-clients \
+        openssh-client \
     # Download the Linux package and save it
     && echo ${PS_PACKAGE_URL} \
     && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb \
