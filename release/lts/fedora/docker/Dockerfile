@@ -34,6 +34,8 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
       compat-openssl10 \
       ca-certificates \
       gssntlmssp \
+    # PowerShell remoting over SSH dependencies
+      openssh-clients \
     && echo "end - misc packages" \
     && echo "starting FEDORA-2019-27e7b92407" \
     # For whatever reason FEDORA-2019-27e7b92407 has to be patched manually
