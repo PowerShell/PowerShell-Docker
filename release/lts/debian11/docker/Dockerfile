@@ -61,6 +61,8 @@ RUN apt-get update \
         liblttng-ust0 \
         libstdc++6 \
         zlib1g \
+    # PowerShell remoting over SSH dependencies
+        openssh-client \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
