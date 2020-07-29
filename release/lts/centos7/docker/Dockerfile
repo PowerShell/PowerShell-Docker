@@ -32,6 +32,8 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
       gssntlmssp \
       # less is required for help in powershell
       less \
+      # PowerShell remoting over SSH dependencies
+      openssh-clients \
     && yum upgrade-minimal -y --security \
     && yum clean all \
     && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
