@@ -30,7 +30,7 @@ $first = $true
 $manifestList = @()
 foreach($tag in $TagList)
 {
-    $ammend = ""
+    $amend = ""
     if (!$first) {
         $amend = '--amend'
     }
