@@ -78,7 +78,7 @@ All `Dockerfile`s should follow certain standards:
    For example:
 
 ```dockerfile
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation. 
 # Licensed under the MIT License.
 #
 # Docker image file that describes a brief description of the image to describe
