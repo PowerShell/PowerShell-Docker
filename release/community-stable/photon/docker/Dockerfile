@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation. 
 # Licensed under the MIT License.
 #
 # Docker image file that describes an VMware Photon image with PowerShell
