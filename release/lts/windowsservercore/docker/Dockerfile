@@ -40,7 +40,8 @@ ENV ProgramFiles="C:\Program Files" `
     PSModuleAnalysisCachePath="$LOCALAPPDATA\Microsoft\Windows\PowerShell\docker\ModuleAnalysisCache" `
     # Persist %PSCORE% ENV variable for user convenience
     PSCORE="$ProgramFiles\PowerShell\pwsh.exe" `
-    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-WindowsServerCore-${fromTag}"
+    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-WindowsServerCore-${fromTag}" 1
+    POWERSHELL_TELEMETRY_OPTOUT="1"
 
 # Copy PowerShell Core from the installer container
 COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell\\latest"]
@@ -61,5 +62,8 @@ RUN pwsh `
             if((get-date) -gt $stopTime) { throw 'timout expired'} `
             Start-Sleep -Seconds 6 ; `
           }"
+
+# re-enable telemetry
+ENV POWERSHELL_TELEMETRY_OPTOUT="0"
 
 CMD ["pwsh.exe"]

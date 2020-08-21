@@ -39,6 +39,8 @@ RUN apt-get update \
     # remove powershell package
     && rm /tmp/powershell.deb \
     # intialize powershell module cache
+    # and disable telemetry
+    && export POWERSHELL_TELEMETRY_OPTOUT=1 \
     && pwsh \
         -NoLogo \
         -NoProfile \

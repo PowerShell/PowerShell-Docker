@@ -64,6 +64,8 @@ RUN \
     # Give all user execute permissions and remove write permissions for others
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     # intialize powershell module cache
+    # and disable telemetry
+    && export POWERSHELL_TELEMETRY_OPTOUT=1 \
     && pwsh \
         -NoLogo \
         -NoProfile \

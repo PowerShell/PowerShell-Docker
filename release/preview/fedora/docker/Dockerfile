@@ -38,6 +38,8 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
     && echo "starting FEDORA-2019-27e7b92407" \
     # For whatever reason FEDORA-2019-27e7b92407 has to be patched manually
     # to do this, upgrade libmodulemd1, if it is installed
+    # and disable telemetry
+    && export POWERSHELL_TELEMETRY_OPTOUT=1 \
     && pwsh \
         -NoLogo \
         -NoProfile \

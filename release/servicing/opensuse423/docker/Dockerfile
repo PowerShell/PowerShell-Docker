@@ -72,6 +72,8 @@ RUN zypper --non-interactive update --skip-interactive \
     # remove package manager log file
     && rm -f /var/log/zypp/history /var/log/zypper.log \
     # intialize powershell module cache
+    # and disable telemetry
+    && export POWERSHELL_TELEMETRY_OPTOUT=1 \
     && pwsh \
         -NoLogo \
         -NoProfile \
