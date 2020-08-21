@@ -41,7 +41,7 @@ ENV ProgramFiles="C:\Program Files" `
     # Persist %PSCORE% ENV variable for user convenience
     PSCORE="$ProgramFiles\PowerShell\pwsh.exe" `
     POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-WindowsServerCore-${fromTag}" `
-    POWERSHELL_TELEMETRY_OPTOUT="0"
+    POWERSHELL_TELEMETRY_OPTOUT="1"
 
 # Copy PowerShell Core from the installer container
 COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell\\latest"]
