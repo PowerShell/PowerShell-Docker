@@ -40,7 +40,7 @@ ENV ProgramFiles="C:\Program Files" `
     PSModuleAnalysisCachePath="$LOCALAPPDATA\Microsoft\Windows\PowerShell\docker\ModuleAnalysisCache" `
     # Persist %PSCORE% ENV variable for user convenience
     PSCORE="$ProgramFiles\PowerShell\pwsh.exe" `
-    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-WindowsServerCore-${fromTag}" 1
+    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-WindowsServerCore-${fromTag}" `
     POWERSHELL_TELEMETRY_OPTOUT="1"
 
 # Copy PowerShell Core from the installer container
