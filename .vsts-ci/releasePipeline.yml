@@ -1,0 +1,49 @@
+trigger: none
+
+# needed to disable CI trigger and allow manual trigger
+# when the branch is same as pipline source, the latest build from the source is used.
+# all environment used are for manual tasks and approvals.
+
+resources:
+  pipelines:
+  - pipeline: releasePipeline
+    source: 'Build Docker Images'
+    trigger:
+      branches:
+      - master
+
+variables:
+  runCodesignValidationInjection: false
+
+stages:
+- template: ./templatesReleasePipeline/testAndRelease.yml
+  parameters:
+    channel: "preview"
+
+- template: ./templatesReleasePipeline/testAndRelease.yml
+  parameters:
+    channel: "stable"
+
+- template: ./templatesReleasePipeline/testAndRelease.yml
+  parameters:
+    channel: "lts"
+
+- stage: Approve_Release
+  condition: always()
+  dependsOn: ['test_preview','test_stable','test_lts']
+  displayName: Approve Release
+  jobs:
+  - deployment: ReleaseAutomationKickOff
+    displayName: Approve Release
+    pool: server
+    environment: PSDockerMcrRelease
+
+- stage: Create_PR
+  condition: always()
+  dependsOn: ['Release_preview','Release_stable','Release_lts']
+  displayName: Create McrDocs Pr
+  jobs:
+  - deployment: ReleaseAutomationKickOff
+    displayName: Create McrDocs Pr
+    pool: server
+    environment: PSDockerMcrRelease

@@ -1,0 +1,12 @@
+parameters:
+    - name: "channel"
+      default: 'preview'
+
+stages:
+- template: ./testStage.yml
+  parameters:
+    channel: ${{ parameters.channel }}
+
+- template: ./releaseStage.yml
+  parameters:
+    channel: ${{ parameters.channel }}
