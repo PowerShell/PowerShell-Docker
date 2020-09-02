@@ -50,33 +50,7 @@ jobs:
     displayName: 'Enable ACR'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-  - powershell: |
-      switch('$(Channel)') {
-        'stable' {
-          $releaseTag = '$(stableReleaseTag)'
-          $version = '$(stableReleaseTag)' -replace '^v', ''
-        }
-        'preview' {
-          $releaseTag = '$(previewReleaseTag)'
-          $version = '$(previewReleaseTag)' -replace '^v', ''
-        }
-        'lts' {
-          $releaseTag = '$(ltsReleaseTag)'
-          $version = '$(ltsReleaseTag)' -replace '^v', ''
-        }
-        default {
-          throw "Unknown channel '$(Channel)'"
-        }
-      }
-      $namespace = $releaseTag.ToLowerInvariant()
-      Write-Host "##vso[task.setvariable variable=dockerNamespace;]$namespace"
-      $version = $releaseTag -replace '^v', ''
-      $command = "vso[task.setvariable variable=version]$version"
-      Write-Host $command
-      Write-Host "##$command"
-    displayName: 'Set Version'
-    name: get
-    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+  - template: ./templatesGeneric/setVersionStepsTemplate.yml
 
   - pwsh: |
       Get-ChildItem env: | Out-String -Width 1000
