@@ -1,8 +1,6 @@
 # Docker image file that describes an Debian image with PowerShell installed from Microsoft APT Repo
-ARG fromTag=bullseye-slim
-ARG imageRepo=debian
 
-FROM ${imageRepo}:${fromTag} AS installer-env
+FROM debian:bullseye-slim AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=6.2.3
@@ -23,7 +21,7 @@ RUN mkdir -p ${PS_INSTALL_FOLDER}
 RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
 # Start a new stage so we lose all the tar.gz layers from the final image
-FROM ${imageRepo}:${fromTag}
+FROM debian:bullseye-slim
 
 ARG PS_VERSION=7.0.0
 ARG PS_INSTALL_VERSION=7-lts

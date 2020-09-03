@@ -8,7 +8,7 @@
         "preview-alpine-#shorttag#"
     ],
     "shortTags": [
-        {"Tag": "3.9"}
+        {"Tag": "3.10"}
     ],
     "SkipGssNtlmSspTests": true,
     "SubImage": "test-deps",

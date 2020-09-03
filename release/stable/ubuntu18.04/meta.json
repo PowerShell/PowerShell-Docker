@@ -8,6 +8,9 @@
         "#psversion#-ubuntu-#tag#",
         "ubuntu-#shorttag#"
     ],
+    "shortTags": [
+        {"Tag": "bionic"}
+    ],
     "TestProperties": {
         "size": 355
     },

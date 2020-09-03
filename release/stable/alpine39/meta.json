@@ -7,6 +7,9 @@
         "#psversion#-alpine-#tag#",
         "alpine-#shorttag#"
     ],
+    "shortTags": [
+        {"Tag": "3.9"}
+    ],
     "SkipGssNtlmSspTests": true,
     "SubImage": "test-deps",
     "TestProperties": {

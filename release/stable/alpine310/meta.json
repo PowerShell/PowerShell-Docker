@@ -5,14 +5,14 @@
     "osVersion": "Alpine",
     "tagTemplates": [
         "#psversion#-alpine-#tag#",
-        "preview-alpine-#shorttag#"
+        "alpine-#shorttag#"
     ],
     "shortTags": [
-        {"Tag": "3.9"}
+        {"Tag": "3.10"}
     ],
     "SkipGssNtlmSspTests": true,
     "SubImage": "test-deps",
     "TestProperties": {
-        "size": 211
+        "size": 175
     }
 }

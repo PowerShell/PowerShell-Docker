@@ -1,0 +1,20 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "SkipGssNtlmSspTests": true,
+    "osVersion": "Alpine ${fromTag}",
+    "tagTemplates": [
+        "#tag#"
+    ],
+    "OptionalTests": [
+        "test-deps",
+        "test-deps-musl"
+    ],
+    "TestProperties": {
+        "size": 296
+    },
+    "TagMapping": {
+        "^.*-alpine-3.9$" : "preview-alpine-3.9",
+        "^.*-alpine-3.10$" : "preview-alpine-3.10"
+    }
+}

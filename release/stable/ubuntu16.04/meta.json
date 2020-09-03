@@ -7,6 +7,9 @@
         "#psversion#-ubuntu-#tag#",
         "ubuntu-#shorttag#"
     ],
+    "shortTags": [
+        {"Tag": "xenial"}
+    ],
     "SkipGssNtlmSspTests": false,
     "TestProperties": {
         "size": 395
