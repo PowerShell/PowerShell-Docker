@@ -5,7 +5,8 @@
     "osVersion": "Fedora 31",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-fedora-#tag#",
+        "#psversion#-fedora-#shorttag#-#fulltag#",
+        "#psversion#-fedora-#shorttag#",
         "preview-fedora-#shorttag#"
     ],
     "shortTags": [

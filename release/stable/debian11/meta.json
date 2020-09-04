@@ -5,11 +5,13 @@
     "osVersion": "Debian 11 (Testing)",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-debian-#tag#",
+        "#psversion#-debian-#shorttag#-#fulltag#",
+        "#psversion#-debian-#shorttag#",
         "debian-#shorttag#"
     ],
     "shortTags": [
-        {"Tag": "bullseye-slim"}
+        {"Tag": "bullseye-slim"},
+        {"Tag": "11"}
     ],
     "SubImage": "test-deps",
     "TestProperties": {
