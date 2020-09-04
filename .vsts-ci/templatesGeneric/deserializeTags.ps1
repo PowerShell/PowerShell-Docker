@@ -1,6 +1,6 @@
 $json = Get-ChildItem "${ENV:PIPELINE_WORKSPACE}/releaseTags.json" -recurse -File
 if ($json.Count -ge 1) {
-    $jsonText = Get-Content -Path $json.FullName
+    $jsonText = Get-Content -Raw -Path $json.FullName
     $releaseTags = $jsonText | ConvertFrom-Json
     Write-Verbose 'got json' -verbose
     $releaseTagNames = $releaseTags | Get-Member -Type NoteProperty | Select-Object -ExpandProperty name
