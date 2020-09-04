@@ -4,7 +4,7 @@ if ($json.Count -ge 1) {
     $releaseTags = $jsonText | ConvertFrom-Json
     Write-Verbose 'got json' -verbose
     $releaseTagNames = $releaseTags | Get-Member -Type NoteProperty | Select-Object -ExpandProperty name
-    Write-Verbose 'got names' -verbose
+    Write-Verbose "got names: $($releaseTagNames -join ', ')" -verbose
 
     foreach ($tagName in $releaseTagNames) {
         Write-Verbose "processing $tagName" -verbose
