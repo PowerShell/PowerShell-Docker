@@ -728,7 +728,7 @@ function Get-TagData
     param(
         [string[]]
         $TagsTemplates,
-        [object]
+        [Microsoft.PowerShell.Commands.GroupInfo[]]
         $TagGroup,
         [string]
         $Version,
@@ -741,7 +741,7 @@ function Get-TagData
     $actualTags = @()
     $tagList = @()
     foreach ($tagTemplate in $tagsTemplates) {
-        $templateActualTags = Invoke-FormatTagTemplate -TagTemplate $tagTemplate -TagGroup $TagGroup -Version $Version
+        $templateActualTags = Format-TagTemplate -TagTemplate $tagTemplate -TagGroup $TagGroup -Version $Version
         foreach ($actualTag in $templateActualTags) {
             $actualTags += "${ImageName}/${Repository}:$actualTag"
             $tagList += $actualTag
@@ -758,14 +758,14 @@ function Get-TagData
     }
 }
 
-function Invoke-FormatTagTemplate {
+function Format-TagTemplate {
     param(
         [parameter(Mandatory)]
         [string]
         $TagTemplate,
 
         [parameter(Mandatory)]
-        [object]
+        [Microsoft.PowerShell.Commands.GroupInfo[]]
         $TagGroup,
 
         [parameter(Mandatory)]
@@ -781,13 +781,13 @@ function Invoke-FormatTagTemplate {
     foreach($tag in $tagGroup.Group) {
         # replace the tag token with the tag
         if ($currentTag -match '#tag#') {
-            $actualMatrixTagTemplates += $currentTag -replace '#tag#', $tag.Tag
+            $actualMatrixTagTemplates += $currentTag.Replace('#tag#', $tag.Tag)
         }
         elseif ($currentTag -match '#shorttag#' -and $tag.Type -eq 'Short') {
-            $actualMatrixTagTemplates += $currentTag -replace '#shorttag#', $tag.Tag
+            $actualMatrixTagTemplates += $currentTag.Replace('#shorttag#', $tag.Tag)
         }
         elseif ($currentTag -notmatch '#shorttag#' -and $currentTag -match '#fulltag#' -and $tag.Type -eq 'Full') {
-            $actualMatrixTagTemplates += $currentTag -replace '#fulltag#', $tag.Tag
+            $actualMatrixTagTemplates += $currentTag.Replace('#fulltag#', $tag.Tag)
         }
     }
 
@@ -797,7 +797,7 @@ function Invoke-FormatTagTemplate {
             foreach($currentTag in $actualMatrixTagTemplates)
             {
                 if ($currentTag -match '#fulltag#' -and $tag.Type -eq 'Full') {
-                    $actualFullTags += $currentTag -replace '#fulltag#', $tag.Tag
+                    $actualFullTags += $currentTag.Replace('#fulltag#', $tag.Tag)
                 }
                 else {
                     $actualFullTags += $currentTag
