@@ -4,7 +4,7 @@
     "PackageFormat": "powershell-${PS_VERSION}-linux-alpine-x64.tar.gz",
     "osVersion": "Alpine",
     "tagTemplates": [
-        "#psversion#-alpine-#tag#",
+        "#psversion#-alpine-3.10-#tag#",
         "alpine-#shorttag#"
     ],
     "shortTags": [
