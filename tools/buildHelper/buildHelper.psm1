@@ -747,7 +747,7 @@ function Get-TagData
             $tagList += $actualTag
         }
         Write-Verbose "tl: $($tagList -join '; ')" -Verbose
-        $fromTag = $Tag.FromTag
+        $fromTag = $TagGroup.Name
     }
 
     return [TagData]@{
