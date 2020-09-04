@@ -5,7 +5,7 @@
     "osVersion": "Ubuntu 18.04",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-ubuntu-18.04-#tag#",
+        "#psversion#-ubuntu-18.04-#fulltag#",
         "preview-ubuntu-#shorttag#"
     ],
     "shortTags": [

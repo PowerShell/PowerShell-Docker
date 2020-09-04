@@ -4,7 +4,7 @@
     "PackageFormat": "powershell-${PS_VERSION}-linux-alpine-x64.tar.gz",
     "osVersion": "Alpine",
     "tagTemplates": [
-        "#psversion#-alpine-3.9-#tag#",
+        "#psversion#-alpine-3.9-#fulltag#",
         "preview-alpine-#shorttag#"
     ],
     "shortTags": [
@@ -13,6 +13,6 @@
     "SkipGssNtlmSspTests": true,
     "SubImage": "test-deps",
     "TestProperties": {
-        "size": 211
+        "size": 225
     }
 }
