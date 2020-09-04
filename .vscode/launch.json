@@ -19,7 +19,7 @@
             ]
         },
         {
-            "name": "PowerShell: Gen Tags Json  - preview - fedora",
+            "name": "PowerShell: Gen Tags Json - preview - fedora",
             "type": "PowerShell",
             "request": "launch",
             "script": "${workspaceFolder}/build.ps1",
