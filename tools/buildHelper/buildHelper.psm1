@@ -746,7 +746,7 @@ function Get-TagData
             $actualTags += "${ImageName}/${Repository}:$actualTag"
             $tagList += $actualTag
         }
-        Write-Verbose "tl: $($tagList -join '; ')" -Verbose
+
         $fromTag = $TagGroup.Name
     }
 
