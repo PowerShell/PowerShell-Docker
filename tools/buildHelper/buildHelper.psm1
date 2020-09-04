@@ -728,7 +728,7 @@ function Get-TagData
     param(
         [string[]]
         $TagsTemplates,
-        [object]
+        [Microsoft.PowerShell.Commands.GroupInfo[]]
         $TagGroup,
         [string]
         $Version,
@@ -740,31 +740,14 @@ function Get-TagData
 
     $actualTags = @()
     $tagList = @()
-    foreach($tag in $tagGroup.Group) {
-        foreach ($tagTemplate in $tagsTemplates) {
-            # replace the tag token with the tag
-            if ($tagTemplate -match '#tag#') {
-                $actualTag = $tagTemplate -replace '#tag#', $tag.Tag
-            }
-            elseif ($tagTemplate -match '#shorttag#' -and $tag.Type -eq 'Short') {
-                $actualTag = $tagTemplate -replace '#shorttag#', $tag.Tag
-            }
-            elseif ($tagTemplate -match '#fulltag#' -and $tag.Type -eq 'Full') {
-                $actualTag = $tagTemplate -replace '#fulltag#', $tag.Tag
-            }
-            else {
-                # skip if the type of tag token doesn't match the type of tag
-                Write-Verbose -Message "Skipping $($tag.Tag) - $tagTemplate, token doesn't match template"
-                continue
-            }
-
-            # Replace the the psversion token with the powershell version in the tag
-            $actualTag = $actualTag -replace '#psversion#', $Version
-            $actualTag = $actualTag.ToLowerInvariant()
+    foreach ($tagTemplate in $tagsTemplates) {
+        $templateActualTags = Format-TagTemplate -TagTemplate $tagTemplate -TagGroup $TagGroup -Version $Version
+        foreach ($actualTag in $templateActualTags) {
             $actualTags += "${ImageName}/${Repository}:$actualTag"
             $tagList += $actualTag
-            $fromTag = $Tag.FromTag
         }
+
+        $fromTag = $TagGroup.Name
     }
 
     return [TagData]@{
@@ -773,6 +756,68 @@ function Get-TagData
         ActualTags = $actualTags
         ActualTag = $actualTag
     }
+}
+
+function Format-TagTemplate {
+    param(
+        [parameter(Mandatory)]
+        [string]
+        $TagTemplate,
+
+        [parameter(Mandatory)]
+        [Microsoft.PowerShell.Commands.GroupInfo[]]
+        $TagGroup,
+
+        [parameter(Mandatory)]
+        [string]
+        $Version
+    )
+
+    $currentTag = $TagTemplate
+
+    $fullTags = $tagGroup.Group | Where-Object {$_.Type -eq 'Full'}
+
+    $actualMatrixTagTemplates = @()
+    foreach($tag in $tagGroup.Group) {
+        # replace the tag token with the tag
+        if ($currentTag -match '#tag#') {
+            $actualMatrixTagTemplates += $currentTag.Replace('#tag#', $tag.Tag)
+        }
+        elseif ($currentTag -match '#shorttag#' -and $tag.Type -eq 'Short') {
+            $actualMatrixTagTemplates += $currentTag.Replace('#shorttag#', $tag.Tag)
+        }
+        elseif ($currentTag -notmatch '#shorttag#' -and $currentTag -match '#fulltag#' -and $tag.Type -eq 'Full') {
+            $actualMatrixTagTemplates += $currentTag.Replace('#fulltag#', $tag.Tag)
+        }
+    }
+
+    $actualFullTags = @()
+    if ($fullTags) {
+        foreach ($tag in $fullTags) {
+            foreach($currentTag in $actualMatrixTagTemplates)
+            {
+                if ($currentTag -match '#fulltag#' -and $tag.Type -eq 'Full') {
+                    $actualFullTags += $currentTag.Replace('#fulltag#', $tag.Tag)
+                }
+                else {
+                    $actualFullTags += $currentTag
+                }
+            }
+        }
+    }
+    else {
+        $actualFullTags = $actualMatrixTagTemplates
+    }
+
+    $actualTags = @()
+    foreach ($currentTag in $actualFullTags) {
+        # Replace the the psversion token with the powershell version in the tag
+        $currentTag = $currentTag -replace '#psversion#', $Version
+        $currentTag = $currentTag.ToLowerInvariant()
+        $actualTags += $currentTag
+    }
+
+    return $actualTags;
 }
 
 class SasData{

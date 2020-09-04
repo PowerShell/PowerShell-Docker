@@ -5,10 +5,12 @@
     "osVersion": "Debian 11 (Testing)",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
+        "lts-debian-#shorttag#-#fulltag#",
         "lts-debian-#shorttag#"
     ],
     "shortTags": [
-        {"Tag": "bullseye-slim"}
+        {"Tag": "bullseye-slim"},
+        {"Tag": "11"}
     ],
     "SubImage": "test-deps",
     "TestProperties": {

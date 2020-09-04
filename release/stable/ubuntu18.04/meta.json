@@ -5,11 +5,13 @@
     "osVersion": "Ubuntu 18.04",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-ubuntu-18.04-#fulltag#",
+        "#psversion#-ubuntu-#shorttag#-#fulltag#",
+        "#psversion#-ubuntu-#shorttag#",
         "ubuntu-#shorttag#"
     ],
     "shortTags": [
-        {"Tag": "bionic"}
+        {"Tag": "bionic"},
+        {"Tag": "18.04"}
     ],
     "TestProperties": {
         "size": 355
