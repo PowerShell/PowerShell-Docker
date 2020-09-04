@@ -10,6 +10,9 @@
         "#psversion#-arm32v7-ubuntu-#tag#",
         "arm32v7-ubuntu-#shorttag#"
     ],
+    "shortTags": [
+        {"Tag": "bionic"}
+    ],
     "TestProperties": {
         "size": 550,
         "Arm32": true

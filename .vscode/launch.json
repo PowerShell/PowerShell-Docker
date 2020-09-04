@@ -17,6 +17,23 @@
                 "-name",
                 "ubuntu16.04"
             ]
+        },
+        {
+            "name": "PowerShell: Gen Tags Json - preview - fedora",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/build.ps1",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "-GenerateTagsYaml",
+                "-Channel",
+                "preview",
+                "-name",
+                "fedora",
+                "-format",
+                "JSON"
+            ]
         }
     ]
+
 }

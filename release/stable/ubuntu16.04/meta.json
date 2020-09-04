@@ -4,8 +4,11 @@
     "PackageFormat": "powershell_${PS_VERSION}-1.ubuntu.16.04_amd64.deb",
     "osVersion": "Ubuntu 16.04",
     "tagTemplates": [
-        "#psversion#-ubuntu-#tag#",
+        "#psversion#-ubuntu-16.04-#fulltag#",
         "ubuntu-#shorttag#"
+    ],
+    "shortTags": [
+        {"Tag": "xenial"}
     ],
     "SkipGssNtlmSspTests": false,
     "TestProperties": {

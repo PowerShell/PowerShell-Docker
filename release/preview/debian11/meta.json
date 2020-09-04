@@ -8,6 +8,9 @@
         "#psversion#-debian-#tag#",
         "preview-debian-#shorttag#"
     ],
+    "shortTags": [
+        {"Tag": "bullseye-slim"}
+    ],
     "SubImage": "test-deps",
     "TestProperties": {
         "size": 330

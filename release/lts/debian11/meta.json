@@ -7,6 +7,9 @@
     "tagTemplates": [
         "lts-debian-#shorttag#"
     ],
+    "shortTags": [
+        {"Tag": "bullseye-slim"}
+    ],
     "SubImage": "test-deps",
     "TestProperties": {
         "size": 314

@@ -1,8 +1,6 @@
 # Docker image file that describes an Ubuntu16.04 image with PowerShell installed from Microsoft APT Repo
-ARG fromTag=16.04
-ARG imageRepo=ubuntu
 
-FROM ${imageRepo}:${fromTag} AS installer-env
+FROM ubuntu:16.04 AS installer-env
 
 ARG PS_VERSION=6.2.0
 ARG PS_PACKAGE=powershell_${PS_VERSION}-1.ubuntu.16.04_amd64.deb

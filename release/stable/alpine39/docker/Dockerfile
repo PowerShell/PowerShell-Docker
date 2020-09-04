@@ -1,13 +1,9 @@
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 # Docker image file that describes an Alpine3.x image with PowerShell installed from .tar.gz file(s)
 
-# Define arg(s) needed for the From statement
-ARG fromTag=3.9
-ARG imageRepo=alpine
-
-FROM ${imageRepo}:${fromTag} AS installer-env
+FROM alpine:3.9 AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.0.0
@@ -28,7 +24,7 @@ RUN mkdir -p ${PS_INSTALL_FOLDER}
 RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER} -v
 
 # Start a new stage so we lose all the tar.gz layers from the final image
-FROM ${imageRepo}:${fromTag}
+FROM alpine:3.9
 
 ARG fromTag=3.9
 
