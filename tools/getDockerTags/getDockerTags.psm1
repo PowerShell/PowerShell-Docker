@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 #Requires -Version 6.2
@@ -66,8 +66,6 @@ function Get-DockerTagList
         Tag = $fullTag
         FromTag = 'notUsed'
     }
-
-    Write-Verbose "returning $($results.count)" -Verbose
 
     return $results
 }
