@@ -1,5 +1,5 @@
 #!/usr/bin/pwsh
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 # Queue Docker image build for a particular image
@@ -136,6 +136,11 @@ param(
     [string]
     $ServicingVersion,
 
+    [Parameter(ParameterSetName="GenerateTagsYaml")]
+    [ValidateSet('YAML','JSON')]
+    [string]
+    $Format = 'YAML',
+
     [switch]
     $IncludeKnownIssues,
 
@@ -185,6 +190,7 @@ DynamicParam {
     Add-ParameterAttribute -ParameterSetName 'TestByName' -Attributes $Attributes
     Add-ParameterAttribute -ParameterSetName 'localBuildByName' -Attributes $Attributes
     Add-ParameterAttribute -ParameterSetName 'GetTagsByName' -Attributes $Attributes
+    Add-ParameterAttribute -ParameterSetName 'GenerateTagsYaml' -Attributes $Attributes -Mandatory $false
 
     if($dockerFileNames.Count -gt 0)
     {
@@ -227,7 +233,7 @@ End {
 
     $toBuild = @()
     foreach ($actualChannel in $Channels) {
-        if ($PSCmdlet.ParameterSetName -match '.*ByName')
+        if ($PSBoundParameters['Name'])
         {
             # We are using the Name parameter, so assign the variable to that
             $Name = $PSBoundParameters['Name']
@@ -288,7 +294,7 @@ End {
                     {
                         $actualTagData = $allMeta.ActualTagDataByGroup.$tagGroup
                         $SubImagePath = Join-Path -Path $dockerFileName -ChildPath $allMeta.Meta.SubImage
-                        Write-Verbose -Message "getting subimage - fromtag: $($tagGroup.Name) - subimage: $($allMeta.Meta.SubImage)"
+                        Write-Verbose -Message "getting subimage - fromtag: $($dockerFileName) - subimage: $($allMeta.Meta.SubImage)" -Verbose
                         $subImageAllMeta = Get-DockerImageMetaDataWrapper `
                             -DockerFileName $SubImagePath `
                             -CI:$CI.IsPresent `
@@ -492,19 +498,40 @@ End {
 
     if($GenerateTagsYaml.IsPresent)
     {
-        Write-Output "repos:"
-        foreach($repo in $tagGroups.Keys | Sort-Object)
-        {
-            Write-Output "  - repoName: $repo"
-            Write-Output "    tagGroups:"
-            foreach($tag in $tagGroups.$repo | Sort-Object -Property dockerfile)
+        if ($Format -eq 'YAML') {
+            Write-Output "repos:"
+            foreach($repo in $tagGroups.Keys | Sort-Object)
             {
-                Write-Output "    - tags: [$($tag.Tags -join ', ')]"
-                Write-Output "      osVersion: $($tag.osVersion)"
-                Write-Output "      architecture: $($tag.architecture)"
-                Write-Output "      os: $($tag.os)"
-                Write-Output "      dockerfile: $($tag.dockerfile)"
+                Write-Output "  - repoName: $repo"
+                Write-Output "    tagGroups:"
+                foreach($tag in $tagGroups.$repo | Sort-Object -Property dockerfile)
+                {
+                    Write-Output "    - tags: [$($tag.Tags -join ', ')]"
+                    Write-Output "      osVersion: $($tag.osVersion)"
+                    Write-Output "      architecture: $($tag.architecture)"
+                    Write-Output "      os: $($tag.os)"
+                    Write-Output "      dockerfile: $($tag.dockerfile)"
+                }
             }
+        }
+        else {
+            $repos = @{}
+            foreach ($repo in $tagGroups.Keys | Sort-Object) {
+                $tagGroupsJson = @()
+                foreach ($tag in $tagGroups.$repo | Sort-Object -Property dockerfile) {
+                    $tagGroupsJson += @{
+                        tags         = $tag.Tags
+                        osVersion    = $tag.OsVersion
+                        architecture = $tag.architecture
+                        os           = $tag.os
+                        dockerfile   = $tag.dockerfile
+                    }
+                }
+
+                $repos.Add($repo, $tagGroupsJson)
+            }
+
+            $repos | ConvertTo-Json -Depth 10
         }
     }
 

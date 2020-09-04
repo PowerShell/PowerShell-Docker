@@ -276,11 +276,13 @@ function Add-ParameterAttribute {
         $Attributes,
         [Parameter(Mandatory)]
         [string]
-        $ParameterSetName
+        $ParameterSetName,
+        [bool]
+        $Mandatory = $true
     )
     $ParameterAttr = [System.Management.Automation.ParameterAttribute]::new()
     $ParameterAttr.ParameterSetName = $ParameterSetName
-    $ParameterAttr.Mandatory = $true
+    $ParameterAttr.Mandatory = $Mandatory
     $Attributes.Add($ParameterAttr) > $null
 }
 
