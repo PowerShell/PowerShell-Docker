@@ -14,6 +14,9 @@ stages:
     - stage: Test_${{ parameters.channel }}
       dependsOn: []
       displayName: Test ${{ parameters.channel }}
+      variables:
+        - name: docker_release
+          value: True
       jobs:
       - job: GenerateYaml_${{ parameters.channel }}
         pool:
