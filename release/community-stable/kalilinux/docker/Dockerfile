@@ -59,6 +59,8 @@ RUN \
     # remove powershell package
     && rm -f /tmp/powershell.deb \
     # intialize powershell module cache
+    # and disable telemetry
+    && export POWERSHELL_TELEMETRY_OPTOUT=1 \
     && pwsh \
         -NoLogo \
         -NoProfile \

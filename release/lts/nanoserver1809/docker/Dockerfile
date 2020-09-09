@@ -14,6 +14,9 @@ ARG PS_VERSION=7.0.0-rc.1
 
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
 
+# disable telemetry
+ENV POWERSHELL_TELEMETRY_OPTOUT="1"
+
 SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 ARG PS_PACKAGE_URL_BASE64
@@ -83,5 +86,8 @@ RUN pwsh `
             if((get-date) -gt $stopTime) { throw 'timout expired'} `
             Start-Sleep -Seconds 6 ; `
           }"
+
+# re-enable telemetry
+ENV POWERSHELL_TELEMETRY_OPTOUT="0"
 
 CMD ["pwsh.exe"]

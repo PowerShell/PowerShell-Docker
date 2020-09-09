@@ -42,6 +42,8 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
     && rm /tmp/powershell.rpm \
     && ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh \
     # intialize powershell module cache
+    # and disable telemetry
+    && export POWERSHELL_TELEMETRY_OPTOUT=1 \
     && pwsh \
         -NoLogo \
         -NoProfile \
