@@ -72,7 +72,7 @@ jobs:
 
     - pwsh: |
             az account set --subscription $(AcrSubscriptionName)
-            $tags = ./build.ps1 -GenerateTagsYaml -Channel $(channel) -Name $(imagename) -Format JSON | convertfrom-json
+            $tags = ./build.ps1 -GenerateTagsYaml -Channel $(channel) -Name $(imagename) -Format JSON -StableVersion $(StableVersion) -PreviewVersion $(PreviewVersion) -LtsVersion $(LtsVersion) | convertfrom-json
             $repos = @($tags | get-member -MemberType NoteProperty  | Select-Object -ExpandProperty Name)
 
             foreach($repo in $repos) {
