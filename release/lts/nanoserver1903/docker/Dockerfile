@@ -39,7 +39,7 @@ RUN Write-host "Verifying valid Version..."; `
     Expand-Archive /installer/powershell.zip -DestinationPath \PowerShell
 
 # Install PowerShell into NanoServer
-FROM ${NanoServerRepo}:1809
+FROM ${NanoServerRepo}:1903
 
 ARG IMAGE_NAME=mcr.microsoft.com/powershell
 
@@ -52,7 +52,7 @@ ENV ProgramFiles="C:\Program Files" `
     PSCORE="$ProgramFiles\PowerShell\pwsh.exe" `
     # Set the default windows path so we can use it
     WindowsPATH="C:\Windows\system32;C:\Windows" `
-    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-NanoServer-1809"
+    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-NanoServer-1903"
 
 ### Begin workaround ###
 # Note that changing user on nanoserver is not recommended

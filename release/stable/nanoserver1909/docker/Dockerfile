@@ -9,14 +9,14 @@ ARG NanoServerRepo=mcr.microsoft.com/windows/nanoserver
 FROM ${InstallerRepo}:$InstallerVersion  AS installer-env
 
 # Arguments for installing PowerShell, must be defined in the container they are used
-ARG PS_VERSION=7.0.0-rc.1
+ARG PS_VERSION=7.0.0
 
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
 
+SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
 # disable telemetry
 ENV POWERSHELL_TELEMETRY_OPTOUT="1"
-
-SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 ARG PS_PACKAGE_URL_BASE64
 
@@ -39,9 +39,7 @@ RUN Write-host "Verifying valid Version..."; `
     Expand-Archive /installer/powershell.zip -DestinationPath \PowerShell
 
 # Install PowerShell into NanoServer
-FROM ${NanoServerRepo}:1809
-
-ARG IMAGE_NAME=mcr.microsoft.com/powershell
+FROM ${NanoServerRepo}:1909
 
 # Copy PowerShell Core from the installer container
 ENV ProgramFiles="C:\Program Files" `
@@ -52,7 +50,7 @@ ENV ProgramFiles="C:\Program Files" `
     PSCORE="$ProgramFiles\PowerShell\pwsh.exe" `
     # Set the default windows path so we can use it
     WindowsPATH="C:\Windows\system32;C:\Windows" `
-    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-NanoServer-1809"
+    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-NanoServer-1909"
 
 ### Begin workaround ###
 # Note that changing user on nanoserver is not recommended

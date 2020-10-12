@@ -1,6 +1,5 @@
 # escape=`
 # Args used by from statements must be defined here:
-ARG fromTag=1709
 ARG InstallerVersion=nanoserver
 ARG InstallerRepo=mcr.microsoft.com/powershell
 ARG NanoServerRepo=mcr.microsoft.com/windows/nanoserver
@@ -40,9 +39,7 @@ RUN Write-host "Verifying valid Version..."; `
     Expand-Archive /installer/powershell.zip -DestinationPath \PowerShell
 
 # Install PowerShell into NanoServer
-FROM ${NanoServerRepo}:${fromTag}
-
-ARG fromTag=1709
+FROM ${NanoServerRepo}:1809
 
 # Copy PowerShell Core from the installer container
 ENV ProgramFiles="C:\Program Files" `
@@ -53,7 +50,7 @@ ENV ProgramFiles="C:\Program Files" `
     PSCORE="$ProgramFiles\PowerShell\pwsh.exe" `
     # Set the default windows path so we can use it
     WindowsPATH="C:\Windows\system32;C:\Windows" `
-    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-NanoServer-${fromTag}"
+    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-NanoServer-1809"
 
 ### Begin workaround ###
 # Note that changing user on nanoserver is not recommended
