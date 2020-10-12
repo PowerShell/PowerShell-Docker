@@ -1,10 +1,9 @@
 # escape=`
-ARG fromTag=latest
 ARG WindowsServerCoreRepo=mcr.microsoft.com/windows/servercore
 
 # Use server core as an installer container to extract PowerShell,
 # As this is a multi-stage build, this stage will eventually be thrown away
-FROM ${WindowsServerCoreRepo}:${fromTag} AS installer-env
+FROM ${WindowsServerCoreRepo}:1809 AS installer-env
 
 ARG PS_VERSION=7.0.0-preview.1
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/PowerShell-${PS_VERSION}-win-x64.zip
@@ -31,7 +30,7 @@ RUN Write-host "Verifying valid Version..."; `
     Expand-Archive powershell.zip -DestinationPath  \PowerShell
 
 # Install PowerShell into WindowsServerCore
-FROM ${WindowsServerCoreRepo}:${fromTag}
+FROM ${WindowsServerCoreRepo}:1809
 
 # Copy PowerShell Core from the installer container
 ENV ProgramFiles="C:\Program Files" `
@@ -40,7 +39,7 @@ ENV ProgramFiles="C:\Program Files" `
     PSModuleAnalysisCachePath="$LOCALAPPDATA\Microsoft\Windows\PowerShell\docker\ModuleAnalysisCache" `
     # Persist %PSCORE% ENV variable for user convenience
     PSCORE="$ProgramFiles\PowerShell\pwsh.exe" `
-    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-WindowsServerCore-${fromTag}" `
+    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-WindowsServerCore-1809" `
     POWERSHELL_TELEMETRY_OPTOUT="1"
 
 # Copy PowerShell Core from the installer container
