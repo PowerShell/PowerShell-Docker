@@ -8,7 +8,8 @@
         }
     ],
     "tagTemplates": [
-        "lts-nanoserver-#shorttag#"
+        "lts-nanoserver-#shorttag#",
+        "lts-nanoserver-1909-#fulltag#"
     ],
     "Base64EncodePackageUrl": true,
     "TestProperties": {
