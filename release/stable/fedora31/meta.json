@@ -5,8 +5,9 @@
     "osVersion": "Fedora",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-fedora31-#tag#",
-        "fedora31-#shorttag#"
+        "#psversion#-fedora-31-#fulltag#",
+        "#psversion#-fedora-#shorttag#",
+        "fedora-31-#shorttag#"
     ],
     "TestProperties": {
         "size": 632
