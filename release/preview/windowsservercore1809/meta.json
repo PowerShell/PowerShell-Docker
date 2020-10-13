@@ -1,24 +1,16 @@
 {
     "IsLinux": false,
     "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip",
-    "osVersion": "Windows Server Core, version ${fromTag}",
+    "osVersion": "Windows Server Core, version 1809",
     "shortTags": [
         {
             "Tag": "1809"
-        },
-        {
-            "Tag": "1903"
-        },
-        {
-            "Tag": "1909"
-        },
-        {
-            "Tag": "2004"
         }
     ],
     "Base64EncodePackageUrl": true,
     "tagTemplates": [
-        "#psversion#-windowsservercore-#tag#",
+        "#psversion#-windowsservercore-#shorttag#",
+        "#psversion#-windowsservercore-1809-#fulltag#",
         "preview-windowsservercore-#shorttag#"
     ],
     "TestProperties": {

@@ -1,0 +1,19 @@
+{
+    "IsLinux": false,
+    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip",
+    "osVersion": "Windows Server Core, version 2004",
+    "shortTags": [
+        {
+            "Tag": "2004"
+        }
+    ],
+    "Base64EncodePackageUrl": true,
+    "tagTemplates": [
+        "lts-windowsservercore-#shorttag#",
+        "lts-windowsservercore-2004-#fulltag#"
+    ],
+    "TestProperties": {
+        "size": 1
+    },
+    "UseAcr": true
+}

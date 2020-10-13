@@ -1,0 +1,19 @@
+{
+    "IsLinux": false,
+    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip",
+    "osVersion": "Windows Server Core, version 1909",
+    "shortTags": [
+        {
+            "Tag": "1909"
+        }
+    ],
+    "Base64EncodePackageUrl": true,
+    "tagTemplates": [
+        "lts-windowsservercore-#shorttag#",
+        "lts-windowsservercore-1909-#fulltag#"
+    ],
+    "TestProperties": {
+        "size": 1
+    },
+    "UseAcr": true
+}
