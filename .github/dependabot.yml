@@ -4,11 +4,6 @@ version: 2
 
 updates:
   - package-ecosystem: "docker"
-    directory: "/release/preview/alpine39/dependabot"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "docker"
     directory: "/release/preview/alpine311/docker"
     schedule:
       interval: "weekly"
@@ -45,10 +40,5 @@ updates:
 
   - package-ecosystem: "docker"
     directory: "/release/preview/windowsservercore/dependabot"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "docker"
-    directory: "/release/preview/alpine38/dependabot"
     schedule:
       interval: "weekly"
