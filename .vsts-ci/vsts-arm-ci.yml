@@ -13,7 +13,7 @@ stages:
       channel: stable
       acr: OnlyAcr
       useacr: true
-      osFilter: Linux
+      winCiParameter: ''
   - template: stage.yml
     parameters:
       channel: preview
