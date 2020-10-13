@@ -9,7 +9,8 @@
     ],
     "Base64EncodePackageUrl": true,
     "tagTemplates": [
-        "lts-windowsservercore-#shorttag#"
+        "lts-windowsservercore-#shorttag#",
+        "lts-windowsservercore-1909-#fulltag#"
     ],
     "TestProperties": {
         "size": 1
