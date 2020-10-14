@@ -1,5 +1,6 @@
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
+
 Set-StrictMode -Off
 
 Import-module -Name "$PSScriptRoot\containerTestCommon.psm1" -Force
@@ -610,6 +611,7 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
                 Name = $_.Name
                 ExpectedVersion = $_.ExpectedVersion
                 Channel = $_.Channel
+                UseAcr = [bool]$_.UseAcr
             }
         }
 
@@ -617,6 +619,7 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
         $script:windowsContainerRunTests | Where-Object {$_.SkipWebCmdletTests -ne $true} | ForEach-Object {
             $webTestCases += @{
                 Name = $_.Name
+                UseAcr = [bool]$_.UseAcr
             }
         }
     }
@@ -638,8 +641,16 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $UseAcr
             )
+
+            if ($UserAcr) {
+                Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+            }
+
 
             Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
         }
@@ -648,8 +659,15 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
-                $name
+                $name,
+
+                [Bool]
+                $UseAcr
             )
+
+            if ($UserAcr) {
+                Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+            }
 
             $metadataString = Get-MetadataUsingContainer -Name $Name
             $metadataString | Should -Not -BeNullOrEmpty
