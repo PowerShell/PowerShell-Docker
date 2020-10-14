@@ -483,9 +483,9 @@ End {
 
         Write-Verbose -Message "logging to $logPath" -Verbose
         $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml @extraParams
-        if(!$results -or $results.FailedCount -gt 0 -or !$results.PassedCount)
+        if(!$results -or $results.FailedCount -gt 0 -or !$results.TotalCount)
         {
-            throw "Build or tests failed.  Passed: $($results.PassedCount) Failed: $($results.FailedCount)"
+            throw "Build or tests failed.  Passed: $($results.PassedCount) Failed: $($results.FailedCount) Total: $($results.TotalCount)"
         }
     }
 

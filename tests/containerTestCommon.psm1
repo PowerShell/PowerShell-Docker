@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 # Get Docker Engine OS
@@ -180,6 +180,7 @@ function Get-WindowsContainer
                 OptionalTests = $testArgs.OptionalTests
                 TestProperties = $testArgs.TestProperties
                 Channel = $testArgs.Channel
+                UseAcr = $testArgs.UseAcr
             }
         }
     }

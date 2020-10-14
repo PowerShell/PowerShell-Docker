@@ -1,5 +1,6 @@
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
+
 Set-StrictMode -Off
 
 Import-module -Name "$PSScriptRoot\containerTestCommon.psm1" -Force
@@ -131,11 +132,13 @@ Describe "Pull Windows Containers" -Tags 'Windows', 'Pull' {
         $pullTestCases = @()
         $script:windowsContainerRunTests | ForEach-Object {
             $pullTestCases += @{
-                Name = $_.Name
-                Tags = $_.Tags
+                Name   = $_.Name
+                Tags   = $_.Tags
+                UseAcr = [bool]$_.UseAcr
             }
         }
     }
+
     it "<Name> pulls without error" -TestCases $pullTestCases  -skip:$script:skipWindowsRun {
         param(
             [Parameter(Mandatory=$true)]
@@ -144,8 +147,15 @@ Describe "Pull Windows Containers" -Tags 'Windows', 'Pull' {
 
             [Parameter(Mandatory=$true)]
             [string[]]
-            $Tags
+            $Tags,
+
+            [Bool]
+            $UseAcr
         )
+
+        if ($UseAcr) {
+            Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+        }
 
         foreach($tag in $tags) {
             Invoke-Docker -Command pull -Params @(
@@ -215,8 +225,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 $Arm32
             )
 
-            if($Arm32)
-            {
+            if ($Arm32) {
                 Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
             }
 
@@ -610,6 +619,7 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
                 Name = $_.Name
                 ExpectedVersion = $_.ExpectedVersion
                 Channel = $_.Channel
+                UseAcr = [bool]$_.UseAcr
             }
         }
 
@@ -617,6 +627,7 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
         $script:windowsContainerRunTests | Where-Object {$_.SkipWebCmdletTests -ne $true} | ForEach-Object {
             $webTestCases += @{
                 Name = $_.Name
+                UseAcr = [bool]$_.UseAcr
             }
         }
     }
@@ -638,8 +649,15 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $UseAcr
             )
+
+            if ($UseAcr) {
+                Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+            }
 
             Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
         }
@@ -648,8 +666,15 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
-                $name
+                $name,
+
+                [Bool]
+                $UseAcr
             )
+
+            if ($UseAcr) {
+                Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+            }
 
             $metadataString = Get-MetadataUsingContainer -Name $Name
             $metadataString | Should -Not -BeNullOrEmpty
@@ -661,8 +686,15 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
-                $name
+                $name,
+
+                [Bool]
+                $UseAcr
             )
+
+            if ($UseAcr) {
+                Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+            }
 
             $path = Get-ContainerPath -Name $Name
 
@@ -683,8 +715,15 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $UseAcr
             )
+
+            if ($UseAcr) {
+                Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+            }
 
             if ($Channel -ne 'preview') {
                 Set-ItResult -Skipped -Because "Test is not applicable to $Channel"
