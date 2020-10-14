@@ -216,8 +216,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 $Arm32
             )
 
-            if($Arm32)
-            {
+            if ($Arm32) {
                 Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
             }
 
