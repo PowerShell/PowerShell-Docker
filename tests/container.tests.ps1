@@ -67,7 +67,6 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
                 Path = $_.Path
                 BuildArgs = $_.BuildArgs
                 SkipPull = $_.SkipPull
-                UseAcr = [bool]$_.UseAcr
             }
         }
     }
@@ -91,10 +90,7 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
             $BuildArgs,
 
             [bool]
-            $SkipPull,
-
-            [Bool]
-            $UseAcr
+            $SkipPull
         )
 
         Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType windows -SkipPull:$SkipPull -UseAcr
@@ -136,11 +132,13 @@ Describe "Pull Windows Containers" -Tags 'Windows', 'Pull' {
         $pullTestCases = @()
         $script:windowsContainerRunTests | ForEach-Object {
             $pullTestCases += @{
-                Name = $_.Name
-                Tags = $_.Tags
+                Name   = $_.Name
+                Tags   = $_.Tags
+                UseAcr = [bool]$_.UseAcr
             }
         }
     }
+
     it "<Name> pulls without error" -TestCases $pullTestCases  -skip:$script:skipWindowsRun {
         param(
             [Parameter(Mandatory=$true)]
@@ -149,8 +147,15 @@ Describe "Pull Windows Containers" -Tags 'Windows', 'Pull' {
 
             [Parameter(Mandatory=$true)]
             [string[]]
-            $Tags
+            $Tags,
+
+            [Bool]
+            $UseAcr
         )
+
+        if ($UseAcr) {
+            Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+        }
 
         foreach($tag in $tags) {
             Invoke-Docker -Command pull -Params @(
@@ -653,7 +658,6 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
             if ($UserAcr) {
                 Set-ItResult -Pending -Because "Images that use ACR can't be tested"
             }
-
 
             Get-ContainerPowerShellVersion -TestContext $testContext -Name $Name | should -be $ExpectedVersion
         }
