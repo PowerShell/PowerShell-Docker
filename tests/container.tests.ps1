@@ -655,7 +655,7 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
                 $UseAcr
             )
 
-            if ($UserAcr) {
+            if ($UseAcr) {
                 Set-ItResult -Pending -Because "Images that use ACR can't be tested"
             }
 
