@@ -679,8 +679,15 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
-                $name
+                $name,
+
+                [Bool]
+                $UseAcr
             )
+
+            if ($UserAcr) {
+                Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+            }
 
             $path = Get-ContainerPath -Name $Name
 
@@ -701,8 +708,15 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
 
                 [Parameter(Mandatory=$true)]
                 [string]
-                $Channel
+                $Channel,
+
+                [Bool]
+                $UseAcr
             )
+
+            if ($UserAcr) {
+                Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+            }
 
             if ($Channel -ne 'preview') {
                 Set-ItResult -Skipped -Because "Test is not applicable to $Channel"
