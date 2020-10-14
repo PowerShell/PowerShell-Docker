@@ -29,7 +29,7 @@ stages:
     channel: "lts"
 
 - stage: Approve_Release
-  condition: always()
+  condition: succeededOrFailed()
   dependsOn: ['test_preview','test_stable','test_lts']
   displayName: Approve Release
   jobs:
