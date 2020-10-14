@@ -39,7 +39,7 @@ stages:
     environment: PSDockerMcrRelease
 
 - stage: Create_PR
-  condition: always()
+  condition: succeededOrFailed()
   dependsOn: ['Release_preview','Release_stable','Release_lts']
   displayName: Create McrDocs Pr
   jobs:

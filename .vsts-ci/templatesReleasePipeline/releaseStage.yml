@@ -12,7 +12,7 @@ parameters:
 
 stages:
     - stage: Release_${{ parameters.channel }}
-      condition: always()
+      condition: succeededOrFailed()
       dependsOn: ['Approve_Release']
       displayName: Release ${{ parameters.channel }}
       jobs:
