@@ -29,7 +29,7 @@ stages:
     channel: "lts"
 
 - stage: Approve_Release
-  condition: succeededOrFailed()
+  condition: succeeded()
   dependsOn: ['test_preview','test_stable','test_lts']
   displayName: Approve Release
   jobs:
@@ -39,7 +39,7 @@ stages:
     environment: PSDockerMcrRelease
 
 - stage: Create_PR
-  condition: succeededOrFailed()
+  condition: succeeded()
   dependsOn: ['Release_preview','Release_stable','Release_lts']
   displayName: Create McrDocs Pr
   jobs:
