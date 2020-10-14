@@ -67,6 +67,7 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
                 Path = $_.Path
                 BuildArgs = $_.BuildArgs
                 SkipPull = $_.SkipPull
+                UseAcr = [bool]$_.UseAcr
             }
         }
     }
@@ -90,7 +91,10 @@ Describe "Build Windows Containers" -Tags 'Build', 'Windows' {
             $BuildArgs,
 
             [bool]
-            $SkipPull
+            $SkipPull,
+
+            [Bool]
+            $UseAcr
         )
 
         Invoke-DockerBuild -Tags $Tags -Path $Path -BuildArgs $BuildArgs -OSType windows -SkipPull:$SkipPull -UseAcr
@@ -664,7 +668,7 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
                 $UseAcr
             )
 
-            if ($UserAcr) {
+            if ($UseAcr) {
                 Set-ItResult -Pending -Because "Images that use ACR can't be tested"
             }
 
@@ -684,7 +688,7 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
                 $UseAcr
             )
 
-            if ($UserAcr) {
+            if ($UseAcr) {
                 Set-ItResult -Pending -Because "Images that use ACR can't be tested"
             }
 
@@ -713,7 +717,7 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
                 $UseAcr
             )
 
-            if ($UserAcr) {
+            if ($UseAcr) {
                 Set-ItResult -Pending -Because "Images that use ACR can't be tested"
             }
 
