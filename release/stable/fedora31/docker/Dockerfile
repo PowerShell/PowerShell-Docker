@@ -1,5 +1,5 @@
-# Docker image file that describes Fedora 31 image with PowerShell installed from Microsoft YUM Repo
-ARG fromTag=31
+# Docker image file that describes Fedora 32 image with PowerShell installed from Microsoft YUM Repo
+ARG fromTag=32
 ARG imageRepo=fedora
 
 FROM ${imageRepo}:${fromTag} AS installer-env
@@ -9,7 +9,7 @@ ARG PACKAGE_VERSION=7.0.0
 ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
-ARG fromTag=31
+ARG fromTag=32
 
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
