@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 #
 # Docker image file that describes an Kali Rolling image with PowerShell
@@ -26,7 +26,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Invoke-WebRequest : Authentication failed" issue when executing using
     # docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [Invoke-WebRequest] [-Uri <HTTPS URL>]
     DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0 \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-KaliLinux-${fromTag}
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-KaliLinux
 
 # Installation
 RUN \
