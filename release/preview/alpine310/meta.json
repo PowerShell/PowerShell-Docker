@@ -2,9 +2,10 @@
     "IsLinux" : true,
     "UseLinuxVersion": false,
     "PackageFormat": "powershell-${PS_VERSION}-linux-alpine-x64.tar.gz",
-    "osVersion": "Alpine",
+    "osVersion": "Alpine 3.10",
     "tagTemplates": [
-        "#psversion#-alpine-3.10-#fulltag#",
+        "#psversion#-alpine-#shorttag#",
+        "#psversion#-alpine-#shorttag#-#fulltag#",
         "preview-alpine-#shorttag#"
     ],
     "shortTags": [
