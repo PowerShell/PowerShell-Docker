@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 #
 # Docker image file that describes an Amazon Linux image with PowerShell
@@ -8,8 +8,6 @@
 ARG BaseImage=pshorg/powershellcommunity:amazonlinux-2.0
 
 FROM ${BaseImage}
-
-ARG fromTag=2.0.20181010
 
 # Installation
 RUN \
@@ -30,6 +28,6 @@ RUN \
     # remove cache folders and files
     && rm -rf /var/cache/yum
 
-ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-AmazonLinux-${fromTag}
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-AmazonLinux
 
 CMD [ "pwsh" ]

@@ -8,12 +8,10 @@ FROM node:14.3.0-alpine as node
 
 FROM ${BaseImage}
 
-ARG fromTag=3.9
-
 ENV NODE_VERSION=14.3.0 \
     YARN_VERSION=1.22.4 \
     NVM_DIR="/root/.nvm" \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Alpine-${fromTag}
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Alpine-3.9
 
 # workaround for Alpine to run in Azure DevOps
 ENV NODE_NO_WARNINGS=1
