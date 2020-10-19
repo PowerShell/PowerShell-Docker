@@ -6,7 +6,7 @@
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "#psversion#-fedora-32-#fulltag#",
-        "#psversion#-fedora-32-#shorttag#",
+        "#psversion#-fedora-32",
         "fedora-32-#shorttag#"
     ],
     "TestProperties": {

@@ -1,15 +1,13 @@
 # Docker image file that describes Fedora 32 image with PowerShell installed from Microsoft YUM Repo
-ARG fromTag=32
 ARG imageRepo=fedora
 
-FROM ${imageRepo}:${fromTag} AS installer-env
+FROM ${imageRepo}:32 AS installer-env
 
 ARG PS_VERSION=7.0.0
 ARG PACKAGE_VERSION=7.0.0
 ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
-ARG fromTag=32
 
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
@@ -17,7 +15,7 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Fedora-${fromTag}
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Fedora-32
 
 # Install dependencies and clean up
 RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
