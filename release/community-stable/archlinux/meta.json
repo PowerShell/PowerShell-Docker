@@ -1,0 +1,12 @@
+{
+    "IsLinux" : true,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "SkipGssNtlmSspTests": false,
+    "shortTags": [
+        {"Tag": "latest"}
+    ],
+    "tagTemplates": [
+        "#psversion#-archlinux-#tag#",
+        "archlinux"
+    ]
+}
