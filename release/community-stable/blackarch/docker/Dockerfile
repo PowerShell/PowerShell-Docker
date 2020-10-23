@@ -37,13 +37,16 @@ RUN \
     # change current path to gss-ntlmssp package repository folder path
     && cd gss-ntlmssp \
     # utilise sudo to builduser in order to make the gss-ntlmssp package
-    && sudo -u builduser bash -c makepkg -s --noconfirm
+    && sudo -u builduser bash -c makepkg -s --noconfirm \
+    # rename gss-ntlmssp current version and platform architecture package
+    # filename to a generic package filename
+    && mv gss-ntlmssp-*-x86_64.pkg.tar.zst gss-ntlmssp.pkg.tar.zst
 
 # Start a new stage so we lose all the tar.gz layers from the final image
 FROM archlinux:latest
 
 # Copy only the files we need from the previous stage
-COPY --from=installer-env ["/tmp/gss-ntlmssp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.zst", "/tmp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.zst"]
+COPY --from=installer-env ["/tmp/gss-ntlmssp/gss-ntlmssp.pkg.tar.zst", "/tmp/gss-ntlmssp.pkg.tar.zst"]
 
 # Define Args for the needed for BlackArch Linux
 ARG BlackArch_Strap_URL=https://blackarch.org/strap.sh
@@ -98,7 +101,7 @@ RUN \
       # required for SSH
       openssh \
     # install gss-ntlmssp package from the previous stage
-    && pacman -U --noconfirm /tmp/gss-ntlmssp-0.8.0.r3.g2251a72-1-x86_64.pkg.tar.zst \
+    && pacman -U --noconfirm /tmp/gss-ntlmssp.pkg.tar.zst \
     # create powershell folder
     && mkdir -p ${PS_INSTALL_FOLDER} \
     # download the powershell linux compressed package
