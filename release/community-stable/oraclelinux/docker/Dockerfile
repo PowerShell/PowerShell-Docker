@@ -5,7 +5,7 @@
 # installed from RHEL7 PowerShell package
 
 # Define arg(s) needed for the From statement
-FROM oraclelinux:latest AS installer-env
+FROM oraclelinux:8.2 AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.0.1
@@ -22,7 +22,7 @@ ENV \
     LANG=en_US.UTF-8 \
     # Set up PowerShell module analysis cache path
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache  \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OracleLinux-latest
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OracleLinux-8.2
 
 # Installation
 RUN \
@@ -35,7 +35,7 @@ RUN \
       # required for SSH
       openssh-clients \
       # install EPEL repository
-	    oracle-epel-release-el7 \
+	    oracle-epel-release-el8 \
     # update package list from EPEL repository
     && yum update \
     # install dependencies from EPEL repository
