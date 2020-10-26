@@ -3,4 +3,4 @@
 
 # Dummy docker image to trigger dependabot PRs
 
-FROM mcr.microsoft.com/windows/nanoserver:2004
+FROM mcr.microsoft.com/windows/nanoserver:2009
