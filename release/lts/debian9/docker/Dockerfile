@@ -1,8 +1,7 @@
 # Docker image file that describes an Debian 9 image with PowerShell installed from Microsoft APT Repo
-ARG fromTag=stretch-slim
 ARG imageRepo=debian
 
-FROM ${imageRepo}:${fromTag} AS installer-env
+FROM ${imageRepo}:stretch-slim AS installer-env
 
 ARG PS_VERSION=7.0.0
 ARG PS_PACKAGE=powershell-lts_${PS_VERSION}-1.debian.9_amd64.deb
