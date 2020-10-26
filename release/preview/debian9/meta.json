@@ -5,8 +5,13 @@
     "osVersion": "Debian 9",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-debian-#tag#",
+        "#psversion#-debian-#shorttag#-#fulltag#",
+        "#psversion#-debian-#shorttag#",
         "preview-debian-#shorttag#"
+    ],
+    "shortTags": [
+        {"Tag": "stretch-slim"},
+        {"Tag": "9"}
     ],
     "SubImage": "test-deps",
     "TestProperties": {
