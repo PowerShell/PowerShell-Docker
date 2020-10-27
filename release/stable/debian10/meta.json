@@ -5,8 +5,13 @@
     "osVersion": "Debian 10",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-debian-#tag#",
+        "#psversion#-debian-#shorttag#-#fulltag#",
+        "#psversion#-debian-#shorttag#",
         "debian-#shorttag#"
+    ],
+    "shortTags": [
+        {"Tag": "buster-slim"},
+        {"Tag": "10"}
     ],
     "SubImage": "test-deps",
     "TestProperties": {

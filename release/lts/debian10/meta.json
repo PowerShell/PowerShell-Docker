@@ -5,11 +5,15 @@
     "osVersion": "Debian 10",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
+        "lts-debian-#shorttag#-#fulltag#",
         "lts-debian-#shorttag#"
+    ],
+    "shortTags": [
+        {"Tag": "buster-slim"},
+        {"Tag": "10"}
     ],
     "SubImage": "test-deps",
     "TestProperties": {
         "size": 314
     }
 }
-
