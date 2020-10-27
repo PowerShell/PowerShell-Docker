@@ -46,4 +46,4 @@ stages:
   - deployment: ReleaseAutomationKickOff
     displayName: Create McrDocs Pr
     pool: server
-    environment: PSDockerMcrRelease
+    environment: PSDockerMcrDocs
