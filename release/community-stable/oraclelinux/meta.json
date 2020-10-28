@@ -6,7 +6,7 @@
         {"Tag": "8.2"}
     ],
     "tagTemplates": [
-        "#psversion#-oraclelinux-#tag#",
+        "#psversion#-oraclelinux-#shorttag#",
         "oraclelinux"
     ]
 }
