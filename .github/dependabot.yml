@@ -42,3 +42,8 @@ updates:
     directory: "/release/preview/windowsservercore/dependabot"
     schedule:
       interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/release/community-stable/oraclelinux/docker"
+    schedule:
+      interval: "weekly"
