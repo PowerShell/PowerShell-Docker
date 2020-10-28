@@ -1,9 +1,9 @@
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# Docker image file that describes an Alpine3.11 image with PowerShell installed from .tar.gz file(s)
+# Docker image file that describes an Alpine3.12 image with PowerShell installed from .tar.gz file(s)
 
-FROM alpine:3.11 AS installer-env
+FROM alpine:3.12 AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.0.0-preview.1
@@ -24,7 +24,7 @@ RUN mkdir -p ${PS_INSTALL_FOLDER}
 RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER} -v
 
 # Start a new stage so we lose all the tar.gz layers from the final image
-FROM alpine:3.11
+FROM alpine:3.12.1
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
@@ -39,7 +39,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Alpine-3.11
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Alpine-3.12
 
 # Install dotnet dependencies and ca-certificates
 RUN apk add --no-cache \
