@@ -1,8 +1,7 @@
-# Docker image file that describes an CentOS7 image with PowerShell installed from Microsoft YUM Repo
-ARG fromTag=7
-ARG imageRepo=centos
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
-FROM ${imageRepo}:${fromTag} AS installer-env
+FROM centos:7 AS installer-env
 
 ARG PS_VERSION=6.2.0
 ARG PACKAGE_VERSION=6.2.0
@@ -14,7 +13,8 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
-    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache
+    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-CentOS-7
 
 # Install dependencies and clean up
 RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \

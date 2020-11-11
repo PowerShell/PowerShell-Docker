@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 # Docker image file that describes an Ubuntu20.04 image with PowerShell installed from Microsoft APT Repo
 FROM ubuntu:20.04 AS installer-env
 
@@ -40,7 +43,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Debian-11
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Ubuntu-20.04
 
 # Install dependencies and clean up
 RUN apt-get update \

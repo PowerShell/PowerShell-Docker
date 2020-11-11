@@ -1,5 +1,5 @@
 # Docker image file that describes an Ubuntu image with PowerShell and test dependencies
-ARG BaseImage=mcr.microsoft.com/powershell:ubuntu-16.04
+ARG BaseImage=mcr.microsoft.com/powershell:ubuntu-20.04
 
 FROM ${BaseImage}
 
@@ -14,7 +14,7 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Ubuntu-16.04
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Ubuntu-20.04
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c

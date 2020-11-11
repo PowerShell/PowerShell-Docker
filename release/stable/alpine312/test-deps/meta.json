@@ -1,19 +1,19 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "osVersion": "Fedora 31",
-    "SkipGssNtlmSspTests": false,
+    "SkipGssNtlmSspTests": true,
+    "osVersion": "Alpine 3.12",
     "tagTemplates": [
         "#tag#"
     ],
-    "SubRepository": "test-deps",
     "OptionalTests": [
-        "test-deps"
+        "test-deps",
+        "test-deps-musl"
     ],
     "TestProperties": {
-        "size": 632
+        "size": 295
     },
     "TagMapping": {
-        ".*" : "preview-fedora-31"
+        "^.*-alpine-3.12$" : "preview-alpine-3.12"
     }
 }

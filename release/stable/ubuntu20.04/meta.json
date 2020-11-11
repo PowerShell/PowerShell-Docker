@@ -7,7 +7,7 @@
     "tagTemplates": [
         "#psversion#-ubuntu-#shorttag#-#fulltag#",
         "#psversion#-ubuntu-#shorttag#",
-        "preview-ubuntu-#shorttag#"
+        "ubuntu-#shorttag#"
     ],
     "shortTags": [
         {"Tag": "focal"},

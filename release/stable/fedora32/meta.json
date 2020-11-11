@@ -9,6 +9,9 @@
         "#psversion#-fedora-32",
         "fedora-32-#shorttag#"
     ],
+    "shortTags": [
+        {"Tag": "32"}
+    ],
     "TestProperties": {
         "size": 632
     }

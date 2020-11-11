@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 # Docker image file that describes Fedora 32 image with PowerShell installed from Microsoft YUM Repo
 ARG imageRepo=fedora
 
@@ -33,7 +36,6 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
       ca-certificates \
       gssntlmssp \
     && echo "end - misc packages" \
-    && ln -sf /opt/microsoft/powershell/7/pwsh /usr/bin/pwsh \
     # This installs most security advisories
     && echo "starting upgrade minimal" \
     && dnf upgrade-minimal -y --security \
@@ -42,7 +44,7 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
     && dnf updateinfo list -q --security \
     && echo "end - verifying all security advisories are installed..." \
     && dnf clean all \
-    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
+    #&& localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \

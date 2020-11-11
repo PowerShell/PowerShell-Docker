@@ -1,9 +1,13 @@
-# Docker image file that describes Fedora 31 image with PowerShell installed from Microsoft YUM Repo
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
-FROM fedora:31 AS installer-env
+# Docker image file that describes Fedora 32 image with PowerShell installed from Microsoft YUM Repo
+ARG imageRepo=fedora
 
-ARG PS_VERSION=7.0.0-preview.1
-ARG PACKAGE_VERSION=7.0.0_preview.1
+FROM ${imageRepo}:32 AS installer-env
+
+ARG PS_VERSION=7.0.0
+ARG PACKAGE_VERSION=7.0.0
 ARG PS_PACKAGE=powershell-preview-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
@@ -14,7 +18,7 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Fedora-31
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Fedora-32
 
 # Install dependencies and clean up
 RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
@@ -31,50 +35,17 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
       compat-openssl10 \
       ca-certificates \
       gssntlmssp \
-    # PowerShell remoting over SSH dependencies
-      openssh-clients \
     && echo "end - misc packages" \
     && ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh \
-    && echo "starting FEDORA-2019-27e7b92407" \
-    # For whatever reason FEDORA-2019-27e7b92407 has to be patched manually
-    # to do this, upgrade libmodulemd1, if it is installed
-    # and disable telemetry
-    && export POWERSHELL_TELEMETRY_OPTOUT=1 \
-    && pwsh \
-        -NoLogo \
-        -NoProfile \
-        -Command " \
-          try { \$packageList = dnf list installed libmodulemd1} \
-          catch {}; \
-          \$module = (\$packageList | Select-String -SimpleMatch libmodulemd1);  \
-          if(\$module) { \
-            Write-Host '******* Patching *********'; \
-            dnf upgrade -y libmodulemd1 \
-          }" \
-    && echo "end - FEDORA-2019-27e7b92407" \
     # This installs most security advisories
     && echo "starting upgrade minimal" \
     && dnf upgrade-minimal -y --security \
     && echo "end - upgrade minimal" \
-    # query and install any remaining security advisories
-    && pwsh \
-        -NoLogo \
-        -NoProfile \
-        -Command " \
-          Write-Host '******* Getting security advisory list *********'; \
-          (dnf updateinfo list -q --security) |  \
-              Foreach-Object { \
-                  \$advisory=(\$_ -split ' ')[0]; \
-                  Write-Host '******* Patching *********'; \
-                  Write-Host \$advisory; \
-                  Write-Host '************************'; \
-                  dnf upgrade -y --advisory=\$advisory \
-              }" \
     && echo "verifying all security advisories are installed..." \
     && dnf updateinfo list -q --security \
     && echo "end - verifying all security advisories are installed..." \
     && dnf clean all \
-    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
+    #&& localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
@@ -89,4 +60,4 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
-CMD [ "pwsh-preview" ]
+CMD [ "pwsh" ]
