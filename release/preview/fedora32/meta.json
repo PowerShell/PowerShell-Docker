@@ -1,0 +1,17 @@
+{
+    "IsLinux": true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm",
+    "osVersion": "Fedora 32",
+    "SkipGssNtlmSspTests": false,
+    "tagTemplates": [
+        "#psversion#-fedora-32-#fulltag#",
+        "preview-fedora-32"
+    ],
+    "shortTags": [
+        {"Tag": "32"}
+    ],
+    "TestProperties": {
+        "size": 632
+    }
+}
