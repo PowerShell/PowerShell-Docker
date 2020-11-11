@@ -36,7 +36,7 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
       ca-certificates \
       gssntlmssp \
     && echo "end - misc packages" \
-    && ln -sf /opt/microsoft/powershell/7/pwsh /usr/bin/pwsh \
+    && ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh \
     # This installs most security advisories
     && echo "starting upgrade minimal" \
     && dnf upgrade-minimal -y --security \
