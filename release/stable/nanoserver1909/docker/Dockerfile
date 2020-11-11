@@ -1,4 +1,7 @@
 # escape=`
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 # Args used by from statements must be defined here:
 ARG InstallerVersion=nanoserver
 ARG InstallerRepo=mcr.microsoft.com/powershell
