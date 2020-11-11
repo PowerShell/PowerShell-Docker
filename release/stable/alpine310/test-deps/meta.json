@@ -14,6 +14,6 @@
         "size": 296
     },
     "TagMapping": {
-        "^.*-alpine-3.10$" : "preview-alpine-3.10"
+        "^.*-alpine-3.10$" : "alpine-3.10"
     }
 }
