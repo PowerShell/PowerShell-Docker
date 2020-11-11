@@ -2,7 +2,7 @@
 ARG fromTag=7
 ARG imageRepo=centos
 
-FROM ${imageRepo}:${fromTag} AS installer-env
+FROM centos:7 AS installer-env
 
 ARG PS_VERSION=6.2.0
 ARG PACKAGE_VERSION=6.2.0
