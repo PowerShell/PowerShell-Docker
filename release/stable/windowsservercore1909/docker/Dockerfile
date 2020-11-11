@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # escape=`
 ARG WindowsServerCoreRepo=mcr.microsoft.com/windows/servercore
 

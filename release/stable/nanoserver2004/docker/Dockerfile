@@ -1,3 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 # escape=`
 # Args used by from statements must be defined here:
 ARG InstallerVersion=nanoserver
