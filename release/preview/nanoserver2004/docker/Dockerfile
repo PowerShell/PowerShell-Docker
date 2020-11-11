@@ -13,10 +13,10 @@ ARG PS_VERSION=7.0.0-rc.1
 
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
 
+SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
 # disable telemetry
 ENV POWERSHELL_TELEMETRY_OPTOUT="1"
-
-SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 ARG PS_PACKAGE_URL_BASE64
 
@@ -40,8 +40,6 @@ RUN Write-host "Verifying valid Version..."; `
 
 # Install PowerShell into NanoServer
 FROM ${NanoServerRepo}:2004
-
-ARG IMAGE_NAME=mcr.microsoft.com/powershell
 
 # Copy PowerShell Core from the installer container
 ENV ProgramFiles="C:\Program Files" `
