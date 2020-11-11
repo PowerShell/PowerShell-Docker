@@ -1,8 +1,8 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# Docker image file that describes an Ubuntu20.04 image with PowerShell installed from Microsoft APT Repo
-FROM ubuntu:20.04 AS installer-env
+# Docker image file that describes an Ubuntu image with PowerShell installed from Microsoft APT Repo
+FROM ubuntu:18.04 AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.0.0-rc.1
