@@ -45,7 +45,7 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
     && dnf updateinfo list -q --security \
     && echo "end - verifying all security advisories are installed..." \
     && dnf clean all \
-    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
+    #&& localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
