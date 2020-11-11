@@ -44,8 +44,7 @@ FROM ${NanoServerRepo}:1809
 # Copy PowerShell Core from the installer container
 ENV ProgramFiles="C:\Program Files" `
     # set a fixed location for the Module analysis cache
-    LOCALAPPDATA="C:\Users\ContainerAdministrator\AppData\Local" `
-    PSModuleAnalysisCachePath="$LOCALAPPDATA\Microsoft\Windows\PowerShell\docker\ModuleAnalysisCache" `
+    PSModuleAnalysisCachePath="C:\Users\Public\AppData\Local\Microsoft\Windows\PowerShell\docker\ModuleAnalysisCache" `
     # Persist %PSCORE% ENV variable for user convenience
     PSCORE="$ProgramFiles\PowerShell\pwsh.exe" `
     # Set the default windows path so we can use it
