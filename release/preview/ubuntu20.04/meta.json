@@ -4,12 +4,14 @@
     "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
     "osVersion": "Ubuntu 20.04",
     "SkipGssNtlmSspTests": false,
-    "shortTags": [
-        {"Tag": "20.04"}
-    ],
     "tagTemplates": [
-        "#psversion#-ubuntu-20.04-#fulltag#",
+        "#psversion#-ubuntu-#shorttag#-#fulltag#",
+        "#psversion#-ubuntu-#shorttag#",
         "preview-ubuntu-#shorttag#"
+    ],
+    "shortTags": [
+        {"Tag": "focal"},
+        {"Tag": "20.04"}
     ],
     "TestProperties": {
         "size": 355
