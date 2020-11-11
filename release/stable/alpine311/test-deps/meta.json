@@ -2,7 +2,7 @@
     "IsLinux" : true,
     "UseLinuxVersion": false,
     "SkipGssNtlmSspTests": true,
-    "osVersion": "Alpine 3.10",
+    "osVersion": "Alpine 3.11",
     "tagTemplates": [
         "#tag#"
     ],
@@ -11,9 +11,9 @@
         "test-deps-musl"
     ],
     "TestProperties": {
-        "size": 296
+        "size": 295
     },
     "TagMapping": {
-        "^.*-alpine-3.10$" : "preview-alpine-3.10"
+        "^.*-alpine-3.11$" : "alpine-3.11"
     }
 }

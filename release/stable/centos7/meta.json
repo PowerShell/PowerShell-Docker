@@ -7,6 +7,9 @@
         "#psversion#-centos-#tag#",
         "centos-#shorttag#"
     ],
+    "shortTags": [
+        {"Tag": "7"}
+    ],
     "SubImage": "test-deps",
     "TestProperties": {
         "size": 550

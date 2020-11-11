@@ -1,18 +1,16 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT License.
-
-# Docker image file that describes an Alpine3.x image with PowerShell installed from .tar.gz file(s)
-
-FROM alpine:3.10 AS installer-env
+# Docker image file that describes an Ubuntu20.04 image with PowerShell installed from Microsoft APT Repo
+FROM ubuntu:20.04 AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=7.0.0
-ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-alpine-x64.tar.gz
+ARG PS_VERSION=6.2.4
+ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
 
 # Download the Linux tar.gz and save it
 ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
+
+RUN echo ${PS_PACKAGE_URL}
 
 # define the folder we will be installing PowerShell to
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
@@ -21,10 +19,13 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 RUN mkdir -p ${PS_INSTALL_FOLDER}
 
 # Unzip the Linux tar.gz
-RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER} -v
+RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
 # Start a new stage so we lose all the tar.gz layers from the final image
-FROM alpine:3.10
+FROM ubuntu:20.04 AS powershell
+
+ARG PS_VERSION=7.1.0
+ARG PS_INSTALL_VERSION=7
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
@@ -39,37 +40,41 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Alpine-3.10
-# Install dotnet dependencies and ca-certificates
-RUN apk add --no-cache \
-    ca-certificates \
-    less \
-    \
-    # PSReadline/console dependencies
-    ncurses-terminfo-base \
-    \
-    # .NET Core dependencies
-    krb5-libs \
-    libgcc \
-    libintl \
-    libssl1.1 \
-    libstdc++ \
-    tzdata \
-    userspace-rcu \
-    zlib \
-    icu-libs \
-    && apk -X https://dl-cdn.alpinelinux.org/alpine/edge/main add --no-cache \
-    lttng-ust \
-    \
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Ubuntu-20.04
+
+# Install dependencies and clean up
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y \
+    # less is required for help in powershell
+        less \
+    # requied to setup the locale
+        locales \
+    # required for SSL
+        ca-certificates \
+        gss-ntlmssp \
+        libicu66 \
+        libssl1.1 \
+        libc6 \
+        libgcc1 \
+        libgssapi-krb5-2 \
+        liblttng-ust0 \
+        libstdc++6 \
+        zlib1g \
     # PowerShell remoting over SSH dependencies
-    openssh-client \
-    \
+        openssh-client \
+    # Download the Linux package and save it
+    && apt-get dist-upgrade -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && locale-gen $LANG && update-locale
+
+# Give all user execute permissions and remove write permissions for others
+RUN chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     # Create the pwsh symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
-    \
-    # Give all user execute permissions and remove write permissions for others
-    && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     # intialize powershell module cache
+    # and disable telemetry
+    && export POWERSHELL_TELEMETRY_OPTOUT=1 \
     && pwsh \
         -NoLogo \
         -NoProfile \
@@ -81,4 +86,6 @@ RUN apk add --no-cache \
             Start-Sleep -Seconds 6 ; \
           }"
 
+# Use PowerShell as the default shell
+# Use array to avoid Docker prepending /bin/sh -c
 CMD [ "pwsh" ]

@@ -2,18 +2,17 @@
     "IsLinux" : true,
     "UseLinuxVersion": false,
     "PackageFormat": "powershell-${PS_VERSION}-linux-alpine-x64.tar.gz",
-    "osVersion": "Alpine 3.10",
+    "osVersion": "Alpine 3.11",
     "tagTemplates": [
-        "#psversion#-alpine-#shorttag#",
-        "#psversion#-alpine-3.10-#fulltag#",
+        "#psversion#-alpine-3.11-#fulltag#",
         "alpine-#shorttag#"
     ],
     "shortTags": [
-        {"Tag": "3.10"}
+        {"Tag": "3.11"}
     ],
     "SkipGssNtlmSspTests": true,
     "SubImage": "test-deps",
     "TestProperties": {
-        "size": 225
+        "size": 221
     }
 }
