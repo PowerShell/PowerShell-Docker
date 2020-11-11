@@ -1,9 +1,10 @@
-# Docker image file that describes an Ubuntu18.04 image with PowerShell installed from Microsoft APT Repo
-ARG fromTag=18.04
-ARG imageRepo=ubuntu
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
+# Docker image file that describes an Ubuntu image with PowerShell installed from Microsoft APT Repo
 FROM ubuntu:18.04 AS installer-env
 
+# Define Args for the needed to add the package
 ARG PS_VERSION=6.2.0
 ARG PS_PACKAGE=powershell_${PS_VERSION}-1.ubuntu.18.04_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}

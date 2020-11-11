@@ -1,6 +1,5 @@
-# Docker image file that describes an CentOS7 image with PowerShell installed from Microsoft YUM Repo
-ARG fromTag=7
-ARG imageRepo=centos
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 FROM centos:7 AS installer-env
 

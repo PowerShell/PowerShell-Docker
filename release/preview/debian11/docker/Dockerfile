@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 # Docker image file that describes an Debian image with PowerShell installed from Microsoft APT Repo
 
 FROM debian:bullseye-slim AS installer-env
