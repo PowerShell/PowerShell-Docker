@@ -22,7 +22,7 @@ ENV \
     LANG=en_US.UTF-8 \
     # Set up PowerShell module analysis cache path
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache  \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OracleLinux-8.2
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OracleLinux-8.3
 
 # Installation
 RUN \
