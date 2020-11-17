@@ -5,7 +5,7 @@
 # installed from RHEL7 PowerShell package
 
 # Define arg(s) needed for the From statement
-FROM oraclelinux:8.2 AS installer-env
+FROM oraclelinux:8.3 AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.0.1
