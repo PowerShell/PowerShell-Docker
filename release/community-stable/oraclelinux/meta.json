@@ -3,7 +3,7 @@
     "PackageFormat": "powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm",
     "SkipGssNtlmSspTests": false,
     "shortTags": [
-        {"Tag": "8.2"}
+        {"Tag": "8.3"}
     ],
     "tagTemplates": [
         "#psversion#-oraclelinux-#shorttag#",
