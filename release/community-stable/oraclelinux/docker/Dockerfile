@@ -5,7 +5,7 @@
 # installed from RHEL7 PowerShell package
 
 # Define arg(s) needed for the From statement
-FROM oraclelinux:8.2 AS installer-env
+FROM oraclelinux:8.3 AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.0.1
@@ -22,7 +22,7 @@ ENV \
     LANG=en_US.UTF-8 \
     # Set up PowerShell module analysis cache path
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache  \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OracleLinux-8.2
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-OracleLinux-8.3
 
 # Installation
 RUN \
