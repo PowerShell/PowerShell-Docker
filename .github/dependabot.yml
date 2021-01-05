@@ -29,7 +29,7 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "docker"
-    directory: "/release/preview/nanoserver2004/dependabot"
+    directory: "/release/preview/nanoserver20H2/dependabot"
     schedule:
       interval: "weekly"
 
