@@ -1,0 +1,90 @@
+parameters:
+  vmImage: 'ubuntu-16.04'
+  jobName: 'none'
+  releaseTag: ''
+  ACR: 'no'
+  maxParallel: 5
+  dependsOn: []
+
+jobs:
+  - job: ${{ parameters.jobName }}
+    dependsOn:
+      ${{ parameters.dependsOn }}
+    strategy:
+        matrix: $[ ${{ parameters.matrix }} ]
+        maxParallel: ${{ parameters.maxParallel }}
+    variables:
+      - group: 'Staging_ACR'
+      - name: 'dockerImage'
+        value: 'powershell'
+      - name: "Channel"
+        value: ${{ parameters.channel }}
+      - name: "ACR"
+        value: ${{ parameters.ACR }}
+      - name: "releaseTag"
+        value: ${{ parameters.releaseTag }}
+
+    pool:
+      vmImage: ${{ parameters.vmImage }}
+    timeoutInMinutes: 30
+
+    displayName: ${{ parameters.jobName }}
+
+    steps:
+    - download: releasePipeline
+      displayName: Download build meta json
+      artifact: buildMeta
+      patterns: '**/*.json'
+
+    - download: releasePipeline
+      displayName: Download release tags json
+      artifact: releaseTags
+      patterns: '**/*.json'
+    - pwsh: |
+            $json = Get-ChildItem "$ENV:PIPELINE_WORKSPACE/buildmeta.json" -recurse -File
+            if($json.Count -ge 1)
+            {
+                $jsonText = Get-Content -Path $json.FullName
+                $fullTag = ($jsonText | ConvertFrom-Json).FullTag
+                Write-Verbose "setting FULL_TAG to $fullTag" -verbose
+                Write-Host "##vso[task.setvariable variable=FULL_TAG;]$fullTag"
+            }
+            else{
+                Write-Verbose "Did not find buildmeta json" -verbose
+            }
+      displayName: 'Set Full Tag'
+
+    - task: PowerShell@2
+      displayName: 'Deserialize Release Tags'
+      inputs:
+        targetType: 'filePath'
+        filePath: .vsts-ci/templatesGeneric/deserializeTags.ps1
+        pwsh: true
+
+    - template: ../templatesGeneric/setVersionStepsTemplate.yml
+
+    - pwsh: |
+        Get-ChildItem env: | Out-String -Width 1000
+      displayName: 'Capture Environment'
+
+    - pwsh: 'az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
+      displayName: 'az login'
+
+    - pwsh: |
+            az account set --subscription $(AcrSubscriptionName)
+            $manifestLists = ./build.ps1 -GenerateManifestLists -Channel $(channel) -OsFilter All  | convertfrom-json
+            $repos = @($manifestLists.Repo)
+
+            foreach($repo in $repos) {
+              foreach($tag in ($manifestLists | where-object {$_.repo -eq $repo}).ManifestList) {
+                $name = $repo + ":" + $tag
+                $stagingRepo = $repo -replace 'public/', '$(dockerNamespace)/'
+                Write-verbose "Running: az acr import --name $(productionACR) --source '$(dockerHost)/${stagingRepo}:$tag' --image '${repo}:$tag' --force" -verbose
+                az acr import --name $(productionACR) --source "$(dockerHost)/${stagingRepo}:$tag" --image "${repo}:$tag" --force
+              }
+            }
+      displayName: 'release - $(channel) - $(imagename)'
+
+    - pwsh: 'az logout'
+      displayName: 'az logout'
+      condition: always()

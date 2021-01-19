@@ -44,3 +44,9 @@ stages:
           matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux']
           dependsOn:
             - GenerateYaml_${{ parameters.channel }}
+
+    - stage: Release_ManifestList
+      jobs:
+      - template: ./releaseManifestList.yml
+        parameters:
+          jobName: ${{ parameters.channel }}_manifest_list
