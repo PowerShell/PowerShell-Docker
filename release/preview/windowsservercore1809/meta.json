@@ -13,6 +13,9 @@
         "#psversion#-windowsservercore-1809-#fulltag#",
         "preview-windowsservercore-#shorttag#"
     ],
+    "manifestLists": [
+        "preview"
+    ],
     "TestProperties": {
         "size": 1
     }
