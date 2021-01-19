@@ -34,6 +34,10 @@ param(
     [switch]
     $GenerateMatrixJson,
 
+    [Parameter(Mandatory, ParameterSetName="GenerateManifestLists")]
+    [switch]
+    $GenerateManifestLists,
+
     [Parameter(Mandatory, ParameterSetName="GenerateTagsYaml")]
     [switch]
     $GenerateTagsYaml,
@@ -93,6 +97,7 @@ param(
     [Parameter(Mandatory, ParameterSetName="DupeCheckAll")]
     [Parameter(Mandatory, ParameterSetName="GenerateTagsYaml")]
     [Parameter(Mandatory, ParameterSetName="GenerateMatrixJson")]
+    [Parameter(Mandatory, ParameterSetName="GenerateManifestLists")]
     [string[]]
     $Channel='stable',
 
@@ -113,6 +118,7 @@ param(
     $Version,
 
     [Parameter(ParameterSetName="GenerateMatrixJson")]
+    [Parameter(ParameterSetName="GenerateManifestLists")]
     [Parameter(ParameterSetName="GenerateTagsYaml")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
@@ -124,12 +130,14 @@ param(
     [string]
     $LtsVersion,
 
+    [Parameter(ParameterSetName="GenerateManifestLists")]
     [Parameter(ParameterSetName="GenerateMatrixJson")]
     [Parameter(ParameterSetName="GenerateTagsYaml")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
     $PreviewVersion,
 
+    [Parameter(ParameterSetName="GenerateManifestLists")]
     [Parameter(ParameterSetName="GenerateMatrixJson")]
     [Parameter(ParameterSetName="GenerateTagsYaml")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
@@ -147,11 +155,13 @@ param(
     [switch]
     $ForcePesterInstall,
 
+    [Parameter(ParameterSetName="GenerateManifestLists")]
     [Parameter(ParameterSetName="GenerateMatrixJson")]
     [string]
     [ValidateSet('All','OnlyAcr','NoAcr')]
     $Acr,
 
+    [Parameter(ParameterSetName="GenerateManifestLists")]
     [Parameter(ParameterSetName="GenerateMatrixJson")]
     [string]
     [ValidateSet('All','Linux','Windows')]
@@ -208,7 +218,7 @@ DynamicParam {
 }
 
 Begin {
-    if ($PSCmdlet.ParameterSetName -notin 'GenerateMatrixJson', 'GenerateTagsYaml', 'DupeCheckAll' -and $Channel.Count -gt 1)
+    if ($PSCmdlet.ParameterSetName -notin 'GenerateMatrixJson', 'GenerateTagsYaml', 'DupeCheckAll', 'GenerateManifestLists' -and $Channel.Count -gt 1)
     {
         throw "Multiple Channels are not supported in this parameter set"
     }
@@ -368,7 +378,7 @@ End {
                     }
                 }
             }
-            elseif ($GenerateTagsYaml.IsPresent -or $GenerateMatrixJson.IsPresent) {
+            elseif ($GenerateTagsYaml.IsPresent -or $GenerateMatrixJson.IsPresent -or $GenerateManifestLists.IsPresent) {
                 if($Acr -eq 'OnlyAcr' -and !$useAcr)
                 {
                     continue
@@ -400,7 +410,8 @@ End {
                 $dockerfile = "https://github.com/PowerShell/PowerShell-Docker/blob/master$relativeImagePath/docker/Dockerfile"
 
                 $osVersion = $allMeta.meta.osVersion
-                if($osVersion -or $GenerateMatrixJson.IsPresent)
+                $manifestLists = $allMeta.meta.ManifestLists
+                if($osVersion -or $GenerateMatrixJson.IsPresent -or $GenerateManifestLists.IsPresent)
                 {
                     if ($osVersion) {
                         $osVersion = $osVersion.replace('${fromTag}', $actualTagData.fromTag)
@@ -425,6 +436,7 @@ End {
                         Name            = $dockerFileName
                         UseAcr          = $UseAcr
                         ContinueOnError = $continueOnError
+                        ManifestLists   = $manifestLists
                     }
 
                     $tagGroups[$tagGroup] += $tag
@@ -579,6 +591,72 @@ End {
                 $command = "vso[task.setvariable variable=$variableName;isoutput=true]$($matrixJson)"
                 Write-Verbose "sending command: '$command'"
                 Write-Host "##$command"
+            }
+        }
+    }
+
+    if ($GenerateManifestLists.IsPresent) {
+        $manifestLists = @()
+        $tags = @()
+        foreach ($repo in $tagGroups.Keys | Sort-Object) {
+            $channelGroups = $tagGroups.$repo | Group-Object -Property Channel
+            foreach ($channelGroup in $channelGroups) {
+                $channelName = $channelGroup.Name
+                Write-Verbose "generating $channelName json"
+                $osGroups = $channelGroup.Group | Group-Object -Property os
+                foreach ($osGroup in $osGroups) {
+                    $osName = $osGroup.Name
+
+                    # Filter out subimages.  We cannot directly build subimages.
+                    foreach ($tag in $osGroup.Group | Where-Object { $_.Name -notlike '*/*' } | Sort-Object -Property ManifestLists) {
+                        if ($tag.ManifestLists) {
+                            foreach ($manifestList in $tag.ManifestLists) {
+
+                                if ($manifestLists -notcontains $manifestList) {
+                                    $manifestLists += $manifestList
+                                }
+
+                                $tag | Add-Member -MemberType NoteProperty -Value $repo -Name 'Repo'
+
+                                $tags += $tag
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $matrix = @{}
+        foreach ($manifestList in $manifestLists) {
+            $jobName = $manifestList -replace '-', '_'
+            $manifestListTags = [PSCustomObject]@{
+                ManifestList = $manifestList
+                Channel      = ""
+                Tags         = @()
+                JobName      = $jobName
+                Repo         = ""
+            }
+
+            foreach ($tag in $tags | Where-Object { $_.ManifestLists -contains $manifestList }) {
+                if (-not $matrix.ContainsKey($manifestList)) {
+                    $matrix.Add($manifestList, @{ })
+                }
+
+                $manifestListTags.Channel = $tag.Channel
+                $manifestListTags.Tags += $tag.Tags | Where-Object { $_ -notmatch '\d{8}' } | Select-Object -First 1
+                $manifestListTags.Repo = $tag.Repo
+            }
+
+            if (-not $matrix.$manifestList.ContainsKey($jobName) -and -not $tag.ContinueOnError) {
+                $matrix.$manifestList.Add($jobName, $manifestListTags)
+            }
+        }
+
+        foreach ($manifestList in $matrix.Keys) {
+            foreach ($jobName in $matrix.$manifestList.Keys) {
+                $jobMatrix = $matrix.$manifestList.$jobName
+                $matrixJson = $jobMatrix | ConvertTo-Json -Compress
+                Write-Output $matrixJson
             }
         }
     }
