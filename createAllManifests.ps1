@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 # script to create the Docker manifest lists
@@ -13,26 +13,19 @@ param (
     $Channel='stable'
 )
 
+$buildScriptPath = Join-Path -Path $PSScriptRoot -ChildPath 'build.ps1'
+
 $createScriptPath = Join-Path -Path $PSScriptRoot -ChildPath 'createManifest.ps1'
 
-$latestStableUbuntu   = "ubuntu-bionic"
-$latestStableWsc1809  = "windowsservercore-1809"
-$latestStableWsc1903  = "windowsservercore-1903"
-$latestStableNano1809 = "nanoserver-1809"
-$latestStableNano1903 = "nanoserver-1903"
+$json = &$buildScriptPath -GenerateManifestLists -Channel $Channel -OsFilter All
 
-$latestPreviewUbuntu  = "preview-ubuntu-bionic"
-$latestPreviewWsc1809 = "preview-windowsservercore-1809"
-$latestPreviewWsc1903 = "preview-windowsservercore-1809"
+$manifestLists = $json | ConvertFrom-Json
 
-switch ($Channel)
-{
-    'preview' {
-        &$createScriptPath -ContainerRegistry $Registry -taglist $latestPreviewUbuntu, $latestPreviewWsc1903, $latestPreviewWsc1809 -ManifestTag 'preview'
-    }
-
-    'stable' {
-        &$createScriptPath -ContainerRegistry $Registry -taglist $latestStableUbuntu, $latestStableWsc1903, $latestStableWsc1809 -ManifestTag 'latest'
-        &$createScriptPath -ContainerRegistry $Registry -taglist $latestStableNano1903, $latestStableNano1809 -ManifestTag 'nanoserver'
-    }
+$manifestLists.ManifestList | ForEach-Object {
+    Write-Verbose $_ -Verbose
+    $tag = $_
+    $manifestList = $manifestLists | Where-Object {$_.ManifestList -eq $tag}
+    $manifestList | Out-String | Write-Verbose -Verbose
+    Write-Verbose -Verbose "&$createScriptPath -ContainerRegistry $Registry -taglist $manifestList.Tags -ManifestTag '$tag'"
+    &$createScriptPath -ContainerRegistry $Registry -taglist $manifestList.Tags -ManifestTag $tag
 }
