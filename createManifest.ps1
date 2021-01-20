@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 # Used to create a container manifest.
@@ -23,7 +23,11 @@ param(
     [ValidateNotNullOrEmpty()]
     [ValidatePattern('^[abcdefghijklmnopqrstuvwxyz\-_0123456789\.]+$')]
     [string[]]
-    $TagList = ('ubuntu-16.04', 'windowsservercore')
+    $TagList = ('ubuntu-16.04', 'windowsservercore'),
+
+    [switch]
+    $SkipPush
+
 )
 
 $first = $true
@@ -46,4 +50,11 @@ foreach($tag in $TagList)
 docker manifest inspect $ContainerRegistry/${Image}:$ManifestTag
 
 # push the manifest
-docker manifest push --purge $ContainerRegistry/${Image}:$ManifestTag
+if (-not $SkipPush) {
+    Write-Verbose -Message 'pushing manifest list...' -Verbose
+    docker manifest push --purge $ContainerRegistry/${Image}:$ManifestTag
+}
+else {
+    Write-Verbose -Message 'skipping manifest list push...' -Verbose
+
+}

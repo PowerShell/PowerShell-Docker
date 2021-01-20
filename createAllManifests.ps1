@@ -10,22 +10,71 @@ param (
     [ValidateSet('stable','preview','servicing')]
     [Parameter(Mandatory)]
     [string]
-    $Channel='stable'
+    $Channel='stable',
+
+    [switch]
+    $SkipPush
 )
+
+# this function wraps native command Execution
+# for more information, read https://mnaoumov.wordpress.com/2015/01/11/execution-of-external-commands-in-powershell-done-right/
+function script:Start-NativeExecution
+{
+    param(
+        [scriptblock]$sb,
+        [switch]$IgnoreExitcode,
+        [switch]$VerboseOutputOnError
+    )
+
+    Write-Verbose -Message "Running '$($sb.ToString())'" -Verbose
+    $backupEAP = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        if($VerboseOutputOnError.IsPresent)
+        {
+            $output = & $sb 2>&1
+        }
+        else
+        {
+            & $sb
+        }
+
+        # note, if $sb doesn't have a native invocation, $LASTEXITCODE will
+        # point to the obsolete value
+        if ($LASTEXITCODE -ne 0 -and -not $IgnoreExitcode) {
+            if($VerboseOutputOnError.IsPresent -and $output)
+            {
+                $output | Out-String | Write-Verbose -Verbose
+            }
+
+            # Get caller location for easier debugging
+            $caller = Get-PSCallStack -ErrorAction SilentlyContinue
+            if($caller)
+            {
+                $callerLocationParts = $caller[1].Location -split ":\s*line\s*"
+                $callerFile = $callerLocationParts[0]
+                $callerLine = $callerLocationParts[1]
+
+                $errorMessage = "Execution of {$sb} by ${callerFile}: line $callerLine failed with exit code $LASTEXITCODE"
+                throw $errorMessage
+            }
+            throw "Execution of {$sb} failed with exit code $LASTEXITCODE"
+        }
+    } finally {
+        $ErrorActionPreference = $backupEAP
+    }
+}
 
 $buildScriptPath = Join-Path -Path $PSScriptRoot -ChildPath 'build.ps1'
 
 $createScriptPath = Join-Path -Path $PSScriptRoot -ChildPath 'createManifest.ps1'
 
-$json = &$buildScriptPath -GenerateManifestLists -Channel $Channel -OsFilter All
+$json = Start-NativeExecution -sb ([scriptblock]::Create("$buildScriptPath -GenerateManifestLists -Channel $Channel -OsFilter All"))
 
 $manifestLists = $json | ConvertFrom-Json
 
 $manifestLists.ManifestList | ForEach-Object {
-    Write-Verbose $_ -Verbose
     $tag = $_
     $manifestList = $manifestLists | Where-Object {$_.ManifestList -eq $tag}
-    $manifestList | Out-String | Write-Verbose -Verbose
-    Write-Verbose -Verbose "&$createScriptPath -ContainerRegistry $Registry -taglist $manifestList.Tags -ManifestTag '$tag'"
-    &$createScriptPath -ContainerRegistry $Registry -taglist $manifestList.Tags -ManifestTag $tag
+    Start-NativeExecution -sb ([scriptblock]::Create("$createScriptPath -ContainerRegistry $Registry -taglist $($manifestList.Tags -join ', ') -ManifestTag $tag -SkipPush:`$$($SkipPush.IsPresent)"))
 }
