@@ -405,7 +405,7 @@ End {
 
                 $architecture = 'amd64'
                 $imagePath = $allMeta.imagePath
-                $relativeImagePath = $imagePath -replace $PSScriptRoot
+                $relativeImagePath = $imagePath.Replace($PSScriptRoot,'')
                 $relativeImagePath = $relativeImagePath -replace '\\', '/'
                 $dockerfile = "https://github.com/PowerShell/PowerShell-Docker/blob/master$relativeImagePath/docker/Dockerfile"
 
