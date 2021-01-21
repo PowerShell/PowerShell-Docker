@@ -45,7 +45,7 @@ stages:
           dependsOn:
             - GenerateYaml_${{ parameters.channel }}
 
-    - stage: Release_ManifestList
+    - stage: Release_ManifestList_${{ parameters.channel }}
       jobs:
       - template: ./releaseManifestList.yml
         parameters:
