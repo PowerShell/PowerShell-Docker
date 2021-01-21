@@ -10,9 +10,6 @@ jobs:
   - job: ${{ parameters.jobName }}
     dependsOn:
       ${{ parameters.dependsOn }}
-    strategy:
-        matrix: $[ ${{ parameters.matrix }} ]
-        maxParallel: ${{ parameters.maxParallel }}
     variables:
       - group: 'Staging_ACR'
       - name: 'dockerImage'
