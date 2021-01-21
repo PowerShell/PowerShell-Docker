@@ -189,6 +189,9 @@ class DockerImageMetaData {
 
     [bool]
     $ContinueOnError = $false
+
+    [string]
+    $ManifestLists = @()
 }
 
 class ShortTagMetaData {

@@ -13,6 +13,9 @@
         "#psversion#-windowsservercore-2004-#fulltag#",
         "windowsservercore-#shorttag#"
     ],
+    "manifestLists": [
+        "latest"
+    ],
     "TestProperties": {
         "size": 1
     },

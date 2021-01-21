@@ -13,6 +13,9 @@
         {"Tag": "focal"},
         {"Tag": "20.04"}
     ],
+    "manifestLists": [
+        "latest"
+    ],
     "TestProperties": {
         "size": 355
     },
