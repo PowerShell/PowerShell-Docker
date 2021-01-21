@@ -659,6 +659,8 @@ End {
                 Write-Output $matrixJson
             }
         }
+
+        exit 0
     }
 
     if($CheckForDuplicateTags.IsPresent)
