@@ -50,3 +50,4 @@ stages:
       - template: ./releaseManifestList.yml
         parameters:
           jobName: ${{ parameters.channel }}_manifest_list
+          channel: ${{ parameters.channel }}

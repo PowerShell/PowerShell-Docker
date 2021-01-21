@@ -5,6 +5,7 @@ parameters:
   ACR: 'no'
   maxParallel: 5
   dependsOn: []
+  channel: STABLE
 
 jobs:
   - job: ${{ parameters.jobName }}
