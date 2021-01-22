@@ -16,7 +16,7 @@
         "size": 1
     },
     "manifestLists": [
-        "latest"
+        "lts"
     ],
     "UseAcr": true
 }

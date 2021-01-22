@@ -13,7 +13,7 @@
         "lts-windowsservercore-1909-#fulltag#"
     ],
     "manifestLists": [
-        "latest"
+        "lts"
     ],
     "TestProperties": {
         "size": 1
