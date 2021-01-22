@@ -7,7 +7,7 @@ param (
     [string]
     $Registry = 'microsoft',
 
-    [ValidateSet('stable','preview','servicing')]
+    [ValidateSet('stable','preview','servicing', 'lts')]
     [Parameter(Mandatory)]
     [string]
     $Channel='stable',
