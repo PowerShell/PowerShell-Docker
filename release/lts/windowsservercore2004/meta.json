@@ -15,5 +15,8 @@
     "TestProperties": {
         "size": 1
     },
+    "manifestLists": [
+        "latest"
+    ],
     "UseAcr": true
 }
