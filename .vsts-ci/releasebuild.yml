@@ -58,6 +58,20 @@ stages:
       steps:
       - template: manifestSteps.yml
 
+    - job: LtsManifestPhase
+      variables:
+        releaseTag: $(ltsReleaseTag)
+        channel: LTS
+
+      displayName: Create Lts Manifest Lists
+      condition: succeededOrFailed()
+      pool:
+        vmImage: windows-latest
+        timeoutInMinutes: 30
+
+      steps:
+      - template: manifestSteps.yml
+
     - job: StableManifestPhase
       variables:
         releaseTag: $(stableReleaseTag)
