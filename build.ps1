@@ -125,6 +125,7 @@ param(
     $StableVersion,
 
     [Parameter(ParameterSetName="GenerateMatrixJson")]
+    [Parameter(ParameterSetName="GenerateManifestLists")]
     [Parameter(ParameterSetName="GenerateTagsYaml")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
