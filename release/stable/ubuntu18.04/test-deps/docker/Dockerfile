@@ -14,6 +14,8 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Ubuntu-18.04
+
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
 CMD [ "pwsh" ]

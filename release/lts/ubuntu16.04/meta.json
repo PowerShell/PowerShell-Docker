@@ -3,10 +3,14 @@
     "UseLinuxVersion": false,
     "PackageFormat": "powershell-lts_${PS_VERSION}-1.ubuntu.16.04_amd64.deb",
     "osVersion": "Ubuntu 16.04",
-    "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "lts-ubuntu-#shorttag#"
     ],
+    "shortTags": [
+        {"Tag": "xenial"},
+        {"Tag": "16.04"}
+    ],
+    "SkipGssNtlmSspTests": false,
     "TestProperties": {
         "size": 395
     },

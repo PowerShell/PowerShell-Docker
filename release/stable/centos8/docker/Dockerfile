@@ -34,7 +34,6 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
       openssh-clients \
     && yum upgrade-minimal -y --security \
     && yum clean all \
-    # && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # remove powershell package
     && rm /tmp/powershell.rpm \
     && ln -sf /opt/microsoft/powershell/7/pwsh /usr/bin/pwsh \
