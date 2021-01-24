@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 #
 # Docker image file that describes an Intel Clear Linux image with PowerShell
@@ -26,7 +26,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     # Opt out of SocketsHttpHandler in DotNet Core 2.1 to use HttpClientHandler
     DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0 \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-ClearLinux-${fromTag}
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-ClearLinux
 
 # Installation
 RUN \

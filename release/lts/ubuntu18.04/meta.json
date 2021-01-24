@@ -7,6 +7,10 @@
     "tagTemplates": [
         "lts-ubuntu-#shorttag#"
     ],
+    "shortTags": [
+        {"Tag": "bionic"},
+        {"Tag": "18.04"}
+    ],
     "TestProperties": {
         "size": 355
     },
