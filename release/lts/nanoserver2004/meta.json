@@ -12,7 +12,7 @@
         "lts-nanoserver-2004-#fulltag#"
     ],
     "manifestLists": [
-        "lts"
+        "nanoserver-lts"
     ],
     "Base64EncodePackageUrl": true,
     "TestProperties": {
