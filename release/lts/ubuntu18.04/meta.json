@@ -7,6 +7,9 @@
     "tagTemplates": [
         "lts-ubuntu-#shorttag#"
     ],
+    "manifestLists": [
+        "lts"
+    ],
     "shortTags": [
         {"Tag": "bionic"},
         {"Tag": "18.04"}
