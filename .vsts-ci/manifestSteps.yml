@@ -21,14 +21,7 @@ steps:
   displayName: 'docker login'
 
 - pwsh: |
-      if($env:$(Channel) -eq 'true')
-      {
         ./createAllManifests.ps1 -Registry '$(dockerHost)/$(dockerNamespace)' -Channel $(Channel)
-      }
-      else
-      {
-        Write-Host 'Current channel disabled, skipping ...'
-      }
   displayName: 'Create $(Channel) Manifest Lists'
 
 - powershell: 'docker logout $(dockerHost)'
