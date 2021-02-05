@@ -1,0 +1,17 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "osVersion": "CentOS 7.5.1804",
+    "tagTemplates": [
+        "#psversion#-centos-#shorttag#-#fulltag#",
+        "preview-centos-#shorttag#"
+    ],
+    "shortTags": [
+        {"Tag": "7.5.1804"}
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 570
+    }
+}
