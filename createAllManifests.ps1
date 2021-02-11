@@ -69,7 +69,21 @@ $buildScriptPath = Join-Path -Path $PSScriptRoot -ChildPath 'build.ps1'
 
 $createScriptPath = Join-Path -Path $PSScriptRoot -ChildPath 'createManifest.ps1'
 
-$json = Start-NativeExecution -sb ([scriptblock]::Create("$buildScriptPath -GenerateManifestLists -Channel $Channel -OsFilter All"))
+$extraParams = ''
+
+if ($env:STABLERELEASETAG) {
+    $extraParams += " -StableVersion $($env:STABLERELEASETAG -replace '^v')"
+}
+
+if ($env:PREVIEWRELEASETAG) {
+    $extraParams += " -PreviewVersion $($env:PREVIEWRELEASETAG -replace '^v')"
+}
+
+if ($env:LTSRELEASETAG) {
+    $extraParams += " -LtsVersion $($env:LTSRELEASETAG -replace '^v')"
+}
+
+$json = Start-NativeExecution -sb ([scriptblock]::Create("$buildScriptPath -GenerateManifestLists -Channel $Channel -OsFilter All $extraParams"))
 
 $manifestLists = $json | ConvertFrom-Json
 
