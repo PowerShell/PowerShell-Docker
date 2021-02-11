@@ -485,7 +485,7 @@ function Get-DockerImageMetaDataWrapper
             }
         }
         else {
-            Write-Verbose "getting docker tag list" -Verbose
+            Write-Verbose "getting docker tag list"
             if($shortTags)
             {
                 $tagDataFromScript = Get-DockerTagList -ShortTag $shortTags -FullTag $fullTag
