@@ -8,7 +8,7 @@
         "preview-centos-#shorttag#"
     ],
     "shortTags": [
-        {"Tag": "7.7.1908"}
+        {"Tag": "7.7"}
     ],
     "SubImage": "test-deps",
     "TestProperties": {
