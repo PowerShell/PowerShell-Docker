@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 #
 # Docker image file that describes an Arch Linux image with PowerShell
@@ -8,6 +8,12 @@
 FROM archlinux:latest AS installer-env
 
 RUN \
+    mkdir /opt/arch/ \
+    # from https://github.com/FZUG/repo/issues/16 need to set /etc/pacman.conf
+    && echo "Architecture = auto" >> /etc/pacman.conf \
+    && echo "RootDir     = /opt/arch/" >> /etc/pacman.conf \
+    && echo "DBPath      = /var/lib/pacman/" >> /etc/pacman.conf \
+    && echo "LogFile     = /var/log/pacman.log" >> /etc/pacman.conf \
     # create a builduser
     useradd builduser -m \
     # delete the builduser password
