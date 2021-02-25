@@ -1,0 +1,16 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "osVersion": "RedHat Universal Base Image 8.3",
+    "SkipGssNtlmSspTests": true,
+    "tagTemplates": [
+        "preview-ubi-#shorttag#"
+    ],
+    "FullRepository": "powershellrh/test-deps",
+    "OptionalTests": [
+        "test-deps"
+    ],
+    "TestProperties": {
+        "size": 750
+    }
+}
