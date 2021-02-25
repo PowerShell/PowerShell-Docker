@@ -6,7 +6,7 @@
     "tagTemplates": [
         "preview-ubi-#shorttag#"
     ],
-    "FullRepository": "powershellrh/test-deps",
+    "FullRepository": "powershell/rhel/test-deps",
     "OptionalTests": [
         "test-deps"
     ],
