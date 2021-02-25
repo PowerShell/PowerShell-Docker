@@ -4,7 +4,7 @@
     "PackageFormat": "powershell${previewTag}-${PS_VERSION}-1.centos.8.x86_64.rpm",
     "SkipGssNtlmSspTests": true,
     "osVersion": "RedHat Universal Base Image 8.3",
-    "FullRepository": "powershellrh",
+    "FullRepository": "powershell/rhel",
     "tagTemplates": [
         "#psversion#-ubi-#shorttag#-#fulltag#",
         "preview-centos-#shorttag#"
