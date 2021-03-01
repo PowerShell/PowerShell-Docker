@@ -305,7 +305,7 @@ End {
                     {
                         $actualTagData = $allMeta.ActualTagDataByGroup.$tagGroup
                         $SubImagePath = Join-Path -Path $dockerFileName -ChildPath $allMeta.Meta.SubImage
-                        Write-Verbose -Message "getting subimage - fromtag: $($dockerFileName) - subimage: $($allMeta.Meta.SubImage)" -Verbose
+                        Write-Verbose -Message "getting subimage - fromtag: $($dockerFileName) - subimage: $($allMeta.Meta.SubImage)"
                         $subImageAllMeta = Get-DockerImageMetaDataWrapper `
                             -DockerFileName $SubImagePath `
                             -CI:$CI.IsPresent `
