@@ -3,6 +3,7 @@
     "UseLinuxVersion": false,
     "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
     "osVersion": "RHEL 7.8",
+    "FullRepository": "powershell/rhel",
     "tagTemplates": [
         "#psversion#-rhel-#shorttag#-#fulltag#",
         "preview-rhel-#shorttag#"
