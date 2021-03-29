@@ -39,7 +39,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Alpine-3.12
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Alpine-3.13.3
 
 # Install dotnet dependencies and ca-certificates
 RUN apk add --no-cache \
