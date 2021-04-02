@@ -4,10 +4,6 @@
 
 FROM registry.access.redhat.com/ubi8/ubi:8.3 AS installer-env
 
-# ARG PS_VERSION=7.0.0-preview.1
-# ARG PACKAGE_VERSION=7.0.0_preview.1
-# ARG PS_PACKAGE=powershell-preview-${PACKAGE_VERSION}-1.centos.8.x86_64.rpm
-# ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_VERSION=7.0.0-preview.1
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
