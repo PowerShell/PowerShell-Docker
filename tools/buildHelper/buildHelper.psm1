@@ -449,7 +449,7 @@ function Get-DockerImageMetaDataWrapper
 
     # if the image is broken and we shouldn't include known issues,
     # do this
-    if(!$IncludeKnownIssues.IsPresent -and $meta.Broken -ne $null) {
+    if( !$IncludeKnownIssues.IsPresent -and $meta.IsBroken) {
         return
     }
 
