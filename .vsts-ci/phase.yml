@@ -8,6 +8,7 @@ parameters:
   dependsOn: 'GenerateYaml'
   jobName: 'Build'
   maxParallel: 5
+  poolName: ''
 
 jobs:
 - job: ${{ parameters.jobName }}
@@ -19,7 +20,11 @@ jobs:
     ContinueOnError: ${{ parameters.continueonerror }}
 
   pool:
-    vmImage: ${{ parameters.vmImage }}
+    ${{ if ne(parameters.poolName,'') }}:
+      name: ${{ parameters.poolName }}
+    ${{ if ne(parameters.vmImage,'') }}:
+      vmImage: ${{ parameters.vmImage }}
+
   steps:
   - ${{ if eq(parameters.useacr, 'true') }}:
     - pwsh: |

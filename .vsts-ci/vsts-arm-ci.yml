@@ -14,9 +14,11 @@ stages:
       acr: OnlyAcr
       useacr: true
       winCiParameter: ''
+      poolName: acrPrivateLinkTest
   - template: stage.yml
     parameters:
       channel: preview
       acr: OnlyAcr
       useacr: true
       winCiParameter: ''
+      poolName: acrPrivateLinkTest

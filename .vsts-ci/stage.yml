@@ -1,11 +1,11 @@
 parameters:
   channel: 'preview'
   jobName: ''
-  vmImage: 'ubuntu-16.04'
   winCiParameter: '-CI -TagFilter 1809'
   acr: 'NoAcr'
   useacr: 'false'
   osFilter: 'All'
+  poolName: ''
 
 stages:
   - stage: GenerateYaml_${{ coalesce(parameters.jobName, parameters.channel) }}
@@ -34,6 +34,7 @@ stages:
         dependsOn: GenerateYaml_${{ variables.jobName }}
         jobName: Build_Linux
         useacr: ${{ parameters.useacr }}
+        poolName: ${{ parameters.poolName }}
     - template: phase.yml
       parameters:
         matrix: dependencies.GenerateYaml_${{ variables.jobName }}.outputs['matrix.matrix_${{ parameters.channel }}_windows']
@@ -42,3 +43,4 @@ stages:
         vmImage: windows-2019
         ciParameter: ${{ parameters.winCiParameter }}
         useacr: ${{ parameters.useacr }}
+        poolName: ${{ parameters.poolName }}
