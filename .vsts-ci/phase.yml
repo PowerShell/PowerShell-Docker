@@ -22,7 +22,7 @@ jobs:
   pool:
     ${{ if ne(parameters.poolName,'') }}:
       name: ${{ parameters.poolName }}
-    ${{ if ne(parameters.vmImage,'') }}:
+    ${{ if eq(parameters.poolName,'') }}:
       vmImage: ${{ parameters.vmImage }}
 
   steps:
