@@ -11,6 +11,7 @@
     "shortTags": [
         {"Tag": "32"}
     ],
+    "SubImage": "test-deps",
     "TestProperties": {
         "size": 632
     }
