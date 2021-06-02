@@ -8,6 +8,10 @@ RUN dnf install -y \
         sudo \
         wget \
         openssl \
+        hostname \
+        iputils \
+        procps \
+        findutils \
     && dnf clean all
 
 ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Fedora-32
