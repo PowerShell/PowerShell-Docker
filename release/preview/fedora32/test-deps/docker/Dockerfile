@@ -1,5 +1,5 @@
 # Docker image file that describes an Fedora32 image with PowerShell installed from Microsoft YUM Repo
-ARG BaseImage=mcr.microsoft.com/powershell:fedora-32
+ARG BaseImage=mcr.microsoft.com/powershell:preview-fedora-32
 
 FROM ${BaseImage}
 
