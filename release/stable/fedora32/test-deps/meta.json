@@ -3,7 +3,7 @@
     "UseLinuxVersion": false,
     "osVersion": "Fedora 32",
     "tagTemplates": [
-        "preview-fedora-#shorttag#"
+        "fedora-#shorttag#"
     ],
     "SubRepository": "test-deps",
     "OptionalTests": [
