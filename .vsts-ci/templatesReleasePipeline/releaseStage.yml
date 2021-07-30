@@ -2,7 +2,7 @@ parameters:
     - name: "channel"
       default: 'preview'
     - name: "vmImage"
-      default: 'ubuntu-16.04'
+      default: 'ubuntu-latest'
     - name: "acr"
       default: 'All'
     - name: "useacr"
@@ -21,7 +21,7 @@ stages:
       jobs:
       - job: GenerateYaml_${{ parameters.channel }}
         pool:
-            vmImage: ubuntu-16.04
+            vmImage: ubuntu-latest
         displayName: Generate Matrix YAML ${{ parameters.channel }}
         steps:
         - pwsh: |
