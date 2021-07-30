@@ -6,7 +6,7 @@ trigger: none
 
 parameters:
   - name: WhatIf
-    default: "No"
+    default: "Yes"
     displayName: "Only show what would be done"
 
 resources:
