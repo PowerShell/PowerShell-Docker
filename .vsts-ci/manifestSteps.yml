@@ -21,7 +21,7 @@ steps:
   displayName: 'docker login'
 
 - pwsh: |
-        ./createAllManifests.ps1 -Registry '$(dockerHost)/$(dockerNamespace)' -Channel $(Channel)
+        ./createAllManifests.ps1 -Registry '$(dockerHost)/public/$(dockerNamespace)' -Channel $(Channel)
   displayName: 'Create $(Channel) Manifest Lists'
 
 - powershell: 'docker logout $(dockerHost)'
