@@ -192,6 +192,9 @@ class DockerImageMetaData {
 
     [string]
     $ManifestLists = @()
+
+    [bool]
+    $IsPrivate = $false
 }
 
 class ShortTagMetaData {
@@ -422,7 +425,7 @@ function Get-DockerImageMetaDataWrapper
         $BaseImage,
 
         [string]
-        $BaseRepositry,
+        $BaseRepository,
 
         [switch]
         $Strict,
@@ -520,7 +523,9 @@ function Get-DockerImageMetaDataWrapper
     }
     else
     {
-        $fullRepository = $BaseRepositry
+        $scope = if ($meta.IsPrivate) { "internal" } else { "public" }
+        $fullRepository = $scope + '/' + $BaseRepository
+
         if ($meta.SubRepository)
         {
             $fullRepository += '/{0}' -f $meta.SubRepository

@@ -1,6 +1,8 @@
 parameters:
     - name: "channel"
       default: 'preview'
+    - name: "WhatIf"
+      default: 'No'
 
 stages:
 - template: ./testStage.yml
@@ -10,3 +12,4 @@ stages:
 - template: ./releaseStage.yml
   parameters:
     channel: ${{ parameters.channel }}
+    WhatIf: ${{ parameters.WhatIf }}

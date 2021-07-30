@@ -282,7 +282,7 @@ End {
                 -Version $windowsVersion `
                 -ImageName $ImageName `
                 -LinuxVersion $linuxVersion `
-                -BaseRepositry $Repository `
+                -BaseRepository $Repository `
                 -Strict:$CheckForDuplicateTags.IsPresent `
                 -Channel $actualChannel
 
@@ -317,7 +317,7 @@ End {
                             -LinuxVersion $linuxVersion `
                             -TagData $allMeta.TagData `
                             -BaseImage $actualTagData.ActualTags[0] `
-                            -BaseRepositry $Repository `
+                            -BaseRepository $Repository `
                             -Strict:$CheckForDuplicateTags.IsPresent `
                             -FromTag $tagGroup.Name `
                             -Channel $actualChannel
@@ -390,7 +390,7 @@ End {
                     continue
                 }
 
-                $tagGroup = "public/$($allMeta.FullRepository)"
+                $tagGroup = $($allMeta.FullRepository)
                 $os = 'windows'
                 if ($allMeta.meta.IsLinux) {
                     $os = 'linux'

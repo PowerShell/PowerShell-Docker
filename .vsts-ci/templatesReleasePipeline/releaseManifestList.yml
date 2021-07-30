@@ -1,11 +1,12 @@
 parameters:
-  vmImage: 'ubuntu-16.04'
+  vmImage: 'ubuntu-latest'
   jobName: 'none'
   releaseTag: ''
   ACR: 'no'
   maxParallel: 5
   dependsOn: []
   channel: STABLE
+  WhatIf: 'no'
 
 jobs:
   - job: ${{ parameters.jobName }}
@@ -21,6 +22,8 @@ jobs:
         value: ${{ parameters.ACR }}
       - name: "releaseTag"
         value: ${{ parameters.releaseTag }}
+      - name: "WhatIf"
+        value: ${{ parameters.WhatIf }}
 
     pool:
       vmImage: ${{ parameters.vmImage }}
@@ -78,7 +81,12 @@ jobs:
                 $name = $repo + ":" + $tag
                 $stagingRepo = $repo -replace 'public/', '$(dockerNamespace)/'
                 Write-verbose "Running: az acr import --name $(productionACR) --source '$(dockerHost)/${stagingRepo}:$tag' --image '${repo}:$tag' --force" -verbose
-                az acr import --name $(productionACR) --source "$(dockerHost)/${stagingRepo}:$tag" --image "${repo}:$tag" --force
+                if($env:WHATIF -eq 'No') {
+                  az acr import --name $(productionACR) --source "$(dockerHost)/${stagingRepo}:$tag" --image "${repo}:$tag" --force
+                } else {
+                  Write-verbose "skipping import due to whatif" -verbose
+                }
+
               }
             }
       displayName: 'release - $(channel) - $(imagename)'

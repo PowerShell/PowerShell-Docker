@@ -1,6 +1,6 @@
 parameters:
   name: ''
-  vmImage: 'ubuntu-18.04'
+  vmImage: 'ubuntu-latest'
   continueonerror: false
   ciParameter: '-CI'
   useacr: 'false'

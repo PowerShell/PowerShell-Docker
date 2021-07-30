@@ -4,6 +4,11 @@ trigger: none
 # when the branch is same as pipline source, the latest build from the source is used.
 # all environment used are for manual tasks and approvals.
 
+parameters:
+  - name: WhatIf
+    default: "No"
+    displayName: "Only show what would be done"
+
 resources:
   pipelines:
   - pipeline: releasePipeline
@@ -19,14 +24,17 @@ stages:
 - template: ./templatesReleasePipeline/testAndRelease.yml
   parameters:
     channel: "preview"
+    WhatIf: ${{ parameters.WhatIf }}
 
 - template: ./templatesReleasePipeline/testAndRelease.yml
   parameters:
     channel: "stable"
+    WhatIf: ${{ parameters.WhatIf }}
 
 - template: ./templatesReleasePipeline/testAndRelease.yml
   parameters:
     channel: "lts"
+    WhatIf: ${{ parameters.WhatIf }}
 
 - stage: Approve_Release
   condition: succeeded()

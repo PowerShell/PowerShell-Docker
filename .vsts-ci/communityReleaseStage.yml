@@ -1,7 +1,7 @@
 parameters:
   channel: 'preview'
   jobName: ''
-  vmImage: 'ubuntu-16.04'
+  vmImage: 'ubuntu-latest'
   acr: 'All'
   useacr: 'false'
   osFilter: 'All'
@@ -15,7 +15,7 @@ stages:
     jobs:
     - job: GenerateYaml_${{ variables.jobName }}
       pool:
-        vmImage: ubuntu-16.04
+        vmImage: ubuntu-latest
       displayName: Generate Matrix YAML ${{ parameters.channel }}
       steps:
       - pwsh: |
