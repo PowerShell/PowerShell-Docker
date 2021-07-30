@@ -509,6 +509,8 @@ function Invoke-DockerBuild
             $env:ACR_NAME
             '--platform'
             $OSType
+            "--build-arg"
+            "dockerHost=$env:DOCKERHOST"
         )
     }
     else {

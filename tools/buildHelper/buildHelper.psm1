@@ -192,6 +192,9 @@ class DockerImageMetaData {
 
     [string]
     $ManifestLists = @()
+
+    [bool]
+    $IsPrivate = $false
 }
 
 class ShortTagMetaData {

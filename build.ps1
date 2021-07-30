@@ -390,7 +390,9 @@ End {
                     continue
                 }
 
-                $tagGroup = "public/$($allMeta.FullRepository)"
+                # make public or private
+                $scope = if ($allMeta.meta.IsPrivate) { "internal" } else { "public" }
+                $tagGroup = "$scope/$($allMeta.FullRepository)"
                 $os = 'windows'
                 if ($allMeta.meta.IsLinux) {
                     $os = 'linux'
