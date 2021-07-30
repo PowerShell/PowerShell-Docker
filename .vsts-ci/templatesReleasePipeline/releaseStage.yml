@@ -9,6 +9,9 @@ parameters:
       default: 'false'
     - name: "osFilter"
       default: 'All'
+    - name: "WhatIf"
+      default: 'No'
+
 
 stages:
     - stage: Release_${{ parameters.channel }}
@@ -35,6 +38,7 @@ stages:
         parameters:
           jobName: ${{ parameters.channel }}_${{ parameters.osFilter }}
           matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_windows']
+          WhatIf: ${{ parameters.WhatIf }}
           dependsOn:
             - GenerateYaml_${{ parameters.channel }}
 
@@ -42,6 +46,7 @@ stages:
         parameters:
           jobName: ${{ parameters.channel }}_linux
           matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux']
+          WhatIf: ${{ parameters.WhatIf }}
           dependsOn:
             - GenerateYaml_${{ parameters.channel }}
 
