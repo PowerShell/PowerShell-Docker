@@ -3,11 +3,12 @@
 # Licensed under the MIT License.
 
 ARG dockerHost=mcr.microsoft.com
-ARG WindowsServerCoreRepo=$dockerHost/windows/servercore
+ARG WindowsServerCoreRepo=windows/servercore
+ARM tag=ltsc2022
 
 # Use server core as an installer container to extract PowerShell,
 # As this is a multi-stage build, this stage will eventually be thrown away
-FROM ${WindowsServerCoreRepo}:ltsc2022 AS installer-env
+FROM ${dockerHost}/${WindowsServerCoreRepo}:${tag} AS installer-env
 
 ARG PS_VERSION=6.2.0
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/PowerShell-${PS_VERSION}-win-x64.zip
@@ -34,7 +35,7 @@ RUN Write-host "Verifying valid Version..."; `
     Expand-Archive powershell.zip -DestinationPath  \PowerShell
 
 # Install PowerShell into WindowsServerCore
-FROM ${WindowsServerCoreRepo}:ltsc2022
+FROM ${dockerHost}/${WindowsServerCoreRepo}:${tag}
 
 # Copy PowerShell Core from the installer container
 ENV ProgramFiles="C:\Program Files" `
