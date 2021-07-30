@@ -18,6 +18,7 @@ variables:
   previewReleaseTag: ${{ parameters.previewReleaseTag }}
   ltsReleaseTag: ${{ parameters.ltsReleaseTag }}
   stableReleaseTag: ${{ parameters.stableReleaseTag }}
+  runCodesignValidationInjection: false
 
 stages:
   - stage: GenerateFullTag
