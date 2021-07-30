@@ -524,7 +524,7 @@ function Get-DockerImageMetaDataWrapper
     else
     {
         $scope = if ($meta.IsPrivate) { "internal" } else { "public" }
-        $fullRepository = $BaseRepository + '/' + $scope
+        $fullRepository = $scope + '/' + $BaseRepository
 
         if ($meta.SubRepository)
         {
