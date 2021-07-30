@@ -56,3 +56,4 @@ stages:
         parameters:
           jobName: ${{ parameters.channel }}_manifest_list
           channel: ${{ parameters.channel }}
+          WhatIf: ${{ parameters.WhatIf }}
