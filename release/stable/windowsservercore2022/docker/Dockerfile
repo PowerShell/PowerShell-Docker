@@ -4,7 +4,7 @@
 
 ARG dockerHost=mcr.microsoft.com
 ARG WindowsServerCoreRepo=windows/servercore
-ARM tag=ltsc2022
+ARG tag=ltsc2022
 
 # Use server core as an installer container to extract PowerShell,
 # As this is a multi-stage build, this stage will eventually be thrown away
