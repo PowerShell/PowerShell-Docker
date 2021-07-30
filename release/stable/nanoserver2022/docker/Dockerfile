@@ -6,7 +6,7 @@
 ARG InstallerVersion=nanoserver
 ARG dockerHost=mcr.microsoft.com
 ARG InstallerRepo=mcr.microsoft.com/powershell
-ARG NanoServerRepo=${dockerHost}/windows/nanoserver
+ARG NanoServerRepo=$dockerHost/windows/nanoserver
 
 # Use server core as an installer container to extract PowerShell,
 # As this is a multi-stage build, this stage will eventually be thrown away

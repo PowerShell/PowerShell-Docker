@@ -3,7 +3,7 @@
 # Licensed under the MIT License.
 
 ARG dockerHost=mcr.microsoft.com
-ARG WindowsServerCoreRepo=${dockerHost}/windows/servercore
+ARG WindowsServerCoreRepo=$dockerHost/windows/servercore
 
 # Use server core as an installer container to extract PowerShell,
 # As this is a multi-stage build, this stage will eventually be thrown away
