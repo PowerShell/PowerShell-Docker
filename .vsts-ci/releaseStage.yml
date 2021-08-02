@@ -1,9 +1,14 @@
 parameters:
-  channel: 'preview'
-  vmImage: 'ubuntu-latest'
-  acr: 'All'
-  useacr: 'false'
-  osFilter: 'All'
+  - name: channel
+    default: 'preview'
+  - name: vmImage
+    default: 'ubuntu-latest'
+  - name: acr
+    default: 'All'
+  - name: useacr
+    default: 'false'
+  - name: osFilter
+    default: 'All'
 
 stages:
   - stage: GenerateYaml_${{ parameters.channel }}
