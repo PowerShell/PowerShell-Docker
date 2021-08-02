@@ -28,8 +28,6 @@ jobs:
       - group: 'Staging_ACR'
       - name: 'dockerImage'
         value: 'powershell'
-      - name: "Channel"
-        value: ${{ parameters.channel }}
       - name: "ACR"
         value: ${{ parameters.ACR }}
       - name: "releaseTag"
