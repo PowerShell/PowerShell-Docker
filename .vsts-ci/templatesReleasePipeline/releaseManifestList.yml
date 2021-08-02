@@ -1,12 +1,21 @@
 parameters:
-  vmImage: 'ubuntu-latest'
-  jobName: 'none'
-  releaseTag: ''
-  ACR: 'no'
-  maxParallel: 5
-  dependsOn: []
-  channel: STABLE
-  WhatIf: 'no'
+  - name: vmImage
+    default: 'windows-latest'
+  - name: jobName
+    default: 'none'
+  - name: releaseTag
+    default: ''
+  - name: ACR
+    default: 'no'
+  - name: maxParallel
+    default: 5
+  - name: dependsOn
+    default: []
+    type: object
+  - name: channel
+    default: STABLE
+  - name: WhatIf
+    default: 'no'
 
 jobs:
   - job: ${{ parameters.jobName }}
