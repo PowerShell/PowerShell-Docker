@@ -421,26 +421,31 @@ End {
                         $osVersion = ''
                     }
 
-                    if(!$tagGroups.ContainsKey($tagGroup))
-                    {
-                        $tags = @()
-                        $tagGroups[$tagGroup] = $tags
-                    }
+                    # skip if we are generate TagsYaml and the image is private.
+                    if (!$GenerateTagsYaml.IsPresent -or !$allMeta.Meta.IsPrivate) {
+                        if (!$tagGroups.ContainsKey($tagGroup)) {
+                            $tags = @()
+                            $tagGroups[$tagGroup] = $tags
+                        }
 
-                    $tag = [PSCustomObject]@{
-                        Architecture    = $architecture
-                        OsVersion       = $osVersion
-                        Os              = $os
-                        Tags            = $actualTagData.TagList
-                        Dockerfile      = $dockerfile
-                        Channel         = $actualChannel
-                        Name            = $dockerFileName
-                        UseAcr          = $UseAcr
-                        ContinueOnError = $continueOnError
-                        ManifestLists   = $manifestLists
-                    }
+                        $tag = [PSCustomObject]@{
+                            Architecture    = $architecture
+                            OsVersion       = $osVersion
+                            Os              = $os
+                            Tags            = $actualTagData.TagList
+                            Dockerfile      = $dockerfile
+                            Channel         = $actualChannel
+                            Name            = $dockerFileName
+                            UseAcr          = $UseAcr
+                            ContinueOnError = $continueOnError
+                            ManifestLists   = $manifestLists
+                        }
 
-                    $tagGroups[$tagGroup] += $tag
+                        $tagGroups[$tagGroup] += $tag
+                    }
+                    else {
+                        Write-Verbose -Message "skipping generating yaml for $dockerFileName" -Verbose
+                    }
                 }
                 else {
                     Write-Verbose "Skipping $($actualTagData.tagList[0]) due to no OS Version in meta.json" -Verbose
@@ -519,11 +524,13 @@ End {
                 Write-Output "    tagGroups:"
                 foreach($tag in $tagGroups.$repo | Sort-Object -Property dockerfile)
                 {
-                    Write-Output "    - tags: [$($tag.Tags -join ', ')]"
-                    Write-Output "      osVersion: $($tag.osVersion)"
-                    Write-Output "      architecture: $($tag.architecture)"
-                    Write-Output "      os: $($tag.os)"
-                    Write-Output "      dockerfile: $($tag.dockerfile)"
+                    if (!$tag.IsPrivate) {
+                        Write-Output "    - tags: [$($tag.Tags -join ', ')]"
+                        Write-Output "      osVersion: $($tag.osVersion)"
+                        Write-Output "      architecture: $($tag.architecture)"
+                        Write-Output "      os: $($tag.os)"
+                        Write-Output "      dockerfile: $($tag.dockerfile)"
+                    }
                 }
             }
         }
