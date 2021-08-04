@@ -1,12 +1,21 @@
 parameters:
-  vmImage: 'ubuntu-latest'
-  jobName: 'none'
-  releaseTag: ''
-  ACR: 'no'
-  maxParallel: 5
-  dependsOn: []
-  channel: STABLE
-  WhatIf: 'no'
+  - name: vmImage
+    default: 'windows-latest'
+  - name: jobName
+    default: 'none'
+  - name: releaseTag
+    default: ''
+  - name: ACR
+    default: 'no'
+  - name: maxParallel
+    default: 5
+  - name: dependsOn
+    default: []
+    type: object
+  - name: channel
+    default: STABLE
+  - name: WhatIf
+    default: 'no'
 
 jobs:
   - job: ${{ parameters.jobName }}
@@ -79,7 +88,7 @@ jobs:
             foreach($repo in $repos) {
               foreach($tag in ($manifestLists | where-object {$_.repo -eq $repo}).ManifestList) {
                 $name = $repo + ":" + $tag
-                $stagingRepo = $repo -replace 'public/', '$(dockerNamespace)/'
+                $stagingRepo = ($repo -replace 'public/', 'public/$(dockerNamespace)/') -replace 'internal/', 'internal/$(dockerNamespace)/'
                 Write-verbose "Running: az acr import --name $(productionACR) --source '$(dockerHost)/${stagingRepo}:$tag' --image '${repo}:$tag' --force" -verbose
                 if($env:WHATIF -eq 'No') {
                   az acr import --name $(productionACR) --source "$(dockerHost)/${stagingRepo}:$tag" --image "${repo}:$tag" --force
