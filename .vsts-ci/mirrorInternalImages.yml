@@ -1,0 +1,32 @@
+variables:
+  - group: mcrint
+
+jobs:
+- job: Mirror
+  pool:
+    vmImage: vs2017-win2016
+
+  strategy:
+    matrix:
+      servercore: 
+        sourceImage: private/windows/servercore:ltsc2022
+        targetImage: windows/servercore:ltsc2022
+      nanoserver: 
+        sourceImage: private/windows/nanoserver:ltsc2022
+        targetImage: windows/nanoserver:ltsc2022
+
+  displayName: Mirror Image $(targetImage)
+  steps:
+  - checkout: self
+  - task: AzureCLI@2
+    displayName: Mirror $(targetImage)
+    inputs:
+      connectedServiceNameARM: c58d97a0-15dd-4781-b8b9-c8a0c2fdcdd9
+      scriptType: pscore
+      scriptLocation: inlineScript
+      inlineScript: >-
+        az acr import --name $(targetusername) `
+          --source $(mcrinthostname)/$(sourceImage) `
+          --image $(targetImage) `
+          --username $(mcrintusername) `
+          --password $(mcrintsecret)
