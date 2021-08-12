@@ -1,0 +1,58 @@
+variables:
+  - group: mcrint
+
+parameters:
+  - name: publicSource
+    default: no
+    displayName: no if the source requires login, yes if the source does not.
+  - name: sourceHostName
+    displayName: Source HostName
+  - name: sourceServerCoreImageName
+    default: windows/servercore:ltsc2022
+    displayName: Source Window servercore Image name without server name
+  - name: sourceNanoImageName
+    default: windows/nanoserver:ltsc2022
+    displayName: Source Window servercore Image name without server name
+
+jobs:
+- job: Mirror
+  pool:
+    vmImage: vs2017-win2016
+
+  strategy:
+    matrix:
+      servercore:
+        sourceImage: ${{ parameters.sourceServerCoreImageName }}
+        targetImage: windows/servercore:ltsc2022
+      nanoserver:
+        sourceImage: ${{ parameters.sourceNanoImageName }}
+        targetImage: windows/nanoserver:ltsc2022
+
+  displayName: Mirror Image
+  steps:
+  - checkout: self
+  - task: AzureCLI@2
+    displayName: Mirror $(targetImage) - with login
+    condition: and(succeeded(), eq('${{ parameters.publicSource }}', 'no'))
+    inputs:
+      connectedServiceNameARM: c58d97a0-15dd-4781-b8b9-c8a0c2fdcdd9
+      scriptType: pscore
+      scriptLocation: inlineScript
+      inlineScript: >-
+        az acr import --name $(targetusername) `
+          --source $(mcrinthostname)/$(sourceImage) `
+          --image $(targetImage) `
+          --username $(mcrintusername) `
+          --password $(mcrintsecret) --force
+  - task: AzureCLI@2
+    displayName: Mirror $(targetImage) - without login
+    condition: and(succeeded(), ne('${{ parameters.publicSource }}', 'no'))
+    inputs:
+      connectedServiceNameARM: c58d97a0-15dd-4781-b8b9-c8a0c2fdcdd9
+      scriptType: pscore
+      scriptLocation: inlineScript
+      inlineScript: >-
+        az acr import --name $(targetusername) `
+          --source $(mcrinthostname)/$(sourceImage) `
+          --image $(targetImage) --force
+
