@@ -1,10 +1,10 @@
 variables:
   - group: mcrint
-  
+
 parameters:
   - name: publicSource
-    value: no
-    displayname: no if the source requires login, yes if the source does not.
+    default: no
+    displayName: no if the source requires login, yes if the source does not.
 
 jobs:
 - job: Mirror
@@ -13,10 +13,10 @@ jobs:
 
   strategy:
     matrix:
-      servercore: 
+      servercore:
         sourceImage: private/windows/servercore:ltsc2022
         targetImage: windows/servercore:ltsc2022
-      nanoserver: 
+      nanoserver:
         sourceImage: private/windows/nanoserver:ltsc2022
         targetImage: windows/nanoserver:ltsc2022
 
@@ -47,4 +47,4 @@ jobs:
         az acr import --name $(targetusername) `
           --source $(mcrinthostname)/$(sourceImage) `
           --image $(targetImage)
-         
+
