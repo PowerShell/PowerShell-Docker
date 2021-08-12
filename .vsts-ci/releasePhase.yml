@@ -12,6 +12,7 @@ parameters:
   - name: dependsOn
     default: []
     type: object
+  - name: matrix
 
 jobs:
 - job: ${{ parameters.jobName }}
@@ -22,7 +23,6 @@ jobs:
       maxParallel: ${{ parameters.maxParallel }}
   variables:
     dockerImage: 'powershell'
-    Channel: ${{ parameters.channel }}
     ACR: ${{ parameters.ACR }}
     releaseTag: ${{ parameters.releaseTag }}
 

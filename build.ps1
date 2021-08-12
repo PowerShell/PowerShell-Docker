@@ -524,13 +524,11 @@ End {
                 Write-Output "    tagGroups:"
                 foreach($tag in $tagGroups.$repo | Sort-Object -Property dockerfile)
                 {
-                    if (!$tag.IsPrivate) {
-                        Write-Output "    - tags: [$($tag.Tags -join ', ')]"
-                        Write-Output "      osVersion: $($tag.osVersion)"
-                        Write-Output "      architecture: $($tag.architecture)"
-                        Write-Output "      os: $($tag.os)"
-                        Write-Output "      dockerfile: $($tag.dockerfile)"
-                    }
+                    Write-Output "    - tags: [$($tag.Tags -join ', ')]"
+                    Write-Output "      osVersion: $($tag.osVersion)"
+                    Write-Output "      architecture: $($tag.architecture)"
+                    Write-Output "      os: $($tag.os)"
+                    Write-Output "      dockerfile: $($tag.dockerfile)"
                 }
             }
         }
