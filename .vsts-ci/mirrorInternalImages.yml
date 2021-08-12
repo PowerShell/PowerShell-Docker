@@ -1,5 +1,10 @@
 variables:
   - group: mcrint
+  
+parameters:
+  - name: publicSource
+    value: no
+    displayname: no if the source requires login, yes if the source does not.
 
 jobs:
 - job: Mirror
@@ -19,7 +24,8 @@ jobs:
   steps:
   - checkout: self
   - task: AzureCLI@2
-    displayName: Mirror $(targetImage)
+    displayName: Mirror $(targetImage) - with login
+    condition: and(succeeded(), eq('${{ parameters.publicSource', 'no'))
     inputs:
       connectedServiceNameARM: c58d97a0-15dd-4781-b8b9-c8a0c2fdcdd9
       scriptType: pscore
@@ -30,3 +36,15 @@ jobs:
           --image $(targetImage) `
           --username $(mcrintusername) `
           --password $(mcrintsecret)
+  - task: AzureCLI@2
+    displayName: Mirror $(targetImage) - without login
+    condition: and(succeeded(), ne('${{ parameters.publicSource', 'no'))
+    inputs:
+      connectedServiceNameARM: c58d97a0-15dd-4781-b8b9-c8a0c2fdcdd9
+      scriptType: pscore
+      scriptLocation: inlineScript
+      inlineScript: >-
+        az acr import --name $(targetusername) `
+          --source $(mcrinthostname)/$(sourceImage) `
+          --image $(targetImage)
+         
