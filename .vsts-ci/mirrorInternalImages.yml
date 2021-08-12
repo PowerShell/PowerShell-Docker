@@ -25,7 +25,7 @@ jobs:
   - checkout: self
   - task: AzureCLI@2
     displayName: Mirror $(targetImage) - with login
-    condition: and(succeeded(), eq('${{ parameters.publicSource', 'no'))
+    condition: and(succeeded(), eq('${{ parameters.publicSource }}', 'no'))
     inputs:
       connectedServiceNameARM: c58d97a0-15dd-4781-b8b9-c8a0c2fdcdd9
       scriptType: pscore
@@ -38,7 +38,7 @@ jobs:
           --password $(mcrintsecret)
   - task: AzureCLI@2
     displayName: Mirror $(targetImage) - without login
-    condition: and(succeeded(), ne('${{ parameters.publicSource', 'no'))
+    condition: and(succeeded(), ne('${{ parameters.publicSource }}', 'no'))
     inputs:
       connectedServiceNameARM: c58d97a0-15dd-4781-b8b9-c8a0c2fdcdd9
       scriptType: pscore
