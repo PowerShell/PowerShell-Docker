@@ -5,6 +5,15 @@ parameters:
   - name: publicSource
     default: no
     displayName: no if the source requires login, yes if the source does not.
+  - name: sourceHostName
+    default: $(mcrinthostname)
+    displayName: Source HostName
+  - name: sourceServerCoreImageName
+    default: windows/servercore:ltsc2022
+    displayName: Source Window servercore Image name without server name
+  - name: sourceNanoImageName
+    default: windows/nanoserver:ltsc2022
+    displayName: Source Window servercore Image name without server name
 
 jobs:
 - job: Mirror
@@ -14,10 +23,10 @@ jobs:
   strategy:
     matrix:
       servercore:
-        sourceImage: private/windows/servercore:ltsc2022
+        sourceImage: ${{ parameters.sourceServerCoreImageName }}
         targetImage: windows/servercore:ltsc2022
       nanoserver:
-        sourceImage: private/windows/nanoserver:ltsc2022
+        sourceImage: ${{ parameters.sourceNanoImageName }}
         targetImage: windows/nanoserver:ltsc2022
 
   displayName: Mirror Image $(targetImage)
