@@ -6,7 +6,6 @@ parameters:
     default: no
     displayName: no if the source requires login, yes if the source does not.
   - name: sourceHostName
-    default: $(mcrinthostname)
     displayName: Source HostName
   - name: sourceServerCoreImageName
     default: windows/servercore:ltsc2022
