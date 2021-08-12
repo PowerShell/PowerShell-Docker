@@ -29,7 +29,7 @@ jobs:
         sourceImage: ${{ parameters.sourceNanoImageName }}
         targetImage: windows/nanoserver:ltsc2022
 
-  displayName: Mirror Image $(targetImage)
+  displayName: Mirror Image
   steps:
   - checkout: self
   - task: AzureCLI@2
@@ -44,7 +44,7 @@ jobs:
           --source $(mcrinthostname)/$(sourceImage) `
           --image $(targetImage) `
           --username $(mcrintusername) `
-          --password $(mcrintsecret)
+          --password $(mcrintsecret) --force
   - task: AzureCLI@2
     displayName: Mirror $(targetImage) - without login
     condition: and(succeeded(), ne('${{ parameters.publicSource }}', 'no'))
@@ -55,5 +55,5 @@ jobs:
       inlineScript: >-
         az acr import --name $(targetusername) `
           --source $(mcrinthostname)/$(sourceImage) `
-          --image $(targetImage)
+          --image $(targetImage) --force
 
