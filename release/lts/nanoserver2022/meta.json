@@ -12,9 +12,6 @@
         "lts-nanoserver-#shorttag#",
         "lts-nanoserver-#shorttag#-#fulltag#"
     ],
-    "manifestLists": [
-        "nanoserver-lts"
-    ],
     "Base64EncodePackageUrl": true,
     "TestProperties": {
         "size": 1

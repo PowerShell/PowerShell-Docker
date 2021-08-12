@@ -13,9 +13,6 @@
         "lts-windowsservercore-#shorttag#",
         "lts-windowsservercore-#shorttag#-#fulltag#"
     ],
-    "manifestLists": [
-        "lts"
-    ],
     "TestProperties": {
         "size": 1
     },
