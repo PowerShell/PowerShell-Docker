@@ -4,7 +4,7 @@
 
 # Args used by from statements must be defined here:
 ARG InstallerVersion=nanoserver
-ARG dockerHost=mcr.microsoft.com/windows/server
+ARG dockerHost=mcr.microsoft.com
 ARG InstallerRepo=mcr.microsoft.com/powershell
 ARG NanoServerRepo=windows/nanoserver
 ARG tag=ltsc2022
@@ -44,7 +44,7 @@ RUN Write-host "Verifying valid Version..."; `
     Expand-Archive /installer/powershell.zip -DestinationPath \PowerShell
 
 # Install PowerShell into NanoServer
-FROM ${dockerHost}:${tag}
+FROM mcr.microsoft.com/windows/server:${tag}
 
 # Copy PowerShell Core from the installer container
 ENV ProgramFiles="C:\Program Files" `
