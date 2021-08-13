@@ -9,8 +9,6 @@ ARG InstallerRepo=mcr.microsoft.com/powershell
 ARG NanoServerRepo=windows/server
 ARG tag=ltsc2022
 
-#mcr.microsoft.com/windows/server:ltsc2022
-
 # Use server core as an installer container to extract PowerShell,
 # As this is a multi-stage build, this stage will eventually be thrown away
 FROM ${InstallerRepo}:$InstallerVersion  AS installer-env
