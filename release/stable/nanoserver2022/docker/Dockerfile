@@ -44,7 +44,7 @@ RUN Write-host "Verifying valid Version..."; `
     Expand-Archive /installer/powershell.zip -DestinationPath \PowerShell
 
 # Install PowerShell into NanoServer
-FROM ${dockerHost}/${NanoServerRepo}:${tag}
+FROM mcr.microsoft.com/${NanoServerRepo}:${tag}
 
 # Copy PowerShell Core from the installer container
 ENV ProgramFiles="C:\Program Files" `
