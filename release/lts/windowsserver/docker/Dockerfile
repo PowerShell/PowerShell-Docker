@@ -34,7 +34,7 @@ RUN Write-host "Verifying valid Version..."; `
     Invoke-WebRequest -Uri $url -outfile /powershell.zip -verbose; `
     Expand-Archive powershell.zip -DestinationPath  \PowerShell
 
-# Install PowerShell into WindowsServerCore
+# Install PowerShell into WindowsServer
 FROM mcr.microsoft.com/${WindowsServerRepo}:${tag}
 
 # Copy PowerShell Core from the installer container
@@ -43,7 +43,7 @@ ENV ProgramFiles="C:\Program Files" `
     PSModuleAnalysisCachePath="C:\Users\Public\AppData\Local\Microsoft\Windows\PowerShell\docker\ModuleAnalysisCache" `
     # Persist %PSCORE% ENV variable for user convenience
     PSCORE="$ProgramFiles\PowerShell\pwsh.exe" `
-    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-WindowsServerCore-ltsc2022" `
+    POWERSHELL_DISTRIBUTION_CHANNEL="PSDocker-WindowsServer-ltsc2022" `
     POWERSHELL_TELEMETRY_OPTOUT="1"
 
 # Copy PowerShell Core from the installer container
