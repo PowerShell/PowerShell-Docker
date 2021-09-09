@@ -9,6 +9,11 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "docker"
+    directory: "/release/preview/alpine313/docker"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
     directory: "/release/preview/centos8/dependabot"
     schedule:
       interval: "weekly"
