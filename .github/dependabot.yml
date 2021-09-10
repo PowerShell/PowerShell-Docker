@@ -2,9 +2,8 @@ version: 2
 
 # update_schedule: live is not supported by docker
 
-updates:
   - package-ecosystem: "docker"
-    directory: "/release/preview/alpine312/docker"
+    directory: "/release/preview/alpine313/docker"
     schedule:
       interval: "weekly"
 
