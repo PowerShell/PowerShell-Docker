@@ -12,6 +12,9 @@
         "#psversion#-nanoserver-#shorttag#-#fulltag#",
         "preview-nanoserver-#shorttag#"
     ],
+    "manifestLists": [
+        "preview-nanoserver"
+    ],
     "Base64EncodePackageUrl": true,
     "TestProperties": {
         "size": 1
