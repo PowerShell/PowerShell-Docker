@@ -13,7 +13,7 @@ If it's not a bug, please remove the template and elaborate the issue in your ow
 ## Check list
 
 - [ ] Verified that this is not a [Known Issue](https://github.com/PowerShell/PowerShell-Docker/wiki/Known-Issues)
-- [ ] Verified this is not an issues in the underlying windows container that should be reported to [Windows Container User Voice](https://windowsserver.uservoice.com/forums/304624-containers)
+- [ ] Verified this is not an issues in the underlying windows container that should be reported to [Windows Feedback Hub](https://support.microsoft.com/windows/send-feedback-to-microsoft-with-the-feedback-hub-app-f59187f8-8739-22d6-ba93-f66612949332)
 
 ## Steps to reproduce
 <!-- Please include any docker commands you used to run the image -->
