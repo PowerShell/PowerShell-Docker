@@ -41,7 +41,7 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
-          commit-message: "Update ${{ env.FORMULA_NAME}} formula to version ${{ env.NEW_FORMULA_VERSION }}"
+          commit-message: "Update the release build yaml with the latest versions"
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           title: "Update ${{ env.FORMULA_NAME }} formula to version ${{ env.NEW_FORMULA_VERSION }}"
