@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
 
-name: Update Formula
+name: Update Release Build Parameters
 on:
   push:
     paths:
@@ -21,7 +21,8 @@ defaults:
 env:
   UPDATE_SCRIPT_PATH: ./tools/updateScript.ps1
 jobs:
-  homebrew-formula-stable:
+  update-release-build-parameters:
+    name: Update Release Build Parameters
     timeout-minutes: 15
     runs-on: ubuntu-20.04
     steps:
