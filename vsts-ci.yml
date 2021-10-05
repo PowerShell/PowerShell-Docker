@@ -1,5 +1,18 @@
 name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
 
+pr:
+  branches:
+    include:
+    - master
+    - release*
+    - feature*
+  paths:
+    include:
+    - '*'
+    exclude:
+    - .github/*
+    - .vsts-ci/releasebuild.yml
+
 resources:
 - repo: self
   clean: true
