@@ -2,7 +2,9 @@
 # Licensed under the MIT license.
 
 name: Update Release Build Parameters
+
 on:
+  workflow_dispatch:
   push:
     paths:
       - '.github/workflows/update.yml'
@@ -33,6 +35,7 @@ jobs:
         run: |
           &$env:UPDATE_SCRIPT_PATH -FormulaPath $env:FORMULA_PATH -Channel $env:CHANNEL_NAME
       - name: Create Pull Request
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         id: cpr
         uses: peter-evans/create-pull-request@v3
         env:
@@ -46,4 +49,4 @@ jobs:
           reviewers: travisez13
           base: master
           draft: false
-          branch: powershell-stable-patch-${{ env.BRANCH_POSTFIX }}
+          branch: update-release-build
