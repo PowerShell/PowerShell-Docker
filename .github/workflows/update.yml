@@ -1,0 +1,48 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
+name: Update Formula
+on:
+  push:
+    paths:
+      - '.github/workflows/update.yml'
+    branches:
+      - master
+      - add-gh-action
+  pull_request:
+    paths:
+      - '.github/workflows/update.yml'
+  schedule:
+    # At 20:20 UTC on every day-of-week from Monday through Friday.
+    - cron:  '0 0/4 * * *'
+defaults:
+  run:
+    shell: pwsh
+env:
+  UPDATE_SCRIPT_PATH: ./tools/updateScript.ps1
+jobs:
+  homebrew-formula-stable:
+    timeout-minutes: 15
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Auto-update formula
+        run: |
+          &$env:UPDATE_SCRIPT_PATH -FormulaPath $env:FORMULA_PATH -Channel $env:CHANNEL_NAME
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v3
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        with:
+          commit-message: "Update ${{ env.FORMULA_NAME}} formula to version ${{ env.NEW_FORMULA_VERSION }}"
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          title: "Update ${{ env.FORMULA_NAME }} formula to version ${{ env.NEW_FORMULA_VERSION }}"
+          assignees: travisez13
+          reviewers: travisez13
+          base: master
+          draft: false
+          branch: powershell-stable-patch-${{ env.BRANCH_POSTFIX }}
