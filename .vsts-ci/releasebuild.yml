@@ -6,7 +6,7 @@ parameters:
   - name: 'ltsReleaseTag'
     default: v7.0.8
   - name: 'stableReleaseTag'
-    default: v7.0.8
+    default: v7.1.5
 
 resources:
 - repo: self
