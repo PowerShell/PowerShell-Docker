@@ -4,9 +4,9 @@ parameters:
   - name: 'previewReleaseTag'
     default: v7.2.0-preview.10
   - name: 'ltsReleaseTag'
-    default: v7.0.7
+    default: v7.0.8
   - name: 'stableReleaseTag'
-    default: v7.1.4
+    default: v7.0.8
 
 resources:
 - repo: self
