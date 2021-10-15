@@ -44,7 +44,7 @@ Tags go here.
 
 ## Support
 
-For our support policy, see [PowerShell Core Support Lifecycle](https://docs.microsoft.com/en-us/powershell/scripting/powershell-core-support)
+For our support policy, see [PowerShell Core Support Lifecycle](https://docs.microsoft.com/powershell/scripting/install/powershell-support-lifecycle?view=powershell-7.1)
 
 ## Feedback
 
