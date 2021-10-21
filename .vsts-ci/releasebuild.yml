@@ -108,7 +108,7 @@ stages:
 
       condition: succeededOrFailed()
       pool:
-        name: Hosted Ubuntu 1604
+        vmImage: ubuntu-latest
         timeoutInMinutes: 30
 
       steps:
