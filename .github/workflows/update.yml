@@ -44,7 +44,7 @@ jobs:
           commit-message: "Update the release build yaml with the latest versions"
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-          title: "Update ${{ env.FORMULA_NAME }} formula to version ${{ env.NEW_FORMULA_VERSION }}"
+          title: "Update the release build yaml with the latest versions"
           assignees: travisez13
           reviewers: travisez13
           base: master
