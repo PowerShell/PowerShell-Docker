@@ -4,9 +4,9 @@ parameters:
   - name: 'previewReleaseTag'
     default: v7.2.0-rc.1
   - name: 'ltsReleaseTag'
-    default: v7.0.8
+    default: v7.2.0
   - name: 'stableReleaseTag'
-    default: v7.1.5
+    default: v7.2.0
 
 resources:
 - repo: self
@@ -35,11 +35,27 @@ stages:
 
       steps:
       - pwsh: |
+          if ($env:PREVIEWRELEASETAG -notmatch '^v\d+\.\d+\.\d+-(preview|rc)\.\d+$') {
+            throw "preview release tag is not for a preview build: '${env:PREVIEWRELEASETAG}'"
+          }
+        displayName: stop build if preview release tag does not match preview format
+      - pwsh: |
+          if ($env:STABLERELEASETAG -notmatch '^v\d+\.\d+\.\d+$') {
+            throw "stable release tag is not for a stable build: '${env:STABLERELEASETAG}'"
+          }
+        displayName: stop build if stable release tag does not match stable format
+      - pwsh: |
+          if ($env:LTSRELEASETAG -notmatch '^v\d+\.\d+\.\d+$') {
+            throw "LTS release tag is not for a stable build: '${env:LTSRELEASETAG}'"
+          }
+        displayName: stop build if LTS release tag does not match stable format
+      - pwsh: |
           $path = '$(SYSTEM.DEFAULTWORKINGDIRECTORY)/BuildMeta.json'
           @{
             FullTag = (Get-Date).ToString("yyyyMMdd")
           } | ConvertTo-Json | Out-File -Encoding utf8NoBOM -FilePath ./BuildMeta.json
           Write-Host "##vso[artifact.upload containerfolder=buildMeta;artifactname=buildMeta]$path"
+        displayName: Create BuildMeta Json with FullTag
   - template: releaseStage.yml
     parameters:
       channel: stable

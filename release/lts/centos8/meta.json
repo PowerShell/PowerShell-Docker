@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "PackageFormat": "powershell-lts-${PS_VERSION}-1.rhel.7.x86_64.rpm",
+    "PackageFormat": "powershell-lts-${PS_VERSION}-1.rh.x86_64.rpm",
     "osVersion": "CentOS 8",
     "tagTemplates": [
         "lts-centos-#shorttag#"

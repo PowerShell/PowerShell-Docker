@@ -8,7 +8,8 @@
         "preview-ubuntu-#shorttag#"
     ],
     "shortTags": [
-        {"Tag": "xenial"}
+        {"Tag": "xenial"},
+        {"Tag": "16.04"}
     ],
     "SkipGssNtlmSspTests": false,
     "TestProperties": {

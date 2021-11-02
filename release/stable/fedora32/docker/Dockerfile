@@ -8,7 +8,7 @@ FROM ${imageRepo}:32 AS installer-env
 
 ARG PS_VERSION=7.0.0
 ARG PACKAGE_VERSION=7.0.0
-ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
+ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rh.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 

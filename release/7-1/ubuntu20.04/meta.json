@@ -1,0 +1,23 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "osVersion": "Ubuntu 20.04",
+    "SkipGssNtlmSspTests": false,
+    "tagTemplates": [
+        "#psversion#-ubuntu-#shorttag#-#fulltag#",
+        "#psversion#-ubuntu-#shorttag#",
+        "ubuntu-#shorttag#"
+    ],
+    "shortTags": [
+        {"Tag": "focal"},
+        {"Tag": "20.04"}
+    ],
+    "manifestLists": [
+        "latest"
+    ],
+    "TestProperties": {
+        "size": 355
+    },
+    "SubImage": "test-deps"
+}

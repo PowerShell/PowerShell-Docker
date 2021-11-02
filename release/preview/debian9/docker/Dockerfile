@@ -7,7 +7,7 @@ ARG imageRepo=debian
 FROM ${imageRepo}:stretch-slim AS installer-env
 
 ARG PS_VERSION=7.0.0-preview.1
-ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.debian.9_amd64.deb
+ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.deb_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 # Define ENVs for Localization/Globalization

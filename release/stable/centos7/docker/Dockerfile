@@ -3,9 +3,9 @@
 
 FROM centos:7 AS installer-env
 
-ARG PS_VERSION=6.2.0
-ARG PACKAGE_VERSION=6.2.0
-ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
+ARG PS_VERSION=7.2.0
+ARG PACKAGE_VERSION=7.2.0
+ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rh.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 # Define ENVs for Localization/Globalization
@@ -28,6 +28,8 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
       gssntlmssp \
       # less is required for help in powershell
       less \
+      # clear is part of ncurses which is used by clear
+      ncurses \
       # PowerShell remoting over SSH dependencies
       openssh-clients \
     && yum upgrade-minimal -y --security \

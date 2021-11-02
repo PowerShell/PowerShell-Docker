@@ -6,7 +6,7 @@ FROM ${imageRepo}:${fromTag} AS installer-env
 
 ARG PS_VERSION=6.2.0
 ARG PACKAGE_VERSION=6.2.0
-ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rhel.7.x86_64.rpm
+ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rh.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 # Define ENVs for Localization/Globalization
