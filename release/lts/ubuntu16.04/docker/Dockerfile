@@ -6,7 +6,7 @@
 FROM ubuntu:16.04 AS installer-env
 
 ARG PS_VERSION=7.0.0-rc.1
-ARG PS_PACKAGE=powershell-lts_${PS_VERSION}-1.ubuntu.16.04_amd64.deb
+ARG PS_PACKAGE=powershell-lts_${PS_VERSION}-1.deb_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
 # Define ENVs for Localization/Globalization
