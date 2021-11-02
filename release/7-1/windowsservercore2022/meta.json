@@ -1,0 +1,23 @@
+{
+    "IsLinux": false,
+    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip",
+    "osVersion": "Windows Server Core, LTSC 2022",
+    "shortTags": [
+        {
+            "Tag": "ltsc2022"
+        }
+    ],
+    "Base64EncodePackageUrl": true,
+    "tagTemplates": [
+        "#psversion#-windowsservercore-#shorttag#",
+        "#psversion#-windowsservercore-#shorttag#-#fulltag#",
+        "windowsservercore-#shorttag#"
+    ],
+    "manifestLists": [
+        "latest"
+    ],
+    "TestProperties": {
+        "size": 1
+    },
+    "UseAcr": true
+}

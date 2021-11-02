@@ -1,0 +1,15 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "osVersion": "CentOS 8",
+    "tagTemplates": [
+        "centos-#shorttag#"
+    ],
+    "SubRepository": "test-deps",
+    "OptionalTests": [
+        "test-deps"
+    ],
+    "TestProperties": {
+        "size": 750
+    }
+}

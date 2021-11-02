@@ -1,0 +1,20 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion" : false,
+    "PackageFormat": "powershell_${PS_VERSION}-1.debian.9_amd64.deb",
+    "osVersion": "Debian 9",
+    "SkipGssNtlmSspTests": false,
+    "tagTemplates": [
+        "#psversion#-debian-#shorttag#-#fulltag#",
+        "#psversion#-debian-#shorttag#",
+        "debian-#shorttag#"
+    ],
+    "shortTags": [
+        {"Tag": "stretch-slim"},
+        {"Tag": "9"}
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 314
+    }
+}
