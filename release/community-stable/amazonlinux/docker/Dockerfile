@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. 
+# Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 #
 # Docker image file that describes an Amazon Linux image with PowerShell
@@ -9,7 +9,7 @@ FROM amazonlinux:latest AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.0.1
-ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rhel.7.x86_64.rpm
+ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rh.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
 
