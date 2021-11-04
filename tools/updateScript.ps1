@@ -51,7 +51,7 @@ foreach ($default in $defaults) {
         ('^v7\.1') {
             "Stable"
         }
-        ('^v.*-preview\.\d*') {
+        ('^v.*-(preview|rc)\.\d*') {
             "Preview"
         }
         default {
