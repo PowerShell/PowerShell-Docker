@@ -45,10 +45,12 @@ $updated = $false
 foreach ($default in $defaults) {
     $existingReleaseTag = $default.Matches.groups[1]
     $channel = switch -Regex ($existingReleaseTag) {
-        ('^v7\.0') {
+        ('^v7\.[02468]\.\d+$') {
             "LTS"
+            # Don't also match stable
+            continue
         }
-        ('^v7\.1') {
+        ('^v7\.\d+.\d+$') {
             "Stable"
         }
         ('^v.*-(preview|rc)\.\d*') {
