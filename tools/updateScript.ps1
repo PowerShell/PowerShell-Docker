@@ -3,7 +3,7 @@
 
 $yamlPath = "$psscriptroot\..\.vsts-ci/releasebuild.yml"
 $yaml = Get-Content -Path $yamlPath
-$defaults = $yaml | Select-String -Pattern '^\s* default:\s(v\d*\.\d*\.\d*(-\w*\.\d*)?)$'
+$defaults = $yaml | Select-String -Pattern '^\s* default:\s''(v\d*\.\d*\.\d*(-\w*\.\d*)?)''$'
 
 $retryCount = 3
 $retryIntervalSec = 15
@@ -43,6 +43,7 @@ function Get-ChannelMeta {
 
 $updated = $false
 foreach ($default in $defaults) {
+    Write-Verbose "Updating $default" -Verbose
     $existingReleaseTag = $default.Matches.groups[1]
     $channel = switch -Regex ($existingReleaseTag) {
         ('^v7\.[02468]\.\d+$') {
@@ -64,9 +65,16 @@ foreach ($default in $defaults) {
     $newReleaseTag = $meta.metadata.ReleaseTag
     $existingReleaseTagRegEx = [regex]::Escape($existingReleaseTag)
     if ($existingReleaseTag.ToString() -ne $newReleaseTag.ToString()) {
-        Write-Verbose -Message "replacing '$existingReleaseTag' with '$newReleaseTag' - $($existingReleaseTag -ne $newReleaseTag)" -Verbose
-        $yaml = $yaml -replace $existingReleaseTag, $newReleaseTag
-        $updated = $true
+        [System.Management.Automation.SemanticVersion] $existingVersion = $existingReleaseTag -replace '^v', ''
+        [System.Management.Automation.SemanticVersion]$newVersion = $newReleaseTag -replace '^v', ''
+        if ($newVersion -gt $existingVersion) {
+            Write-Verbose -Message "replacing '$existingReleaseTag' with '$newReleaseTag' - $($existingReleaseTag -ne $newReleaseTag)" -Verbose
+            $yaml = $yaml -replace $existingReleaseTagRegEx, $newReleaseTag
+            $updated = $true
+        }
+        else {
+            Write-Verbose -Message "Skipping '$existingReleaseTag' newer than $newReleaseTag" -Verbose
+        }
     }
     # @{
     #     ExistingReleaseTag = $existingReleaseTag
