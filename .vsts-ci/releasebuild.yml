@@ -2,11 +2,11 @@ name: s_$(stableReleaseTag)_p_$(previewReleaseTag)_l_$(ltsReleaseTag)$(Rev:_rr)
 
 parameters:
   - name: 'previewReleaseTag'
-    default: v7.2.0-rc.1
+    default: 'v7.2.0-rc.1'
   - name: 'ltsReleaseTag'
-    default: v7.2.0
+    default: 'v7.2.0'
   - name: 'stableReleaseTag'
-    default: v7.2.0
+    default: 'v7.2.0'
 
 resources:
 - repo: self
