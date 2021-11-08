@@ -54,6 +54,8 @@ For our support policy, see [PowerShell Core Support Lifecycle](https://docs.mic
   file an issue at [PowerShell/PowerShell-Docker](https://github.com/PowerShell/PowerShell-Docker/issues/new/choose)
 
 ## License
+- Legal Notice: [Container License Information](https://aka.ms/mcr/osslegalnotice)
+
 
 PowerShell is licensed under the [MIT license][].
 
