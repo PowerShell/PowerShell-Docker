@@ -56,7 +56,8 @@ stages:
     dependsOn: []
     jobs:
     - job: Secret_Scan
-      pool: 'Hosted VS2017'
+      pool:
+        vmImage: windows-latest
       displayName: Secret Scan
 
       steps:
