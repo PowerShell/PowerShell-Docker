@@ -54,7 +54,7 @@ function Get-PowerShellVersion
             $metaData.ServicingReleaseTag
         }
         elseif ($Lts.IsPresent) {
-            $ltsReleaseTag = $metaData.LtsReleaseTag
+            $ltsReleaseTag = $metaData.LtsReleaseTag[0]
             if (-not $ltsReleaseTag) {
                 $metaData.PreviewReleaseTag
             }
