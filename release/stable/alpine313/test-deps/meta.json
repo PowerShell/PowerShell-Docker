@@ -4,16 +4,13 @@
     "SkipGssNtlmSspTests": true,
     "osVersion": "Alpine 3.13",
     "tagTemplates": [
-        "#tag#"
+        "alpine-#shorttag#"
     ],
     "OptionalTests": [
         "test-deps",
         "test-deps-musl"
     ],
     "TestProperties": {
-        "size": 295
-    },
-    "TagMapping": {
-        "^.*-alpine-3.13$" : "preview-alpine-3.13"
+        "size": 335
     }
 }
