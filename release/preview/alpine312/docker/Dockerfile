@@ -24,7 +24,7 @@ RUN mkdir -p ${PS_INSTALL_FOLDER}
 RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER} -v
 
 # Start a new stage so we lose all the tar.gz layers from the final image
-FROM alpine:3.12.1
+FROM alpine:3.12
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
