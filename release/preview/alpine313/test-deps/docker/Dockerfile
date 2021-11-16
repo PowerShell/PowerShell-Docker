@@ -1,6 +1,6 @@
 # Docker image file that describes an Alpine image with PowerShell and test dependencies
 
-ARG BaseImage=mcr.microsoft.com/powershell:alpine-3.13.6
+ARG BaseImage=mcr.microsoft.com/powershell:alpine-3.13
 
 FROM node:14.17.6-alpine as node
 
