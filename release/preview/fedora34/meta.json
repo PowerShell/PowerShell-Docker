@@ -2,15 +2,15 @@
     "IsLinux": true,
     "UseLinuxVersion": false,
     "PackageFormat": "powershell${previewTag}-${PS_VERSION}-1.rh.x86_64.rpm",
-    "osVersion": "Fedora 32",
+    "osVersion": "Fedora 34",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-fedora-32-#fulltag#",
-        "#psversion#-fedora-32",
+        "#psversion#-fedora-34-#fulltag#",
+        "#psversion#-fedora-34",
         "preview-fedora-#shorttag#"
     ],
     "shortTags": [
-        {"Tag": "32"}
+        {"Tag": "34"}
     ],
     "SubImage": "test-deps",
     "TestProperties": {
