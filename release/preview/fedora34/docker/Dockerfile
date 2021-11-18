@@ -14,6 +14,7 @@ ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$
 
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Fedora-32
@@ -43,7 +44,7 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
     && dnf updateinfo list -q --security \
     && echo "end - verifying all security advisories are installed..." \
     && dnf clean all \
-    && localedef --charmap=UTF-8 --inputfile=en_US en_US.UTF-8 \
+    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \
