@@ -1,0 +1,19 @@
+{
+    "IsLinux": true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell${previewTag}-${PS_VERSION}-1.rh.x86_64.rpm",
+    "osVersion": "Fedora 34",
+    "SkipGssNtlmSspTests": false,
+    "tagTemplates": [
+        "#psversion#-fedora-34-#fulltag#",
+        "#psversion#-fedora-34",
+        "preview-fedora-#shorttag#"
+    ],
+    "shortTags": [
+        {"Tag": "34"}
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 632
+    }
+}
