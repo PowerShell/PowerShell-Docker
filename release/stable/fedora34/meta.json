@@ -5,12 +5,12 @@
     "osVersion": "Fedora 32",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-fedora-32-#fulltag#",
-        "#psversion#-fedora-32",
+        "#psversion#-fedora-34-#fulltag#",
+        "#psversion#-fedora-34",
         "fedora-#shorttag#"
     ],
     "shortTags": [
-        {"Tag": "32"}
+        {"Tag": "34"}
     ],
     "SubImage": "test-deps",
     "TestProperties": {

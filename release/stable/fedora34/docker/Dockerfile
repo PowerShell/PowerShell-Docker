@@ -1,10 +1,10 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# Docker image file that describes Fedora 32 image with PowerShell installed from Microsoft YUM Repo
+# Docker image file that describes Fedora 34 image with PowerShell installed from Microsoft YUM Repo
 ARG imageRepo=fedora
 
-FROM ${imageRepo}:32 AS installer-env
+FROM ${imageRepo}:34 AS installer-env
 
 ARG PS_VERSION=7.0.0
 ARG PACKAGE_VERSION=7.0.0
@@ -14,11 +14,10 @@ ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$
 
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
-    LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Fedora-32
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Fedora-34
 
 # Install dependencies and clean up
 RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
@@ -32,7 +31,7 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
     # Needed to run localdef
       glibc-locale-source \
     # Invoke-WebRequest doesn't work correctly without this
-      compat-openssl10 \
+      openssl-libs \
       ca-certificates \
       gssntlmssp \
     && echo "end - misc packages" \
@@ -44,7 +43,7 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
     && dnf updateinfo list -q --security \
     && echo "end - verifying all security advisories are installed..." \
     && dnf clean all \
-    #&& localedef --charmap=UTF-8 --inputfile=en_US $LANG \
+    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     # intialize powershell module cache
     && pwsh \
         -NoLogo \

@@ -1,7 +1,7 @@
 {
     "IsLinux": true,
     "UseLinuxVersion": false,
-    "osVersion": "Fedora 32",
+    "osVersion": "Fedora 34",
     "tagTemplates": [
         "fedora-#shorttag#"
     ],
