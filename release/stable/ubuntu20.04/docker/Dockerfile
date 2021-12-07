@@ -50,7 +50,7 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y \
     # less is required for help in powershell
         less \
-    # requied to setup the locale
+    # required to setup the locale
         locales \
     # required for SSL
         ca-certificates \
