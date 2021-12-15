@@ -1,0 +1,16 @@
+{
+    "IsLinux" : true,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "SkipGssNtlmSspTests": true,
+    "shortTags": [
+        {"Tag": "1.0"}
+    ],
+    "tagTemplates": [
+        "#psversion#-mariner-#tag#",
+        "preview-mariner"
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 387
+    }
+}
