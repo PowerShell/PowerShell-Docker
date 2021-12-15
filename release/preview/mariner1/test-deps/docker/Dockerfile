@@ -1,4 +1,4 @@
-# Docker image file that describes an Ubuntu image with PowerShell and test dependencies
+# Docker image file that describes an Mariner image with PowerShell and test dependencies
 ARG BaseImage=mcr.microsoft.com/powershell:mariner
 FROM ${BaseImage}
 
@@ -25,7 +25,7 @@ RUN yum update -y \
     # remove cache folders and files
     && rm -rf /var/cache/yum
 
-ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Ubuntu-20.04
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Mariner-1.0
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
