@@ -72,10 +72,6 @@ function Get-PowerShellVersion
         $retVersion = $Version
     }
 
-    if ($Linux.IsPresent) {
-        $retVersion = $retVersion -replace '\-', '~'
-    }
-
     return $retVersion
 }
 
