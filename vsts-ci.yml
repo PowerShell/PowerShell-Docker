@@ -49,7 +49,7 @@ stages:
         condition: ne(variables['Build.Reason'], 'PullRequest')
       - pwsh: |
           try {
-            ./build.ps1 -CheckForDuplicateTags -Channel stable, preview, servicing, lts
+            ./build.ps1 -CheckForDuplicateTags -Channel stable, preview, lts
           } catch {
             Get-Error
             throw
