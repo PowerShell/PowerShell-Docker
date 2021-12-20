@@ -470,9 +470,9 @@ function Get-DockerImageMetaDataWrapper
     {
         if((Test-Path $scriptPath) )
         {
+            Write-Verbose "Getting tags using script: $scriptPath" -Verbose
             # Get the tag data for the image
             $tagDataFromScript = @(& $scriptPath -CI:$CI.IsPresent @getTagsExtraParams | Where-Object {$_.FromTag})
-            Write-Verbose "tdfs count:$($tagDataFromScript.count)-$($Strict.IsPresent)"
             if($tagDataFromScript.count -eq 0 -and $Strict.IsPresent)
             {
                 throw "Did not get tag data from script for $scriptPath!"
