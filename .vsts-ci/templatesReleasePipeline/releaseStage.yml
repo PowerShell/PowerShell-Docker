@@ -2,7 +2,7 @@ parameters:
     - name: "channel"
       default: 'preview'
     - name: "vmImage"
-      default: 'PSMMSUbuntu20.04-Secure'
+      default: PSMMSUbuntu20.04-Secure
     - name: "acr"
       default: 'All'
     - name: "useacr"
@@ -23,7 +23,7 @@ stages:
         pool:
           name: PowerShell1ES
           demands:
-            - ImageOverride -equals '${{ parameters.vmImage }}'
+            - ImageOverride -equals ${{ parameters.vmImage }}
 
         displayName: Generate Matrix YAML ${{ parameters.channel }}
         steps:
