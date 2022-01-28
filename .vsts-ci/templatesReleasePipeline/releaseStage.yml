@@ -23,7 +23,7 @@ stages:
         pool:
           name: PowerShell1ES
           demands:
-            - ImageOverride -eq '${{ parameters.vmImage }}'
+            - ImageOverride -equals '${{ parameters.vmImage }}'
 
         displayName: Generate Matrix YAML ${{ parameters.channel }}
         steps:

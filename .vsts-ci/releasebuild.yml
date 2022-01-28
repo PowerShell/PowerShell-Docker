@@ -32,7 +32,7 @@ stages:
       pool:
         name: PowerShell1ES
         demands:
-          - ImageOverride -eq 'PSMMSUbuntu20.04-Secure'
+          - ImageOverride -equals 'PSMMSUbuntu20.04-Secure'
         timeoutInMinutes: 30
 
       steps:
@@ -85,7 +85,7 @@ stages:
       pool:
         name: PowerShell1ES
         demands:
-          - ImageOverride -eq 'PSMMS2019-Secure'
+          - ImageOverride -equals 'PSMMS2019-Secure'
 
       timeoutInMinutes: 30
 
@@ -102,7 +102,7 @@ stages:
       pool:
         name: PowerShell1ES
         demands:
-          - ImageOverride -eq 'PSMMS2019-Secure'
+          - ImageOverride -equals 'PSMMS2019-Secure'
 
       timeoutInMinutes: 30
 
@@ -120,7 +120,7 @@ stages:
       pool:
         name: PowerShell1ES
         demands:
-          - ImageOverride -eq 'PSMMS2019-Secure'
+          - ImageOverride -equals 'PSMMS2019-Secure'
 
       timeoutInMinutes: 30
 
@@ -138,7 +138,7 @@ stages:
       pool:
         name: PowerShell1ES
         demands:
-          - ImageOverride -eq 'PSMMSUbuntu20.04-Secure'
+          - ImageOverride -equals 'PSMMSUbuntu20.04-Secure'
 
       timeoutInMinutes: 30
 
