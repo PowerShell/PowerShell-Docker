@@ -30,7 +30,9 @@ stages:
 
       condition: succeededOrFailed()
       pool:
-        vmImage: ubuntu-latest
+        name: PowerShell1ES
+        demands:
+          - ImageOverride -equals PSMMSUbuntu20.04-Secure
         timeoutInMinutes: 30
 
       steps:
@@ -79,9 +81,13 @@ stages:
 
       displayName: Create Preview Manifest Lists
       condition: succeededOrFailed()
+
       pool:
-        vmImage: windows-latest
-        timeoutInMinutes: 30
+        name: PowerShell1ES
+        demands:
+          - ImageOverride -equals PSMMS2019-Secure
+
+      timeoutInMinutes: 30
 
       steps:
       - template: manifestSteps.yml
@@ -94,8 +100,11 @@ stages:
       displayName: Create Lts Manifest Lists
       condition: succeededOrFailed()
       pool:
-        vmImage: windows-latest
-        timeoutInMinutes: 30
+        name: PowerShell1ES
+        demands:
+          - ImageOverride -equals PSMMS2019-Secure
+
+      timeoutInMinutes: 30
 
       steps:
       - template: manifestSteps.yml
@@ -109,8 +118,11 @@ stages:
 
       condition: succeededOrFailed()
       pool:
-        vmImage: windows-latest
-        timeoutInMinutes: 30
+        name: PowerShell1ES
+        demands:
+          - ImageOverride -equals PSMMS2019-Secure
+
+      timeoutInMinutes: 30
 
       steps:
       - template: manifestSteps.yml
@@ -124,8 +136,11 @@ stages:
 
       condition: succeededOrFailed()
       pool:
-        vmImage: ubuntu-latest
-        timeoutInMinutes: 30
+        name: PowerShell1ES
+        demands:
+          - ImageOverride -equals PSMMSUbuntu20.04-Secure
+
+      timeoutInMinutes: 30
 
       steps:
       - task: DownloadBuildArtifacts@0

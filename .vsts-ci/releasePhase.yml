@@ -1,6 +1,6 @@
 parameters:
   - name: vmImage
-    default: 'ubuntu-latest'
+    default: PSMMSUbuntu20.04-Secure
   - name: jobName
     default: 'none'
   - name: releaseTag
@@ -27,7 +27,10 @@ jobs:
     releaseTag: ${{ parameters.releaseTag }}
 
   pool:
-    vmImage: ${{ parameters.vmImage }}
+    name: PowerShell1ES
+    demands:
+      - ImageOverride -equals ${{ parameters.vmImage }}
+
   timeoutInMinutes: 135
 
   displayName: ${{ parameters.jobName }}

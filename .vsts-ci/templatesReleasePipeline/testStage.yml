@@ -21,6 +21,7 @@ stages:
       - job: GenerateYaml_${{ parameters.channel }}
         pool:
           vmImage: ubuntu-latest
+
         displayName: Generate Matrix YAML ${{ parameters.channel }}
         steps:
         - pwsh: |
