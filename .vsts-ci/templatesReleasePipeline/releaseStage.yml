@@ -53,7 +53,7 @@ stages:
           jobName: ${{ parameters.channel }}_linux
           matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux']
           WhatIf: ${{ parameters.WhatIf }}
-          vmImage: "PSMMUbuntu20.04-Secure"
+          vmImage: "PSMMSUbuntu20.04-Secure"
           dependsOn:
             - GenerateYaml_${{ parameters.channel }}
 
