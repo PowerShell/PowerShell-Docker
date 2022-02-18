@@ -7,7 +7,7 @@
     ],
     "tagTemplates": [
         "#psversion#-mariner-#tag#",
-        "preview-mariner"
+        "preview-mariner-#shorttag#"
     ],
     "SubImage": "test-deps",
     "TestProperties": {
