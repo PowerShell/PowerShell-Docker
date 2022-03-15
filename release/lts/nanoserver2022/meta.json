@@ -10,7 +10,7 @@
     "tagTemplates": [
         "lts-#psversion#-nanoserver-#shorttag#",
         "lts-nanoserver-#shorttag#",
-        "lts-nanoserver-#shorttag#-#fulltag#"
+        "lts-nanoserver-#shorttag#"
     ],
     "manifestLists": [
         "nanoserver-lts"

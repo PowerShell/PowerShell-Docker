@@ -11,7 +11,7 @@
     "tagTemplates": [
         "lts-#psversion#-windowsserver-#shorttag#",
         "lts-windowsserver-#shorttag#",
-        "lts-windowsserver-#shorttag#-#fulltag#"
+        "lts-windowsserver-#shorttag#"
     ],
     "manifestLists": [
         "lts"

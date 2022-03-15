@@ -5,7 +5,7 @@
     "osVersion": "Debian 10",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "lts-debian-#shorttag#-#fulltag#",
+        "lts-debian-#shorttag#",
         "lts-debian-#shorttag#"
     ],
     "shortTags": [
