@@ -8,8 +8,6 @@
         }
     ],
     "tagTemplates": [
-        "#psversion#-nanoserver-#shorttag#",
-        "#psversion#-nanoserver-1809-#fulltag#",
         "preview-nanoserver-#shorttag#"
     ],
     "Base64EncodePackageUrl": true,

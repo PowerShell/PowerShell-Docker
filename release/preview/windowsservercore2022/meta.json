@@ -12,8 +12,6 @@
     ],
     "Base64EncodePackageUrl": true,
     "tagTemplates": [
-        "#psversion#-windowsservercore-#shorttag#",
-        "#psversion#-windowsservercore-#shorttag#-#fulltag#",
         "preview-windowsservercore-#shorttag#"
     ],
     "TestProperties": {
