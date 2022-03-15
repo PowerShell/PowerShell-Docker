@@ -13,6 +13,9 @@
     "shortTags": [
         {"Tag": "bionic"}
     ],
+    "manifestLists": [
+        "arm32"
+    ],
     "TestProperties": {
         "size": 550,
         "Arm32": true
