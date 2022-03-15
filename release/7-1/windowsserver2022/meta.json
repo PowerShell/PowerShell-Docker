@@ -10,7 +10,7 @@
     "Base64EncodePackageUrl": true,
     "tagTemplates": [
         "#psversion#-windowsserver-#shorttag#",
-        "#psversion#-windowsserver-#shorttag#-#fulltag#",
+        "#psversion#-windowsserver-#shorttag#",
         "windowsserver-#shorttag#"
     ],
     "manifestLists": [
