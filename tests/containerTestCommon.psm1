@@ -520,6 +520,7 @@ function Invoke-DockerBuild
         }
 
         $buildArgList += '--quiet'
+        $buildArgList += '--progress=plain'
     }
 
     foreach($argName in $buildArgNames)
