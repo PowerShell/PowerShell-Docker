@@ -9,7 +9,7 @@
     ],
     "tagTemplates": [
         "#psversion#-nanoserver-#shorttag#",
-        "#psversion#-nanoserver-2004-#fulltag#",
+        "#psversion#-nanoserver-2004",
         "nanoserver-#shorttag#"
     ],
     "manifestLists": [

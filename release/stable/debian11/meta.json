@@ -5,7 +5,7 @@
     "osVersion": "Debian 11 (Testing)",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-debian-#shorttag#-#fulltag#",
+        "#psversion#-debian-#shorttag#",
         "#psversion#-debian-#shorttag#",
         "debian-#shorttag#"
     ],

@@ -4,7 +4,7 @@
     "PackageFormat": "powershell-${PS_VERSION}-1.rh.x86_64.rpm",
     "osVersion": "CentOS 7",
     "tagTemplates": [
-        "#psversion#-centos-#shorttag#-#fulltag#",
+        "#psversion#-centos-#shorttag#",
         "centos-#shorttag#"
     ],
     "shortTags": [

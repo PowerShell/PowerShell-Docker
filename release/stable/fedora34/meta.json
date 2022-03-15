@@ -5,7 +5,7 @@
     "osVersion": "Fedora 32",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-fedora-34-#fulltag#",
+        "#psversion#-fedora-34",
         "#psversion#-fedora-34",
         "fedora-#shorttag#"
     ],

@@ -5,7 +5,7 @@
     "osVersion": "Ubuntu 20.04",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-ubuntu-#shorttag#-#fulltag#",
+        "#psversion#-ubuntu-#shorttag#",
         "#psversion#-ubuntu-#shorttag#",
         "ubuntu-#shorttag#"
     ],
