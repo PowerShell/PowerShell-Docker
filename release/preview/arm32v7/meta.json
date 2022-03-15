@@ -10,7 +10,8 @@
         "preview-arm32v7-ubuntu-#shorttag#"
     ],
     "shortTags": [
-        {"Tag": "bionic"}
+        {"Tag": "bionic"},
+        {"Tag": "18.04"}
     ],
     "TestProperties": {
         "size": 550,
