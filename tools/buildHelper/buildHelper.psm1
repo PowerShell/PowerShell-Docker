@@ -747,6 +747,10 @@ function Get-TagData
         $fromTag = $TagGroup.Name
     }
 
+    # remove any duplicate tags from the template formatting
+    $actualTags = $actualTags | Select-Object -Unique
+    $tagList = $tagList | Select-Object -Unique
+
     return [TagData]@{
         TagList = $tagList
         FromTag = $fromTag
