@@ -7,13 +7,14 @@
     "Base64EncodePackageUrl": true,
     "UseAcr": true,
     "tagTemplates": [
-        "lts-arm32v7-ubuntu-#shorttag#"
+        "#psversion#-ubuntu-#shorttag#-arm32-#fulltag#",
+        "lts-ubuntu-#shorttag#-arm32"
     ],
     "shortTags": [
         {"Tag": "bionic"}
     ],
     "manifestLists": [
-        "arm32"
+        "lts"
     ],
     "TestProperties": {
         "size": 550,

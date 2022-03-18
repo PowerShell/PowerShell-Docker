@@ -7,14 +7,15 @@
     "Base64EncodePackageUrl": true,
     "UseAcr": true,
     "tagTemplates": [
-        "#psversion#-arm32v7-ubuntu-#tag#",
-        "preview-arm32v7-ubuntu-#shorttag#"
+        "#psversion#-ubuntu-#shorttag#-arm32-#fulltag#",
+        "preview-ubuntu-#shorttag#-arm32"
     ],
     "shortTags": [
-        {"Tag": "bionic"}
+        {"Tag": "bionic"},
+        {"Tag": "18.04"}
     ],
     "manifestLists": [
-        "arm32"
+        "preview"
     ],
     "TestProperties": {
         "size": 550,
