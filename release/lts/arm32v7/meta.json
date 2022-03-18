@@ -2,7 +2,7 @@
     "IsLinux" : true,
     "UseLinuxVersion": false,
     "PackageFormat": "powershell-${PS_VERSION}-linux-arm32.tar.gz",
-    "osVersion": "Ubuntu 18.04 ARM 32v7",
+    "osVersion": "Ubuntu 20.04 ARM 32v7",
     "SkipGssNtlmSspTests": true,
     "Base64EncodePackageUrl": true,
     "UseAcr": true,
@@ -11,7 +11,8 @@
         "lts-ubuntu-#shorttag#-arm32"
     ],
     "shortTags": [
-        {"Tag": "bionic"}
+        {"Tag": "focal"},
+        {"Tag": "20.04"}
     ],
     "manifestLists": [
         "lts"
