@@ -7,7 +7,7 @@
     "Base64EncodePackageUrl": true,
     "UseAcr": true,
     "tagTemplates": [
-        "#psversion#-ubuntu-#shorttag#-arm32-#fulltag#",
+        "preview-#psversion#-ubuntu-#shorttag#-arm32-#fulltag#",
         "preview-ubuntu-#shorttag#-arm32"
     ],
     "shortTags": [
