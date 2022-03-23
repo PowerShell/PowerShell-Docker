@@ -45,9 +45,9 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Mariner-1.0
 
 # Install dependencies and clean up
-RUN dnf update -y \
+RUN tdnf update -y \
     # install dependencies
-    && dnf install -y \
+    && tdnf install -y \
     # required for localization
     icu \
     # required for help in PowerShell
@@ -56,9 +56,9 @@ RUN dnf update -y \
     openssh-clients \
     ca-certificates \
     # upgrade packages
-    && dnf upgrade -y \
+    && tdnf upgrade -y \
     # clean cached data
-    && dnf clean all \
+    && tdnf clean all \
     # remove cache folders and files
     && rm -rf /var/cache/yum
 
