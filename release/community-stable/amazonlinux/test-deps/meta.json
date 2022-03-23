@@ -7,5 +7,6 @@
     "FullRepository": "pshorg/powershellcommunity-test-deps",
     "OptionalTests": [
         "test-deps"
-    ]
+    ],
+    "osVersion": "Amazon Linux"
 }
