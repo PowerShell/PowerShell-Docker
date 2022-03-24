@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-FROM cblmariner.azurecr.io/base/core:1.0 AS installer-env
+FROM mcr.microsoft.com/cbl-mariner/base/core:1.0 AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.3.0-preview.1
