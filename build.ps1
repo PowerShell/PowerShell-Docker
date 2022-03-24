@@ -418,7 +418,7 @@ End {
                         $osVersion = $osVersion.replace('${fromTag}', $actualTagData.fromTag)
                     }
                     else {
-                        $osVersion = ''
+                        throw "meta.json should have osVersion: $dockerFileName"
                     }
 
                     # skip if we are generate TagsYaml and the image is private.

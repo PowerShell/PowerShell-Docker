@@ -9,5 +9,6 @@
         "#psversion#-amazonlinux-#tag#",
         "amazonlinux"
     ],
-    "SubImage": "test-deps"
+    "SubImage": "test-deps",
+    "osVersion": "Amazon Linux"
 }

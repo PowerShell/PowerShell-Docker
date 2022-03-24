@@ -45,9 +45,9 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Mariner-1.0
 
 # Install dependencies and clean up
-RUN yum update -y \
+RUN tdnf update -y \
     # install dependencies
-    && yum install -y \
+    && tdnf install -y \
     # required for localization
     icu \
     # required for help in PowerShell
@@ -56,9 +56,9 @@ RUN yum update -y \
     openssh-clients \
     ca-certificates \
     # upgrade packages
-    && yum upgrade -y \
+    && tdnf upgrade -y \
     # clean cached data
-    && yum clean all \
+    && tdnf clean all \
     # remove cache folders and files
     && rm -rf /var/cache/yum
 
