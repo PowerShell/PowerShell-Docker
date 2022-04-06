@@ -1,0 +1,18 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "SkipGssNtlmSspTests": true,
+    "osVersion": "RedHat Universal Base Image 8.3",
+    "FullRepository": "powershell/rhel",
+    "tagTemplates": [
+        "preview-ubi-#shorttag#"
+    ],
+    "shortTags": [
+        {"Tag": "8.3"}
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 378
+    }
+}
