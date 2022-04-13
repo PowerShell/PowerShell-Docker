@@ -9,7 +9,6 @@
     ],
     "tagTemplates": [
         "lts-nanoserver-#shorttag#",
-        "lts-nanoserver-1809"
     ],
     "manifestLists": [
         "nanoserver-lts"
