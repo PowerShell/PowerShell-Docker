@@ -9,7 +9,6 @@
     ],
     "Base64EncodePackageUrl": true,
     "tagTemplates": [
-        "lts-#psversion#-windowsserver-#shorttag#",
         "lts-windowsserver-#shorttag#",
         "lts-windowsserver-#shorttag#"
     ],
