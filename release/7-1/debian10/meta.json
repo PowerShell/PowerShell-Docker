@@ -6,7 +6,6 @@
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "#psversion#-debian-#shorttag#",
-        "#psversion#-debian-#shorttag#",
         "debian-#shorttag#"
     ],
     "shortTags": [
