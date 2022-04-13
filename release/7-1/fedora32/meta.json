@@ -6,7 +6,6 @@
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "#psversion#-fedora-32",
-        "#psversion#-fedora-32",
         "fedora-32-#shorttag#"
     ],
     "shortTags": [
