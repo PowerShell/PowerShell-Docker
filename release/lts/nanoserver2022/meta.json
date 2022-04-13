@@ -8,7 +8,6 @@
         }
     ],
     "tagTemplates": [
-        "lts-#psversion#-nanoserver-#shorttag#",
         "lts-nanoserver-#shorttag#",
     ],
     "manifestLists": [
