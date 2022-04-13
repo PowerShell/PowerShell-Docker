@@ -6,7 +6,6 @@
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "#psversion#-ubuntu-#shorttag#",
-        "#psversion#-ubuntu-#shorttag#",
         "ubuntu-#shorttag#"
     ],
     "shortTags": [
