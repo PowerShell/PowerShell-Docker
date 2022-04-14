@@ -44,8 +44,11 @@ RUN yum update -y \
       less \
       ncurses \
       openssh-clients \
+      glibc-locale-source \
+      glibc-langpack-en \
     && yum upgrade-minimal -y --security \
     && yum clean all \
+    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
     && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
