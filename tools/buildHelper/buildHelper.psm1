@@ -119,6 +119,11 @@ function Get-ImageList
     }
 }
 
+enum DistributionState {
+    Validating;
+    Validated;
+}
+
 class DockerImageMetaData {
     [Bool]
     $IsLinux = $false
@@ -191,6 +196,12 @@ class DockerImageMetaData {
 
     [bool]
     $IsPrivate = $false
+
+    [datetime]
+    $EndOfLife = (Get-Date).AddDays(7)
+
+    [DistributionState]
+    $DistributionState =[DistributionState]::Validating
 }
 
 class ShortTagMetaData {
