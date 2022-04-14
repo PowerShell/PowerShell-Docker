@@ -1,34 +1,41 @@
-
+# syntax = docker/dockerfile:1.2
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-
 FROM registry.access.redhat.com/ubi8/ubi:8.3 AS installer-env
-
-ARG PS_VERSION=7.0.1
-ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
+ARG PS_VERSION=7.2.2
+#ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
+ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rh.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
-
 # define the folder we will be installing PowerShell to
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
-
 # Install powershell
 # create folder at install location
-RUN mkdir -p ${PS_INSTALL_FOLDER} \
-    # download linux powershell tar.gz and save it to tmp (to be left behind in final image)
-    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.tar.gz \
-    # extract contents from powershell tar.gz
-    && tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
-
+RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.rpm
 # start new stage so that the tar.gz layers are left behind in multi-stage build
 FROM registry.access.redhat.com/ubi8/ubi:8.3 AS final-image
-
-ARG PS_VERSION=7.0.1
+ARG PS_VERSION=7.2.2
 ARG PS_INSTALL_VERSION=7
-
 # copy only files needed from the prior stage, others will be left behind
-COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
-
+#COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
+RUN --mount=type=cache,target=/var/cache/yum,rw \
+    yum update -y \
+    && yum install -y \
+      less \
+      ncurses \
+      openssh-clients \
+      glibc-locale-source \
+      glibc-langpack-en \
+      libicu \
+    && yum upgrade-minimal -y --security \
+    && yum clean all
+RUN --mount=type=cache,target=/var/cache/yum,rw \
+    --mount=from=installer-env,target=/mnt/rpm,source=/tmp \
+    yum update -y \
+    && yum localinstall -y \
+      /mnt/rpm/linux.rpm \
+    && yum upgrade-minimal -y --security \
+    && yum clean all
 # Define ENVs for Localization/Globalization
 ENV PS_INSTALL_VERSION=7 \
     PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
@@ -36,19 +43,9 @@ ENV PS_INSTALL_VERSION=7 \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-UBI-8.3 \
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
-
-RUN yum update -y \
-    && yum install -y \
-      less \
-      ncurses \
-      openssh-clients \
-      glibc-locale-source \
-      glibc-langpack-en \
-    && yum upgrade-minimal -y --security \
-    && yum clean all \
-    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-UBI-8.3
+    #DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+RUN localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
     && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
@@ -63,7 +60,6 @@ RUN yum update -y \
             Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
             Start-Sleep -Seconds 6 ; \
           }"
-
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
-CMD ["pwsh-preview"]
+CMD ["pwsh"]
