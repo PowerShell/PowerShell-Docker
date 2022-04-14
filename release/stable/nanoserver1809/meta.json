@@ -9,7 +9,6 @@
     ],
     "tagTemplates": [
         "#psversion#-nanoserver-#shorttag#",
-        "#psversion#-nanoserver-1809-#fulltag#",
         "nanoserver-#shorttag#"
     ],
     "manifestLists": [
@@ -18,5 +17,6 @@
     "Base64EncodePackageUrl": true,
     "TestProperties": {
         "size": 1
-    }
+    },
+    "UseAcr": true
 }

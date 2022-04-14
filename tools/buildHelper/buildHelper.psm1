@@ -437,13 +437,6 @@ function Get-DockerImageMetaDataWrapper
     $scriptPath = Join-Path -Path $imagePath -ChildPath 'getLatestTag.ps1'
     $metaJsonPath = Join-Path -Path $imagePath -ChildPath 'meta.json'
 
-    if ($env:FULL_TAG) {
-        $fullTag = $env:FULL_TAG
-    }
-    else {
-        $fullTag = (Get-Date).ToString("yyyyMMdd")
-    }
-
     $meta = Get-DockerImageMetaData -Path $metaJsonPath
 
     # if the image is broken and we shouldn't include known issues,
@@ -487,7 +480,7 @@ function Get-DockerImageMetaDataWrapper
             Write-Verbose "getting docker tag list"
             if($shortTags)
             {
-                $tagDataFromScript = Get-DockerTagList -ShortTag $shortTags -FullTag $fullTag
+                $tagDataFromScript = Get-DockerTagList -ShortTag $shortTags
             }
         }
     }
@@ -754,6 +747,10 @@ function Get-TagData
         $fromTag = $TagGroup.Name
     }
 
+    # remove any duplicate tags from the template formatting
+    $actualTags = $actualTags | Select-Object -Unique
+    $tagList = $tagList | Select-Object -Unique
+
     return [TagData]@{
         TagList = $tagList
         FromTag = $fromTag
@@ -777,9 +774,14 @@ function Format-TagTemplate {
         $Version
     )
 
-    $currentTag = $TagTemplate
+    $twoPartVersion = ($Version -split '\.(?=\d+([-]|$))')[0]
 
-    $fullTags = $tagGroup.Group | Where-Object {$_.Type -eq 'Full'}
+    if(!$twoPartVersion)
+    {
+        throw "Version '$Version' is not in the expected format 'x.y.z' or 'x.y.z-preview.n'"
+    }
+
+    $currentTag = $TagTemplate
 
     $actualMatrixTagTemplates = @()
     foreach($tag in $tagGroup.Group) {
@@ -790,33 +792,12 @@ function Format-TagTemplate {
         elseif ($currentTag -match '#shorttag#' -and $tag.Type -eq 'Short') {
             $actualMatrixTagTemplates += $currentTag.Replace('#shorttag#', $tag.Tag)
         }
-        elseif ($currentTag -notmatch '#shorttag#' -and $currentTag -match '#fulltag#' -and $tag.Type -eq 'Full') {
-            $actualMatrixTagTemplates += $currentTag.Replace('#fulltag#', $tag.Tag)
-        }
-    }
-
-    $actualFullTags = @()
-    if ($fullTags) {
-        foreach ($tag in $fullTags) {
-            foreach($currentTag in $actualMatrixTagTemplates)
-            {
-                if ($currentTag -match '#fulltag#' -and $tag.Type -eq 'Full') {
-                    $actualFullTags += $currentTag.Replace('#fulltag#', $tag.Tag)
-                }
-                else {
-                    $actualFullTags += $currentTag
-                }
-            }
-        }
-    }
-    else {
-        $actualFullTags = $actualMatrixTagTemplates
     }
 
     $actualTags = @()
-    foreach ($currentTag in $actualFullTags) {
+    foreach ($currentTag in $actualMatrixTagTemplates) {
         # Replace the the psversion token with the powershell version in the tag
-        $currentTag = $currentTag -replace '#psversion#', $Version
+        $currentTag = $currentTag -replace '#psversion#', $twoPartVersion
         $currentTag = $currentTag.ToLowerInvariant()
         $actualTags += $currentTag
     }
