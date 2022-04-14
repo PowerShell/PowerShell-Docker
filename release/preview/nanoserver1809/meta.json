@@ -13,5 +13,6 @@
     "Base64EncodePackageUrl": true,
     "TestProperties": {
         "size": 1
-    }
+    },
+    "UseAcr": true
 }
