@@ -7,7 +7,6 @@
         {"Tag": "1.0"}
     ],
     "tagTemplates": [
-        "#psversion#-mariner-#tag#",
         "preview-mariner-#shorttag#"
     ],
     "SubImage": "test-deps",

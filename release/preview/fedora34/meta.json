@@ -5,8 +5,6 @@
     "osVersion": "Fedora 34",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "#psversion#-fedora-34-#fulltag#",
-        "#psversion#-fedora-34",
         "preview-fedora-#shorttag#"
     ],
     "shortTags": [

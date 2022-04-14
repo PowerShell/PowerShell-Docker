@@ -45,9 +45,7 @@ function Get-DockerTagList
 {
     param(
         [Parameter(Mandatory)]
-        [string[]] $ShortTag,
-        [Parameter(Mandatory)]
-        [string] $fullTag
+        [string[]] $ShortTag
     )
     $results = @()
 
@@ -60,13 +58,6 @@ function Get-DockerTagList
         }
     }
 
-    # Return the full form of the tag
-    $results += [UpstreamDockerTagData] @{
-        Type = 'Full'
-        Tag = $fullTag
-        FromTag = 'notUsed'
-    }
-
     return $results
 }
 
@@ -77,115 +68,7 @@ class UpstreamDockerTagData
     [string] $FromTag
 }
 
-# return objects representing the tags we need for a given Image
-function Get-DockerTags
-{
-    param(
-        [parameter(Mandatory)]
-        [string]
-        $Image,
-
-        [parameter(Mandatory)]
-        [string[]]
-        $ShortTags,
-
-        [parameter()]
-        [string]
-        $AlternativeShortTag,
-
-        [parameter(Mandatory)]
-        [string]
-        $FullTagFilter,
-
-        [Switch]
-        $OnlyShortTags,
-
-        [Switch]
-        $SkipShortTagFilter,
-
-        [switch]
-        $Mcr
-    )
-
-    if($ShortTags.Count -gt 1 -and $AlternativeShortTag)
-    {
-        throw "-AlternativeShortTag can only be used when there is only one -ShortTag"
-    }
-
-    # The versions of nanoserver we care about
-    $results = @()
-
-    # Get all the tags
-    if($Mcr.IsPresent)
-    {
-        $mcrImage = $Image -replace 'mcr\.microsoft\.com', ''
-        $tags = Get-DockerTagsList "https://mcr.microsoft.com/v2/$mcrImage/tags/list" -PropertyName tags
-    }
-    else {
-        if($image -match '/')
-        {
-            $dockerImage = $Image
-        }
-        else
-        {
-            $dockerImage = "library/$Image"
-        }
-
-        $tags = Get-DockerTagsList "https://registry.hub.docker.com/v2/repositories/$dockerImage/tags/" -PropertyName name
-    }
-
-    if(!$tags)
-    {
-        throw 'no results: '+$Image
-    }
-
-    foreach($shortTag in $ShortTags)
-    {
-        # filter to tags we care about
-        # then, to full tags
-        # then get the newest tag
-        $fullTag = $tags |
-            Where-Object{$SkipShortTagFilter.IsPresent -or $_ -like "${shortTag}*"} |
-                Where-Object{$_ -match $FullTagFilter} |
-                    Sort-Object -Descending |
-                        Select-Object -First 1
-
-        if($fullTag)
-        {
-            # Return the short form of the tag
-            $results += [UpstreamDockerTagData] @{
-                Type = 'Short'
-                Tag = $shortTag
-                FromTag = $fullTag
-            }
-
-            if($AlternativeShortTag)
-            {
-                # Return the short form of the tag
-                $results += [UpstreamDockerTagData] @{
-                    Type = 'Short'
-                    Tag = $AlternativeShortTag
-                    FromTag = $fullTag
-                }
-            }
-
-            if(!$OnlyShortTags.IsPresent)
-            {
-                # Return the full form of the tag
-                $results += [UpstreamDockerTagData] @{
-                    Type = 'Full'
-                    Tag = $fullTag
-                    FromTag = $fullTag
-                }
-            }
-        }
-    }
-
-    return $results
-}
-
 Export-ModuleMember -Function @(
-    'Get-DockerTags'
     'Get-DockerTagsList'
     'Get-DockerTagList'
 )

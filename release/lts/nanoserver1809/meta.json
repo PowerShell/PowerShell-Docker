@@ -8,8 +8,7 @@
         }
     ],
     "tagTemplates": [
-        "lts-nanoserver-#shorttag#",
-        "lts-nanoserver-1809-#fulltag#"
+        "lts-nanoserver-#shorttag#"
     ],
     "manifestLists": [
         "nanoserver-lts"
@@ -17,5 +16,6 @@
     "Base64EncodePackageUrl": true,
     "TestProperties": {
         "size": 1
-    }
+    },
+    "UseAcr": true
 }

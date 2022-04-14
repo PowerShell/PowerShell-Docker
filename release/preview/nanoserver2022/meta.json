@@ -8,8 +8,6 @@
         }
     ],
     "tagTemplates": [
-        "#psversion#-nanoserver-#shorttag#",
-        "#psversion#-nanoserver-#shorttag#-#fulltag#",
         "preview-nanoserver-#shorttag#"
     ],
     "manifestLists": [

@@ -9,8 +9,7 @@
     ],
     "Base64EncodePackageUrl": true,
     "tagTemplates": [
-        "lts-windowsservercore-#shorttag#",
-        "lts-windowsservercore-1909-#fulltag#"
+        "lts-windowsservercore-#shorttag#"
     ],
     "manifestLists": [
         "lts"

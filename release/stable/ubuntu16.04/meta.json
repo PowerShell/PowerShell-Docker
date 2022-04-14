@@ -4,7 +4,7 @@
     "PackageFormat": "powershell_${PS_VERSION}-1.deb_amd64.deb",
     "osVersion": "Ubuntu 16.04",
     "tagTemplates": [
-        "#psversion#-ubuntu-#shorttag#-#fulltag#",
+        "#psversion#-ubuntu-#shorttag#",
         "ubuntu-#shorttag#"
     ],
     "shortTags": [
