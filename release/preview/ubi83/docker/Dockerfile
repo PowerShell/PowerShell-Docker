@@ -19,7 +19,9 @@ ARG PS_INSTALL_VERSION=7
 # copy only files needed from the prior stage, others will be left behind
 #COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 RUN --mount=type=cache,target=/var/cache/yum,rw \
+    --mount=from=installer-env,target=/mnt/rpm,source=/tmp \
     yum update -y \
+    && yum localinstall -y /mnt/rpm/linux.rpm \
     && yum install -y \
       less \
       ncurses \
@@ -29,13 +31,13 @@ RUN --mount=type=cache,target=/var/cache/yum,rw \
       libicu \
     && yum upgrade-minimal -y --security \
     && yum clean all
-RUN --mount=type=cache,target=/var/cache/yum,rw \
-    --mount=from=installer-env,target=/mnt/rpm,source=/tmp \
-    yum update -y \
-    && yum localinstall -y \
-      /mnt/rpm/linux.rpm \
-    && yum upgrade-minimal -y --security \
-    && yum clean all
+# RUN --mount=type=cache,target=/var/cache/yum,rw \
+#     --mount=from=installer-env,target=/mnt/rpm,source=/tmp \
+#     yum update -y \
+#     && yum localinstall -y \
+#       /mnt/rpm/linux.rpm \
+#     && yum upgrade-minimal -y --security \
+#     && yum clean all
 # Define ENVs for Localization/Globalization
 ENV PS_INSTALL_VERSION=7 \
     PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
@@ -45,6 +47,7 @@ ENV PS_INSTALL_VERSION=7 \
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-UBI-8.3
     #DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
 RUN localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
