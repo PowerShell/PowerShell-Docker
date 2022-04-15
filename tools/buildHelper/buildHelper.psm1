@@ -9,6 +9,16 @@ $repoRoot = Join-Path -path $parent -ChildPath '..'
 $modulePath = Join-Path -Path $repoRoot -ChildPath 'tools\getDockerTags'
 Import-Module $modulePath -Force
 
+$repoMetaData = $null
+function Get-RepoMetaData {
+    if (!$script:repoMetaData) {
+        Write-Verbose "getting metadata from repo" -Verbose
+        $script:repoMetaData = Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json'
+    }
+
+    return $script:repoMetaData
+}
+
 function Get-PowerShellVersion
 {
     [CmdletBinding(DefaultParameterSetName='Default')]
@@ -45,7 +55,7 @@ function Get-PowerShellVersion
     )
 
     if ($PSCmdlet.ParameterSetName -notlike 'ExplicitVersion*') {
-        $metaData = Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json'
+        $metaData = Get-RepoMetaData
 
         $releaseTag = if ($Preview.IsPresent) {
             $metaData.PreviewReleaseTag
