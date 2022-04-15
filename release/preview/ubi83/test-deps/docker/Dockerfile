@@ -11,6 +11,7 @@ RUN yum install -y \
         hostname \
         iputils \
         procps-ng \
+        libicu \
     && yum clean all \
     && rm -rf /var/cache/yum
 
