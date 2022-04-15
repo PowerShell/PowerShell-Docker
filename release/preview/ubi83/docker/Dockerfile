@@ -19,7 +19,7 @@ ARG PS_INSTALL_VERSION=7
 # copy only files needed from the prior stage, others will be left behind
 #COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 RUN --mount=type=cache,target=/var/cache/yum,rw \
-    --mount=from=installer-env,target=/mnt/rpm,source=/tmp \
+    --mount=from=installer-env,target=/mnt/rpm,source=/tmp,rw \
     yum update -y \
     && yum localinstall -y /mnt/rpm/linux.rpm \
     && yum install -y \
