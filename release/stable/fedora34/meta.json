@@ -2,7 +2,7 @@
     "IsLinux": true,
     "UseLinuxVersion": false,
     "PackageFormat": "powershell-${PS_VERSION}-1.rh.x86_64.rpm",
-    "osVersion": "Fedora 32",
+    "osVersion": "Fedora 34",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "#psversion#-fedora-34",
@@ -14,5 +14,7 @@
     "SubImage": "test-deps",
     "TestProperties": {
         "size": 632
-    }
+    },
+    "EndOfLife": "2022-05-17",
+    "DistributionState": "Validated"
 }
