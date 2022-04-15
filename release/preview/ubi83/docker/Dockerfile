@@ -3,7 +3,6 @@
 # Licensed under the MIT License.
 FROM registry.access.redhat.com/ubi8/ubi:8.3 AS installer-env
 ARG PS_VERSION=7.2.2
-#ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rh.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
@@ -16,8 +15,7 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.rpm
 FROM registry.access.redhat.com/ubi8/ubi:8.3 AS final-image
 ARG PS_VERSION=7.2.2
 ARG PS_INSTALL_VERSION=7
-# copy only files needed from the prior stage, others will be left behind
-#COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
+
 RUN --mount=type=cache,target=/var/cache/yum,rw \
     yum update -y \
     && yum install -y \
@@ -44,7 +42,7 @@ ENV PS_INSTALL_VERSION=7 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-UBI-8.3
-    #DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
 RUN localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \

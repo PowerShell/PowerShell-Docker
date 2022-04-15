@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "PackageFormat": "powershell-${PS_VERSION}-1.rh.x86_64.rpm",
     "SkipGssNtlmSspTests": true,
     "osVersion": "RedHat Universal Base Image 8.3",
     "FullRepository": "powershell/rhel",
@@ -13,6 +13,6 @@
     ],
     "SubImage": "test-deps",
     "TestProperties": {
-        "size": 767
+        "size": 725
     }
 }
