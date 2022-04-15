@@ -12,5 +12,7 @@
     "SubImage": "test-deps",
     "TestProperties": {
         "size": 586
-    }
+    },
+    "EndOfLife": "2020-08-06",
+    "DistributionState": "Validated"
 }
