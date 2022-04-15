@@ -242,6 +242,7 @@ End {
     $tagGroups = @{}
     $dupeCheckTable = @{}
     $dupeTagIssues = @()
+    $fullMatrix = @{}
 
     $toBuild = @()
     foreach ($actualChannel in $Channels) {
@@ -440,6 +441,8 @@ End {
                             UseAcr          = $UseAcr
                             ContinueOnError = $continueOnError
                             ManifestLists   = $manifestLists
+                            EndOfLife         = $allMeta.meta.EndOfLife
+                            DistributionState = $allMeta.meta.GetDistributionState().ToString()
                         }
 
                         $tagGroups[$tagGroup] += $tag
@@ -579,10 +582,13 @@ End {
                         $jobName = $tag.Name -replace '-', '_'
                         if (-not $matrix.$channelName[$osName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
                             $matrix.$channelName[$osName].Add($jobName, @{
-                                    Channel         = $tag.Channel
-                                    ImageName       = $tag.Name
-                                    JobName         = $jobName
-                                    ContinueOnError = $tag.ContinueOnError
+                                    Channel           = $tag.Channel
+                                    ImageName         = $tag.Name
+                                    JobName           = $jobName
+                                    ContinueOnError   = $tag.ContinueOnError
+                                    EndOfLife         = $tag.EndOfLife
+                                    DistributionState = $tag.DistributionState
+                                    OsVersion         = $tag.OsVersion
                                 })
                         }
                     }
@@ -591,15 +597,21 @@ End {
         }
 
         foreach ($channelName in $matrix.Keys) {
+            $fullMatrix[$channelName] = @()
             foreach ($osName in $matrix.$channelName.Keys) {
                 $osMatrix = $matrix.$channelName.$osName
+                $fullMatrix[$channelName] += $osMatrix.Values
                 $matrixJson = $osMatrix | ConvertTo-Json -Compress
                 $variableName = "matrix_${channelName}_${osName}"
                 $command = "vso[task.setvariable variable=$variableName;isoutput=true]$($matrixJson)"
+                Set-Item -Path ENV:$VariableName -Value $matrixJson
                 Write-Verbose "sending command: '$command'"
                 Write-Host "##$command"
             }
         }
+
+        $matrixJson = $fullMatrix | ConvertTo-Json -Compress -Depth 100
+        Set-Item -Path ENV:matrix -Value $matrixJson
     }
 
     if ($GenerateManifestLists.IsPresent) {
