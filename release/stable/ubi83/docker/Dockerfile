@@ -1,35 +1,38 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-
 FROM registry.access.redhat.com/ubi8/ubi:8.3 AS installer-env
-
-ARG PS_VERSION=7.2.0
-ARG PACKAGE_VERSION=7.2.0
-ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rh.x86_64.rpm
+ARG PS_VERSION=7.0.1
+ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
-
+# define the folder we will be installing PowerShell to
+ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
+# Install powershell
+# create folder at install location
+RUN mkdir -p ${PS_INSTALL_FOLDER} \
+    # download linux powershell tar.gz and save it to tmp (to be left behind in final image)
+    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.tar.gz \
+    # extract contents from powershell tar.gz
+    && tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
+# start new stage so that the tar.gz layers are left behind in multi-stage build
+FROM registry.access.redhat.com/ubi8/ubi:8.3 AS final-image
+ARG PS_VERSION=7.0.1
+ARG PS_INSTALL_VERSION=7
+# copy only files needed from the prior stage, others will be left behind
+COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 # Define ENVs for Localization/Globalization
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+ENV PS_INSTALL_VERSION=7 \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
-    PS_INSTALL_VERSION=7 \
-    PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-UBI-8.3
-
-# Install dependencies and clean up
-RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
-    && yum install -y /tmp/powershell.rpm \
-    && yum update -y \
-    # Install libraries for NTLM support
+    # DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+RUN yum update -y \
     && yum install -y \
-      # less is required for help in powershell
       less \
-      # clear is part of ncurses which is used by clear
       ncurses \
-      # PowerShell remoting over SSH dependencies
       openssh-clients \
       glibc-locale-source \
       glibc-langpack-en \
@@ -40,22 +43,17 @@ RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
     && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
-    # remove powershell package
-    && rm /tmp/powershell.rpm \
-    # intialize powershell module cache
-    # and disable telemetry
     && export POWERSHELL_TELEMETRY_OPTOUT=1 \
-    && pwsh \
+    && pwsh\
         -NoLogo \
         -NoProfile \
         -Command " \
-          \$ErrorActionPreference = 'Stop' ; \
+                    \$ErrorActionPreference = 'Stop' ; \
           \$ProgressPreference = 'SilentlyContinue' ; \
           while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
             Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
             Start-Sleep -Seconds 6 ; \
           }"
-
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
-CMD [ "pwsh" ]
+CMD ["pwsh"]
