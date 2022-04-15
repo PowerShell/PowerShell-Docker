@@ -130,8 +130,10 @@ function Get-ImageList
 }
 
 enum DistributionState {
-    Validating;
-    Validated;
+    Unknown
+    Validating
+    Validated
+    EndOfLife
 }
 
 class DockerImageMetaData {
@@ -211,7 +213,15 @@ class DockerImageMetaData {
     $EndOfLife = (Get-Date).AddDays(7)
 
     [DistributionState]
-    $DistributionState =[DistributionState]::Validating
+    $DistributionState =[DistributionState]::Unknown
+
+    [DistributionState] GetDistributionState() {
+        if ($this.EndOfLife -lt (Get-Date)) {
+            return [DistributionState]::EndOfLife
+        }
+
+        return $this.DistributionState
+    }
 }
 
 class ShortTagMetaData {
