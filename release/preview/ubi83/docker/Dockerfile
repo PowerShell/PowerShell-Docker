@@ -21,6 +21,7 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
 
 # Install dependencies and clean up
 RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
+    && chmod a+x,o-w /tmp/powershell.rpm \
     && yum install -y /tmp/powershell.rpm \
     && yum update -y \
     # Install libraries for NTLM support
