@@ -1,5 +1,5 @@
 # Docker image file that describes an CentOS7 image with PowerShell installed from Microsoft YUM Repo
-ARG BaseImage=mcr.microsoft.com/powershell:ubi-8.3
+ARG BaseImage=mcr.microsoft.com/powershell:preview-ubi-8.3
 
 FROM ${BaseImage}
 
@@ -11,6 +11,11 @@ RUN yum install -y \
         hostname \
         iputils \
         procps-ng \
+        less \
+        ncurses \
+        openssh-clients \
+        glibc-locale-source \
+        glibc-langpack-en \
         libicu \
     && yum clean all \
     && rm -rf /var/cache/yum
