@@ -1,31 +1,27 @@
-# syntax = docker/dockerfile:1.2
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 FROM registry.access.redhat.com/ubi8/ubi:8.3 AS installer-env
-ARG PS_VERSION=7.2.2
-ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rh.x86_64.rpm
+
+ARG PS_VERSION=7.2.0
+ARG PACKAGE_VERSION=7.2.0
+ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.rh.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
-# define the folder we will be installing PowerShell to
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 
-RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.rpm
-
-FROM registry.access.redhat.com/ubi8/ubi:8.3 AS final-image
-ARG PS_VERSION=7.2.2
-ARG PS_INSTALL_VERSION=7
-
-COPY --from=installer-env ["/tmp", "/tmp"]
 # Define ENVs for Localization/Globalization
-ENV LC_ALL=en_US.UTF-8 \
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     PS_INSTALL_VERSION=7 \
     PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # set a fixed location for the Module analysis cache
-    PSModuleAnalysisCachePath=/var/cache/microsoft/powershe
+    PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-UBI-8.3
 
-RUN yum install -y /tmp/linux.rpm \
+# Install dependencies and clean up
+RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.rpm \
+    && yum install -y /tmp/powershell.rpm \
     && yum update -y \
     # Install libraries for NTLM support
     && yum install -y \
@@ -45,7 +41,7 @@ RUN yum install -y /tmp/linux.rpm \
     && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
     && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
     # remove powershell package
-    # && rm /tmp/linux.rpm \
+    && rm /tmp/powershell.rpm \
     # intialize powershell module cache
     # and disable telemetry
     && export POWERSHELL_TELEMETRY_OPTOUT=1 \
@@ -62,4 +58,4 @@ RUN yum install -y /tmp/linux.rpm \
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
-CMD [ "pwsh-preview" ]
+CMD [ "pwsh" ]
