@@ -11,11 +11,13 @@
     "tagTemplates": [
         "lts-windowsservercore-#shorttag#"
     ],
-    "TestProperties": {
-        "size": 1
-    },
     "manifestLists": [
         "lts"
     ],
-    "UseAcr": true
+    "TestProperties": {
+        "size": 1
+    },
+    "UseAcr": true,
+    "EndOfLife": "2021-12-14",
+    "DistributionState": "Validated"
 }
