@@ -18,8 +18,7 @@ ARG PS_INSTALL_VERSION=7
 
 COPY --from=installer-env ["/tmp", "/tmp"]
 # Define ENVs for Localization/Globalization
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
-    LC_ALL=en_US.UTF-8 \
+ENV LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     PS_INSTALL_VERSION=7 \
     PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
