@@ -17,25 +17,68 @@ ARG PS_VERSION=7.2.2
 ARG PS_INSTALL_VERSION=7
 
 COPY --from=installer-env ["/tmp", "/tmp"]
+# Define ENVs for Localization/Globalization
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8 \
+    PS_INSTALL_VERSION=7 \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
+    # set a fixed location for the Module analysis cache
+    PSModuleAnalysisCachePath=/var/cache/microsoft/powershe
 
-RUN --mount=type=cache,target=/var/cache/yum,rw \
-    yum update -y \
+# RUN --mount=type=cache,target=/var/cache/yum,rw \
+#     yum update -y \
+#     && yum install -y \
+#       less \
+#       ncurses \
+#       openssh-clients \
+#       glibc-locale-source \
+#       glibc-langpack-en \
+#       libicu \
+#     && yum upgrade-minimal -y --security \
+#     && yum clean all
+
+# RUN --mount=type=cache,target=var/cache/yum,rw \
+#     yum update -y \
+#     && yum localinstall -y /tmp/linux.rpm \
+#     && rm /tmp/powershell.rpm \
+#     && yum upgrade-minimal -y --security \
+#     && yum clean all
+
+RUN yum install -y /tmp/linux.rpm \
+    && yum update -y \
+    # Install libraries for NTLM support
     && yum install -y \
+      # less is required for help in powershell
       less \
+      # clear is part of ncurses which is used by clear
       ncurses \
+      # PowerShell remoting over SSH dependencies
       openssh-clients \
       glibc-locale-source \
       glibc-langpack-en \
       libicu \
     && yum upgrade-minimal -y --security \
-    && yum clean all
-
-RUN --mount=type=cache,target=var/cache/yum,rw \
-    yum update -y \
-    && yum localinstall -y /tmp/linux.rpm \
-    && rm /tmp/powershell.rpm \
-    && yum upgrade-minimal -y --security \
-    && yum clean all
+    && yum clean all \
+    && localedef --charmap=UTF-8 --inputfile=en_US $LANG \
+    && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
+    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
+    # remove powershell package
+    && rm /tmp/linux.rpm \
+    # intialize powershell module cache
+    # and disable telemetry
+    && export POWERSHELL_TELEMETRY_OPTOUT=1 \
+    && pwsh \
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+          \$ErrorActionPreference = 'Stop' ; \
+          \$ProgressPreference = 'SilentlyContinue' ; \
+          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+            Start-Sleep -Seconds 6 ; \
+          }"
 
 ENV PS_INSTALL_VERSION=7 \
     PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
