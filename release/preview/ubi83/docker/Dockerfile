@@ -17,7 +17,7 @@ FROM registry.access.redhat.com/ubi8/ubi:8.3 AS final-image
 ARG PS_VERSION=7.2.2
 ARG PS_INSTALL_VERSION=7
 # copy only files needed from the prior stage, others will be left behind
-#COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
+COPY --from=installer-env ["/tmp/rpm", "/tmp/rpm"]
 RUN --mount=type=cache,target=/var/cache/yum,rw \
     --mount=from=installer-env,target=/mnt/rpm,source=/tmp,rw \
     yum update -y \
