@@ -85,47 +85,50 @@ function Get-PowerShellVersion
     return $retVersion
 }
 
+function Get-ChannePath
+{
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $Channel
+    )
+
+    $relativePath = $channelData | Where-Object {$_.Name -eq $Channel} | Select-Object -ExpandProperty Path -First 1
+    $repoRoot = Join-Path -Path $PSScriptRoot -ChildPath '..\..'
+    $resolvedRepoRoot = (Resolve-Path -Path $repoRoot).ProviderPath
+    return Join-Path -Path $resolvedRepoRoot -ChildPath $relativePath
+}
+
+function Get-ChannelTagPrefix {
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $Channel
+    )
+
+    return $channelData | Where-Object {$_.Name -eq $Channel} | Select-Object -ExpandProperty TagPrefix -First 1
+}
+
+function Get-ChannelNames {
+    $channelData = Get-ChannelData
+    $channelNames = $channelData | Select-Object -ExpandProperty Name
+    return $channelNames
+}
+
 # Gets list of images names
 function Get-ImageList
 {
     param(
         [Parameter(HelpMessage="Filters returned list to stable or preview images. Default to all images.")]
-        [ValidateSet('stable','preview','servicing','all','community-stable','lts')]
         [string[]]
         $Channel='all'
     )
 
-    # Get the names of the builds.
-    $releasePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\release'
-    $stablePath = Join-Path -Path $releasePath -ChildPath 'stable'
-    $ltsPath = Join-Path -Path $releasePath -ChildPath 'lts'
-    $previewPath = Join-Path -Path $releasePath -ChildPath 'preview'
-    $servicingPath = Join-Path -Path $releasePath -ChildPath 'servicing'
-    $communityStablePath = Join-Path -Path $releasePath -ChildPath 'community-stable'
+    $channelList = Get-ChannelNames | Where-Object {$_ -eq $Channel -or $Channel -eq 'all'}
 
-    if ($Channel -in 'stable', 'all')
-    {
-        Get-ChildItem -Path $stablePath -Directory | Select-Object -ExpandProperty Name | Write-Output
-    }
-
-    if ($Channel -in 'servicing', 'all')
-    {
-        Get-ChildItem -Path $servicingPath -Directory | Select-Object -ExpandProperty Name | Write-Output
-    }
-
-    if ($Channel -in 'lts', 'all')
-    {
-        Get-ChildItem -Path $ltsPath -Directory | Select-Object -ExpandProperty Name | Write-Output
-    }
-
-    if ($Channel -in 'preview', 'all')
-    {
-        Get-ChildItem -Path $previewPath -Directory | Select-Object -ExpandProperty Name | Where-Object { $dockerFileNames -notcontains $_ } | Write-Output
-    }
-
-    if ($Channel -in 'community-stable', 'all')
-    {
-        Get-ChildItem -Path $communityStablePath -Directory | Select-Object -ExpandProperty Name | Write-Output
+    foreach($channelName in $channelList){
+        $channelPath = Get-ChannePath -Channel $channelName
+        Get-ChildItem -Path $channelPath -Directory | Select-Object -ExpandProperty Name | Write-Output
     }
 }
 
@@ -558,9 +561,10 @@ function Get-DockerImageMetaDataWrapper
     }
 
     $actualTagDataByGroup = [System.Collections.Generic.Dictionary[object,TagData]]::new()
+    $tagPrefix = Get-ChannelTagPrefix -Channel $Channel
     foreach ($tagGroup in ($tagDataFromScript | Group-Object -Property 'FromTag'))
     {
-        $actualTagDataByGroup[$tagGroup] = Get-TagData -TagsTemplates $tagsTemplates -TagGroup $tagGroup -Version $Version -ImageName $ImageName -Repository $fullRepository
+        $actualTagDataByGroup[$tagGroup] = Get-TagData -TagsTemplates $tagsTemplates -TagGroup $tagGroup -Version $Version -ImageName $ImageName -Repository $fullRepository -TagPrefix $tagPrefix
     }
 
     $psversion = $Version
@@ -763,7 +767,9 @@ function Get-TagData
         [string]
         $ImageName,
         [string]
-        $Repository
+        $Repository,
+        [string]
+        $TagPrefix
     )
 
     $actualTags = @()
@@ -771,6 +777,10 @@ function Get-TagData
     foreach ($tagTemplate in $tagsTemplates) {
         $templateActualTags = Format-TagTemplate -TagTemplate $tagTemplate -TagGroup $TagGroup -Version $Version
         foreach ($actualTag in $templateActualTags) {
+            if($TagPrefix) {
+                $actualTag = $TagPrefix + '-' + $actualTag
+            }
+
             $actualTags += "${ImageName}/${Repository}:$actualTag"
             $tagList += $actualTag
         }
@@ -864,6 +874,22 @@ function New-SasData
         SasBase = $sasBase
         SasQuery = $sasQuery
     }
+}
+
+class ChannelData {
+    [string] $Name
+    [string] $Path
+    [string] $TagPrefix
+}
+
+[ChannelData[]] $channelData = $null
+function Get-ChannelData {
+    if (!$Script:channelData) {
+        $jsonPath = Join-Path $PSScriptRoot -ChildPath 'channels.json'
+        $Script:channelData = Get-Content -Raw -Path $jsonPath | ConvertFrom-Json -Depth 100 -AsHashtable
+    }
+
+    return $Script:channelData
 }
 
 function Invoke-PesterWrapper {

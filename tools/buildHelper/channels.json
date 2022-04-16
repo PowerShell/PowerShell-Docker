@@ -1,0 +1,19 @@
+[
+    {
+        "name": "stable",
+        "path": "release/stable"
+    },
+    {
+        "name": "preview",
+        "path": "release/preview"
+    },
+    {
+        "name": "lts",
+        "path": "release/stable",
+        "tagPrefix": "lts"
+    },
+    {
+        "name": "community-stable",
+        "path": "release/community-stable"
+    }
+]
