@@ -34,6 +34,10 @@ param(
     [switch]
     $GenerateMatrixJson,
 
+    [Parameter(ParameterSetName="GenerateMatrixJson")]
+    [switch]
+    $FullJson,
+
     [Parameter(Mandatory, ParameterSetName="GenerateManifestLists")]
     [switch]
     $GenerateManifestLists,
@@ -466,7 +470,6 @@ End {
         $testArgPath = Join-Path -Path $testsPath -ChildPath 'testArgs.json'
         $testArgList | ConvertTo-Json -Depth 2 | Out-File -FilePath $testArgPath
 
-        Write-Verbose "Launching pester..." -Verbose
         $extraParams = @{}
         if($Test.IsPresent)
         {
@@ -498,17 +501,7 @@ End {
             $extraParams.Add('Tags', $tags)
         }
 
-        if(!(Get-Module -ListAvailable pester -ErrorAction Ignore) -or $ForcePesterInstall.IsPresent)
-        {
-            Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
-        }
-
-        Write-Verbose -Message "logging to $logPath" -Verbose
-        $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml @extraParams
-        if(!$results -or $results.FailedCount -gt 0 -or !$results.TotalCount)
-        {
-            throw "Build or tests failed.  Passed: $($results.PassedCount) Failed: $($results.FailedCount) Total: $($results.TotalCount)"
-        }
+        Invoke-PesterWrapper -Script $testsPath -OutputFile $logPath -ExtraParams $extraParams
     }
 
     # print local image names
@@ -604,14 +597,18 @@ End {
                 $matrixJson = $osMatrix | ConvertTo-Json -Compress
                 $variableName = "matrix_${channelName}_${osName}"
                 $command = "vso[task.setvariable variable=$variableName;isoutput=true]$($matrixJson)"
-                Set-Item -Path ENV:$VariableName -Value $matrixJson
-                Write-Verbose "sending command: '$command'"
-                Write-Host "##$command"
+                if (!$FullJson) {
+                    Set-Item -Path ENV:$VariableName -Value $matrixJson
+                    Write-Verbose "sending command: '$command'"
+                    Write-Host "##$command"
+                }
             }
         }
 
-        $matrixJson = $fullMatrix | ConvertTo-Json -Compress -Depth 100
-        Set-Item -Path ENV:matrix -Value $matrixJson
+        if($FullJson) {
+            $matrixJson = $fullMatrix | ConvertTo-Json -Depth 100
+            Write-Output $matrixJson
+        }
     }
 
     if ($GenerateManifestLists.IsPresent) {

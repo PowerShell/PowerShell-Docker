@@ -865,3 +865,31 @@ function New-SasData
         SasQuery = $sasQuery
     }
 }
+
+function Invoke-PesterWrapper {
+    param(
+        [string]
+        $Script,
+
+        [string]
+        $OutputFile,
+
+        [hashtable]
+        $ExtraParams
+    )
+
+    Write-Verbose "Launching pester with $($ExtraParams|Out-String)" -Verbose
+
+    if(!(Get-Module -ListAvailable pester -ErrorAction Ignore) -or $ForcePesterInstall.IsPresent)
+    {
+        Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
+    }
+
+    Write-Verbose -Message "logging to $OutputFile" -Verbose
+    $results = $null
+    $results = Invoke-Pester -Script $Script -OutputFile $OutputFile -PassThru -OutputFormat NUnitXml @extraParams
+    if(!$results -or $results.FailedCount -gt 0 -or !$results.TotalCount)
+    {
+        throw "Build or tests failed.  Passed: $($results.PassedCount) Failed: $($results.FailedCount) Total: $($results.TotalCount)"
+    }
+}
