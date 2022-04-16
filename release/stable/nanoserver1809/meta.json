@@ -18,5 +18,5 @@
     "TestProperties": {
         "size": 1
     },
-    "UseAcr": true
+    "UseAcr": false
 }
