@@ -713,7 +713,6 @@ function Get-TestParams
 
             $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
             $packageName = $packageName -replace '\${channelTag}', $channelTag
-            Write-Verbose "Package name: $packageName" -Verbose
             $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
             $packageUrl.Query = $sasData.sasQuery
