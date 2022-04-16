@@ -89,6 +89,17 @@ function Get-ChannelPath
     return Join-Path -Path $resolvedRepoRoot -ChildPath $relativePath
 }
 
+function Get-ChannelPackageTag
+{
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $Channel
+    )
+
+    return $channelData | Where-Object {$_.Name -eq $Channel} | Select-Object -ExpandProperty PackageTag -First 1
+}
+
 function Get-PwshInstallVersion
 {
     param(
@@ -667,14 +678,11 @@ function Get-TestParams
         {
             $packageUrl = [System.UriBuilder]::new($sasData.sasBase)
 
-            $previewTag = ''
-            if($psversion -like '*-*')
-            {
-                $previewTag = '-preview'
-            }
+            $channelTag = Get-ChannelPackageTag -Channel $actualChannel
 
             $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
-            $packageName = $packageName -replace '\${previewTag}', $previewTag
+            $packageName = $packageName -replace '\${channelTag}', $channelTag
+            Write-Verbose "Package name: $packageName" -Verbose
             $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
             $packageUrl.Query = $sasData.sasQuery
@@ -693,14 +701,10 @@ function Get-TestParams
         {
             $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
 
-            $previewTag = ''
-            if($psversion -like '*-*')
-            {
-                $previewTag = '-preview'
-            }
+            $channelTag = Get-ChannelPackageTag -Channel $actualChannel
 
             $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
-            $packageName = $packageName -replace '\${previewTag}', $previewTag
+            $packageName = $packageName -replace '\${channelTag}', $channelTag
             $containerName = 'v' + ($psversion -replace '~', '-')
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
             $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
@@ -862,6 +866,7 @@ class ChannelData {
     [string] $Path
     [string] $TagPrefix
     [string] $PwshInstallVersion
+    [string] $PackageTag
 }
 
 [ChannelData[]] $channelData = $null
