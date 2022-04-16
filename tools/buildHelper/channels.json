@@ -2,21 +2,26 @@
     {
         "name": "stable",
         "path": "release/stable",
-        "pwshInstallVersion": "7-preview"
+        "pwshInstallVersion": "7-preview",
+        "packageTag": ""
     },
     {
         "name": "preview",
         "path": "release/preview",
-        "pwshInstallVersion": "7"
+        "pwshInstallVersion": "7",
+        "packageTag": "-preview"
     },
     {
         "name": "lts",
         "path": "release/stable",
         "tagPrefix": "lts",
-        "pwshInstallVersion": "7-lts"
+        "pwshInstallVersion": "7-lts",
+        "packageTag": "-lts"
     },
     {
         "name": "community-stable",
-        "path": "release/community-stable"
+        "path": "release/community-stable",
+        "pwshInstallVersion": "7",
+        "packageTag": ""
     }
 ]
