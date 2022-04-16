@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion" : false,
-    "PackageFormat": "powershell_${PS_VERSION}-1.deb_amd64.deb",
+    "PackageFormat": "powershell${channelTag}_${PS_VERSION}-1.deb_amd64.deb",
     "osVersion": "Debian 9",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [

@@ -1,8 +1,8 @@
 {
     "IsLinux": true,
     "UseLinuxVersion": false,
-    "PackageFormat": "powershell-${PS_VERSION}-1.rh.x86_64.rpm",
-    "osVersion": "Fedora 32",
+    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.rh.x86_64.rpm",
+    "osVersion": "Fedora 34",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "#psversion#-fedora-34",
