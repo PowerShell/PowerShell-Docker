@@ -58,17 +58,17 @@ param(
     $SkipTest,
 
     [Parameter(Mandatory, ParameterSetName="GetTagsByName")]
-    [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
+    [Parameter(Mandatory, ParameterSetName="GetTagsByChannel")]
     [switch]
     $GetTags,
 
-    [Parameter(Mandatory, ParameterSetName="DupeCheckAll")]
+    [Parameter(Mandatory, ParameterSetName="DupeCheck")]
     [switch]
     $CheckForDuplicateTags,
 
     [Parameter(Mandatory, ParameterSetName="TestAll")]
     [Parameter(Mandatory, ParameterSetName="localBuildAll")]
-    [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
+    [Parameter(Mandatory, ParameterSetName="GetTagsByChannel")]
     [switch]
     $All,
 
@@ -87,20 +87,6 @@ param(
     [string]
     $TagFilter,
 
-    [ValidateSet('stable','preview','servicing','community-stable','community-preview','community-servicing','lts')]
-    [Parameter(Mandatory, ParameterSetName="TestByName")]
-    [Parameter(Mandatory, ParameterSetName="TestAll")]
-    [Parameter(ParameterSetName="localBuildByName")]
-    [Parameter(Mandatory, ParameterSetName="localBuildAll")]
-    [Parameter(Mandatory, ParameterSetName="GetTagsByName")]
-    [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
-    [Parameter(Mandatory, ParameterSetName="DupeCheckAll")]
-    [Parameter(Mandatory, ParameterSetName="GenerateTagsYaml")]
-    [Parameter(Mandatory, ParameterSetName="GenerateMatrixJson")]
-    [Parameter(Mandatory, ParameterSetName="GenerateManifestLists")]
-    [string[]]
-    $Channel='stable',
-
     [Parameter(ParameterSetName="localBuildByName")]
     [Parameter(ParameterSetName="localBuildAll")]
     [ValidateScript({([uri]$_).Scheme -eq 'https'})]
@@ -112,7 +98,7 @@ param(
     [Parameter(Mandatory, ParameterSetName="TestByName")]
     [Parameter(Mandatory, ParameterSetName="TestAll")]
     [Parameter(Mandatory, ParameterSetName="GetTagsByName")]
-    [Parameter(Mandatory, ParameterSetName="GetTagsAll")]
+    [Parameter(Mandatory, ParameterSetName="GetTagsByChannel")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
     $Version,
@@ -174,26 +160,12 @@ DynamicParam {
     # Add a dynamic parameter '-Name' which specifies the name(s) of the images to build or test
     $buildHelperPath = Join-Path -Path $PSScriptRoot -ChildPath 'tools/buildHelper'
 
-    Import-Module $buildHelperPath -Force
+    Import-Module $buildHelperPath
 
-    # Get the names of the builds.
-    $releasePath = Join-Path -Path $PSScriptRoot -ChildPath 'release'
-
-    switch ($Channel)
-    {
-        $null {
-            $imageChannel = 'all'
-        }
-
-        default {
-            $imageChannels = $Channel
-        }
-    }
+    $imageChannel = 'all'
 
     $dockerFileNames = @()
-    foreach($imageChannel in $imageChannels){
-        Get-ImageList -Channel $imageChannel | ForEach-Object { $dockerFileNames += $_ }
-    }
+    Get-ImageList -Channel $imageChannel | ForEach-Object { $dockerFileNames += $_ }
 
     # Create the parameter attributs
     $Attributes = [System.Collections.ObjectModel.Collection[System.Attribute]]::new()
@@ -215,18 +187,65 @@ DynamicParam {
     # Return parameters dictionaly
     $parameters = [System.Management.Automation.RuntimeDefinedParameterDictionary]::new()
     $parameters.Add("Name", $Parameter) > $null
+
+    # Create the parameter attributs
+    $channelAttributes = [System.Collections.ObjectModel.Collection[System.Attribute]]::new()
+
+    Add-ParameterAttribute -ParameterSetName 'TestAll' -Attributes $channelAttributes
+    Add-ParameterAttribute -ParameterSetName 'TestByName' -Attributes $channelAttributes
+    Add-ParameterAttribute -ParameterSetName 'localBuildAll' -Attributes $channelAttributes
+    Add-ParameterAttribute -ParameterSetName 'localBuildByName' -Attributes $channelAttributes
+    Add-ParameterAttribute -ParameterSetName 'GetTagsByName' -Attributes $channelAttributes
+    Add-ParameterAttribute -ParameterSetName 'GetTagsByChannel' -Attributes $channelAttributes
+    Add-ParameterAttribute -ParameterSetName 'DupeCheck' -Attributes $channelAttributes
+    Add-ParameterAttribute -ParameterSetName 'GenerateMatrixJson' -Attributes $channelAttributes -Mandatory $false
+    Add-ParameterAttribute -ParameterSetName 'GenerateTagsYaml' -Attributes $channelAttributes
+    Add-ParameterAttribute -ParameterSetName 'GenerateManifestLists' -Attributes $channelAttributes
+
+    $channelNames = Get-ChannelNames
+    $ValidateSetAttr = [System.Management.Automation.ValidateSetAttribute]::new(([string[]]$channelNames))
+    $channelAttributes.Add($ValidateSetAttr) > $null
+
+    # Create the parameter
+    $Parameter = [System.Management.Automation.RuntimeDefinedParameter]::new("Channel", [string[]], $channelAttributes)
+    $parameters.Add("Channel", $Parameter) > $null
+
     return $parameters
 }
 
 Begin {
-    $ENV:DOCKER_BUILDKIT=1
-    if ($PSCmdlet.ParameterSetName -notin 'GenerateMatrixJson', 'GenerateTagsYaml', 'DupeCheckAll', 'GenerateManifestLists' -and $Channel.Count -gt 1)
+    $Channel = $PSBoundParameters["Channel"]
+    if ($PSBoundParameters['Name']) {
+        $Name = $PSBoundParameters["Name"]
+    } else {
+        $Name = $null
+    }
+
+    $ENV:DOCKER_BUILDKIT = 1
+    if ($PSCmdlet.ParameterSetName -notin 'GenerateMatrixJson', 'GenerateTagsYaml', 'DupeCheck', 'GenerateManifestLists' -and $Channel.Count -gt 1)
     {
         throw "Multiple Channels are not supported in this parameter set"
     }
 
     # We are using the Channel parameter, so assign the variable to that
-    $Channels = $Channel
+    if ($PSCmdlet.ParameterSetName -like '*All' -or ($PSCmdlet.ParameterSetName -eq 'localBuildByName' -and $Channel.Count -eq 0)) {
+        $Channels = $channelNames
+    } elseif ($FullJson) {
+        $Channels = $channelNames | Where-Object { $_ -notlike 'community*' }
+    } else {
+        $Channels = $Channel
+    }
+
+    foreach($dockerFileName in $Name) {
+        $images = (Get-ImageList -Channel $Channels)
+        if($dockerFileName -notin $images) {
+            $exception = [System.Management.Automation.ParameterBindingException]::new("Image $dockerFileName not found in channel $Channels")
+            throw $exception
+        }
+    }
+
+
+    Write-Verbose "Channels: $Channels" -Verbose
 
     $sasData = $null
     if($SasUrl)
@@ -266,10 +285,11 @@ End {
         # Get Versions
         $versions = Get-Versions -Channel $actualChannel @versionExtraParams
         $windowsVersion = $versions.windowsVersion
+        Write-Verbose "Windows Version: $windowsVersion" -Verbose
         $linuxVersion = $versions.linuxVersion
 
         # Calculate the paths
-        $channelPath = Join-Path -Path $releasePath -ChildPath $actualChannel.ToLowerInvariant()
+        $channelPath = Get-ChannePath -Channel $actualChannel
 
         foreach($dockerFileName in $Name)
         {
@@ -328,7 +348,7 @@ End {
                 }
             }
         }
-    }
+    } # end foreach channel
 
     foreach($allMeta in $toBuild)
     {

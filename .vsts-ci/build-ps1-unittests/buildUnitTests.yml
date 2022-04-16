@@ -1,0 +1,55 @@
+name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
+
+pr:
+  branches:
+    include:
+    - master
+    - release*
+    - feature*
+  paths:
+    include:
+    - build.ps1
+    - tools/buildHelper/*
+
+resources:
+- repo: self
+  clean: true
+
+variables:
+  POWERSHELL_TELEMETRY_OPTOUT: 1
+
+stages:
+  - stage: buildUnitTests
+    displayName: Build Unit Tests
+    dependsOn: []
+    jobs:
+    - job: buildUnitTests
+      pool:
+        vmImage: ubuntu-latest
+      displayName: Build Unit Tests
+      steps:
+      - pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhss"))"
+        displayName: Set Build Name for Non-PR
+        condition: ne(variables['Build.Reason'], 'PullRequest')
+      - pwsh: Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
+        displayName: 'Install Pester'
+        condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+      - pwsh: |
+          $OutputFile = "$PWD/build-unit-tests.xml"
+          $results = $null
+          $results = Invoke-Pester -Script ./unittests/ -OutputFile $OutputFile -PassThru -OutputFormat NUnitXml
+          Write-Host "##vso[artifact.upload containerfolder=testResults;artifactname=testResults]$OutputFile"
+          if(!$results -or $results.FailedCount -gt 0 -or !$results.TotalCount)
+          {
+              throw "Build or tests failed.  Passed: $($results.PassedCount) Failed: $($results.FailedCount) Total: $($results.TotalCount)"
+          }
+        displayName: Run Build Unit Tests
+        condition: succeededOrFailed()
+      - task: PublishTestResults@2
+        displayName: 'Publish Test Results **/*tests.xml'
+        inputs:
+          testResultsFormat: NUnit
+          testResultsFiles: '**/*tests.xml'
+          testRunTitle: 'Build Unit Tests'
+        continueOnError: true
+        condition: succeededOrFailed()
