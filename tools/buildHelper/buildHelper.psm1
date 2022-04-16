@@ -85,7 +85,7 @@ function Get-PowerShellVersion
     return $retVersion
 }
 
-function Get-ChannePath
+function Get-ChannelPath
 {
     param(
         [Parameter(Mandatory)]
@@ -138,7 +138,7 @@ function Get-ImageList
     $channelList = Get-ChannelNames | Where-Object {$_ -eq $Channel -or $Channel -eq 'all'}
 
     foreach($channelName in $channelList){
-        $channelPath = Get-ChannePath -Channel $channelName
+        $channelPath = Get-ChannelPath -Channel $channelName
         Get-ChildItem -Path $channelPath -Directory | Select-Object -ExpandProperty Name | Write-Output
     }
 }

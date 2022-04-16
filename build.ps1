@@ -294,7 +294,7 @@ End {
         $linuxVersion = $versions.linuxVersion
 
         # Calculate the paths
-        $channelPath = Get-ChannePath -Channel $actualChannel
+        $channelPath = Get-ChannelPath -Channel $actualChannel
 
         foreach($dockerFileName in $Name)
         {
