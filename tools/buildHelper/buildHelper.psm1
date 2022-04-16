@@ -89,6 +89,17 @@ function Get-ChannePath
     return Join-Path -Path $resolvedRepoRoot -ChildPath $relativePath
 }
 
+function Get-PwshInstallVersion
+{
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $Channel
+    )
+
+    return $channelData | Where-Object {$_.Name -eq $Channel} | Select-Object -ExpandProperty pwshInstallVersion -First 1
+}
+
 function Get-ChannelTagPrefix {
     param(
         [Parameter(Mandatory)]
@@ -648,6 +659,7 @@ function Get-TestParams
     $buildArgs['PACKAGE_VERSION'] = $packageVersion
     $buildArgs['IMAGE_NAME'] = $imageNameParam
     $buildArgs['BaseImage'] = $BaseImage
+    $buildArgs['PS_INSTALL_VERSION'] = Get-PwshInstallVersion -Channel $actualChannel
 
     if ($allMeta.meta.PackageFormat)
     {
@@ -849,6 +861,7 @@ class ChannelData {
     [string] $Name
     [string] $Path
     [string] $TagPrefix
+    [string] $PwshInstallVersion
 }
 
 [ChannelData[]] $channelData = $null
