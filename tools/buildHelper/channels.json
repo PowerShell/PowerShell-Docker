@@ -2,13 +2,13 @@
     {
         "name": "stable",
         "path": "release/stable",
-        "pwshInstallVersion": "7-preview",
+        "pwshInstallVersion": "7",
         "packageTag": ""
     },
     {
         "name": "preview",
         "path": "release/preview",
-        "pwshInstallVersion": "7",
+        "pwshInstallVersion": "7-preview",
         "packageTag": "-preview"
     },
     {
