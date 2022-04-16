@@ -2,10 +2,11 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 FROM registry.access.redhat.com/ubi8/ubi:8.3 AS installer-env
-ARG PS_VERSION=7.2.2
-ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rh.x86_64.rpm
+ARG PS_VERSION=7.3.0-preview.1
+ARG PS_PACKAGE=powershell-preview-${PS_VERSION}-1.rh.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
+
 # define the folder we will be installing PowerShell to
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 # Install powershell
