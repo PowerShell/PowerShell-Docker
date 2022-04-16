@@ -1,16 +1,19 @@
 [
     {
         "name": "stable",
-        "path": "release/stable"
+        "path": "release/stable",
+        "pwshInstallVersion": "7-preview"
     },
     {
         "name": "preview",
-        "path": "release/preview"
+        "path": "release/preview",
+        "pwshInstallVersion": "7"
     },
     {
         "name": "lts",
         "path": "release/stable",
-        "tagPrefix": "lts"
+        "tagPrefix": "lts",
+        "pwshInstallVersion": "7-lts"
     },
     {
         "name": "community-stable",

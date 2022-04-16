@@ -338,18 +338,8 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             $permissionsTestCases = @(
                 $script:linuxContainerRunTests | ForEach-Object {
                     $path = '/opt/microsoft/powershell/6/pwsh'
-                    switch -RegEx ($_.Channel)
-                    {
-                        'stable' {
-                            $path = '/opt/microsoft/powershell/7/pwsh'
-                        }
-                        'lts' {
-                            $path = '/opt/microsoft/powershell/7-lts/pwsh'
-                        }
-                        'preview' {
-                            $path = '/opt/microsoft/powershell/7-preview/pwsh'
-                        }
-                    }
+                    $pwshInstallFolder = Get-PwshInstallVersion -Channel $_.Channel
+                    $path = "/opt/microsoft/powershell/$pwshInstallFolder/pwsh"
 
                     $Arm32 = [bool] $_.TestProperties.Arm32
                     @{
