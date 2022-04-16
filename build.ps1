@@ -244,8 +244,7 @@ Begin {
         }
     }
 
-
-    Write-Verbose "Channels: $Channels" -Verbose
+    Write-Verbose "Channels: $Channels"
 
     $sasData = $null
     if($SasUrl)
@@ -285,7 +284,6 @@ End {
         # Get Versions
         $versions = Get-Versions -Channel $actualChannel @versionExtraParams
         $windowsVersion = $versions.windowsVersion
-        Write-Verbose "Windows Version: $windowsVersion" -Verbose
         $linuxVersion = $versions.linuxVersion
 
         # Calculate the paths
