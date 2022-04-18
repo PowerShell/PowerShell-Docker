@@ -1,0 +1,20 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "osVersion": "Universal Base Image 8.3",
+    "SkipGssNtlmSspTests": true,
+    "shortTags": [
+        {"Tag": "8.3"}
+    ],
+    "tagTemplates": [
+        "#psversion#-ubi-#shorttag#",
+        "ubi-#shorttag#"
+    ],
+    "FullRepository": "powershell/rhel/test-deps",
+    "OptionalTests": [
+        "test-deps"
+    ],
+    "TestProperties": {
+        "size": 750
+    }
+}
