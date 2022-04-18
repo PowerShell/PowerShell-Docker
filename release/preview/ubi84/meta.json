@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "PackageFormat": "powershell${previewTag}-${PS_VERSION}-1.rh.x86_64.rpm",
+    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.rh.x86_64.rpm",
     "SkipGssNtlmSspTests": true,
     "osVersion": "Universal Base Image 8.4",
     "FullRepository": "powershell/rhel",
