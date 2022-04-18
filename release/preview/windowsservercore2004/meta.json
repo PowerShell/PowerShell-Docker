@@ -17,5 +17,7 @@
     "TestProperties": {
         "size": 1
     },
-    "UseAcr": true
+    "UseAcr": true,
+    "EndOfLife": "2021-12-14",
+    "DistributionState": "Validated"
 }

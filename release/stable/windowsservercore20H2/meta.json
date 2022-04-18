@@ -16,4 +16,6 @@
         "size": 1
     },
     "UseAcr": true,
+    "EndOfLife": "2022-05-10",
+    "DistributionState": "Validated"
 }

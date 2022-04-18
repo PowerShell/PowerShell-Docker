@@ -34,6 +34,10 @@ param(
     [switch]
     $GenerateMatrixJson,
 
+    [Parameter(ParameterSetName="GenerateMatrixJson")]
+    [switch]
+    $FullJson,
+
     [Parameter(Mandatory, ParameterSetName="GenerateManifestLists")]
     [switch]
     $GenerateManifestLists,
@@ -221,8 +225,11 @@ Begin {
         $Name = $null
     }
 
-    $ENV:DOCKER_BUILDKIT = 1
-    if ($PSCmdlet.ParameterSetName -notin 'GenerateMatrixJson', 'GenerateTagsYaml', 'DupeCheck', 'GenerateManifestLists' -and $Channel.Count -gt 1)
+    if (!$IsWindows) {
+        $ENV:DOCKER_BUILDKIT = 1
+    }
+
+    if ($PSCmdlet.ParameterSetName -notin 'GenerateMatrixJson', 'GenerateTagsYaml', 'DupeCheckAll', 'GenerateManifestLists' -and $Channel.Count -gt 1)
     {
         throw "Multiple Channels are not supported in this parameter set"
     }
@@ -260,6 +267,7 @@ End {
     $tagGroups = @{}
     $dupeCheckTable = @{}
     $dupeTagIssues = @()
+    $fullMatrix = @{}
 
     $toBuild = @()
     foreach ($actualChannel in $Channels) {
@@ -458,6 +466,8 @@ End {
                             UseAcr          = $UseAcr
                             ContinueOnError = $continueOnError
                             ManifestLists   = $manifestLists
+                            EndOfLife         = $allMeta.meta.EndOfLife
+                            DistributionState = $allMeta.meta.GetDistributionState().ToString()
                         }
 
                         $tagGroups[$tagGroup] += $tag
@@ -481,7 +491,6 @@ End {
         $testArgPath = Join-Path -Path $testsPath -ChildPath 'testArgs.json'
         $testArgList | ConvertTo-Json -Depth 2 | Out-File -FilePath $testArgPath
 
-        Write-Verbose "Launching pester..." -Verbose
         $extraParams = @{}
         if($Test.IsPresent)
         {
@@ -513,17 +522,7 @@ End {
             $extraParams.Add('Tags', $tags)
         }
 
-        if(!(Get-Module -ListAvailable pester -ErrorAction Ignore) -or $ForcePesterInstall.IsPresent)
-        {
-            Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
-        }
-
-        Write-Verbose -Message "logging to $logPath" -Verbose
-        $results = Invoke-Pester -Script $testsPath -OutputFile $logPath -PassThru -OutputFormat NUnitXml @extraParams
-        if(!$results -or $results.FailedCount -gt 0 -or !$results.TotalCount)
-        {
-            throw "Build or tests failed.  Passed: $($results.PassedCount) Failed: $($results.FailedCount) Total: $($results.TotalCount)"
-        }
+        Invoke-PesterWrapper -Script $testsPath -OutputFile $logPath -ExtraParams $extraParams
     }
 
     # print local image names
@@ -597,10 +596,13 @@ End {
                         $jobName = $tag.Name -replace '-', '_'
                         if (-not $matrix.$channelName[$osName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
                             $matrix.$channelName[$osName].Add($jobName, @{
-                                    Channel         = $tag.Channel
-                                    ImageName       = $tag.Name
-                                    JobName         = $jobName
-                                    ContinueOnError = $tag.ContinueOnError
+                                    Channel           = $tag.Channel
+                                    ImageName         = $tag.Name
+                                    JobName           = $jobName
+                                    ContinueOnError   = $tag.ContinueOnError
+                                    EndOfLife         = $tag.EndOfLife
+                                    DistributionState = $tag.DistributionState
+                                    OsVersion         = $tag.OsVersion
                                 })
                         }
                     }
@@ -609,14 +611,24 @@ End {
         }
 
         foreach ($channelName in $matrix.Keys) {
+            $fullMatrix[$channelName] = @()
             foreach ($osName in $matrix.$channelName.Keys) {
                 $osMatrix = $matrix.$channelName.$osName
+                $fullMatrix[$channelName] += $osMatrix.Values
                 $matrixJson = $osMatrix | ConvertTo-Json -Compress
                 $variableName = "matrix_${channelName}_${osName}"
                 $command = "vso[task.setvariable variable=$variableName;isoutput=true]$($matrixJson)"
-                Write-Verbose "sending command: '$command'"
-                Write-Host "##$command"
+                if (!$FullJson) {
+                    Set-Item -Path ENV:$VariableName -Value $matrixJson
+                    Write-Verbose "sending command: '$command'"
+                    Write-Host "##$command"
+                }
             }
+        }
+
+        if($FullJson) {
+            $matrixJson = $fullMatrix | ConvertTo-Json -Depth 100
+            Write-Output $matrixJson
         }
     }
 

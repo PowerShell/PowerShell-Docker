@@ -2,7 +2,7 @@
     "IsLinux" : true,
     "UseLinuxVersion" : false,
     "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
-    "osVersion": "Debian 11 (Testing)",
+    "osVersion": "Debian 11",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
         "preview-debian-#shorttag#"
@@ -14,6 +14,8 @@
     "SubImage": "test-deps",
     "TestProperties": {
         "size": 350
-    }
+    },
+    "EndOfLife": "2023-12-15",
+    "DistributionState": "Validated"
 }
 
