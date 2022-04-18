@@ -229,7 +229,7 @@ Begin {
         $ENV:DOCKER_BUILDKIT = 1
     }
 
-    if ($PSCmdlet.ParameterSetName -notin 'GenerateMatrixJson', 'GenerateTagsYaml', 'DupeCheckAll', 'GenerateManifestLists' -and $Channel.Count -gt 1)
+    if ($PSCmdlet.ParameterSetName -notin 'GenerateMatrixJson', 'GenerateTagsYaml', 'DupeCheck', 'GenerateManifestLists' -and $Channel.Count -gt 1)
     {
         throw "Multiple Channels are not supported in this parameter set"
     }
