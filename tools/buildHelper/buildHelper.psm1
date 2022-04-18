@@ -9,6 +9,16 @@ $repoRoot = Join-Path -path $parent -ChildPath '..'
 $modulePath = Join-Path -Path $repoRoot -ChildPath 'tools\getDockerTags'
 Import-Module $modulePath -Force
 
+$repoMetaData = $null
+function Get-RepoMetaData {
+    if (!$script:repoMetaData) {
+        Write-Verbose "getting metadata from repo" -Verbose
+        $script:repoMetaData = Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json'
+    }
+
+    return $script:repoMetaData
+}
+
 function Get-PowerShellVersion
 {
     [CmdletBinding(DefaultParameterSetName='Default')]
@@ -45,7 +55,7 @@ function Get-PowerShellVersion
     )
 
     if ($PSCmdlet.ParameterSetName -notlike 'ExplicitVersion*') {
-        $metaData = Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/metadata.json'
+        $metaData = Get-RepoMetaData
 
         $releaseTag = if ($Preview.IsPresent) {
             $metaData.PreviewReleaseTag
@@ -117,6 +127,13 @@ function Get-ImageList
     {
         Get-ChildItem -Path $communityStablePath -Directory | Select-Object -ExpandProperty Name | Write-Output
     }
+}
+
+enum DistributionState {
+    Unknown
+    Validating
+    Validated
+    EndOfLife
 }
 
 class DockerImageMetaData {
@@ -191,6 +208,20 @@ class DockerImageMetaData {
 
     [bool]
     $IsPrivate = $false
+
+    [datetime]
+    $EndOfLife = (Get-Date).AddDays(7)
+
+    [DistributionState]
+    $DistributionState =[DistributionState]::Unknown
+
+    [DistributionState] GetDistributionState() {
+        if ($this.EndOfLife -lt (Get-Date)) {
+            return [DistributionState]::EndOfLife
+        }
+
+        return $this.DistributionState
+    }
 }
 
 class ShortTagMetaData {
@@ -832,5 +863,33 @@ function New-SasData
         SasUri = $sasUri
         SasBase = $sasBase
         SasQuery = $sasQuery
+    }
+}
+
+function Invoke-PesterWrapper {
+    param(
+        [string]
+        $Script,
+
+        [string]
+        $OutputFile,
+
+        [hashtable]
+        $ExtraParams
+    )
+
+    Write-Verbose "Launching pester with $($ExtraParams|Out-String)" -Verbose
+
+    if(!(Get-Module -ListAvailable pester -ErrorAction Ignore) -or $ForcePesterInstall.IsPresent)
+    {
+        Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
+    }
+
+    Write-Verbose -Message "logging to $OutputFile" -Verbose
+    $results = $null
+    $results = Invoke-Pester -Script $Script -OutputFile $OutputFile -PassThru -OutputFormat NUnitXml @extraParams
+    if(!$results -or $results.FailedCount -gt 0 -or !$results.TotalCount)
+    {
+        throw "Build or tests failed.  Passed: $($results.PassedCount) Failed: $($results.FailedCount) Total: $($results.TotalCount)"
     }
 }

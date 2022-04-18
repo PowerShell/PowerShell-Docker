@@ -5,6 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "PowerShell: Build Unit Tests",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "Invoke-Pester",
+            "cwd": "${workspaceFolder}/unittests",
+            "args": [
+            ]
+        },
+        {
             "name": "PowerShell: Build LTS Ubuntu 16.04",
             "type": "PowerShell",
             "request": "launch",
@@ -13,9 +22,9 @@
             "args": [
                 "-build",
                 "-Channel",
-                "lts",
+                "preview",
                 "-name",
-                "ubuntu16.04"
+                "mariner1"
             ]
         },
         {
@@ -32,6 +41,20 @@
                 "fedora",
                 "-format",
                 "JSON"
+            ]
+        },
+        {
+            "name": "PowerShell: check for dups",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/build.ps1",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "-CheckForDuplicateTags",
+                "-Channel",
+                "preview,",
+                "stable,",
+                "lts"
             ]
         }
     ]

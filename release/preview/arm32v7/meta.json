@@ -16,5 +16,7 @@
     "TestProperties": {
         "size": 550,
         "Arm32": true
-    }
+    },
+    "EndOfLife": "2023-04-02",
+    "DistributionState": "Validated"
 }
