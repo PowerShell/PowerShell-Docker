@@ -3,7 +3,7 @@
     "UseLinuxVersion": false,
     "PackageFormat": "powershell${previewTag}-${PS_VERSION}-1.rh.x86_64.rpm",
     "SkipGssNtlmSspTests": true,
-    "osVersion": "RedHat Universal Base Image 8.3",
+    "osVersion": "Universal Base Image 8.3",
     "FullRepository": "powershell/rhel",
     "tagTemplates": [
         "preview-ubi-#shorttag#"
