@@ -3,16 +3,18 @@
     "UseLinuxVersion": false,
     "PackageFormat": "powershell${previewTag}-${PS_VERSION}-1.rh.x86_64.rpm",
     "SkipGssNtlmSspTests": true,
-    "osVersion": "Universal Base Image 8.3",
+    "osVersion": "Universal Base Image 8.4",
     "FullRepository": "powershell/rhel",
     "tagTemplates": [
         "preview-ubi-#shorttag#"
     ],
     "shortTags": [
-        {"Tag": "8.3"}
+        {"Tag": "8.4"}
     ],
     "SubImage": "test-deps",
     "TestProperties": {
         "size": 726
-    }
+    },
+    "DistributionState": "Validating",
+    "EndOfLife": "2023-05-30"
 }
