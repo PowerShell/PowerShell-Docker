@@ -1,14 +1,13 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "osVersion": "Universal Base Image 8.3",
+    "osVersion": "Universal Base Image 8.4",
     "SkipGssNtlmSspTests": true,
     "shortTags": [
-        {"Tag": "8.3"}
+        {"Tag": "8.4"}
     ],
     "tagTemplates": [
-        "#psversion#-ubi-#shorttag#",
-        "ubi-#shorttag#"
+        "preview-ubi-#shorttag#"
     ],
     "FullRepository": "powershell/rhel/test-deps",
     "OptionalTests": [
@@ -16,5 +15,7 @@
     ],
     "TestProperties": {
         "size": 750
-    }
+    },
+    "DistributionState": "Validating",
+    "EndOfLife": "2023-05-30"
 }
