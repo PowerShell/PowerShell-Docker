@@ -1,0 +1,18 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell${previewTag}-${PS_VERSION}-1.rh.x86_64.rpm",
+    "SkipGssNtlmSspTests": true,
+    "osVersion": "Universal Base Image 8.3",
+    "FullRepository": "powershell/rhel",
+    "tagTemplates": [
+        "preview-ubi-#shorttag#"
+    ],
+    "shortTags": [
+        {"Tag": "8.3"}
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 726
+    }
+}
