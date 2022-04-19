@@ -1,11 +1,12 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "PackageFormat": "powershell${previewTag}_${PS_VERSION}-1.deb_amd64.deb",
+    "PackageFormat": "powershell${channelTag}_${PS_VERSION}-1.deb_amd64.deb",
     "osVersion": "Ubuntu 18.04",
     "SkipGssNtlmSspTests": false,
     "tagTemplates": [
-        "preview-ubuntu-#shorttag#"
+        "#psversion#-ubuntu-#shorttag#",
+        "ubuntu-#shorttag#"
     ],
     "shortTags": [
         {"Tag": "bionic"},

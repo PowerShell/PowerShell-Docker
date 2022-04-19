@@ -324,10 +324,6 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
             }
 
-            if ($Channel -ne 'preview') {
-                Set-ItResult -Skipped -Because "Test is not applicable to $Channel"
-            }
-
             $psDistChannel = Get-PowerShellDistibutionChannel -TestContext $testContext -Name $Name
             $psDistChannel | Should -BeLike "PSDocker-*"
         }
@@ -338,18 +334,8 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             $permissionsTestCases = @(
                 $script:linuxContainerRunTests | ForEach-Object {
                     $path = '/opt/microsoft/powershell/6/pwsh'
-                    switch -RegEx ($_.Channel)
-                    {
-                        'stable' {
-                            $path = '/opt/microsoft/powershell/7/pwsh'
-                        }
-                        'lts' {
-                            $path = '/opt/microsoft/powershell/7-lts/pwsh'
-                        }
-                        'preview' {
-                            $path = '/opt/microsoft/powershell/7-preview/pwsh'
-                        }
-                    }
+                    $pwshInstallFolder = Get-PwshInstallVersion -Channel $_.Channel
+                    $path = "/opt/microsoft/powershell/$pwshInstallFolder/pwsh"
 
                     $Arm32 = [bool] $_.TestProperties.Arm32
                     @{
@@ -723,10 +709,6 @@ Describe "Windows Containers" -Tags 'Behavior', 'Windows' {
 
             if ($UseAcr) {
                 Set-ItResult -Pending -Because "Images that use ACR can't be tested"
-            }
-
-            if ($Channel -ne 'preview') {
-                Set-ItResult -Skipped -Because "Test is not applicable to $Channel"
             }
 
             $psDistChannel = Get-PowerShellDistibutionChannel -TestContext $testContext -Name $Name
