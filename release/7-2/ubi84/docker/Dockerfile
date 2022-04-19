@@ -5,9 +5,7 @@ FROM registry.access.redhat.com/ubi8/ubi:8.4 AS installer-env
 ARG PS_VERSION=7.2.2
 ARG PS_PACKAGE=powershell-${PS_VERSION}-1.rh.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=7
-# define the folder we will be installing PowerShell to
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
+
 # Install powershell
 # create folder at install location
 RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.rpm
@@ -35,8 +33,7 @@ RUN --mount=type=cache,target=/var/cache/yum,rw \
     && yum upgrade-minimal -y --security \
     && yum clean all
 # Define ENVs for Localization/Globalization
-ENV PS_INSTALL_VERSION=7 \
-    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
+ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
