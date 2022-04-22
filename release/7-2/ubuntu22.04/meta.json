@@ -20,5 +20,5 @@
     },
     "SubImage": "test-deps",
     "EndOfLife": "2032-04-01",
-    "DistributionState": "Validated"
+    "DistributionState": "Validating"
 }
