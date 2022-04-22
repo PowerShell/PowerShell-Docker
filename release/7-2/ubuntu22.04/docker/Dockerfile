@@ -55,12 +55,12 @@ RUN apt-get update \
     # required for SSL
         ca-certificates \
         gss-ntlmssp \
-        libicu66 \
+        libicu70 \
         libssl3 \
         libc6 \
         libgcc1 \
         libgssapi-krb5-2 \
-        liblttng-ust0 \
+        liblttng-ust1 \
         libstdc++6 \
         zlib1g \
     # PowerShell remoting over SSH dependencies
