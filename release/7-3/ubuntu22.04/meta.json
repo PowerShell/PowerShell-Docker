@@ -1,0 +1,23 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "osVersion": "Ubuntu 22.04",
+    "SkipGssNtlmSspTests": false,
+    "tagTemplates": [
+        "preview-ubuntu-#shorttag#"
+    ],
+    "shortTags": [
+        {"Tag": "jammy"},
+        {"Tag": "22.04"}
+    ],
+    "manifestLists": [
+        "preview"
+    ],
+    "TestProperties": {
+        "size": 334
+    },
+    "SubImage": "test-deps",
+    "EndOfLife": "2023-12-15",
+    "DistributionState": "Validating"
+}
