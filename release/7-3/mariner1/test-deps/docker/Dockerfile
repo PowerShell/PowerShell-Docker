@@ -3,13 +3,14 @@ ARG BaseImage=mcr.microsoft.com/powershell:mariner
 FROM ${BaseImage}
 
 # To find which package provides a particular command, run:
-# yum install dnf-utils
+# tdnf install dnf-utils
 # dnf provides <command>
 
 # Install dependencies and clean up
-RUN yum update -y \
+RUN --mount=type=cache,target=/var/cache/tdnf \
+    tdnf update -y \
     # install dependencies
-    && yum install -y \
+    && tdnf install -y \
     dnf-utils \
     sudo \
     curl \
@@ -18,12 +19,12 @@ RUN yum update -y \
     iputils \
     # provides ps
     procps-ng \
+    unzip \
+    git \
     # upgrade packages
-    && yum upgrade -y \
+    && tdnf upgrade -y \
     # clean cached data
-    && yum clean all \
-    # remove cache folders and files
-    && rm -rf /var/cache/yum
+    && tdnf clean all
 
 ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Mariner-1.0
 
