@@ -603,6 +603,8 @@ End {
                                     EndOfLife         = $tag.EndOfLife
                                     DistributionState = $tag.DistributionState
                                     OsVersion         = $tag.OsVersion
+                                    # azDevOps doesn't support arrays
+                                    TagList           = $tag.Tags -join ';'
                                 })
                         }
                     }
