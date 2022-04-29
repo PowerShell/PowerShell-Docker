@@ -603,6 +603,7 @@ End {
                                     EndOfLife         = $tag.EndOfLife
                                     DistributionState = $tag.DistributionState
                                     OsVersion         = $tag.OsVersion
+                                    TagList           = $tag.Tags
                                 })
                         }
                     }
