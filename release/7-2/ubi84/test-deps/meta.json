@@ -10,7 +10,6 @@
         "#psversion#-ubi-#shorttag#",
         "ubi-#shorttag#"
     ],
-    "FullRepository": "powershell/rhel/test-deps",
     "OptionalTests": [
         "test-deps"
     ],
