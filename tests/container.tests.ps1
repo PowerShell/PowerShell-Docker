@@ -479,14 +479,16 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 @{command = 'bash'}
                 @{command = 'curl'}
                 @{command = 'find'}
+                @{command = 'git'}
                 @{command = 'hostname'}
+                @{command = 'openssl'}
                 @{command = 'ping'}
                 @{command = 'ps'}
                 @{command = 'su'}
                 @{command = 'sudo'}
                 @{command = 'tar'}
+                @{command = 'unzip'}
                 @{command = 'wget'}
-                @{command = 'openssl'}
             )
 
             $debianCommands = @(
