@@ -5,7 +5,7 @@ FROM ${BaseImage}
 
 # Install dependencies and clean up
 RUN --mount=type=cache,target=/var/lib/apt/lists \
-RUN apt-get update \
+    apt-get update \
     && apt-get install --no-install-recommends -y \
         sudo \
         curl \
