@@ -16,7 +16,7 @@
         "latest"
     ],
     "TestProperties": {
-        "size": 333
+        "size": 390
     },
     "SubImage": "test-deps",
     "EndOfLife": "2032-04-01",
