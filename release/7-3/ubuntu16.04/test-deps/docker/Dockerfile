@@ -11,6 +11,8 @@ RUN apt-get update \
         wget \
         iputils-ping \
         iputils-tracepath \
+        git \
+        unzip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
