@@ -4,7 +4,8 @@ ARG BaseImage=mcr.microsoft.com/powershell:preview-debian-10
 FROM ${BaseImage}
 
 # Install dependencies and clean up
-RUN apt-get update \
+RUN --mount=type=cache,target=/var/lib/apt/lists \
+    apt-get update \
     && apt-get install --no-install-recommends -y \
         sudo \
         curl \
@@ -14,8 +15,7 @@ RUN apt-get update \
         procps \
         git \
         unzip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean
 
 ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Debian-10
 

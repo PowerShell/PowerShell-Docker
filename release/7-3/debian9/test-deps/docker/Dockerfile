@@ -4,6 +4,7 @@ ARG BaseImage=mcr.microsoft.com/powershell:debian-9
 FROM ${BaseImage}
 
 # Install dependencies and clean up
+RUN --mount=type=cache,target=/var/lib/apt/lists \
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         sudo \
@@ -12,8 +13,9 @@ RUN apt-get update \
         iputils-ping \
         iputils-tracepath \
         procps \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+        git \
+        unzip \
+    && apt-get clean
 
 ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Debian-9
 
