@@ -39,6 +39,6 @@ stages:
         matrix: dependencies.GenerateYaml_${{ variables.jobName }}.outputs['matrix.matrix_${{ parameters.channel }}_windows']
         dependsOn: GenerateYaml_${{ variables.jobName }}
         jobName: Build_Win
-        vmImage: windows-2019
+        vmImage: windows-2022
         ciParameter: ${{ parameters.winCiParameter }}
         useacr: ${{ parameters.useacr }}
