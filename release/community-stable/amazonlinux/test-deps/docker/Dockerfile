@@ -24,6 +24,8 @@ RUN \
       wget \
       openssl \
       tar \
+      unzip \
+      git \
     && yum clean all \
     # remove cache folders and files
     && rm -rf /var/cache/yum

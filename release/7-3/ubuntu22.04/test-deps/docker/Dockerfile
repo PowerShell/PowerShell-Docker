@@ -4,15 +4,17 @@ ARG BaseImage=mcr.microsoft.com/powershell:ubuntu-22.04
 FROM ${BaseImage}
 
 # Install dependencies and clean up
-RUN apt-get update \
+RUN --mount=type=cache,target=/var/lib/apt/lists \
+    apt-get update \
     && apt-get install --no-install-recommends -y \
         sudo \
         curl \
         wget \
         iputils-ping \
         iputils-tracepath \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+        git \
+        unzip \
+    && apt-get clean
 
 ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Ubuntu-22.04
 

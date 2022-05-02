@@ -21,12 +21,14 @@ COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=node /opt/yarn-v${YARN_VERSION} /opt/yarn-v${YARN_VERSION}
 
 RUN apk add --no-cache --virtual .pipeline-deps readline linux-pam \
-    && apk add \
+    && apk add --no-cache  \
         bash \
         sudo \
         shadow \
         openssl \
         curl \
+        git \
+        unzip \
     && apk del .pipeline-deps \
     && ln -s /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
     && ln -s /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg

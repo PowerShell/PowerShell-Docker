@@ -10,12 +10,11 @@
         "#psversion#-ubi-#shorttag#",
         "ubi-#shorttag#"
     ],
-    "FullRepository": "powershell/rhel/test-deps",
     "OptionalTests": [
         "test-deps"
     ],
     "TestProperties": {
-        "size": 750
+        "size": 788
     },
     "DistributionState": "Validating",
     "EndOfLife": "2023-05-30"

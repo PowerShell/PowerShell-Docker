@@ -12,6 +12,8 @@ RUN dnf install -y \
         iputils \
         procps \
         findutils \
+        unzip \
+        git \
     && dnf clean all
 
 ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Fedora-34
