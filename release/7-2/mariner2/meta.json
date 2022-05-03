@@ -2,7 +2,7 @@
     "IsLinux" : true,
     "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
     "SkipGssNtlmSspTests": true,
-    "osVersion": "Mariner 2.0",
+    "osVersion": "Mariner 2.0 (Beta)",
     "shortTags": [
         {"Tag": "2.0"}
     ],

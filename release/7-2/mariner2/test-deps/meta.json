@@ -2,7 +2,7 @@
     "IsLinux" : true,
     "UseLinuxVersion": false,
     "SkipGssNtlmSspTests": true,
-    "osVersion": "Mariner 2.0",
+    "osVersion": "Mariner 2.0 (Beta)",
     "tagTemplates": [
         "mariner-#shorttag#"
     ],
