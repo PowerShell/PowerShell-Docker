@@ -928,6 +928,9 @@ function Invoke-PesterWrapper {
         Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
     }
 
+    Remove-Module Pester -Force
+    Import-Module pester -MaximumVersion 4.99
+
     Write-Verbose -Message "logging to $OutputFile" -Verbose
     $results = $null
     $results = Invoke-Pester -Script $Script -OutputFile $OutputFile -PassThru -OutputFormat NUnitXml @extraParams
