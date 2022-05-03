@@ -169,6 +169,15 @@ class DockerImageMetaData {
                 $this.ShortDistroName + '-#shorttag#'
             )
         }
+
+        switch -RegEx ($this.GetDistributionState()) {
+            'Unknown|Validating' {
+                $this.OsVersion = $this.OsVersion + ' (In Validation)'
+            }
+            'EndOfLife' {
+                $this.OsVersion = $this.OsVersion + ' (End of Life)'
+            }
+        }
     }
 
     [Bool]
