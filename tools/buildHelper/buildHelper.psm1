@@ -162,6 +162,15 @@ enum DistributionState {
 }
 
 class DockerImageMetaData {
+    [void] Init() {
+        if (!$this.tagTemplates -and $this.ShortDistroName) {
+            $this.tagTemplates = @(
+                '#psversion#-' + $this.ShortDistroName + '-#shorttag#'
+                $this.ShortDistroName + '-#shorttag#'
+            )
+        }
+    }
+
     [Bool]
     $IsLinux = $false
 
@@ -199,7 +208,7 @@ class DockerImageMetaData {
     $ShortTags
 
     [string[]]
-    $tagTemplates
+    $TagTemplates
 
     [string]
     $SubImage
@@ -247,6 +256,9 @@ class DockerImageMetaData {
 
         return $this.DistributionState
     }
+
+
+    [string] $ShortDistroName
 }
 
 class ShortTagMetaData {
@@ -265,7 +277,9 @@ Function Get-DockerImageMetaData
     {
         try {
             $meta = Get-Content -Path $Path | ConvertFrom-Json
-            return [DockerImageMetaData] $meta
+            $dockerImageMeta = [DockerImageMetaData] $meta
+            $dockerImageMeta.Init()
+            return $dockerImageMeta
         }
         catch {
             throw "$_ converting $Path"
@@ -928,8 +942,8 @@ function Invoke-PesterWrapper {
         Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
     }
 
-    Remove-Module Pester -Force
-    Import-Module pester -MaximumVersion 4.99
+    Remove-Module Pester -Force -ErrorAction SilentlyContinue
+    Import-Module pester -MaximumVersion 4.99 -Scope Global
 
     Write-Verbose -Message "logging to $OutputFile" -Verbose
     $results = $null

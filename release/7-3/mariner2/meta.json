@@ -6,9 +6,7 @@
     "shortTags": [
         {"Tag": "1.0"}
     ],
-    "tagTemplates": [
-        "preview-mariner-#shorttag#"
-    ],
+    "ShortDistroName": "mariner",
     "SubImage": "test-deps",
     "TestProperties": {
         "size": 387

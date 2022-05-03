@@ -3,9 +3,7 @@
     "UseLinuxVersion": false,
     "PackageFormat": "powershell${channelTag}_${PS_VERSION}-1.deb_amd64.deb",
     "osVersion": "Ubuntu 16.04",
-    "tagTemplates": [
-        "preview-ubuntu-#shorttag#"
-    ],
+    "ShortDistroName": "ubuntu",
     "shortTags": [
         {"Tag": "xenial"},
         {"Tag": "16.04"}

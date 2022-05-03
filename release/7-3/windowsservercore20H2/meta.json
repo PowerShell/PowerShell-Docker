@@ -8,9 +8,7 @@
         }
     ],
     "Base64EncodePackageUrl": true,
-    "tagTemplates": [
-        "preview-windowsservercore-#shorttag#"
-    ],
+    "ShortDistroName": "windowsservercore",
     "TestProperties": {
         "size": 1
     },

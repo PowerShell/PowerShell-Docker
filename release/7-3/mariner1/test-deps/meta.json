@@ -4,7 +4,7 @@
     "SkipGssNtlmSspTests": true,
     "osVersion": "Mariner 1.0",
     "tagTemplates": [
-        "preview-mariner-#shorttag#"
+        "mariner-#shorttag#"
     ],
     "SubRepository": "test-deps",
     "OptionalTests": [

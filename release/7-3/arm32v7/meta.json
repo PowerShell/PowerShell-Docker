@@ -6,9 +6,7 @@
     "SkipGssNtlmSspTests": true,
     "Base64EncodePackageUrl": true,
     "UseAcr": true,
-    "tagTemplates": [
-        "preview-arm32v7-ubuntu-#shorttag#"
-    ],
+    "ShortDistroName": "arm32v7-ubuntu",
     "shortTags": [
         {"Tag": "bionic"},
         {"Tag": "18.04"}

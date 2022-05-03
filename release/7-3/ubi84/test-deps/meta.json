@@ -7,7 +7,7 @@
         {"Tag": "8.4"}
     ],
     "tagTemplates": [
-        "preview-ubi-#shorttag#"
+        "ubi-#shorttag#"
     ],
     "OptionalTests": [
         "test-deps"

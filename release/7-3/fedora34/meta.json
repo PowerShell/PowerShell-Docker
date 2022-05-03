@@ -4,9 +4,7 @@
     "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.rh.x86_64.rpm",
     "osVersion": "Fedora 34",
     "SkipGssNtlmSspTests": false,
-    "tagTemplates": [
-        "preview-fedora-#shorttag#"
-    ],
+    "ShortDistroName": "fedora",
     "shortTags": [
         {"Tag": "34"}
     ],

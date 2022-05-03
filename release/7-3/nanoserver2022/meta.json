@@ -7,11 +7,9 @@
             "Tag": "ltsc2022"
         }
     ],
-    "tagTemplates": [
-        "preview-nanoserver-#shorttag#"
-    ],
+    "ShortDistroName": "nanoserver",
     "manifestLists": [
-        "preview-nanoserver"
+        "nanoserver"
     ],
     "Base64EncodePackageUrl": true,
     "TestProperties": {

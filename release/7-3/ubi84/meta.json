@@ -4,9 +4,7 @@
     "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.rh.x86_64.rpm",
     "SkipGssNtlmSspTests": true,
     "osVersion": "Universal Base Image 8.4",
-    "tagTemplates": [
-        "preview-ubi-#shorttag#"
-    ],
+    "ShortDistroName": "ubi",
     "shortTags": [
         {"Tag": "8.4"}
     ],
