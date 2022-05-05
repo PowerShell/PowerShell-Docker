@@ -17,6 +17,7 @@ jobs:
       maxParallel: ${{ parameters.maxParallel }}
   variables:
     ContinueOnError: ${{ parameters.continueonerror }}
+    scanType: Register
 
   pool:
     vmImage: ${{ parameters.vmImage }}
@@ -26,6 +27,11 @@ jobs:
         Write-Host "##vso[task.setvariable variable=ACR_NAME;]$env:ACR_NAME_VAR"
       displayName: 'Enable ACR'
       condition: ne(variables['ACR'], 'no')
+
+  - pwsh: |
+      Write-Host "##vso[task.setvariable variable=scanType;]LogOnly"
+    displayName: Set scanType to LogOnly For PRs
+    condition: ne(variables['Build.Reason'], 'PullRequest')
 
   - pwsh: 'Get-ChildItem env:'
     displayName: 'Capture Environment'
@@ -63,6 +69,10 @@ jobs:
   - task: ComponentGovernanceComponentDetection@0
     inputs:
       dockerImagesToScan: $(dockerImagesToScan)
+      scanType: $(scanType)
+      verbosity: 'Verbose'
+      alertWarningLevel: 'High'
+      failOnAlert: true
     displayName: Component Governance - $(ImageName) $(Channel)
 
   - pwsh: |
