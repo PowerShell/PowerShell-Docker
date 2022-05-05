@@ -16,7 +16,6 @@ ARG PS_VERSION=7.3.0-preview.1
 ARG PS_INSTALL_VERSION=7-preview
 
 RUN --mount=type=cache,target=/var/cache/yum,rw \
-    yum update -y \
     && yum install -y \
       less \
       ncurses \
@@ -28,7 +27,6 @@ RUN --mount=type=cache,target=/var/cache/yum,rw \
     && yum clean all
 RUN --mount=type=cache,target=/var/cache/yum,rw \
     --mount=from=installer-env,target=/mnt/rpm,source=/tmp \
-    yum update -y \
     && yum localinstall -y \
       /mnt/rpm/linux.rpm \
     && yum upgrade-minimal -y --security \
