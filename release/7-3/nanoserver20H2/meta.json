@@ -7,9 +7,7 @@
             "Tag": "20H2"
         }
     ],
-    "tagTemplates": [
-        "preview-nanoserver-#shorttag#"
-    ],
+    "ShortDistroName": "nanoserver",
     "Base64EncodePackageUrl": true,
     "TestProperties": {
         "size": 1

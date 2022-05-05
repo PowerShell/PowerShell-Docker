@@ -6,10 +6,13 @@
     "shortTags": [
         {"Tag": "1.0"}
     ],
-    "ShortDistroName": "mariner",
+    "tagTemplates": [
+        "mariner-#shorttag#",
+        "#psversion#-mariner-#shorttag#"
+    ],
     "SubImage": "test-deps",
     "TestProperties": {
-        "size": 387
+        "size": 610
     },
     "EndOfLife": "2022-10-14",
     "DistributionState": "Validating"

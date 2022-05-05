@@ -3,7 +3,7 @@
     "UseLinuxVersion": false,
     "osVersion": "Debian 9",
     "tagTemplates": [
-        "preview-debian-#shorttag#"
+        "debian-#shorttag#"
     ],
     "SubRepository": "test-deps",
     "OptionalTests": [

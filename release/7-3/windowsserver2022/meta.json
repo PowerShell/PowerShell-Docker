@@ -8,11 +8,9 @@
         }
     ],
     "Base64EncodePackageUrl": true,
-    "tagTemplates": [
-        "preview-windowsserver-#shorttag#"
-    ],
+    "ShortDistroName": "windowsserver",
     "manifestLists": [
-        "preview-windowsserver"
+        "windowsserver"
     ],
     "TestProperties": {
         "size": 1

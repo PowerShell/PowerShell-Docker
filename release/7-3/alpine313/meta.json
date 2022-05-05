@@ -3,9 +3,7 @@
     "UseLinuxVersion": false,
     "PackageFormat": "powershell-${PS_VERSION}-linux-alpine-x64.tar.gz",
     "osVersion": "Alpine 3.13",
-    "tagTemplates": [
-        "preview-alpine-#shorttag#"
-    ],
+    "ShortDistroName": "alpine",
     "shortTags": [
         {"Tag": "3.13"}
     ],
