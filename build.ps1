@@ -527,25 +527,26 @@ End {
         Invoke-PesterWrapper -Script $testsPath -OutputFile $logPath -ExtraParams $extraParams
     }
 
-    $dockerImagesToScan = ''
-    # print local image names
-    # used only with the -Build
-    foreach($fullName in $localImageNames)
-    {
-        Write-Verbose "image name: $fullName" -Verbose
+    Write-Verbose "!$GenerateTagsYaml -and !$GenerateMatrixJson -and !$GenerateManifestLists -and '$($PSCmdlet.ParameterSetName)' -notlike '*All'" -Verbose
+    if (!$GenerateTagsYaml -and !$GenerateMatrixJson -and !$GenerateManifestLists -and $PSCmdlet.ParameterSetName -notlike '*All') {
+        $dockerImagesToScan = ''
+        # print local image names
+        # used only with the -Build
+        foreach ($fullName in $localImageNames) {
+            Write-Verbose "image name: $fullName" -Verbose
 
-        if ($dockerImagesToScan -ne '') {
-            $dockerImagesToScan += ',' + $dockerImagesToScan
+            if ($dockerImagesToScan -ne '') {
+                $dockerImagesToScan += ',' + $dockerImagesToScan
+            }
+            else {
+                $dockerImagesToScan += $fullName
+            }
         }
-        else {
-            $dockerImagesToScan += $fullName
+
+        if ($dockerImagesToScan) {
+            Set-BuildVariable -Name 'dockerImagesToScan' -Value $dockerImagesToScan
         }
     }
-
-    $variableName = "dockerImagesToScan"
-    $command = "vso[task.setvariable variable=$variableName;isoutput=false]$dockerImagesToScan"
-    Write-Verbose "sending command: '$command'" -Verbose
-    Write-Host "##$command"
 
     if($GenerateTagsYaml.IsPresent)
     {
@@ -636,11 +637,8 @@ End {
                 $fullMatrix[$channelName] += $osMatrix.Values
                 $matrixJson = $osMatrix | ConvertTo-Json -Compress
                 $variableName = "matrix_${channelName}_${osName}"
-                $command = "vso[task.setvariable variable=$variableName;isoutput=true]$($matrixJson)"
                 if (!$FullJson) {
-                    Set-Item -Path ENV:$VariableName -Value $matrixJson
-                    Write-Verbose "sending command: '$command'"
-                    Write-Host "##$command"
+                    Set-BuildVariable -Name $variableName -Value $matrixJson -IsOutput
                 }
             }
         }

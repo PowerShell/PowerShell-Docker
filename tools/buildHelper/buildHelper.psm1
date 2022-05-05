@@ -964,3 +964,35 @@ function Invoke-PesterWrapper {
         throw "Build or tests failed.  Passed: $($results.PassedCount) Failed: $($results.FailedCount) Total: $($results.TotalCount)"
     }
 }
+
+# Sets a build variable
+Function Set-BuildVariable
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Name,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Value,
+
+        [switch]
+        $IsOutput
+    )
+
+    $IsOutputString = if ($IsOutput) { 'true' } else { 'false' }
+    $command = "vso[task.setvariable variable=$Name;isOutput=$IsOutputString]$Value"
+
+    # always log command to make local debugging easier
+    Write-Verbose -Message "sending command: $command" -Verbose
+
+    if ($env:TF_BUILD) {
+        # In VSTS
+        Write-Host "##$command"
+        # The variable will not show up until the next task.
+    }
+
+    # Setting in the current session for the same behavior as the CI and to make it show up in the same task
+    Set-Item env:/$name -Value $Value
+}

@@ -6,6 +6,7 @@ Describe "build.ps1 -GenerateMatrixJson" {
         Write-Verbose "repoRoot: $repoRoot"
         $buildScript = Join-Path $repoRoot "build.ps1"
         Write-Verbose "buildScript: $buildScript"
+        Import-Module -Name "$repoRoot/tools/buildHelper" -Scope Global
     }
     Context "By channel" {
         BeforeAll {
@@ -18,25 +19,28 @@ Describe "build.ps1 -GenerateMatrixJson" {
                 Write-Verbose "got write-Host" -Verbose
                 $global:writeHostBuffer += $Object.ToString()
             }
+            $global:matrixValue = @()
+            Mock -CommandName "Set-BuildVariable" -MockWith {
+                $global:matrixValue += [pscustomobject]@{
+                    Value=$Value
+                    Name=$Name
+                }
+                Write-Verbose "Mocking Set-BuildVariable" -Verbose
+            }
+
         }
         BeforeEach {
             $Channel = 'stable'
             $pattern = '##vso\[task\.setvariable variable=matrix_'+$Channel+'_(windows|linux);isoutput=true]'
         }
-        It "Should Write to host" {
+        It "Should Set matrix" {
             $vstsCmd = & $buildScript -GenerateMatrixJson -Channel $Channel 4>$null
-            $Global:writeHostBuffer.count | should -BeGreaterThan 1
-        }
-        It "Commands sholud be vso commands" {
-            foreach($vstsCmd in $Global:writeHostBuffer) {
-                $vstsCmd | Should -Match $pattern
-            }
+            Assert-MockCalled -CommandName "Set-BuildVariable" -Times 1
         }
         It "Should have generated valid json" {
             $script:matrix = @()
-            foreach($vstsCmd in $Global:writeHostBuffer) {
-                Write-Verbose "vstsCmd: $vstsCmd"
-                $json = $vstsCmd -replace $pattern
+            foreach($vstsVariable in $global:matrixValue) {
+                $json = $vstsVariable.Value
                 { $script:matrix += $json | ConvertFrom-Json -AsHashtable } | should -not -Throw
             }
             $script:matrix.count | Should -Be 2
