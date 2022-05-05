@@ -31,7 +31,7 @@ jobs:
   - pwsh: |
       Write-Host "##vso[task.setvariable variable=scanType;]LogOnly"
     displayName: Set scanType to LogOnly For PRs
-    condition: ne(variables['Build.Reason'], 'PullRequest')
+    condition: eq(variables['Build.Reason'], 'PullRequest')
 
   - pwsh: 'Get-ChildItem env:'
     displayName: 'Capture Environment'
