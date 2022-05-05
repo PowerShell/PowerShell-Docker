@@ -23,7 +23,6 @@ RUN --mount=type=cache,target=/var/cache/yum,rw \
       glibc-locale-source \
       glibc-langpack-en \
       libicu \
-    && yum upgrade-minimal -y --security \
     && yum clean all
 RUN --mount=type=cache,target=/var/cache/yum,rw \
     --mount=from=installer-env,target=/mnt/rpm,source=/tmp \
