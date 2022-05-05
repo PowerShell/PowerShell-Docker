@@ -527,12 +527,25 @@ End {
         Invoke-PesterWrapper -Script $testsPath -OutputFile $logPath -ExtraParams $extraParams
     }
 
+    $dockerImagesToScan = ''
     # print local image names
     # used only with the -Build
     foreach($fullName in $localImageNames)
     {
         Write-Verbose "image name: $fullName" -Verbose
+
+        if ($dockerImagesToScan -ne '') {
+            $dockerImagesToScan += ',' + $dockerImagesToScan
+        }
+        else {
+            $dockerImagesToScan += $fullName
+        }
     }
+
+    $variableName = "dockerImagesToScan"
+    $command = "vso[task.setvariable variable=$variableName;isoutput=false]$dockerImagesToScan"
+    Write-Verbose "sending command: '$command'" -Verbose
+    Write-Host "##$command"
 
     if($GenerateTagsYaml.IsPresent)
     {

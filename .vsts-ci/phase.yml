@@ -56,6 +56,16 @@ jobs:
     continueOnError: ${{ variables.continueonerror }}
 
   - pwsh: |
+      Get-ChildItem env:\docker*
+    displayName: 'Capture Docker* Environment Variables'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
+  - task: ComponentGovernanceComponentDetection@0
+    inputs:
+      dockerImagesToScan: $(dockerImagesToScan)
+    displayName: Component Governance - $(ImageName) $(Channel)
+
+  - pwsh: |
       if ( '$env:CHANNEL' -eq '' ) { exit }
       $files = @(Get-ChildItem -Recurse test*.xml)
       if($files.count -eq 0) {
