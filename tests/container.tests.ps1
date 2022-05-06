@@ -487,7 +487,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 @{command = 'su'}
                 @{command = 'sudo'}
                 @{command = 'tar'}
-                @{command = 'unzip'}
+                @{command = 'gzip'}
                 @{command = 'wget'}
             )
 
