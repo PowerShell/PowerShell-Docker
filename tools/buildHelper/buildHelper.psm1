@@ -268,6 +268,8 @@ class DockerImageMetaData {
 
 
     [string] $ShortDistroName
+
+    [bool]$UseInCI = $true
 }
 
 class ShortTagMetaData {

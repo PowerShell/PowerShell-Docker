@@ -17,5 +17,6 @@
     },
     "SubImage": "test-deps",
     "EndOfLife": "2023-12-15",
-    "DistributionState": "Validated"
+    "DistributionState": "Validated",
+    "UseInCi": false
 }
