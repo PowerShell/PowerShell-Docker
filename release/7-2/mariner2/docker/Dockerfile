@@ -20,6 +20,13 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 # Create the install folder
 RUN mkdir -p ${PS_INSTALL_FOLDER}
 
+# Install tar a gzip so we can unzip the tar.gz
+RUN --mount=type=cache,target=/var/cache/tdnf \
+    tdnf install -y \
+    tar \
+    gzip \
+    && tdnf clean all
+
 # Unzip the Linux tar.gz
 RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 

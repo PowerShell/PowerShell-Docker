@@ -456,18 +456,20 @@ End {
                         }
 
                         $tag = [PSCustomObject]@{
-                            Architecture    = $architecture
-                            OsVersion       = $osVersion
-                            Os              = $os
-                            Tags            = $actualTagData.TagList
-                            Dockerfile      = $dockerfile
-                            Channel         = $actualChannel
-                            Name            = $dockerFileName
-                            UseAcr          = $UseAcr
-                            ContinueOnError = $continueOnError
-                            ManifestLists   = $manifestLists
+                            Architecture      = $architecture
+                            OsVersion         = $osVersion
+                            Os                = $os
+                            Tags              = $actualTagData.TagList
+                            Dockerfile        = $dockerfile
+                            Channel           = $actualChannel
+                            Name              = $dockerFileName
+                            UseAcr            = $UseAcr
+                            ContinueOnError   = $continueOnError
+                            ManifestLists     = $manifestLists
                             EndOfLife         = $allMeta.meta.EndOfLife
                             DistributionState = $allMeta.meta.GetDistributionState().ToString()
+                            IsLinux           = $allMeta.meta.IsLinux
+                            UseInCI           = $allMeta.meta.UseInCI
                         }
 
                         $tagGroups[$tagGroup] += $tag
@@ -605,6 +607,8 @@ End {
                                     OsVersion         = $tag.OsVersion
                                     # azDevOps doesn't support arrays
                                     TagList           = $tag.Tags -join ';'
+                                    IsLinux           = $tag.IsLinux
+                                    UseInCI           = $tag.UseInCI
                                 })
                         }
                     }
