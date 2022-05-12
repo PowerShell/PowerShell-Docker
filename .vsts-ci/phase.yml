@@ -15,6 +15,7 @@ jobs:
   strategy:
       matrix: $[ ${{ parameters.matrix }} ]
       maxParallel: ${{ parameters.maxParallel }}
+
   variables:
     ContinueOnError: ${{ parameters.continueonerror }}
     scanType: Register
