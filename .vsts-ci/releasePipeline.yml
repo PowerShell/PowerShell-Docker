@@ -19,6 +19,7 @@ resources:
 
 variables:
   runCodesignValidationInjection: false
+  DisableDockerDetector: true
 
 stages:
 - template: ./templatesReleasePipeline/testAndRelease.yml

@@ -19,6 +19,7 @@ variables:
   ltsReleaseTag: ${{ parameters.ltsReleaseTag }}
   stableReleaseTag: ${{ parameters.stableReleaseTag }}
   runCodesignValidationInjection: false
+  DisableDockerDetector: true
 
 stages:
   - stage: GenerateFullTag
