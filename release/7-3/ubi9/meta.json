@@ -12,6 +12,6 @@
     "TestProperties": {
         "size": 502
     },
-    "DistributionState": "Validating",
+    "DistributionState": "ImageCreation",
     "EndOfLife": "2023-05-30"
 }
