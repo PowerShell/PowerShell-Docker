@@ -11,7 +11,7 @@ ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$
 ARG PS_INSTALL_VERSION=7
 
 # Download the Linux tar.gz and save it
-ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
+RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.tar.gz
 
 RUN echo ${PS_PACKAGE_URL}
 
