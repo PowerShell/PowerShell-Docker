@@ -10,7 +10,8 @@ ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$
 ARG PS_INSTALL_VERSION=7-preview
 
 # Download the Linux tar.gz and save it
-RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.tar.gz
+RUN tdnf install -y ca-certificates \
+  && curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.tar.gz
 
 RUN echo ${PS_PACKAGE_URL}
 

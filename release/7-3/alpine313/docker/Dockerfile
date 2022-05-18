@@ -12,7 +12,7 @@ ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$
 ARG PS_INSTALL_VERSION=7-preview
 
 # Download the Linux tar.gz and save it
-RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.tar.gz
+RUN wget -O /tmp/linux.tar.gz ${PS_PACKAGE_URL}
 
 # define the folder we will be installing PowerShell to
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
