@@ -7,7 +7,6 @@ FROM ${BaseImage}
 RUN yum install -y \
         sudo \
         wget \
-        openssl \
         hostname \
         iputils \
         procps-ng \

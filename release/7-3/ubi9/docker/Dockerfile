@@ -20,6 +20,7 @@ RUN --mount=type=cache,target=/var/cache/yum,rw \
       less \
       ncurses \
       openssh-clients \
+      openssl \
       glibc-locale-source \
       glibc-langpack-en \
       libicu \
