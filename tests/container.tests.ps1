@@ -255,6 +255,7 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
                 $metadataJson | Select-Object -ExpandProperty StableReleaseTag | Should -Match '^v\d+\.\d+\.\d+.*$'
             } catch {
                 Write-Verbose $metadataJson -Verbose
+                throw
             }
         }
 
