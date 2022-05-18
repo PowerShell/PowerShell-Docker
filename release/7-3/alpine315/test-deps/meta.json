@@ -1,16 +1,16 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "osVersion": "Ubuntu 20.04",
+    "SkipGssNtlmSspTests": true,
+    "osVersion": "Alpine 3.14",
     "tagTemplates": [
-        "ubuntu-#shorttag#"
+        "alpine-#shorttag#"
     ],
-    "SubRepository": "test-deps",
     "OptionalTests": [
         "test-deps",
-        "test-deps-debian"
+        "test-deps-musl"
     ],
     "TestProperties": {
-        "size": 430
+        "size": 335
     }
 }
