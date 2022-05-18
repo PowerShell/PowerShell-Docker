@@ -16,7 +16,7 @@ RUN yum install -y \
     && yum clean all \
     && rm -rf /var/cache/yum
 
-ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-ubi-8.3
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-ubi-8.4
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
