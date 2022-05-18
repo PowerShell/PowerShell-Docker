@@ -37,7 +37,9 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-UBI-9
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-UBI-9 \
+    # Needed to talk to many sites, see:  https://github.com/dotnet/runtime/issues/65874
+    OPENSSL_ENABLE_SHA1_SIGNATURES=1
 
 RUN localedef --charmap=UTF-8 --inputfile=en_US $LANG \
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
