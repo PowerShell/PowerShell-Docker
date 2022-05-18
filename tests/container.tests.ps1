@@ -249,9 +249,13 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             }
 
             $metadataString = Get-MetadataUsingContainer -Name $Name
-            $metadataString | Should -Not -BeNullOrEmpty
-            $metadataJson = $metadataString | ConvertFrom-Json -ErrorAction Stop
-            $metadataJson | Select-Object -ExpandProperty StableReleaseTag | Should -Match '^v\d+\.\d+\.\d+.*$'
+            try {
+                $metadataString | Should -Not -BeNullOrEmpty
+                $metadataJson = $metadataString | ConvertFrom-Json -ErrorAction Stop
+                $metadataJson | Select-Object -ExpandProperty StableReleaseTag | Should -Match '^v\d+\.\d+\.\d+.*$'
+            } catch {
+                Write-Verbose $metadataJson -Verbose
+            }
         }
 
         it "Get-UICulture from <Name> should return en-US" -TestCases $runTestCases -Skip:$script:skipLinuxRun {
