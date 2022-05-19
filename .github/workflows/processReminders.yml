@@ -3,6 +3,7 @@ name: 'check reminders'
 on:
   schedule:
     - cron: '*/15 * * * *'
+  workflow_dispatch:
 
 jobs:
   reminder:
