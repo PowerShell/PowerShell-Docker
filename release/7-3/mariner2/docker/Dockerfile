@@ -31,7 +31,7 @@ RUN --mount=type=cache,target=/var/cache/tdnf \
 RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
 # Start a new stage so we lose all the tar.gz layers from the final image
-FROM cblmariner.azurecr.io/base/core:1.0 AS powershell
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS powershell
 
 ARG PS_VERSION=7.3.0-preview.1
 ARG PS_INSTALL_VERSION=7-preview
