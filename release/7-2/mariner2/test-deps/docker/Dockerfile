@@ -21,6 +21,7 @@ RUN --mount=type=cache,target=/var/cache/tdnf \
     procps-ng \
     unzip \
     git \
+    mariner-repos-microsoft-preview \
     # upgrade packages
     && tdnf upgrade -y \
     # clean cached data
