@@ -12,7 +12,7 @@ Describe "build.ps1 -Test" {
     }
     Context "-Channel -Name" {
         It "Should invoke pester" {
-            & $buildScript -Test -Pull -ImageName "unittest" -Name 'mariner1' -Channel preview -Version v7.2.2 4>&1 | out-null
+            & $buildScript -Test -Pull -ImageName "unittest" -Name 'ubuntu22.04' -Channel preview -Version v7.2.2 4>&1 | out-null
             Assert-VerifiableMock
         }
         It "throw for non existant image" {
