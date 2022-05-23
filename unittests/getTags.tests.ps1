@@ -10,7 +10,7 @@ Describe "build.ps1 -GetTags" {
 
     Context "-Channel -Name" {
         It "Should invoke pester" {
-            & $buildScript -GetTags -Name 'mariner1' -Channel preview -Version v7.2.2 4>&1 | out-null
+            & $buildScript -GetTags -Name 'ubuntu22.04' -Channel preview -Version v7.2.2 4>&1 | out-null
         }
         It "throw for non existant image" {
             [Type] $exceptionType = [System.Management.Automation.ParameterBindingException]

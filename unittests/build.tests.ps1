@@ -15,7 +15,7 @@ Describe "buildps1-Build" {
     }
     Context "-Channel -Name" {
         It "Should invoke pester" {
-            & $buildScript -Build -Name "mariner1" -Channel preview 4>&1 | out-null
+            & $buildScript -Build -Name "ubuntu22.04" -Channel preview 4>&1 | out-null
             Assert-MockCalled -CommandName "Invoke-PesterWrapper" -Times 1
             Assert-MockCalled -CommandName "Set-BuildVariable" -Times 1
         }
