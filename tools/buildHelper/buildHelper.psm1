@@ -720,6 +720,68 @@ function Get-TestParams
         $packageVersion = $packageVersion -replace '-', '_'
     }
 
+    $pwshInstallerFileUriBase = "https://github.com/PowerShell/PowerShell/releases/download/v$($psversion)/"
+    $pwshInstallerFileName = ""
+    if(($channelTag -eq "stable") -or ($channelTag -eq "lts"))
+    {
+        switch ($dockerFileName)
+        {
+            {($_ -like "alpine") -or ($_ -like "mariner")}
+            {
+                # $pwshInstallerFileUri = "https://github.com/PowerShell/PowerShell/releases/download/v$($psversion)/powershell-$($psversion)-linux-x64.tar.gz"
+                $pwshInstallerFileName = "powershell-$($psversion)-linux-x64.tar.gz"
+            }
+            {($_ -like "debian") -or ($_ -like "ubuntu")}
+            {
+                # $pwshInstallerFileUri = "https://github.com/PowerShell/PowerShell/releases/download/v$($psversion)/powershell_$($psversion)-1.deb_amd64.deb"
+                $pwshInstallerFileName = "powershell_$($psversion)-1.deb_amd64.deb"
+            }
+            {($_ -like "nanoserver") -or ($_ -like "windowsserver")}
+            {
+                # $pwshInstallerFileUri = "https://github.com/PowerShell/PowerShell/releases/download/v$($psversion)/PowerShell-$($psversion)-win-x64.zip"
+                $pwshInstallerFileName = "PowerShell-$($psversion)-win-x64.zip"
+            }
+            "ubi"
+            {
+                # $pwshInstallerFileUri = "https://github.com/PowerShell/PowerShell/releases/download/v$($psversion)/powershell-$($psversion)-1.rh.x86_64.rpm"
+                $pwshInstallerFileName = "powershell-$($psversion)-1.rh.x86_64.rpm"
+            }
+        }
+    }
+    elseif($channelTag -eq "preview")
+    {
+        switch ($dockerFileName)
+        {
+            {($_ -like "alpine") -or ($_ -like "mariner")}
+            {
+                # $psversion will be like 7.3.0-preview.1
+                # $packageversion will be like 7.3.0_preview.1
+                # $pwshInstallerFileUri = "https://github.com/PowerShell/PowerShell/releases/download/v$($psversion)/powershell-$($psversion)-linux-x64.tar.gz"
+                $pwshInstallerFileName = "powershell-$($psversion)-linux-x64.tar.gz"
+            }
+            {($_ -like "debian") -or ($_ -like "ubuntu")}
+            {
+                # $pwshInstallerFileUri = "https://github.com/PowerShell/PowerShell/releases/download/v$($psversion)/powershell-preview_$($psversion)-1.deb_amd64.deb"
+                $pwshInstallerFileName = "powershell-preview_$($psversion)-1.deb_amd64.deb"
+            }
+            {($_ -like "nanoserver") -or ($_ -like "windowsserver")}
+            {
+                # $pwshInstallerFileUri = "https://github.com/PowerShell/PowerShell/releases/download/v$($psversion)/PowerShell-$($psversion)-win-x64.zip"                
+                $pwshInstallerFileName = "PowerShell-$($psversion)-win-x64.zip"
+            }
+            "ubi"
+            {
+                # $pwshInstallerFileUri = "https://github.com/PowerShell/PowerShell/releases/download/v$($psversion)/powershell-preview-$($psversion)-1.rh.x86_64.rpm"
+                $pwshInstallerFileName = "powershell-preview-$($psversion)-1.rh.x86_64.rpm"
+            }
+        }
+    }
+
+    $pwshInstallerFilePath = $pwshInstallerFileUriBase + $pwshInstallerFileName
+    $pwshLocalFilePath = Join-Path -Path $contextPath -ChildPath $pwshInstallerFilePath
+    $wc=[System.Net.WebClient]::new()
+    $wc.DownloadFile($pwshInstallerFilePath, $pwshLocalFilePath)
+
     $buildArgs = [System.Collections.Generic.Dictionary[string,string]]::new()
     $buildArgs['fromTag'] = $actualTagData.FromTag
     $buildArgs['PS_VERSION'] = $psversion
@@ -727,6 +789,7 @@ function Get-TestParams
     $buildArgs['IMAGE_NAME'] = $imageNameParam
     $buildArgs['BaseImage'] = $BaseImage
     $buildArgs['PS_INSTALL_VERSION'] = Get-PwshInstallVersion -Channel $actualChannel
+    $buildArgs['PS_INSTALL_PATH'] = $pwshLocalFilePath
 
     if ($allMeta.meta.PackageFormat)
     {
@@ -754,6 +817,8 @@ function Get-TestParams
         }
         else
         {
+            
+
             $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
 
             $channelTag = Get-ChannelPackageTag -Channel $actualChannel
