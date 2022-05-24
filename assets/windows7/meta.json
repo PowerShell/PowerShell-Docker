@@ -1,0 +1,13 @@
+{
+    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.rh.x86_64.rpm",
+    "SkipGssNtlmSspTests": true,
+    "osVersion": "Windows 7",
+    "shortTags": [
+        {"Tag": "7"}
+    ],
+    "TestProperties": {
+        "size": 502
+    },
+    "DistributionState": "Validating",
+    "EndOfLife": "2023-01-07"
+}
