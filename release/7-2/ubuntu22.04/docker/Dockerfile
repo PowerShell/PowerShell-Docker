@@ -5,7 +5,7 @@
 FROM ubuntu:22.04 AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=7.2.2
+ARG PS_VERSION=7.2.4
 ARG PS_PACKAGE=powershell_${PS_VERSION}-1.deb_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
