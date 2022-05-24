@@ -1,8 +1,25 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# Docker image file that describes an Ubuntu20.04 image with PowerShell installed from Microsoft APT Repo
+# Download the deb file in this image
 FROM ubuntu:22.04 AS installer-env
+
+RUN --mount=type=cache,target=/var/lib/apt \
+    --mount=type=cache,target=/var/cache/apt \
+    apt-get update \
+    && apt-get install --no-install-recommends -y \
+    # curl is required to grab the Linux package
+        curl \
+    # less is required for help in powershell
+        less \
+    # required to setup the locale
+        locales \
+    # required for SSL
+        ca-certificates \
+    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb
+
+# Docker image file that describes an Ubuntu20.04 image with PowerShell installed from Microsoft APT Repo
+FROM ubuntu:22.04 AS final-image
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.2.4
@@ -19,7 +36,10 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Ubuntu-22.04
 
 # Install dependencies and clean up
-RUN apt-get update \
+RUN --mount=from=installer-env,target=/mnt/pwsh,source=/tmp \
+    --mount=type=cache,target=/var/lib/apt \
+    --mount=type=cache,target=/var/cache/apt \
+    apt-get update \
     && apt-get install --no-install-recommends -y \
     # curl is required to grab the Linux package
         curl \
@@ -42,14 +62,9 @@ RUN apt-get update \
         openssh-client \
     # Download the Linux package and save it
     && echo ${PS_PACKAGE_URL} \
-    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb \
-    && apt-get install --no-install-recommends -y /tmp/powershell.deb \
+    && apt-get install --no-install-recommends -y /mnt/pwsh/powershell.deb \
     && apt-get dist-upgrade -y \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
     && locale-gen $LANG && update-locale \
-    # remove powershell package
-    && rm /tmp/powershell.deb \
     # intialize powershell module cache
     # and disable telemetry
     && export POWERSHELL_TELEMETRY_OPTOUT=1 \
