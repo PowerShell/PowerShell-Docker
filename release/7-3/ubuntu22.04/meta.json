@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "PackageFormat": "powershell-preview_${PS_VERSION}-1.deb_amd64.deb",
     "osVersion": "Ubuntu 22.04",
     "SkipGssNtlmSspTests": false,
     "ShortDistroName": "ubuntu",
@@ -13,7 +13,7 @@
         "preview"
     ],
     "TestProperties": {
-        "size": 334
+        "size": 280
     },
     "SubImage": "test-deps",
     "EndOfLife": "2023-12-15",
