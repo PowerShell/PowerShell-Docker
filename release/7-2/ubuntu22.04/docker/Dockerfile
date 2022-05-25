@@ -25,7 +25,7 @@ RUN --mount=type=cache,target=/var/lib/apt \
     && echo ${PS_PACKAGE_URL} \
     && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb
 
-# Docker image file that describes an Ubuntu20.04 image with PowerShell installed from Microsoft APT Repo
+# Install the deb file in this image and make powershell available
 FROM ubuntu:22.04 AS final-image
 
 # Define Args for the needed to add the package

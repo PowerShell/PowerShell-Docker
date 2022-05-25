@@ -13,7 +13,7 @@
         "preview"
     ],
     "TestProperties": {
-        "size": 280
+        "size": 276
     },
     "SubImage": "test-deps",
     "EndOfLife": "2023-12-15",
