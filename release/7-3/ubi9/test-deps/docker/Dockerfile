@@ -7,7 +7,6 @@ FROM ${BaseImage}
 RUN yum install -y \
         sudo \
         wget \
-        openssl \
         hostname \
         iputils \
         procps-ng \
@@ -16,7 +15,7 @@ RUN yum install -y \
     && yum clean all \
     && rm -rf /var/cache/yum
 
-ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-ubi-8.4
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-ubi-9
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c

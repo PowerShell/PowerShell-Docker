@@ -156,6 +156,7 @@ function Get-ImageList
 
 enum DistributionState {
     Unknown
+    ImageCreation
     Validating
     Validated
     EndOfLife

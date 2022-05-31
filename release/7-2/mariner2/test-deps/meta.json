@@ -2,7 +2,7 @@
     "IsLinux" : true,
     "UseLinuxVersion": false,
     "SkipGssNtlmSspTests": true,
-    "osVersion": "Mariner 2.0 (Beta)",
+    "osVersion": "Mariner 2.0",
     "tagTemplates": [
         "mariner-#shorttag#"
     ],
@@ -12,6 +12,6 @@
         "test-deps-redhat"
     ],
     "TestProperties": {
-        "size": 610
+        "size": 760
     }
 }

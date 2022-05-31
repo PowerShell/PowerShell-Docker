@@ -2,14 +2,14 @@
     "IsLinux" : true,
     "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
     "SkipGssNtlmSspTests": true,
-    "osVersion": "Mariner 2.0 (Beta)",
+    "osVersion": "Mariner 2.0",
     "shortTags": [
         {"Tag": "2.0"}
     ],
     "ShortDistroName": "mariner",
     "SubImage": "test-deps",
     "TestProperties": {
-        "size": 424
+        "size": 760
     },
     "EndOfLife": "2022-10-14",
     "DistributionState": "Validating"

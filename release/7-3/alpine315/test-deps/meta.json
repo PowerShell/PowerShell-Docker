@@ -2,16 +2,15 @@
     "IsLinux" : true,
     "UseLinuxVersion": false,
     "SkipGssNtlmSspTests": true,
-    "osVersion": "Mariner 1.0",
+    "osVersion": "Alpine 3.14",
     "tagTemplates": [
-        "mariner-#shorttag#"
+        "alpine-#shorttag#"
     ],
-    "SubRepository": "test-deps",
     "OptionalTests": [
         "test-deps",
-        "test-deps-redhat"
+        "test-deps-musl"
     ],
     "TestProperties": {
-        "size": 544
+        "size": 335
     }
 }
