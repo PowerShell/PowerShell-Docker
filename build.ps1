@@ -632,7 +632,7 @@ End {
 
         foreach ($channelName in $matrix.Keys) {
             $fullMatrix[$channelName] = @()
-            foreach ($osName in $matrix.$channelName.Keys) {
+            foreach ($osName in $matrix.$channelName.Keys | Sort-Object) {
                 $osMatrix = $matrix.$channelName.$osName
                 $fullMatrix[$channelName] += $osMatrix.Values
                 $matrixJson = $osMatrix | ConvertTo-Json -Compress

@@ -254,7 +254,7 @@ class DockerImageMetaData {
     $IsPrivate = $false
 
     [datetime]
-    $EndOfLife = (Get-Date).AddDays(7)
+    $EndOfLife = (Get-Date).Date.AddDays(7)
 
     [DistributionState]
     $DistributionState =[DistributionState]::Unknown
