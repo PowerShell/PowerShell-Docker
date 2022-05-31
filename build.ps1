@@ -630,11 +630,11 @@ End {
             }
         }
 
-        foreach ($channelName in $matrix.Keys) {
+        foreach ($channelName in $matrix.Keys | Sort-Object) {
             $fullMatrix[$channelName] = @()
             foreach ($osName in $matrix.$channelName.Keys | Sort-Object) {
                 $osMatrix = $matrix.$channelName.$osName
-                $fullMatrix[$channelName] += $osMatrix.Values
+                $fullMatrix[$channelName] += $osMatrix.Values | Sort-Object -Property ImageName
                 $matrixJson = $osMatrix | ConvertTo-Json -Compress
                 $variableName = "matrix_${channelName}_${osName}"
                 if (!$FullJson) {
