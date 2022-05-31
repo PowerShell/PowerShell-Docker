@@ -58,7 +58,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Auto-update formula
+      - name: Auto-update JSON
         run: |
           .\build.ps1 -GenerateMatrixJson -FullJson -Channel preview, stable > .\assets\matrix.json
       - name: Create Pull Request
