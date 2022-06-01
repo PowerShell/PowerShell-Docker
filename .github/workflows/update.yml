@@ -60,7 +60,7 @@ jobs:
 
       - name: Auto-update JSON
         run: |
-          .\build.ps1 -GenerateMatrixJson -FullJson -Channel preview, stable > .\assets\matrix.json
+          ./tools/updateJson.ps1
       - name: Create Pull Request
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         id: cpr
