@@ -611,7 +611,7 @@ End {
 
                         $jobName = $tag.Name -replace '-', '_'
                         if (-not $matrix.$channelName[$osName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
-                            $matrix.$channelName[$osName].Add($jobName, @{
+                            $matrix.$channelName[$osName].Add($jobName, (ConvertTo-SortedDictionary -Hashtable @{
                                     Channel           = $tag.Channel
                                     ImageName         = $tag.Name
                                     JobName           = $jobName
@@ -623,7 +623,7 @@ End {
                                     TagList           = $tag.Tags -join ';'
                                     IsLinux           = $tag.IsLinux
                                     UseInCI           = $tag.UseInCI
-                                })
+                                }))
                         }
                     }
                 }
@@ -634,7 +634,11 @@ End {
             $fullMatrix[$channelName] = @()
             foreach ($osName in $matrix.$channelName.Keys | Sort-Object) {
                 $osMatrix = $matrix.$channelName.$osName
-                $fullMatrix[$channelName] += $osMatrix.Values | Sort-Object -Property ImageName
+                $channelMatrix = [System.Collections.ArrayList]::new()
+                $osMatrix.Values | Sort-Object -Property ImageName | ForEach-Object {
+                    $null = $channelMatrix.Add($_)
+                }
+                $fullMatrix[$channelName] += $channelMatrix
                 $matrixJson = $osMatrix | ConvertTo-Json -Compress
                 $variableName = "matrix_${channelName}_${osName}"
                 if (!$FullJson) {
