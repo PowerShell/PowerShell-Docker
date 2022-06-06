@@ -6,13 +6,13 @@
 FROM alpine:3.13 AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=7.0.0
-ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-alpine-x64.tar.gz
-ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
 
-# Download the Linux tar.gz and save it
-RUN wget -O /tmp/linux.tar.gz ${PS_PACKAGE_URL}
+# TODO: where is the caching supposed to happen? At the level where download happens right?
+# TODO contd: COPY will cache, but just won't recopy the file if its checksum is the same as previously in that image layer
+# Alternatively, I can cache tmp folder where the powershell package is copied INTO or opt folder where its extracted to
+# but given we shed that in the final image, is there benefit?
+COPY ${PS_INSTALL_PATH} /tmp/linux.tar.gz
 
 # define the folder we will be installing PowerShell to
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION

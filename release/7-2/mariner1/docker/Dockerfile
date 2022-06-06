@@ -4,16 +4,9 @@
 FROM mcr.microsoft.com/cbl-mariner/base/core:1.0 AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=7.3.0-preview.1
-ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
-ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=7-preview
+ARG PS_INSTALL_VERSION=7
 
-# Download the Linux tar.gz and save it
-RUN tdnf install -y ca-certificates \
-  && curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.tar.gz
-
-RUN echo ${PS_PACKAGE_URL}
+COPY ${PS_INSTALL_PATH} /tmp/linux.tar.gz
 
 # define the folder we will be installing PowerShell to
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
@@ -27,16 +20,12 @@ RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 # Start a new stage so we lose all the tar.gz layers from the final image
 FROM cblmariner.azurecr.io/base/core:1.0 AS powershell
 
-ARG PS_VERSION=7.3.0-preview.1
-ARG PS_INSTALL_VERSION=7-preview
-
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links
 ARG PS_INSTALL_VERSION=7-preview
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
-    \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
@@ -67,8 +56,6 @@ RUN tdnf update -y \
 RUN chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     # Create the pwsh symbolic link that points to powershell
     && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
-    # Create the pwsh symbolic link that points to powershell
-    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
     # intialize powershell module cache
     # and disable telemetry
     && export POWERSHELL_TELEMETRY_OPTOUT=1 \
@@ -85,4 +72,4 @@ RUN chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
-CMD [ "pwsh-preview" ]
+CMD [ "pwsh" ]

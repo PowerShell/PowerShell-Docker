@@ -778,9 +778,13 @@ function Get-TestParams
         }
     }
 
+    # https://github.com/PowerShell/PowerShell/releases/download/v$($psversion) + powershell-preview-$($psversion)-1.rh.x86_64.rpm
     $pwshInstallerFilePath = $pwshInstallerFileUriBase + $pwshInstallerFileName
-    $pwshLocalFilePath = Join-Path -Path $contextPath -ChildPath $pwshInstallerFilePath
+    # ./ + powershell-preview-$($psversion)-1.rh.x86_64.rpm
+    $pwshLocalFilePath = Join-Path -Path $contextPath -ChildPath $pwshInstallerFileName
     $wc=[System.Net.WebClient]::new()
+    # download from: https://github.com/PowerShell/PowerShell/releases/download/v$($psversion)/powershell-preview-$($psversion)-1.rh.x86_64.rpm
+    #          to:   ./powershell-preview-$($psversion)-1.rh.x86_64.rpm
     $wc.DownloadFile($pwshInstallerFilePath, $pwshLocalFilePath)
 
     $buildArgs = [System.Collections.Generic.Dictionary[string,string]]::new()

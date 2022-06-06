@@ -6,13 +6,9 @@
 FROM alpine:3.13 AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=7.0.0-preview.1
-ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-alpine-x64.tar.gz
-ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7-preview
 
-# Download the Linux tar.gz and save it
-RUN wget -O /tmp/linux.tar.gz ${PS_PACKAGE_URL}
+COPY ${PS_INSTALL_PATH} /tmp/linux.tar.gz
 
 # define the folder we will be installing PowerShell to
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
