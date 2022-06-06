@@ -5,48 +5,51 @@
 FROM ubuntu:22.04 AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=7.3.0-preview.1
-ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
+ARG PS_VERSION=7.3.0-preview.4
+ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.deb_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7-preview
 
-# Download the Linux tar.gz and save it
-RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.tar.gz
+RUN --mount=type=cache,target=/var/lib/apt \
+    --mount=type=cache,target=/var/cache/apt \
+    apt-get update \
+    && apt-get install --no-install-recommends -y \
+    # curl is required to grab the Linux package
+        curl \
+    # less is required for help in powershell
+        less \
+    # requied to setup the locale
+        locales \
+    # required for SSL
+        ca-certificates \
+    # Download the Linux package and save it
+    && echo ${PS_PACKAGE_URL} \
+    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb
 
-RUN echo ${PS_PACKAGE_URL}
+# Install the deb file in this image and make powershell available
+FROM ubuntu:22.04 AS final-image
 
-# define the folder we will be installing PowerShell to
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
-
-# Create the install folder
-RUN mkdir -p ${PS_INSTALL_FOLDER}
-
-# Unzip the Linux tar.gz
-RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
-
-# Start a new stage so we lose all the tar.gz layers from the final image
-FROM ubuntu:22.04 AS powershell
-
-ARG PS_VERSION=7.3.0-preview.1
+# # Define args needed to add the package
+ARG PS_VERSION=7.3.0-preview.4
+ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.deb_amd64.deb
+ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7-preview
 
-# Copy only the files we need from the previous stage
-COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
-
-# Define Args and Env needed to create links
-ARG PS_INSTALL_VERSION=7-preview
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
-    \
-    # Define ENVs for Localization/Globalization
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+# Define ENVs for Localization/Globalization
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Ubuntu-20.04
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Ubuntu-22.04
 
 # Install dependencies and clean up
-RUN apt-get update \
+RUN --mount=from=installer-env,target=/mnt/pwsh,source=/tmp \
+    --mount=type=cache,target=/var/lib/apt \
+    --mount=type=cache,target=/var/cache/apt \
+      apt-get update \
+    && apt-get install --no-install-recommends -y /mnt/pwsh/powershell.deb \
     && apt-get install --no-install-recommends -y \
     # less is required for help in powershell
         less \
@@ -65,21 +68,15 @@ RUN apt-get update \
         zlib1g \
     # PowerShell remoting over SSH dependencies
         openssh-client \
-    # Download the Linux package and save it
     && apt-get dist-upgrade -y \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && locale-gen $LANG && update-locale
-
-# Give all user execute permissions and remove write permissions for others
-RUN chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
-    # Create the pwsh symbolic link that points to powershell
-    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
-    # Create the pwsh symbolic link that points to powershell
-    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
-    # intialize powershell module cache
-    # and disable telemetry
+    && locale-gen $LANG && update-locale \
     && export POWERSHELL_TELEMETRY_OPTOUT=1 \
+    # Give all user execute permissions and remove write permissions for others
+    && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
+    # Create the pwsh symbolic link that points to powershell
+    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    # Create the pwsh-preview symbolic link that points to powershell
+    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
     && pwsh \
         -NoLogo \
         -NoProfile \

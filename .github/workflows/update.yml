@@ -50,3 +50,30 @@ jobs:
           base: master
           draft: false
           branch: update-release-build
+  update-matrix-json:
+    name: Update Matrix Json
+    timeout-minutes: 15
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Auto-update JSON
+        run: |
+          ./tools/updateJson.ps1
+      - name: Create Pull Request
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        id: cpr
+        uses: peter-evans/create-pull-request@v3
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        with:
+          commit-message: "Update the matrix json"
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          title: "Update the matrix json"
+          assignees: travisez13
+          reviewers: travisez13
+          base: master
+          draft: false
+          branch: update-matrix-json

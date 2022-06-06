@@ -254,7 +254,7 @@ class DockerImageMetaData {
     $IsPrivate = $false
 
     [datetime]
-    $EndOfLife = (Get-Date).AddDays(7)
+    $EndOfLife = (Get-Date).Date.AddDays(7)
 
     [DistributionState]
     $DistributionState =[DistributionState]::Unknown
@@ -1065,4 +1065,17 @@ Function Set-BuildVariable
 
     # Setting in the current session for the same behavior as the CI and to make it show up in the same task
     Set-Item env:/$name -Value $Value
+}
+
+Function ConvertTo-SortedDictionary {
+    param(
+        [hashtable]
+        $Hashtable
+    )
+
+    $sortedDictionary = [System.Collections.Generic.SortedDictionary[string,object]]::new()
+    foreach($key in $Hashtable.Keys) {
+        $sortedDictionary.Add($key, $Hashtable[$key])
+    }
+    return $sortedDictionary
 }
