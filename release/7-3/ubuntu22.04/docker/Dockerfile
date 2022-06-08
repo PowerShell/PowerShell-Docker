@@ -4,16 +4,14 @@
 # Docker image file that describes an Ubuntu20.04 image with PowerShell installed from Microsoft APT Repo
 FROM ubuntu:22.04 AS installer-env
 
-# Define Args for the needed to add the package
-ARG PS_INSTALL_VERSION=7-preview
-
 COPY ${PS_INSTALL_PATH} /tmp/powershell.deb
 
 # Define ENVs for Localization/Globalization
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+ENV PS_INSTALL_VERSION=7-preview \ 
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
-    PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Ubuntu-22.04
