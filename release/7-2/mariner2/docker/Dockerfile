@@ -27,13 +27,12 @@ RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 # Start a new stage so we lose all the tar.gz layers from the final image
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS powershell
 
-ARG PS_INSTALL_VERSION=7
-
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
+ENV PS_INSTALL_VERSION=7 \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
     \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \

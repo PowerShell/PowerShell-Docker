@@ -4,7 +4,6 @@
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS powershell
 
 ARG PS_VERSION=7.3.0-preview.4
-ARG PS_INSTALL_VERSION=7-preview
 
 # Define Args and Env needed to create links
 ARG PS_INSTALL_VERSION=7-preview
