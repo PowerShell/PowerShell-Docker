@@ -11,7 +11,7 @@ FROM debian:bullseye-slim AS final-image
 
 # Define Env needed to create links
 ENV PS_INSTALL_VERSION=7-preview \
-    PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \

@@ -1,17 +1,20 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# Docker image file that describes an Ubuntu20.04 image with PowerShell installed from Microsoft APT Repo
+# Docker image file that describes an Ubuntu22.04 image with PowerShell installed from Microsoft APT Repo
 FROM ubuntu:22.04 AS installer-env
 
 COPY ${PS_INSTALL_PATH} /tmp/powershell.deb
 
-# Define ENVs for Localization/Globalization
-ENV PS_INSTALL_VERSION=7-preview \ 
+FROM ubuntu:22.04 AS final-image
+
+# Define ENVs
+ENV PS_INSTALL_VERSION=7-preview \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
+    # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
-    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Ubuntu-22.04
@@ -41,6 +44,8 @@ RUN --mount=from=installer-env,target=/mnt/pwsh,source=/tmp \
     # PowerShell remoting over SSH dependencies
         openssh-client \
     && apt-get dist-upgrade -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
     && locale-gen $LANG && update-locale \
     && export POWERSHELL_TELEMETRY_OPTOUT=1 \
     # Give all user execute permissions and remove write permissions for others

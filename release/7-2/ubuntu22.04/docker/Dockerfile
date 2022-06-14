@@ -6,6 +6,8 @@ FROM ubuntu:22.04 AS installer-env
 
 COPY ${PS_INSTALL_PATH} /tmp/powershell.deb
 
+FROM ubuntu:22.04 AS final-image
+
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
@@ -23,15 +25,25 @@ RUN --mount=from=installer-env,target=/mnt/pwsh,source=/tmp \
     && apt-get install --no-install-recommends -y \
     # less is required for help in powershell
         less \
-    # required to setup the locale
+    # requied to setup the locale
         locales \
     # required for SSL
         ca-certificates \
         gss-ntlmssp \
+        libicu70 \
+        libssl3 \
+        libc6 \
+        libgcc1 \
+        libgssapi-krb5-2 \
         liblttng-ust1 \
+        libstdc++6 \
+        zlib1g \
     # PowerShell remoting over SSH dependencies
         openssh-client \
     && apt-get dist-upgrade -y \
+    && apt-get clean \
+    # Todo: double check this if it exists
+    && rm -rf /var/lib/apt/lists/* \
     && locale-gen $LANG && update-locale \
     # intialize powershell module cache
     # and disable telemetry

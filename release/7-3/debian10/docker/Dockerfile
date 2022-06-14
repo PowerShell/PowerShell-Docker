@@ -11,7 +11,7 @@ FROM debian:buster-slim AS final-image
 
 # Define ENVs for Localization/Globalization
 ENV PS_INSTALL_VERSION=7-preview \
-    PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
     LANG=en_US.UTF-8 \
