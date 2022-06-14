@@ -3,13 +3,11 @@
 
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS installer-env
 
-# Define Args for the needed to add the package
-ARG PS_INSTALL_VERSION=7
-
 COPY ${PS_INSTALL_PATH} /tmp/linux.tar.gz
 
 # define the folder we will be installing PowerShell to
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
+ENV PS_INSTALL_VERSION=7 \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION}
 
 # Create the install folder
 RUN mkdir -p ${PS_INSTALL_FOLDER}
@@ -24,8 +22,8 @@ RUN --mount=type=cache,target=/var/cache/tdnf \
 # Unzip the Linux tar.gz
 RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
-# Start a new stage so we lose all the tar.gz layers from the final image
-FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS powershell
+# Start a new stage so we lose all the tar.gz layers in the final image
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS final-image
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
@@ -33,7 +31,6 @@ COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershe
 # Define Args and Env needed to create links
 ENV PS_INSTALL_VERSION=7 \
     PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
-    \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
@@ -58,6 +55,7 @@ RUN tdnf update -y \
     # clean cached data
     && tdnf clean all \
     # remove cache folders and files
+    # TODO: would this not be tndf, instead of yum? does that exist?
     && rm -rf /var/cache/yum \
     # Give all user execute permissions and remove write permissions for others
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \

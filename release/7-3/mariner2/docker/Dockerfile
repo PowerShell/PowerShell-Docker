@@ -5,10 +5,9 @@ FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS powershell
 
 ARG PS_VERSION=7.3.0-preview.4
 
-# Define Args and Env needed to create links
-ARG PS_INSTALL_VERSION=7-preview
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
-    \
+# Define Args and Envs
+ENV PS_INSTALL_VERSION=7-preview \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
@@ -32,14 +31,10 @@ RUN --mount=type=cache,target=/var/cache/tdnf \
     # upgrade packages
     && tdnf upgrade -y \
     # clean cached data
-    && tdnf clean all
-
-# Create the pwsh symbolic link that points to powershell
-RUN ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh
-
-# intialize powershell module cache
-# and disable telemetry for this ONE session
-RUN export POWERSHELL_TELEMETRY_OPTOUT=1 \
+    && tdnf clean all \
+    # Create the pwsh symbolic link that points to powershell
+    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    && export POWERSHELL_TELEMETRY_OPTOUT=1 \
     && pwsh \
         -NoLogo \
         -NoProfile \
@@ -54,3 +49,24 @@ RUN export POWERSHELL_TELEMETRY_OPTOUT=1 \
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
 CMD [ "pwsh-preview" ]
+
+# # Create the pwsh symbolic link that points to powershell
+# RUN ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh
+
+# # intialize powershell module cache
+# # and disable telemetry for this ONE session
+# RUN export POWERSHELL_TELEMETRY_OPTOUT=1 \
+#     && pwsh \
+#         -NoLogo \
+#         -NoProfile \
+#         -Command " \
+#           \$ErrorActionPreference = 'Stop' ; \
+#           \$ProgressPreference = 'SilentlyContinue' ; \
+#           while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+#             Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+#             Start-Sleep -Seconds 6 ; \
+#           }"
+
+# # Use PowerShell as the default shell
+# # Use array to avoid Docker prepending /bin/sh -c
+# CMD [ "pwsh-preview" ]
