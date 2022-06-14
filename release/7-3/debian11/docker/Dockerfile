@@ -5,13 +5,13 @@
 
 FROM debian:bullseye-slim AS installer-env
 
-# Define Args for the needed to add the package
-ARG PS_INSTALL_VERSION=7-preview
-
 COPY ${PS_INSTALL_PATH} /tmp/powershell.deb
 
+FROM debian:bullseye-slim AS final-image
+
 # Define Env needed to create links
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
+ENV PS_INSTALL_VERSION=7-preview \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
@@ -21,7 +21,11 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Debian-11
 
 # Install dependencies and clean up
-RUN apt-get update \
+RUN --mount=from=installer-env,target=/mnt/pwsh,source=/tmp \
+    --mount=type=cache,target=/var/lib/apt \
+    --mount=type=cache,target=/var/cache/apt \
+    apt-get update \
+    && apt-get install --no-install-recommends -y /mnt/pwsh/powershell.deb \
     && apt-get install --no-install-recommends -y \
     # less is required for help in powershell
         less \
@@ -35,12 +39,11 @@ RUN apt-get update \
         libc6 \
         libgcc1 \
         libgssapi-krb5-2 \
+        liblttng-ust0 \
         libstdc++6 \
         zlib1g \
     # PowerShell remoting over SSH dependencies
         openssh-client \
-    # Install the powershell package
-    && apt-get install --no-install-recommends -y /tmp/powershell.deb \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \

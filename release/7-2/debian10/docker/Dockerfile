@@ -40,7 +40,6 @@ RUN --mount=from=installer-env,target=/mnt/pwsh,source=/tmp \
         zlib1g \
     # PowerShell remoting over SSH dependencies
         openssh-client \
-    && apt-get install --no-install-recommends -y /tmp/powershell.deb \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
