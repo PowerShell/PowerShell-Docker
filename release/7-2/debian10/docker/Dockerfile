@@ -1,11 +1,13 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# Docker image file that describes an Debian image with PowerShell installed from Microsoft APT Repo
+# Docker image file that describes an Debian 10 image with PowerShell installed from Microsoft APT Repo
 FROM debian:buster-slim AS installer-env
 
 # Define Args for the needed to add the package
 COPY ${PS_INSTALL_PATH} /tmp/powershell.deb
+
+FROM debian:buster-slim as final-image
 
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
@@ -15,7 +17,11 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Debian-10
 
 # Install dependencies and clean up
-RUN apt-get update \
+RUN --mount=from=installer-env,target=/mnt/pwsh,source=/tmp \
+    --mount=type=cache,target=/var/lib/apt \
+    --mount=type=cache,target=/var/cache/apt \
+    apt-get update \
+    && apt-get install --no-install-recommends -y /mnt/pwsh/powershell.deb \
     && apt-get install --no-install-recommends -y \
     # less is required for help in powershell
         less \
@@ -42,8 +48,6 @@ RUN apt-get update \
     && sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     # generate locale
     && locale-gen && update-locale \
-    # remove powershell package
-    && rm /tmp/powershell.deb \
     # intialize powershell module cache
     # and disable telemetry
     && export POWERSHELL_TELEMETRY_OPTOUT=1 \

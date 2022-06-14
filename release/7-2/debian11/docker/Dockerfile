@@ -1,12 +1,14 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# Docker image file that describes an Debian image with PowerShell installed from Microsoft APT Repo
+# Docker image file that describes an Debian 11 image with PowerShell installed from Microsoft APT Repo
+
 FROM debian:bullseye-slim AS installer-env
 
 COPY ${PS_INSTALL_PATH} /tmp/powershell.deb
 
-# Define Env needed to create links
+FROM debian:bullseye-slim as final-image
+
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
@@ -16,11 +18,15 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Debian-11
 
 # Install dependencies and clean up
-RUN apt-get update \
+RUN --mount=from=installer-env,target=/mnt/pwsh,source=/tmp \
+    --mount=type=cache,target=/var/lib/apt \
+    --mount=type=cache,target=/var/cache/apt \
+    apt-get update \
+    && apt-get install --no-install-recommends -y /mnt/pwsh/powershell.deb \
     && apt-get install --no-install-recommends -y \
     # less is required for help in powershell
         less \
-    # requied to setup the locale
+    # required to setup the locale
         locales \
     # required for SSL
         ca-certificates \
@@ -35,7 +41,6 @@ RUN apt-get update \
         zlib1g \
     # PowerShell remoting over SSH dependencies
         openssh-client \
-    && apt-get install --no-install-recommends -y /tmp/powershell.deb \
     && apt-get dist-upgrade -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
@@ -43,8 +48,8 @@ RUN apt-get update \
     && sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     # generate locale
     && locale-gen && update-locale \
-    # remove powershell package
-    && rm /tmp/powershell.deb \
+    # intialize powershell module cache
+    # and disable telemetry
     && export POWERSHELL_TELEMETRY_OPTOUT=1 \
     && pwsh \
         -NoLogo \
