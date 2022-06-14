@@ -5,17 +5,11 @@
 
 FROM alpine:3.13 AS installer-env
 
-# Define Args for the needed to add the package
-ARG PS_INSTALL_VERSION=7
-
-# TODO: where is the caching supposed to happen? At the level where download happens right?
-# TODO contd: COPY will cache, but just won't recopy the file if its checksum is the same as previously in that image layer
-# Alternatively, I can cache tmp folder where the powershell package is copied INTO or opt folder where its extracted to
-# but given we shed that in the final image, is there benefit?
 COPY ${PS_INSTALL_PATH} /tmp/linux.tar.gz
 
 # define the folder we will be installing PowerShell to
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
+ENV PS_INSTALL_VERSION=7 \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION}
 
 # Create the install folder
 RUN mkdir -p ${PS_INSTALL_FOLDER}
@@ -29,10 +23,9 @@ FROM alpine:3.13
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
-# Define Args and Env needed to create links
-ARG PS_INSTALL_VERSION=7
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
-    \
+# Define Args and EnvS
+ENV PS_INSTALL_VERSION=7 \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
