@@ -8,9 +8,10 @@ COPY ${PS_INSTALL_PATH} /tmp/powershell.deb
 
 FROM ubuntu:22.04 AS final-image
 
+ARG PS_INSTALL_VERSION=7-preview
+
 # Define ENVs
-ENV PS_INSTALL_VERSION=7-preview \
-    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
+ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \

@@ -9,9 +9,10 @@ COPY ${PS_INSTALL_PATH} /tmp/powershell.deb
 
 FROM debian:bullseye-slim AS final-image
 
+ARG PS_INSTALL_VERSION=7-preview
+
 # Define Env needed to create links
-ENV PS_INSTALL_VERSION=7-preview \
-    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
+ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
@@ -54,8 +55,8 @@ RUN --mount=from=installer-env,target=/mnt/pwsh,source=/tmp \
     # Give all user execute permissions and remove write permissions for others
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     # Create the pwsh symbolic link that points to powershell
-    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
-    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
+    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    && ln -sf ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
     # intialize powershell module cache
     # and disable telemetry
     && export POWERSHELL_TELEMETRY_OPTOUT=1 \
