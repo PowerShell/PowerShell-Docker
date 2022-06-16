@@ -60,15 +60,15 @@ RUN ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh
 # and disable telemetry for this ONE session
 RUN export POWERSHELL_TELEMETRY_OPTOUT=1 \
     && pwsh \
-    -NoLogo \
-    -NoProfile \
-    -Command " \
-    \$ErrorActionPreference = 'Stop' ; \
-    \$ProgressPreference = 'SilentlyContinue' ; \
-    while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
-    Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
-    Start-Sleep -Seconds 6 ; \
-    }"
+        -NoLogo \
+        -NoProfile \
+        -Command " \
+            \$ErrorActionPreference = 'Stop' ; \
+            \$ProgressPreference = 'SilentlyContinue' ; \
+            while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+                Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+                Start-Sleep -Seconds 6 ; \
+            }"
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
