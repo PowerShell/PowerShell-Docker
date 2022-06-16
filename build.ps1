@@ -225,9 +225,7 @@ Begin {
         $Name = $null
     }
 
-    if (!$IsWindows) {
-        $ENV:DOCKER_BUILDKIT = 1
-    }
+    $ENV:DOCKER_BUILDKIT = 1
 
     if ($PSCmdlet.ParameterSetName -notin 'GenerateMatrixJson', 'GenerateTagsYaml', 'DupeCheck', 'GenerateManifestLists' -and $Channel.Count -gt 1)
     {

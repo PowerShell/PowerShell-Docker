@@ -1,6 +1,20 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS installer-env
+
+# Define Args for the needed to add the package
+ARG PS_VERSION=7.3.0-preview.4
+ARG PS_PACKAGE=powershell-preview-${PS_VERSION}-1.cm1.x86_64.rpm
+ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
+ARG PS_INSTALL_VERSION=7-preview
+
+# Download the Linux tar.gz and save it
+ADD ${PS_PACKAGE_URL} /tmp/powershell.rpm
+
+RUN echo ${PS_PACKAGE_URL}
+
+# Start a new stage so we lose all the tar.gz layers from the final image
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS powershell
 
 ARG PS_VERSION=7.3.0-preview.4
@@ -29,11 +43,15 @@ RUN --mount=type=cache,target=/var/cache/tdnf \
     # required for SSH
     openssh-clients \
     ca-certificates \
-    powershell-preview \
+    dotnet-runtime-7.0 \
     # upgrade packages
     && tdnf upgrade -y \
     # clean cached data
     && tdnf clean all
+
+RUN --mount=type=cache,target=/var/cache/tdnf,rw \
+    --mount=from=installer-env,target=/mnt/rpm,source=/tmp \
+    rpm -i /mnt/rpm/powershell.rpm
 
 # Create the pwsh symbolic link that points to powershell
 RUN ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh
@@ -45,12 +63,12 @@ RUN export POWERSHELL_TELEMETRY_OPTOUT=1 \
         -NoLogo \
         -NoProfile \
         -Command " \
-          \$ErrorActionPreference = 'Stop' ; \
-          \$ProgressPreference = 'SilentlyContinue' ; \
-          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
-            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
-            Start-Sleep -Seconds 6 ; \
-          }"
+            \$ErrorActionPreference = 'Stop' ; \
+            \$ProgressPreference = 'SilentlyContinue' ; \
+            while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+                Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+                Start-Sleep -Seconds 6 ; \
+            }"
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
