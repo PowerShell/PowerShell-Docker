@@ -9,9 +9,6 @@
         {"Tag": "focal"},
         {"Tag": "20.04"}
     ],
-    "manifestLists": [
-        "preview"
-    ],
     "TestProperties": {
         "size": 355
     },
