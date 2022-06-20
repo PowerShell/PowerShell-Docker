@@ -154,6 +154,18 @@ function Get-ImageList
     }
 }
 
+function Get-CacheFolder
+{
+    $tmpPath = ([System.IO.Path]::GetTempPath())
+    $cacheFolderPath = Join-Path -Path $tmpPath -ChildPath "PSDockerCache"
+    if (!(Test-Path $cacheFolderPath))
+    {
+        New-Item -Path $cacheFolderPath -ItemType Directory
+    }
+
+    return $cacheFolderPath
+}
+
 enum DistributionState {
     Unknown
     ImageCreation
@@ -721,10 +733,25 @@ function Get-TestParams
         $packageVersion = $packageVersion -replace '-', '_'
     }
 
-    $pwshSourceInstallerFile = "https://github.com/PowerShell/PowerShell/releases/download/v$($psversion)/$($allmeta.meta.PackageFormat)"
-    $pwshDestLocalFilePath = Join-Path -Path $contextPath -ChildPath $allmeta.meta.PackageFormat
-    $wc=[System.Net.WebClient]::new()
-    $wc.DownloadFile($pwshSourceInstallerFile, $pwshLocalFilePath)
+    # get tmp cache location call method
+    $tmpCacheFolder = Get-CacheFolder
+    $cachedPwshFilePath = Join-Path -Path $tmpCacheFolder -ChildPath $allmeta.meta.PackageFormat
+
+    # check if file already exists in cache
+    if (!(Test-Path $cachedPwshFilePath))
+    {
+        # download the powershell installer file
+        $pwshSourceInstallerFile = "https://github.com/PowerShell/PowerShell/releases/download/v$($psversion)/$($allmeta.meta.PackageFormat)"
+        $wc=[System.Net.WebClient]::new()
+        $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
+    }
+
+    # copy file over if it doesn't already exist in context path.
+    $pwshLocalFilePath = Join-Path $contextPath -ChildPath $allmeta.meta.PackageFormat
+    if (!(Test-Path $pwshLocalFilePath))
+    {
+        Copy-Item -Path $cachedPwshFilePath -Destination $pwshLocalFilePath
+    }
 
     $buildArgs = [System.Collections.Generic.Dictionary[string,string]]::new()
     $buildArgs['fromTag'] = $actualTagData.FromTag
@@ -733,7 +760,7 @@ function Get-TestParams
     $buildArgs['IMAGE_NAME'] = $imageNameParam
     $buildArgs['BaseImage'] = $BaseImage
     $buildArgs['PS_INSTALL_VERSION'] = Get-PwshInstallVersion -Channel $actualChannel
-    $buildArgs['PS_INSTALL_PATH'] = $pwshDestLocalFilePath
+    $buildArgs['PS_INSTALL_PATH'] = $pwshLocalFilePath
 
     if ($allMeta.meta.PackageFormat)
     {
