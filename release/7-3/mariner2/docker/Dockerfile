@@ -35,9 +35,11 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 # Install dependencies and clean up
 RUN --mount=type=cache,target=/var/cache/tdnf \
     tdnf install -y mariner-repos-microsoft-preview \
-    && tdnf update -y \
+    && tdnf makecache \
     # install dependencies
     && tdnf install -y \
+    # required for localization
+    icu \
     # required for help in PowerShell
     less \
     # required for SSH
@@ -54,7 +56,7 @@ RUN --mount=type=cache,target=/var/cache/tdnf,rw \
     rpm -i /mnt/rpm/powershell.rpm
 
 # Create the pwsh symbolic link that points to powershell
-RUN ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh
+RUN if [ -f "/opt/microsoft/powershell/7-preview/pwsh" ]; then ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh; fi
 
 # intialize powershell module cache
 # and disable telemetry for this ONE session
@@ -72,4 +74,4 @@ RUN export POWERSHELL_TELEMETRY_OPTOUT=1 \
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
-CMD [ "pwsh-preview" ]
+CMD [ "pwsh" ]
