@@ -1,6 +1,6 @@
 {
     "IsLinux" : true,
-    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.cm1.x86_64.rpm",
+    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.cm.x86_64.rpm",
     "SkipGssNtlmSspTests": true,
     "osVersion": "Mariner 2.0",
     "shortTags": [

@@ -4,40 +4,21 @@
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=7.2.3
-ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
+ARG PS_VERSION=7.2.5
+ARG PS_PACKAGE=powershell-${PS_VERSION}-1.cm1.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7-preview
 
 # Download the Linux tar.gz and save it
-ADD ${PS_PACKAGE_URL} /tmp/linux.tar.gz
+ADD ${PS_PACKAGE_URL} /tmp/powershell.rpm
 
 RUN echo ${PS_PACKAGE_URL}
-
-# define the folder we will be installing PowerShell to
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
-
-# Create the install folder
-RUN mkdir -p ${PS_INSTALL_FOLDER}
-
-# Install tar a gzip so we can unzip the tar.gz
-RUN --mount=type=cache,target=/var/cache/tdnf \
-    tdnf install -y \
-    tar \
-    gzip \
-    && tdnf clean all
-
-# Unzip the Linux tar.gz
-RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
 # Start a new stage so we lose all the tar.gz layers from the final image
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS powershell
 
-ARG PS_VERSION=7.3.0-preview.1
+ARG PS_VERSION=7.2.5
 ARG PS_INSTALL_VERSION=7-preview
-
-# Copy only the files we need from the previous stage
-COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 
 # Define Args and Env needed to create links
 ARG PS_INSTALL_VERSION=7-preview
@@ -52,7 +33,9 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Mariner-2.0
 
 # Install dependencies and clean up
-RUN tdnf update -y \
+RUN --mount=type=cache,target=/var/cache/tdnf \
+    tdnf install -y mariner-repos-microsoft-preview \
+    && tdnf update -y \
     # install dependencies
     && tdnf install -y \
     # required for localization
@@ -62,32 +45,32 @@ RUN tdnf update -y \
     # required for SSH
     openssh-clients \
     ca-certificates \
+    dotnet-runtime-6.0 \
     # upgrade packages
     && tdnf upgrade -y \
     # clean cached data
-    && tdnf clean all \
-    # remove cache folders and files
-    && rm -rf /var/cache/yum
+    && tdnf clean all
 
-# Give all user execute permissions and remove write permissions for others
-RUN chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
-    # Create the pwsh symbolic link that points to powershell
-    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
-    # Create the pwsh symbolic link that points to powershell
-    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
-    # intialize powershell module cache
-    # and disable telemetry
-    && export POWERSHELL_TELEMETRY_OPTOUT=1 \
+RUN --mount=type=cache,target=/var/cache/tdnf,rw \
+    --mount=from=installer-env,target=/mnt/rpm,source=/tmp \
+    rpm -i /mnt/rpm/powershell.rpm
+
+# Create the pwsh symbolic link that points to powershell
+RUN if [ -f "/opt/microsoft/powershell/7-preview/pwsh" ]; then ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh; fi
+
+# intialize powershell module cache
+# and disable telemetry for this ONE session
+RUN export POWERSHELL_TELEMETRY_OPTOUT=1 \
     && pwsh \
         -NoLogo \
         -NoProfile \
         -Command " \
-          \$ErrorActionPreference = 'Stop' ; \
-          \$ProgressPreference = 'SilentlyContinue' ; \
-          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
-            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
-            Start-Sleep -Seconds 6 ; \
-          }"
+            \$ErrorActionPreference = 'Stop' ; \
+            \$ProgressPreference = 'SilentlyContinue' ; \
+            while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+                Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+                Start-Sleep -Seconds 6 ; \
+            }"
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
