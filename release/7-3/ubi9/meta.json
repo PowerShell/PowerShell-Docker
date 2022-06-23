@@ -8,6 +8,9 @@
     "shortTags": [
         {"Tag": "9"}
     ],
+    "manifestLists": [
+        "preview"
+    ],
     "SubImage": "test-deps",
     "TestProperties": {
         "size": 502

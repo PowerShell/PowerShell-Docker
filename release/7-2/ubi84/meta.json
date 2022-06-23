@@ -11,6 +11,9 @@
     "shortTags": [
         {"Tag": "8.4"}
     ],
+    "manifestLists": [
+        "latest"
+    ],
     "SubImage": "test-deps",
     "TestProperties": {
         "size": 725
