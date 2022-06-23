@@ -9,7 +9,7 @@ FROM ${BaseImage}
 # Install dependencies and clean up
 RUN --mount=type=cache,target=/var/cache/tdnf \
     # install dependencies
-    && tdnf install -y \
+    tdnf install -y \
     dnf-utils \
     sudo \
     curl \
