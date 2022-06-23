@@ -7,8 +7,8 @@
     "Base64EncodePackageUrl": true,
     "UseAcr": true,
     "tagTemplates": [
-        "#psversion#-arm32v7-ubuntu-#shorttag#",
-        "arm32v7-ubuntu-#shorttag#"
+        "preview-#psversion#-ubuntu-#shorttag#-arm32",
+        "preview-ubuntu-#shorttag#-arm32"
     ],
     "shortTags": [
         {"Tag": "bionic"},
