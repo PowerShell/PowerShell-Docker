@@ -156,8 +156,14 @@ param(
     [Parameter(ParameterSetName="GenerateMatrixJson")]
     [string]
     [ValidateSet('All','Linux','Windows')]
-    $OsFilter
+    $OsFilter,
 
+    [Parameter(ParameterSetName="localBuildByName")]
+    [Parameter(ParameterSetName="localBuildAll")]
+    [Parameter(Mandatory, ParameterSetName="TestByName")]
+    [Parameter(Mandatory, ParameterSetName="TestAll")]
+    [switch]
+    $ResetPSDockerCache
 )
 
 DynamicParam {
@@ -227,6 +233,11 @@ Begin {
 
     if (!$IsWindows) {
         $ENV:DOCKER_BUILDKIT = 1
+    }
+
+    if ($ResetPSDockerCache)
+    {
+        Reset-CacheFolder
     }
 
     if ($PSCmdlet.ParameterSetName -notin 'GenerateMatrixJson', 'GenerateTagsYaml', 'DupeCheck', 'GenerateManifestLists' -and $Channel.Count -gt 1)

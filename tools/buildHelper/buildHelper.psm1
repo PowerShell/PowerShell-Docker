@@ -166,6 +166,20 @@ function Get-CacheFolder
     return $cacheFolderPath
 }
 
+function Reset-CacheFolder
+{
+    $cacheFolderPath = Get-CacheFolder
+    if (Test-Path -Path $cacheFolderPath)
+    {
+        Remove-Item $cacheFolderPath -Recurse
+    }
+}
+
+function Get-PowerShellReleaseUrl
+{
+    return "https://github.com/PowerShell/PowerShell/releases/download/"
+}
+
 enum DistributionState {
     Unknown
     ImageCreation
@@ -741,7 +755,8 @@ function Get-TestParams
     if (!(Test-Path $cachedPwshFilePath))
     {
         # download the powershell installer file
-        $pwshSourceInstallerFile = "https://github.com/PowerShell/PowerShell/releases/download/v$($psversion)/$($allmeta.meta.PackageFormat)"
+        $pwshReleaseUrl = Get-PowerShellReleaseUrl
+        $pwshSourceInstallerFile = "$pwshReleaseUrl/v$psversion/$($allmeta.meta.PackageFormat)"
         $wc=[System.Net.WebClient]::new()
         $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
     }
@@ -788,9 +803,8 @@ function Get-TestParams
         }
         else
         {
-            
-
-            $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
+            $pwshReleaseUrl = Get-PowerShellReleaseUrl
+            $packageUrl = [System.UriBuilder]::new($pwshReleaseUrl)
 
             $channelTag = Get-ChannelPackageTag -Channel $actualChannel
 
