@@ -1,6 +1,6 @@
 {
     "IsLinux" : true,
-    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.cm.x86_64.rpm",
     "SkipGssNtlmSspTests": true,
     "osVersion": "Mariner 2.0",
     "shortTags": [
@@ -9,8 +9,8 @@
     "ShortDistroName": "mariner",
     "SubImage": "test-deps",
     "TestProperties": {
-        "size": 760
+        "size": 387
     },
     "EndOfLife": "2022-10-14",
-    "DistributionState": "Validating"
+    "DistributionState": "Validated"
 }
