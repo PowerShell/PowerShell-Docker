@@ -3,10 +3,11 @@
 
 FROM --platform=linux/arm/v7 ubuntu:jammy AS installer-env
 
-ARG PS_VERSION=7.2.4
+ARG PS_VERSION=7.3.0-preview.4
 ENV PS_PACKAGE=powershell-${PS_VERSION}-linux-arm32.tar.gz
 ENV PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7-preview
+
 # define the folder we will be installing PowerShell to
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 # Create the install folder
@@ -33,7 +34,7 @@ FROM --platform=linux/arm/v7 ubuntu:jammy AS final-image
 
 # Define Args and Env needed to create links
 ARG PS_INSTALL_VERSION=7-preview
-ARG PS_VERSION=7.2.4
+ARG PS_VERSION=7.3.0-preview.4
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
     # Define ENVs for Localization/Globalization
