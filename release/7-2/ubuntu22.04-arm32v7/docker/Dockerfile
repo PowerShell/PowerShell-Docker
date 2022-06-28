@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. 
 # Licensed under the MIT License.
 
-FROM --platform=linux/arm/v7 ubuntu:focal AS installer-env
+FROM --platform=linux/arm/v7 ubuntu:jammy AS installer-env
 
-ARG PS_VERSION=7.2.3
+ARG PS_VERSION=7.2.4
 ENV PS_PACKAGE=powershell-${PS_VERSION}-linux-arm32.tar.gz
 ENV PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
@@ -40,7 +40,7 @@ FROM --platform=linux/arm/v7 ubuntu:focal AS final-image
 
 # Define Args and Env needed to create links
 ARG PS_INSTALL_VERSION=7
-ARG PS_VERSION=7.2.3
+ARG PS_VERSION=7.2.4
 
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
@@ -50,7 +50,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-arm32v7-Ubuntu-20.04
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-arm32v7-Ubuntu-22.04
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
@@ -58,7 +58,7 @@ COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershe
 
 RUN \
   apt-get update \
-  && apt-get install --no-install-recommends ca-certificates libunwind8 libssl1.0 libicu60 less --yes
+  && apt-get install --no-install-recommends ca-certificates libunwind8 libssl3 libicu70 less --yes
 
     # Give all user execute permissions and remove write permissions for others
 RUN chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
