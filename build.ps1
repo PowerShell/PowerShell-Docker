@@ -158,10 +158,6 @@ param(
     [ValidateSet('All','Linux','Windows')]
     $OsFilter,
 
-    [Parameter(ParameterSetName="localBuildByName")]
-    [Parameter(ParameterSetName="localBuildAll")]
-    [Parameter(Mandatory, ParameterSetName="TestByName")]
-    [Parameter(Mandatory, ParameterSetName="TestAll")]
     [switch]
     $ResetPSDockerCache
 )
