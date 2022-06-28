@@ -18,6 +18,9 @@
         "size": 550,
         "Arm32": true
     },
+    "manifestLists": [
+        "preview"
+    ],
     "EndOfLife": "2023-04-02",
     "DistributionState": "Validated"
 }
