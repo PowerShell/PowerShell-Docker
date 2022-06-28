@@ -1,0 +1,23 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-arm32.tar.gz",
+    "osVersion": "Ubuntu 22.04 ARM 32v7",
+    "SkipGssNtlmSspTests": true,
+    "Base64EncodePackageUrl": true,
+    "UseAcr": true,
+    "tagTemplates": [
+        "preview-#psversion#-ubuntu-#shorttag#-arm32",
+        "preview-ubuntu-#shorttag#-arm32"
+    ],
+    "shortTags": [
+        {"Tag": "jammy"},
+        {"Tag": "22.04"}
+    ],
+    "TestProperties": {
+        "size": 550,
+        "Arm32": true
+    },
+    "EndOfLife": "2023-04-02",
+    "DistributionState": "Validated"
+}
