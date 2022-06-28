@@ -9,7 +9,7 @@
         {"Tag": "9"}
     ],
     "manifestLists": [
-        "preview"
+        "ubi-preview"
     ],
     "SubImage": "test-deps",
     "TestProperties": {

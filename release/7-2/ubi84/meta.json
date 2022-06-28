@@ -12,7 +12,7 @@
         {"Tag": "8.4"}
     ],
     "manifestLists": [
-        "latest"
+        "ubi"
     ],
     "SubImage": "test-deps",
     "TestProperties": {
