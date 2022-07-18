@@ -8,9 +8,8 @@ FROM ${BaseImage}
 
 # Install dependencies and clean up
 RUN --mount=type=cache,target=/var/cache/tdnf \
-    tdnf update -y \
     # install dependencies
-    && tdnf install -y \
+    tdnf install -y \
     dnf-utils \
     sudo \
     curl \
@@ -23,8 +22,7 @@ RUN --mount=type=cache,target=/var/cache/tdnf \
     git \
     mariner-repos-microsoft-preview \
     net-tools \
-    # upgrade packages
-    && tdnf upgrade -y \
+    tar \
     # clean cached data
     && tdnf clean all
 

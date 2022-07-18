@@ -25,9 +25,6 @@ RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 # Start a new stage so we lose all the tar.gz layers in the final image
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS final-image
 
-# Copy only the files we need from the previous stage
-COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
-
 # Define Args and Env needed to create links
 ENV PS_INSTALL_VERSION=7 \
     PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
@@ -40,7 +37,9 @@ ENV PS_INSTALL_VERSION=7 \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Mariner-2.0
 
 # Install dependencies and clean up
-RUN tdnf update -y \
+RUN --mount=type=cache,target=/var/cache/tdnf \
+    tdnf install -y mariner-repos-microsoft-preview \
+    && tdnf update -y \
     # install dependencies
     && tdnf install -y \
     # required for localization
@@ -50,13 +49,11 @@ RUN tdnf update -y \
     # required for SSH
     openssh-clients \
     ca-certificates \
+    dotnet-runtime-6.0 \
     # upgrade packages
     && tdnf upgrade -y \
     # clean cached data
     && tdnf clean all \
-    # remove cache folders and files
-    # TODO: would this not be tndf, instead of yum? does that exist?
-    && rm -rf /var/cache/yum \
     # Give all user execute permissions and remove write permissions for others
     && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     # Create the pwsh symbolic link that points to powershell
@@ -70,12 +67,12 @@ RUN tdnf update -y \
         -NoLogo \
         -NoProfile \
         -Command " \
-          \$ErrorActionPreference = 'Stop' ; \
-          \$ProgressPreference = 'SilentlyContinue' ; \
-          while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
-            Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
-            Start-Sleep -Seconds 6 ; \
-          }"
+            \$ErrorActionPreference = 'Stop' ; \
+            \$ProgressPreference = 'SilentlyContinue' ; \
+            while(!(Test-Path -Path \$env:PSModuleAnalysisCachePath)) {  \
+                Write-Host "'Waiting for $env:PSModuleAnalysisCachePath'" ; \
+                Start-Sleep -Seconds 6 ; \
+            }"
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c

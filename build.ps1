@@ -227,9 +227,7 @@ Begin {
         $Name = $null
     }
 
-    if (!$IsWindows) {
-        $ENV:DOCKER_BUILDKIT = 1
-    }
+    $ENV:DOCKER_BUILDKIT = 1
 
     if ($ResetPSDockerCache)
     {

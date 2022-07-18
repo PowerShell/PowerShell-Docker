@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. 
 # Licensed under the MIT License.
 
-FROM arm32v7/ubuntu:bionic AS installer-env
+FROM --platform=linux/arm/v7 ubuntu:focal AS installer-env
 
-ARG PS_VERSION=6.2.3
+ARG PS_VERSION=7.2.3
 ENV PS_PACKAGE=powershell-${PS_VERSION}-linux-arm32.tar.gz
 ENV PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7
@@ -36,11 +36,11 @@ RUN ls -l /tmp/powershell.tar.gz
     # Unzip the Linux tar.gz
 RUN tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
 
-FROM arm32v7/ubuntu:bionic AS final-image
+FROM --platform=linux/arm/v7 ubuntu:focal AS final-image
 
 # Define Args and Env needed to create links
 ARG PS_INSTALL_VERSION=7
-ARG PS_VERSION=6.2.3
+ARG PS_VERSION=7.2.3
 
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
@@ -50,7 +50,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     LANG=en_US.UTF-8 \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-arm32v7-Ubuntu-18.04
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-arm32v7-Ubuntu-20.04
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]

@@ -23,8 +23,7 @@ RUN --mount=type=cache,target=/var/cache/tdnf \
     git \
     mariner-repos-microsoft-preview \
     net-tools \
-    # upgrade packages
-    && tdnf upgrade -y \
+    tar \
     # clean cached data
     && tdnf clean all
 

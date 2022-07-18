@@ -1,5 +1,5 @@
 # Docker image file that describes an CentOS7 image with PowerShell installed from Microsoft YUM Repo
-ARG BaseImage=mcr.microsoft.com/powershell:ubi-8.4
+ARG BaseImage=mcr.microsoft.com/powershell:ubi-9
 
 FROM ${BaseImage}
 
