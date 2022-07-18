@@ -52,7 +52,7 @@ COPY --from=installer-env ["/tmp/gss-ntlmssp/gss-ntlmssp.pkg.tar.zst", "/tmp/gss
 ARG BlackArch_Strap_URL=https://blackarch.org/strap.sh
 
 # Download BlackArch Linux strap shell script
-RUN curl -sSL ${BlackArch_Strap_URL} -o /tmp/strap.sh
+ADD ${BlackArch_Strap_URL} /tmp/strap.sh
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.0.1

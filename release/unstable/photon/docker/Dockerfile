@@ -17,7 +17,7 @@ ARG PS_INSTALL_VERSION=7
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 
 # Download the PowerShell Core Linux tar.gz and save it
-RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell-linux.tar.gz
+ADD ${PS_PACKAGE_URL} /tmp/powershell-linux.tar.gz
 
 # Installation of packages to uncompress downloaded package
 RUN \
