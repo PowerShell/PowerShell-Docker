@@ -2,17 +2,17 @@
     "IsLinux" : true,
     "UseLinuxVersion": false,
     "PackageFormat": "powershell-${PS_VERSION}-linux-arm32.tar.gz",
-    "osVersion": "Ubuntu 18.04 ARM 32v7",
+    "osVersion": "Ubuntu 20.04 ARM 32v7",
     "SkipGssNtlmSspTests": true,
     "Base64EncodePackageUrl": true,
     "UseAcr": true,
     "tagTemplates": [
-        "#psversion#-arm32v7-ubuntu-#shorttag#",
-        "arm32v7-ubuntu-#shorttag#"
+        "#psversion#-ubuntu-#shorttag#-arm32",
+        "ubuntu-#shorttag#-arm32"
     ],
     "shortTags": [
-        {"Tag": "bionic"},
-        {"Tag": "18.04"}
+        {"Tag": "focal"},
+        {"Tag": "20.04"}
     ],
     "TestProperties": {
         "size": 550,
