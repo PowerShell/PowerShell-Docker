@@ -4,15 +4,12 @@
     "PackageFormat": "powershell-${PS_VERSION}-linux-arm32.tar.gz",
     "osVersion": "Ubuntu 22.04 ARM 32v7",
     "SkipGssNtlmSspTests": true,
+    "ShortDistroName": "ubuntu",
     "Base64EncodePackageUrl": true,
     "UseAcr": true,
-    "tagTemplates": [
-        "preview-#psversion#-ubuntu-#shorttag#-arm32",
-        "preview-ubuntu-#shorttag#-arm32"
-    ],
     "shortTags": [
-        {"Tag": "jammy"},
-        {"Tag": "22.04"}
+        {"Tag": "jammy-arm32"},
+        {"Tag": "22.04-arm32"}
     ],
     "TestProperties": {
         "size": 550,
