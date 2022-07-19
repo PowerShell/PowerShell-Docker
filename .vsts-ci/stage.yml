@@ -20,7 +20,12 @@ stages:
       displayName: Generate Matrix YAML ${{ parameters.channel }}
       steps:
       - pwsh: |
-          ./build.ps1 -GenerateMatrixJson -Channel ${{ parameters.channel }} -Verbose -Acr ${{ parameters.acr }} -OsFilter  ${{ parameters.osFilter }}
+          try {
+             ./build.ps1 -GenerateMatrixJson -Channel ${{ parameters.channel }} -Verbose -Acr ${{ parameters.acr }} -OsFilter  ${{ parameters.osFilter }}
+          } catch {
+             Get-Error $_
+             throw
+          }
         displayName: Generate Matrix YAML
         condition: succeededOrFailed()
         name: matrix
