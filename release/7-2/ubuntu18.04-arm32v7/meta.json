@@ -20,5 +20,6 @@
         "Arm32": true
     },
     "EndOfLife": "2023-04-02",
-    "DistributionState": "Validated"
+    "DistributionState": "Validated",
+    "UseInCi": false
 }
