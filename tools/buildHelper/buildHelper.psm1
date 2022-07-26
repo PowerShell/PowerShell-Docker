@@ -814,9 +814,9 @@ function Get-TestParams
         {
             $packageUrl = [System.UriBuilder]::new($sasData.sasBase)
 
-            # $channelTag = Get-ChannelPackageTag -Channel $actualChannel
-            # $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
-            # $packageName = $packageName -replace '\${channelTag}', $channelTag
+            $channelTag = Get-ChannelPackageTag -Channel $actualChannel
+            $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+            $packageName = $packageName -replace '\${channelTag}', $channelTag
             $containerName = = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
             $packageUrl.Query = $sasData.sasQuery
@@ -836,10 +836,10 @@ function Get-TestParams
             $pwshReleaseUrl = Get-PowerShellReleaseUrl
             $packageUrl = [System.UriBuilder]::new($pwshReleaseUrl)
 
-            # $channelTag = Get-ChannelPackageTag -Channel $actualChannel
+            $channelTag = Get-ChannelPackageTag -Channel $actualChannel
 
-            # $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
-            # $packageName = $packageName -replace '\${channelTag}', $channelTag
+            $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+            $packageName = $packageName -replace '\${channelTag}', $channelTag
             $containerName = 'v' + ($psversion -replace '~', '-')
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
             $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
