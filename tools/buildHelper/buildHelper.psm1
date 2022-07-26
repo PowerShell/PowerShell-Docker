@@ -197,6 +197,11 @@ class DockerImageMetaData {
             )
         }
 
+        if (!$this.TagTemplates -and !$this.ShortDistroName)
+        {
+            throw "Image does not contain tag templates and short distro name and must contain one."
+        }
+
         switch -RegEx ($this.GetDistributionState()) {
             'Unknown|Validating' {
                 $this.OsVersion = $this.OsVersion + ' (In Validation)'
