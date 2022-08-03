@@ -817,7 +817,7 @@ function Get-TestParams
             $channelTag = Get-ChannelPackageTag -Channel $actualChannel
             $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
             $packageName = $packageName -replace '\${channelTag}', $channelTag
-            $containerName = = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
+            $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
             $packageUrl.Query = $sasData.sasQuery
             if($allMeta.meta.Base64EncodePackageUrl)
