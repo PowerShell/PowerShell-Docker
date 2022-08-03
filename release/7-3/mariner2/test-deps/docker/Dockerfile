@@ -24,6 +24,7 @@ RUN --mount=type=cache,target=/var/cache/tdnf \
     mariner-repos-microsoft-preview \
     net-tools \
     tar \
+    util-linux \
     # clean cached data
     && tdnf clean all
 
