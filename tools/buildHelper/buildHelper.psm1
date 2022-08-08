@@ -795,6 +795,7 @@ function Get-TestParams
             # download the powershell installer file
             $pwshReleaseUrl = Get-PowerShellReleaseUrl
             $pwshSourceInstallerFile = "$pwshReleaseUrl/v$psversion/$($packageName)"
+            Write-Verbose -Message "pwshSourceInstallerFile $pwshSourceInstallerFile" -Verbose
             $wc=[System.Net.WebClient]::new()
             $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
         }
