@@ -800,7 +800,7 @@ function Get-TestParams
             try {
                 $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
             }
-            catch [MethodInvocationException]{
+            catch {
                 Write-Verbose -Message $pwshSourceInstallerFile -Verbose
                 Write-Verbose -Message $cachedPwshFilePath -Verbose
                 Write-Verbose -Message $_.Message -Verbose
