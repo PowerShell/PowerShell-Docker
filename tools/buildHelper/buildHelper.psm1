@@ -795,9 +795,17 @@ function Get-TestParams
             # download the powershell installer file
             $pwshReleaseUrl = Get-PowerShellReleaseUrl
             $pwshSourceInstallerFile = "$pwshReleaseUrl/v$psversion/$($packageName)"
-            Write-Verbose -Message "pwshSourceInstallerFile $pwshSourceInstallerFile" -Verbose
+
             $wc=[System.Net.WebClient]::new()
-            $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
+            try {
+                $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
+            }
+            catch [MethodInvocationException]{
+                Write-Verbose -Message $pwshSourceInstallerFile -Verbose
+                Write-Verbose -Message $cachedPwshFilePath -Verbose
+                Write-Verbose -Message $_.Message -Verbose
+                return
+            }
         }
 
         # copy file over if it doesn't already exist in context path.
