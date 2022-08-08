@@ -177,7 +177,7 @@ function Reset-CacheFolder
 
 function Get-PowerShellReleaseUrl
 {
-    return "https://github.com/PowerShell/PowerShell/releases/download"
+    return "https://github.com/PowerShell/PowerShell/releases/download/"
 }
 
 function Get-PackageName
@@ -794,7 +794,8 @@ function Get-TestParams
         {
             # download the powershell installer file
             $pwshReleaseUrl = Get-PowerShellReleaseUrl
-            $pwshSourceInstallerFile = "$pwshReleaseUrl/v$packageVersion/$($packageName)"
+            # $pwshSourceInstallerFile = "$pwshReleaseUrl/v$packageVersion/$($packageName)"
+            $pwshSourceInstallerFile = $pwshReleaseUrl + $packageVersion + "/" + $packageName
 
             $wc=[System.Net.WebClient]::new()
             try {
@@ -806,7 +807,9 @@ function Get-TestParams
                 # https://github.com/PowerShell/PowerShell/releases/download/v7.2.2/powershell_7.2.2-1.deb_amd64.deb
                 # RuntimeException: Downloading file from https://github.com/PowerShell/PowerShell/releases/download//vv7.2.2/powershell-preview_v7.2.2-1.deb_amd64.deb to 
                 # /tmp/PSDockerCache/powershell-preview_v7.2.2-1.deb_amd64.deb failed due to Exception calling "DownloadFile" with "2" argument(s): "The remote server returned an error: (404) Not Found."
-                # 
+
+                # Downloading file from https://github.com/PowerShell/PowerShell/releases/download/v7.3.0-preview.6/powershell_7.3.0-preview.6-1.deb_amd64.deb to /tmp/PSDockerCache/powershell_7.3.0-preview.6-1.deb_amd64.deb with preview channel failed due to Exception calling "DownloadFile" with "2" argument(s): "The remote server returned an error: (404) Not Found."
+                # Downloading file from https://github.com/PowerShell/PowerShell/releases/download/v7.3.0-preview.6/powershell_7.3.0-preview.6-1.deb_amd64.deb to /tmp/PSDockerCache/powershell_7.3.0-preview.6-1.deb_amd64.deb with preview channel failed due to Exception calling "DownloadFile" with "2" argument(s): "The remote server returned an error: (404) Not Found." 
             }
         }
 
