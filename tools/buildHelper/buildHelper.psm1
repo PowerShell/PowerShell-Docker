@@ -198,7 +198,7 @@ function Get-PackageName
     $packageNameFromMetadata = $packageNameFromMetadata -replace '\${PS_VERSION}', $packageVersion
     $packageNameFromMetadata = $packageNameFromMetadata -replace '\${channelTag}', $channelTag
 
-    return $package
+    return $packageNameFromMetadata
 }
 
 enum DistributionState {
@@ -773,31 +773,6 @@ function Get-TestParams
         $packageVersion = $packageVersion -replace '-', '_'
     }
 
-    # get tmp cache location call method
-    # $tmpCacheFolder = Get-CacheFolder
-    $channelTag = Get-ChannelPackageTag -Channel $actualChannel
-    $packageName = Get-PackageName $allMeta.meta.PackageFormat $packageVersion $channelTag
-    $tmpCacheFolder = Get-CacheFolder
-    $cachedPwshFilePath = Join-Path -Path $tmpCacheFolder -ChildPath $packageName
-
-    # check if file already exists in cache
-    if (!(Test-Path $cachedPwshFilePath))
-    {
-        # download the powershell installer file
-        $pwshReleaseUrl = Get-PowerShellReleaseUrl
-        $pwshSourceInstallerFile = "$pwshReleaseUrl/v$psversion/$($packageName)"
-        $wc=[System.Net.WebClient]::new()
-        $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
-    }
-
-    # copy file over if it doesn't already exist in context path.
-    $pwshLocalFilePath = Join-Path $contextPath -ChildPath $packageName
-
-    if (!(Test-Path $pwshLocalFilePath))
-    {
-        Copy-Item -Path $cachedPwshFilePath -Destination $pwshLocalFilePath
-    }
-
     $buildArgs = [System.Collections.Generic.Dictionary[string,string]]::new()
     $buildArgs['fromTag'] = $actualTagData.FromTag
     $buildArgs['PS_VERSION'] = $psversion
@@ -805,17 +780,39 @@ function Get-TestParams
     $buildArgs['IMAGE_NAME'] = $imageNameParam
     $buildArgs['BaseImage'] = $BaseImage
     $buildArgs['PS_INSTALL_VERSION'] = Get-PwshInstallVersion -Channel $actualChannel
-    $buildArgs['PS_INSTALL_PATH'] = $pwshLocalFilePath
 
     if ($allMeta.meta.PackageFormat)
     {
+        $channelTag = Get-ChannelPackageTag -Channel $actualChannel
+        $packageName = Get-PackageName $allMeta.meta.PackageFormat $packageVersion $channelTag
+        
+        # check if package file already exists in cache
+        $tmpCacheFolder = Get-CacheFolder
+        $cachedPwshFilePath = Join-Path -Path $tmpCacheFolder -ChildPath $packageName
+
+        if (!(Test-Path $cachedPwshFilePath))
+        {
+            # download the powershell installer file
+            $pwshReleaseUrl = Get-PowerShellReleaseUrl
+            $pwshSourceInstallerFile = "$pwshReleaseUrl/v$psversion/$($packageName)"
+            $wc=[System.Net.WebClient]::new()
+            $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
+        }
+
+        # copy file over if it doesn't already exist in context path.
+        $pwshLocalFilePath = Join-Path $contextPath -ChildPath $packageName
+
+        if (!(Test-Path $pwshLocalFilePath))
+        {
+            Copy-Item -Path $cachedPwshFilePath -Destination $pwshLocalFilePath
+        }
+
+        $buildArgs.Add('PS_INSTALL_PATH', $pwshLocalFilePath)
+
         if($sasData.sasUrl)
         {
             $packageUrl = [System.UriBuilder]::new($sasData.sasBase)
 
-            $channelTag = Get-ChannelPackageTag -Channel $actualChannel
-            $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
-            $packageName = $packageName -replace '\${channelTag}', $channelTag
             $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
             $packageUrl.Query = $sasData.sasQuery
@@ -835,14 +832,14 @@ function Get-TestParams
             $pwshReleaseUrl = Get-PowerShellReleaseUrl
             $packageUrl = [System.UriBuilder]::new($pwshReleaseUrl)
 
-            $channelTag = Get-ChannelPackageTag -Channel $actualChannel
-
-            $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
-            $packageName = $packageName -replace '\${channelTag}', $channelTag
             $containerName = 'v' + ($psversion -replace '~', '-')
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
             $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
         }
+    }
+    else
+    {
+        Write-Verbose -Message "The package format information is null or empty for this image, may be due to being a test-deps image."
     }
 
     $testArgs = @{
