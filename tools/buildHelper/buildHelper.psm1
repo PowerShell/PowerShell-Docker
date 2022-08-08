@@ -803,7 +803,6 @@ function Get-TestParams
             catch {
                 Write-Verbose -Message $pwshSourceInstallerFile -Verbose
                 Write-Verbose -Message $cachedPwshFilePath -Verbose
-                Write-Verbose -Message $_.Message -Verbose
                 return
             }
         }
