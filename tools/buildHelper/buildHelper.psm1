@@ -191,7 +191,6 @@ function Get-PackageName
         [string]
         $packageVersion,
 
-        [Parameter(Mandatory)]
         [string]
         $channelTag
     )
