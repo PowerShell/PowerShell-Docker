@@ -801,9 +801,7 @@ function Get-TestParams
                 $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
             }
             catch {
-                Write-Verbose -Message $pwshSourceInstallerFile -Verbose
-                Write-Verbose -Message $cachedPwshFilePath -Verbose
-                return
+                throw "Downloading file from $pwshSourceInstallerFile to $cachedPwshFilePath failed due to $_"
             }
         }
 
@@ -847,7 +845,7 @@ function Get-TestParams
     }
     else
     {
-        Write-Verbose -Message "The package format information is null or empty for this image, may be due to being a test-deps image."
+        Write-Verbose -Message "The package format information is null or empty for this image, likely due to being a test-deps image."
     }
 
     $testArgs = @{
