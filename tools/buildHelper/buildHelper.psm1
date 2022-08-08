@@ -802,7 +802,7 @@ function Get-TestParams
                 $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
             }
             catch {
-                throw "Downloading file from $pwshSourceInstallerFile to $cachedPwshFilePath with $actualChannel channel failed due to $_"
+                throw "Downloading file from $pwshSourceInstallerFile to $cachedPwshFilePath with $actualChannel channel, package format $($allMeta.Meta.current), package version $packageVersion, channelTag $channelTag failed due to $_"
             }
         }
 
