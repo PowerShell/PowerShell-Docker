@@ -803,13 +803,6 @@ function Get-TestParams
             }
             catch {
                 throw "Downloading file from $pwshSourceInstallerFile to $cachedPwshFilePath with $actualChannel channel failed due to $_"
-                # https://github.com/PowerShell/PowerShell/releases/download//vv7.2.2/powershell-preview_v7.2.2-1.deb_amd64.deb 
-                # https://github.com/PowerShell/PowerShell/releases/download/v7.2.2/powershell_7.2.2-1.deb_amd64.deb
-                # RuntimeException: Downloading file from https://github.com/PowerShell/PowerShell/releases/download//vv7.2.2/powershell-preview_v7.2.2-1.deb_amd64.deb to 
-                # /tmp/PSDockerCache/powershell-preview_v7.2.2-1.deb_amd64.deb failed due to Exception calling "DownloadFile" with "2" argument(s): "The remote server returned an error: (404) Not Found."
-
-                # Downloading file from https://github.com/PowerShell/PowerShell/releases/download/v7.3.0-preview.6/powershell_7.3.0-preview.6-1.deb_amd64.deb to /tmp/PSDockerCache/powershell_7.3.0-preview.6-1.deb_amd64.deb with preview channel failed due to Exception calling "DownloadFile" with "2" argument(s): "The remote server returned an error: (404) Not Found."
-                # Downloading file from https://github.com/PowerShell/PowerShell/releases/download/v7.3.0-preview.6/powershell_7.3.0-preview.6-1.deb_amd64.deb to /tmp/PSDockerCache/powershell_7.3.0-preview.6-1.deb_amd64.deb with preview channel failed due to Exception calling "DownloadFile" with "2" argument(s): "The remote server returned an error: (404) Not Found." 
             }
         }
 
