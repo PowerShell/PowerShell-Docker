@@ -773,8 +773,6 @@ function Get-TestParams
         $packageVersion = $packageVersion -replace '-', '_'
     }
 
-    $tmpCacheFolder = Get-CacheFolder
-
     $buildArgs = [System.Collections.Generic.Dictionary[string,string]]::new()
     $buildArgs['fromTag'] = $actualTagData.FromTag
     $buildArgs['PS_VERSION'] = $psversion
@@ -785,52 +783,56 @@ function Get-TestParams
 
     if ($allMeta.meta.PackageFormat)
     {
+        $channelTag = ""
+        $channelTag = Get-ChannelPackageTag -Channel $actualChannel
+        $packageName = Get-PackageName $allMeta.meta.PackageFormat $packageVersion $channelTag
+    
+        # check if package file already exists in cache
+        $tmpCacheFolder = Get-CacheFolder
+        $cachedPwshFilePath = Join-Path -Path $tmpCacheFolder -ChildPath $packageName
+    
+        if (!(Test-Path $cachedPwshFilePath))
+        {
+            # download the powershell installer file
+            $pwshReleaseUrl = Get-PowerShellReleaseUrl
+            $versionContainerName = ""
+            if ($packageVersion -like "v*")
+            {
+                $versionContainerName = $packageVersion
+            }
+            else {
+                $versionContainerName = "v" + $packageVersion
+            }
+
+            $pwshSourceInstallerFile = $pwshReleaseUrl + '/' + $versionContainerName + '/' + $packageName
+            $wc=[System.Net.WebClient]::new()
+            try {
+                $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
+            }
+            catch {
+                throw "Downloading file from $pwshSourceInstallerFile to $cachedPwshFilePath with $actualChannel channel, package format $($allMeta.meta.PackageFormat), package version $packageVersion, channelTag $channelTag and container name $versionContainerName failed due to $_"
+            }
+        }
+    
+        # copy file over if it doesn't already exist in context path.
+        $pwshLocalFilePath = Join-Path $contextPath -ChildPath $packageName
+    
+        if (!(Test-Path $pwshLocalFilePath))
+        {
+            Copy-Item -Path $cachedPwshFilePath -Destination $pwshLocalFilePath
+        }
+    
+        $buildArgs.Add('PS_INSTALL_PATH', $pwshLocalFilePath)
+
         if($sasData.sasUrl)
         {
             $channelTag = ""
             $packageUrl = [System.UriBuilder]::new($sasData.sasBase)
 
             $channelTag = Get-ChannelPackageTag -Channel $actualChannel
-
             $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
             $packageName = $packageName -replace '\${channelTag}', $channelTag
-            $containerName = ""
-            if ($psversion -like "v*")
-            {
-                $containerName = ($psversion -replace '\.', '-') -replace '~', '-'
-            }
-            else {
-                $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
-            }
-
-
-            Write-Verbose -Message "container name $containerName" -Verbose
-
-            $cachedPwshFilePath = Join-Path -Path $tmpCacheFolder -ChildPath $packageName
-            if (!(Test-Path $cachedPwshFilePath))
-            {
-                # download the powershell installer file
-                $pwshReleaseUrl = Get-PowerShellReleaseUrl
-                $pwshSourceInstallerFile = $pwshReleaseUrl + $containerName + '/' + $packageName
-    
-                $wc=[System.Net.WebClient]::new()
-                try {
-                    $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
-                }
-                catch {
-                    throw "Downloading file from $pwshSourceInstallerFile to $cachedPwshFilePath with $actualChannel channel, package format $($allMeta.meta.PackageFormat), package version $packageVersion, channelTag $channelTag and container name $containerName failed due to $_"
-                }
-            }
-    
-            # copy file over if it doesn't already exist in context path.
-            $pwshLocalFilePath = Join-Path $contextPath -ChildPath $packageName
-    
-            if (!(Test-Path $pwshLocalFilePath))
-            {
-                Copy-Item -Path $cachedPwshFilePath -Destination $pwshLocalFilePath
-            }
-    
-            $buildArgs.Add('PS_INSTALL_PATH', $pwshLocalFilePath)
+            $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
 
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
             $packageUrl.Query = $sasData.sasQuery
@@ -854,46 +856,15 @@ function Get-TestParams
 
             $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
             $packageName = $packageName -replace '\${channelTag}', $channelTag
-            $containerName = ""
-            if ($psversion -like "v*")
-            {
-                $containerName = ($psversion -replace '\.', '-') -replace '~', '-'
-            }
-            else {
-                $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
-            }
 
-            $cachedPwshFilePath = Join-Path -Path $tmpCacheFolder -ChildPath $packageName
-            if (!(Test-Path $cachedPwshFilePath))
-            {
-                # download the powershell installer file
-                $pwshReleaseUrl = Get-PowerShellReleaseUrl
-                # $pwshSourceInstallerFile = "$pwshReleaseUrl/v$packageVersion/$($packageName)"
-                $pwshSourceInstallerFile = $pwshReleaseUrl + $containerName + '/' + $packageName
-                Write-Verbose -Message "pwshSourceInstallerFile $pwshSourceInstallerFile"
-    
-                $wc=[System.Net.WebClient]::new()
-                try {
-                    $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
-                }
-                catch {
-                    throw "Downloading file from $pwshSourceInstallerFile to $cachedPwshFilePath with $actualChannel channel, package format $($allMeta.meta.PackageFormat), package version $packageVersion, channelTag $channelTag and container name $containerName failed due to $_"
-                }
-            }
-    
-            # copy file over if it doesn't already exist in context path.
-            $pwshLocalFilePath = Join-Path $contextPath -ChildPath $packageName
-    
-            if (!(Test-Path $pwshLocalFilePath))
-            {
-                Copy-Item -Path $cachedPwshFilePath -Destination $pwshLocalFilePath
-            }
-
-            $buildArgs.Add('PS_INSTALL_PATH', $pwshLocalFilePath)
+            $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
 
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
             $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
         }
+    }
+    else {
+        Write-Verbose -Message "Package format is null or empty for this image, likely due to being a test-deps image"
     }
 
     $testArgs = @{
