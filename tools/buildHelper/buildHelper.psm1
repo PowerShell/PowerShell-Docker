@@ -787,13 +787,22 @@ function Get-TestParams
     {
         if($sasData.sasUrl)
         {
+            $channelTag = ""
             $packageUrl = [System.UriBuilder]::new($sasData.sasBase)
 
             $channelTag = Get-ChannelPackageTag -Channel $actualChannel
 
             $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
             $packageName = $packageName -replace '\${channelTag}', $channelTag
-            $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
+            $containerName = ""
+            if ($psversion -like "v*")
+            {
+                $containerName = ($psversion -replace '\.', '-') -replace '~', '-'
+            }
+            else {
+                $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
+            }
+
 
             Write-Verbose -Message "container name $containerName" -Verbose
 
@@ -838,13 +847,21 @@ function Get-TestParams
         }
         else
         {
+            $channelTag = ""
             $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
 
             $channelTag = Get-ChannelPackageTag -Channel $actualChannel
 
             $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
             $packageName = $packageName -replace '\${channelTag}', $channelTag
-            $containerName = 'v' + ($psversion -replace '~', '-')
+            $containerName = ""
+            if ($psversion -like "v*")
+            {
+                $containerName = ($psversion -replace '\.', '-') -replace '~', '-'
+            }
+            else {
+                $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
+            }
 
             $cachedPwshFilePath = Join-Path -Path $tmpCacheFolder -ChildPath $packageName
             if (!(Test-Path $cachedPwshFilePath))
