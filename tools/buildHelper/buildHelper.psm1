@@ -804,7 +804,7 @@ function Get-TestParams
                 $versionContainerName = "v" + $packageVersion
             }
 
-            $pwshSourceInstallerFile = $pwshReleaseUrl + '/' + $versionContainerName + '/' + $packageName
+            $pwshSourceInstallerFile = $pwshReleaseUrl + $versionContainerName + '/' + $packageName
             $wc=[System.Net.WebClient]::new()
             try {
                 $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
