@@ -764,14 +764,21 @@ function Get-TestParams
         $imageNameParam = 'pshorg/powershellcommunity:' + $actualTagData.TagList[0]
     }
 
-    $packageVersion = $psversion
+    # psversion must always be preprended with "v" i.e v7.2.2 or v7.3.0-preview6
+    if ($psversion -notlike "v*")
+    {
+        $psversion = "v" + $psversion
+    }
+
+    # packageVersion should be prepended with "v"
+    $packageVersion = $psversion.TrimStart("v")
 
     # if the package name ends with rpm
     # then replace the - in the filename with _ as fpm creates the packages this way.
-    # if($allMeta.meta.PackageFormat -and $allMeta.meta.PackageFormat -match 'rpm$')
-    # {
-    #     $packageVersion = $packageVersion -replace '-', '_'
-    # }
+    if($allMeta.meta.PackageFormat -and $allMeta.meta.PackageFormat -match 'rpm$')
+    {
+        $packageVersion = $packageVersion -replace '-', '_'
+    }
 
     $buildArgs = [System.Collections.Generic.Dictionary[string,string]]::new()
     $buildArgs['fromTag'] = $actualTagData.FromTag
@@ -785,18 +792,7 @@ function Get-TestParams
     {
         $channelTag = Get-ChannelPackageTag -Channel $actualChannel
 
-        $packageNameVersion = $psversion.Trim("v")
-        $pwshReleaseVersion = "v" + $packageNameVersion #guarantee the version for release has only 1 v preprended
-
-        # if the package name ends with rpm
-        # then replace the - in the filename with _ as fpm creates the packages this way.
-        # for the powershell release version we wish to keep '-' in version
-        if ($allMeta.Meta.PackageFormat -match 'rpm$')
-        {
-            $packageNameVersion = $packageNameVersion -replace '-', '_'
-        }
-
-        $packageName = Get-PackageName $allMeta.meta.PackageFormat $packageNameVersion $channelTag
+        $packageName = Get-PackageName $allMeta.meta.PackageFormat $packageVersion $channelTag
 
         # check if package file already exists in cache
         $tmpCacheFolder = Get-CacheFolder
@@ -806,13 +802,13 @@ function Get-TestParams
         {
             # download the powershell installer file
             $pwshReleaseUrl = Get-PowerShellReleaseUrl
-            $pwshSourceInstallerFile = $pwshReleaseUrl + $pwshReleaseVersion + '/' + $packageName
+            $pwshSourceInstallerFile = $pwshReleaseUrl + $psversion + '/' + $packageName
             $wc=[System.Net.WebClient]::new()
             try {
                 $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
             }
             catch {
-                throw "Downloading file from $pwshSourceInstallerFile to $cachedPwshFilePath with $actualChannel channel, package format $($allMeta.meta.PackageFormat), package version $packageVersion, channelTag $channelTag and container name $versionContainerName failed due to $_"
+                throw "Downloading file from $pwshSourceInstallerFile to $cachedPwshFilePath with actual channel: $actualChannel, package format: $($allMeta.meta.PackageFormat), package version: $packageVersion, channelTag: $channelTag failed due to $_"
             }
         }
 
@@ -835,7 +831,7 @@ function Get-TestParams
             $packageName = $packageName -replace '\${channelTag}', $channelTag
             $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
-            $packageUrl.Query = $sasData.sasQuery
+            $packageUrl.Query = $sasData.sasQueryn
             if($allMeta.meta.Base64EncodePackageUrl)
             {
                 $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.ToString())
