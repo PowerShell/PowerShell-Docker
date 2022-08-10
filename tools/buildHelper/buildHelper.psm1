@@ -766,12 +766,12 @@ function Get-TestParams
 
     $packageVersion = $psversion
 
-    # if the package name ends with rpm
-    # then replace the - in the filename with _ as fpm creates the packages this way.
-    if($allMeta.meta.PackageFormat -and $allMeta.meta.PackageFormat -match 'rpm$')
-    {
-        $packageVersion = $packageVersion -replace '-', '_'
-    }
+    # # if the package name ends with rpm
+    # # then replace the - in the filename with _ as fpm creates the packages this way.
+    # if($allMeta.meta.PackageFormat -and $allMeta.meta.PackageFormat -match 'rpm$')
+    # {
+    #     $packageVersion = $packageVersion -replace '-', '_'
+    # }
 
     $buildArgs = [System.Collections.Generic.Dictionary[string,string]]::new()
     $buildArgs['fromTag'] = $actualTagData.FromTag
@@ -791,7 +791,7 @@ function Get-TestParams
 
         if ($allMeta.meta.PackageFormat -match 'rpm$')
         {
-            $containerVersion = $containerVersion -replace '-', '_'
+            $packageVersion = $containerVersion -replace '-', '_'
         }
     
         # check if package file already exists in cache
@@ -803,7 +803,7 @@ function Get-TestParams
             # download the powershell installer file
             $pwshReleaseUrl = Get-PowerShellReleaseUrl
             
-            $versionContainerName = "v" + $containerVersion
+            $versionContainerName = "v" + $packageVersion
             
             $pwshSourceInstallerFile = $pwshReleaseUrl + $versionContainerName + '/' + $packageName
             $wc=[System.Net.WebClient]::new()
