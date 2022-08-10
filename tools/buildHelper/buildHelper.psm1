@@ -808,7 +808,12 @@ function Get-TestParams
             $pwshReleaseUrl = Get-PowerShellReleaseUrl
             $pwshSourceInstallerFile = $pwshReleaseUrl + $pwshReleaseVersion + $packageName
             $wc=[System.Net.WebClient]::new()
-            $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
+            try {
+                $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
+            }
+            catch {
+                throw "Downloading file from $pwshSourceInstallerFile to $cachedPwshFilePath with $actualChannel channel, package format $($allMeta.meta.PackageFormat), package version $packageVersion, channelTag $channelTag and container name $versionContainerName failed due to $_"
+            }
         }
 
         # copy file over if it doesn't already exist in context path.
