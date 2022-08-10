@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "PackageFormat": "powershell-${PS_VERSION}-linux-arm32.tar.gz",
+    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-linux-arm32.tar.gz",
     "osVersion": "Ubuntu 20.04 ARM 32v7",
     "SkipGssNtlmSspTests": true,
     "ShortDistroName": "ubuntu",

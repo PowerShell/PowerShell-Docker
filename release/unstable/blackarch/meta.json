@@ -1,6 +1,6 @@
 {
     "IsLinux" : true,
-    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-linux-x64.tar.gz",
     "SkipGssNtlmSspTests": false,
     "shortTags": [
         {"Tag": "latest"}

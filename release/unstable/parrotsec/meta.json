@@ -1,6 +1,6 @@
 {
     "IsLinux" : true,
-    "PackageFormat": "powershell_${PS_VERSION}-1.debian.11_amd64.deb",
+    "PackageFormat": "powershell${channelTag}_${PS_VERSION}-1.debian.11_amd64.deb",
     "SkipGssNtlmSspTests": false,
     "shortTags": [
         {"Tag": "latest"}

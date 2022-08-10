@@ -1,6 +1,6 @@
 {
     "IsLinux" : true,
-    "PackageFormat": "powershell-${PS_VERSION}-1.rh.x86_64.rpm",
+    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.rh.x86_64.rpm",
     "SkipGssNtlmSspTests": false,
     "shortTags": [
         {"Tag": "latest"}

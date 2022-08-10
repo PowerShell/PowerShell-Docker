@@ -1,6 +1,6 @@
 {
     "IsLinux": false,
-    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip",
+    "PackageFormat": "PowerShell${channelTag}-${PS_VERSION}-win-x64.zip",
     "osVersion": "Windows Server, LTSC 2022",
     "shortTags": [
         {
