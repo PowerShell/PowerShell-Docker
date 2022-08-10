@@ -790,6 +790,7 @@ function Get-TestParams
 
     if ($allMeta.meta.PackageFormat)
     {
+        $channelTag = ""
         $channelTag = Get-ChannelPackageTag -Channel $actualChannel
 
         $packageName = Get-PackageName $allMeta.meta.PackageFormat $packageVersion $channelTag
