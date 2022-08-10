@@ -783,9 +783,16 @@ function Get-TestParams
 
     if ($allMeta.meta.PackageFormat)
     {
+        $containerVersion = $packageVersion.TrimStart("v")
         $channelTag = ""
         $channelTag = Get-ChannelPackageTag -Channel $actualChannel
-        $packageName = Get-PackageName $allMeta.meta.PackageFormat $packageVersion $channelTag
+        #want package name version to not contain '_' if rpm, but stripped of "v"
+        $packageName = Get-PackageName $allMeta.meta.PackageFormat $containerVersion $channelTag
+
+        if ($allMeta.meta.PackageFormat -match 'rpm$')
+        {
+            $containerVersion = $containerVersion -replace '-', '_'
+        }
     
         # check if package file already exists in cache
         $tmpCacheFolder = Get-CacheFolder
@@ -795,15 +802,9 @@ function Get-TestParams
         {
             # download the powershell installer file
             $pwshReleaseUrl = Get-PowerShellReleaseUrl
-            $versionContainerName = ""
-            if ($packageVersion -like "v*")
-            {
-                $versionContainerName = $packageVersion
-            }
-            else {
-                $versionContainerName = "v" + $packageVersion
-            }
-
+            
+            $versionContainerName = "v" + $containerVersion
+            
             $pwshSourceInstallerFile = $pwshReleaseUrl + $versionContainerName + '/' + $packageName
             $wc=[System.Net.WebClient]::new()
             try {
