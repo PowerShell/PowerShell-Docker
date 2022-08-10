@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion" : false,
-    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-linux-x64.tar.gz",
+    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
     "osVersion": "Debian 11",
     "SkipGssNtlmSspTests": false,
     "ShortDistroName": "debian",

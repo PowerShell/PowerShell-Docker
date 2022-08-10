@@ -1,6 +1,6 @@
 {
     "IsLinux": false,
-    "PackageFormat": "PowerShell${channelTag}-${PS_VERSION}-win-x64.zip",
+    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip",
     "osVersion": "Nano Server, version 1809",
     "shortTags": [
         {
