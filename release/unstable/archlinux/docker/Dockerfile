@@ -32,7 +32,8 @@ RUN \
     # clone the gss-ntlmssp package repository
     && git clone https://aur.archlinux.org/gss-ntlmssp.git \
     # change the cloned gss-ntlmssp package repository directory permission
-    && chmod 777 /tmp/gss-ntlmssp/ \
+    # DO NOT use 777
+    # && chmod 777 /tmp/gss-ntlmssp/ \
     # change current path to gss-ntlmssp package repository folder path
     && cd gss-ntlmssp \
     # utilise sudo to builduser in order to make the gss-ntlmssp package
