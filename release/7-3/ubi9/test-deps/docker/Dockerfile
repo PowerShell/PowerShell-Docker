@@ -13,6 +13,7 @@ RUN yum install -y \
         git \
         unzip \
     && yum clean all \
+    && yum upgrade -y --security \
     && rm -rf /var/cache/yum
 
 ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-ubi-9

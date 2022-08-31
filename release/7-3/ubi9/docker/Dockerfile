@@ -29,7 +29,7 @@ RUN --mount=type=cache,target=/var/cache/yum,rw \
     --mount=from=installer-env,target=/mnt/rpm,source=/tmp \
     yum localinstall -y \
       /mnt/rpm/linux.rpm \
-    && yum upgrade-minimal -y --security \
+    && yum upgrade -y --security \
     && yum clean all
 # Define ENVs for Localization/Globalization
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \

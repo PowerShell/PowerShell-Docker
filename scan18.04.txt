@@ -1,0 +1,313 @@
+
+Testing mcr.microsoft.com/powershell:ubuntu-18.04...
+
+Γ£ù Low severity vulnerability found in sqlite3/libsqlite3-0
+  Description: CVE-2020-9991
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-SQLITE3-1070682
+  Introduced through: curl@7.58.0-2ubuntu3.19
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > openldap/libldap-2.4-2@2.4.45+dfsg-1ubuntu1.11 > heimdal/libgssapi3-heimdal@7.5.0+dfsg-1 > heimdal/libheimntlm0-heimdal@7.5.0+dfsg-1 > heimdal/libkrb5-26-heimdal@7.5.0+dfsg-1 > sqlite3/libsqlite3-0@3.22.0-1ubuntu0.5
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Low severity vulnerability found in sqlite3/libsqlite3-0
+  Description: Information Exposure
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-SQLITE3-1070693
+  Introduced through: curl@7.58.0-2ubuntu3.19
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > openldap/libldap-2.4-2@2.4.45+dfsg-1ubuntu1.11 > heimdal/libgssapi3-heimdal@7.5.0+dfsg-1 > heimdal/libheimntlm0-heimdal@7.5.0+dfsg-1 > heimdal/libkrb5-26-heimdal@7.5.0+dfsg-1 > sqlite3/libsqlite3-0@3.22.0-1ubuntu0.5
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Low severity vulnerability found in shadow/passwd
+  Description: Time-of-check Time-of-use (TOCTOU)
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-SHADOW-306209
+  Introduced through: shadow/passwd@1:4.5-1ubuntu2.3, openssh/openssh-client@1:7.6p1-4ubuntu0.7, apt@1.6.14, shadow/login@1:4.5-1ubuntu2.3
+  From: shadow/passwd@1:4.5-1ubuntu2.3
+  From: openssh/openssh-client@1:7.6p1-4ubuntu0.7 > shadow/passwd@1:4.5-1ubuntu2.3
+  From: apt@1.6.14 > adduser@3.116ubuntu1 > shadow/passwd@1:4.5-1ubuntu2.3
+  and 1 more...
+  Image layer: Introduced by your base image (ubuntu:18.04)
+
+Γ£ù Low severity vulnerability found in samba/libwbclient0
+  Description: Race Condition
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-SAMBA-2337441
+  Introduced through: gss-ntlmssp@0.7.0-4build3
+  From: gss-ntlmssp@0.7.0-4build3 > samba/libwbclient0@2:4.7.6+dfsg~ubuntu-0ubuntu2.28
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Low severity vulnerability found in samba/libwbclient0
+  Description: CVE-2021-3670
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-SAMBA-2806585
+  Introduced through: gss-ntlmssp@0.7.0-4build3
+  From: gss-ntlmssp@0.7.0-4build3 > samba/libwbclient0@2:4.7.6+dfsg~ubuntu-0ubuntu2.28
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Low severity vulnerability found in samba/libwbclient0
+  Description: CVE-2022-32742
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-SAMBA-2960879
+  Introduced through: gss-ntlmssp@0.7.0-4build3
+  From: gss-ntlmssp@0.7.0-4build3 > samba/libwbclient0@2:4.7.6+dfsg~ubuntu-0ubuntu2.28
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Low severity vulnerability found in pcre3/libpcre3
+  Description: Uncontrolled Recursion
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-PCRE3-452543
+  Introduced through: meta-common-packages@meta
+  From: meta-common-packages@meta > pcre3/libpcre3@2:8.39-9ubuntu0.1
+  Image layer: Introduced by your base image (ubuntu:18.04)
+
+Γ£ù Low severity vulnerability found in openssh/openssh-client
+  Description: Information Exposure
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-OPENSSH-1047874
+  Introduced through: openssh/openssh-client@1:7.6p1-4ubuntu0.7
+  From: openssh/openssh-client@1:7.6p1-4ubuntu0.7
+  Image layer: Introduced by your base image (ubuntu:18.04)
+
+Γ£ù Low severity vulnerability found in openssh/openssh-client
+  Description: CVE-2021-41617
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-OPENSSH-1726889
+  Introduced through: openssh/openssh-client@1:7.6p1-4ubuntu0.7
+  From: openssh/openssh-client@1:7.6p1-4ubuntu0.7
+  Image layer: Introduced by your base image (ubuntu:18.04)
+
+Γ£ù Low severity vulnerability found in ncurses/libtinfo5
+  Description: Out-of-bounds Write
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-NCURSES-1656319
+  Introduced through: ncurses/libtinfo5@6.1-1ubuntu1.18.04, bash@4.4.18-2ubuntu1.3, less@487-0.1, ncurses/libncurses5@6.1-1ubuntu1.18.04, ncurses/ncurses-bin@6.1-1ubuntu1.18.04, procps@2:3.3.12-3ubuntu1.2, util-linux/fdisk@2.31.1-0.4ubuntu3.7, openssh/openssh-client@1:7.6p1-4ubuntu0.7, util-linux/mount@2.31.1-0.4ubuntu3.7, ncurses/libncursesw5@6.1-1ubuntu1.18.04, ncurses/ncurses-base@6.1-1ubuntu1.18.04
+  From: ncurses/libtinfo5@6.1-1ubuntu1.18.04
+  From: bash@4.4.18-2ubuntu1.3 > ncurses/libtinfo5@6.1-1ubuntu1.18.04
+  From: less@487-0.1 > ncurses/libtinfo5@6.1-1ubuntu1.18.04
+  and 14 more...
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Low severity vulnerability found in ncurses/libtinfo5
+  Description: Out-of-bounds Read
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-NCURSES-2770344
+  Introduced through: ncurses/libtinfo5@6.1-1ubuntu1.18.04, bash@4.4.18-2ubuntu1.3, less@487-0.1, ncurses/libncurses5@6.1-1ubuntu1.18.04, ncurses/ncurses-bin@6.1-1ubuntu1.18.04, procps@2:3.3.12-3ubuntu1.2, util-linux/fdisk@2.31.1-0.4ubuntu3.7, openssh/openssh-client@1:7.6p1-4ubuntu0.7, util-linux/mount@2.31.1-0.4ubuntu3.7, ncurses/libncursesw5@6.1-1ubuntu1.18.04, ncurses/ncurses-base@6.1-1ubuntu1.18.04
+  From: ncurses/libtinfo5@6.1-1ubuntu1.18.04
+  From: bash@4.4.18-2ubuntu1.3 > ncurses/libtinfo5@6.1-1ubuntu1.18.04
+  From: less@487-0.1 > ncurses/libtinfo5@6.1-1ubuntu1.18.04
+  and 14 more...
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Low severity vulnerability found in ncurses/libtinfo5
+  Description: Out-of-bounds Read
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-NCURSES-481908
+  Introduced through: ncurses/libtinfo5@6.1-1ubuntu1.18.04, bash@4.4.18-2ubuntu1.3, less@487-0.1, ncurses/libncurses5@6.1-1ubuntu1.18.04, ncurses/ncurses-bin@6.1-1ubuntu1.18.04, procps@2:3.3.12-3ubuntu1.2, util-linux/fdisk@2.31.1-0.4ubuntu3.7, openssh/openssh-client@1:7.6p1-4ubuntu0.7, util-linux/mount@2.31.1-0.4ubuntu3.7, ncurses/libncursesw5@6.1-1ubuntu1.18.04, ncurses/ncurses-base@6.1-1ubuntu1.18.04
+  From: ncurses/libtinfo5@6.1-1ubuntu1.18.04
+  From: bash@4.4.18-2ubuntu1.3 > ncurses/libtinfo5@6.1-1ubuntu1.18.04
+  From: less@487-0.1 > ncurses/libtinfo5@6.1-1ubuntu1.18.04
+  and 14 more...
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Low severity vulnerability found in ncurses/libtinfo5
+  Description: Out-of-bounds Read
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-NCURSES-482343
+  Introduced through: ncurses/libtinfo5@6.1-1ubuntu1.18.04, bash@4.4.18-2ubuntu1.3, less@487-0.1, ncurses/libncurses5@6.1-1ubuntu1.18.04, ncurses/ncurses-bin@6.1-1ubuntu1.18.04, procps@2:3.3.12-3ubuntu1.2, util-linux/fdisk@2.31.1-0.4ubuntu3.7, openssh/openssh-client@1:7.6p1-4ubuntu0.7, util-linux/mount@2.31.1-0.4ubuntu3.7, ncurses/libncursesw5@6.1-1ubuntu1.18.04, ncurses/ncurses-base@6.1-1ubuntu1.18.04
+  From: ncurses/libtinfo5@6.1-1ubuntu1.18.04
+  From: bash@4.4.18-2ubuntu1.3 > ncurses/libtinfo5@6.1-1ubuntu1.18.04
+  From: less@487-0.1 > ncurses/libtinfo5@6.1-1ubuntu1.18.04
+  and 14 more...
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Low severity vulnerability found in krb5/libkrb5support0
+  Description: Integer Overflow or Wraparound
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-KRB5-459140
+  Introduced through: curl@7.58.0-2ubuntu3.19, gss-ntlmssp@0.7.0-4build3, openssh/openssh-client@1:7.6p1-4ubuntu0.7, powershell@7.2.6-1.deb
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > krb5/libgssapi-krb5-2@1.16-2ubuntu0.2 > krb5/libkrb5support0@1.16-2ubuntu0.2
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > krb5/libgssapi-krb5-2@1.16-2ubuntu0.2 > krb5/libk5crypto3@1.16-2ubuntu0.2 > krb5/libkrb5support0@1.16-2ubuntu0.2
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > krb5/libgssapi-krb5-2@1.16-2ubuntu0.2 > krb5/libkrb5-3@1.16-2ubuntu0.2 > krb5/libkrb5support0@1.16-2ubuntu0.2
+  and 7 more...
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Low severity vulnerability found in heimdal/libasn1-8-heimdal
+  Description: NULL Pointer Dereference
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-HEIMDAL-1766740
+  Introduced through: curl@7.58.0-2ubuntu3.19, meta-common-packages@meta
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > openldap/libldap-2.4-2@2.4.45+dfsg-1ubuntu1.11 > heimdal/libgssapi3-heimdal@7.5.0+dfsg-1 > heimdal/libasn1-8-heimdal@7.5.0+dfsg-1
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > openldap/libldap-2.4-2@2.4.45+dfsg-1ubuntu1.11 > heimdal/libgssapi3-heimdal@7.5.0+dfsg-1 > heimdal/libhcrypto4-heimdal@7.5.0+dfsg-1 > heimdal/libasn1-8-heimdal@7.5.0+dfsg-1
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > openldap/libldap-2.4-2@2.4.45+dfsg-1ubuntu1.11 > heimdal/libgssapi3-heimdal@7.5.0+dfsg-1 > heimdal/libheimntlm0-heimdal@7.5.0+dfsg-1 > heimdal/libkrb5-26-heimdal@7.5.0+dfsg-1 > heimdal/libasn1-8-heimdal@7.5.0+dfsg-1
+  and 17 more...
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Low severity vulnerability found in heimdal/libasn1-8-heimdal
+  Description: CVE-2019-12098
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-HEIMDAL-346634
+  Introduced through: curl@7.58.0-2ubuntu3.19, meta-common-packages@meta
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > openldap/libldap-2.4-2@2.4.45+dfsg-1ubuntu1.11 > heimdal/libgssapi3-heimdal@7.5.0+dfsg-1 > heimdal/libasn1-8-heimdal@7.5.0+dfsg-1
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > openldap/libldap-2.4-2@2.4.45+dfsg-1ubuntu1.11 > heimdal/libgssapi3-heimdal@7.5.0+dfsg-1 > heimdal/libhcrypto4-heimdal@7.5.0+dfsg-1 > heimdal/libasn1-8-heimdal@7.5.0+dfsg-1
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > openldap/libldap-2.4-2@2.4.45+dfsg-1ubuntu1.11 > heimdal/libgssapi3-heimdal@7.5.0+dfsg-1 > heimdal/libheimntlm0-heimdal@7.5.0+dfsg-1 > heimdal/libkrb5-26-heimdal@7.5.0+dfsg-1 > heimdal/libasn1-8-heimdal@7.5.0+dfsg-1
+  and 17 more...
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Low severity vulnerability found in gnutls28/libgnutls30
+  Description: Information Exposure
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-GNUTLS28-340583
+  Introduced through: gnutls28/libgnutls30@3.5.18-1ubuntu1.6, apt@1.6.14, curl@7.58.0-2ubuntu3.19
+  From: gnutls28/libgnutls30@3.5.18-1ubuntu1.6
+  From: apt@1.6.14 > gnutls28/libgnutls30@3.5.18-1ubuntu1.6
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > rtmpdump/librtmp1@2.4+20151223.gitfa8646d.1-1 > gnutls28/libgnutls30@3.5.18-1ubuntu1.6
+  and 1 more...
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Low severity vulnerability found in glibc/libc-bin
+  Description: Use After Free
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-GLIBC-1297556
+  Introduced through: glibc/libc-bin@2.27-3ubuntu1.6, glibc/locales@2.27-3ubuntu1.6, meta-common-packages@meta
+  From: glibc/libc-bin@2.27-3ubuntu1.6
+  From: glibc/locales@2.27-3ubuntu1.6 > glibc/libc-bin@2.27-3ubuntu1.6
+  From: glibc/locales@2.27-3ubuntu1.6
+  and 1 more...
+  Image layer: Introduced by your base image (ubuntu:18.04)
+
+Γ£ù Low severity vulnerability found in glibc/libc-bin
+  Description: Allocation of Resources Without Limits or Throttling
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-GLIBC-2415107
+  Introduced through: glibc/libc-bin@2.27-3ubuntu1.6, glibc/locales@2.27-3ubuntu1.6, meta-common-packages@meta
+  From: glibc/libc-bin@2.27-3ubuntu1.6
+  From: glibc/locales@2.27-3ubuntu1.6 > glibc/libc-bin@2.27-3ubuntu1.6
+  From: glibc/locales@2.27-3ubuntu1.6
+  and 1 more...
+  Image layer: Introduced by your base image (ubuntu:18.04)
+
+Γ£ù Low severity vulnerability found in glibc/libc-bin
+  Description: Improper Data Handling
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-GLIBC-345677
+  Introduced through: glibc/libc-bin@2.27-3ubuntu1.6, glibc/locales@2.27-3ubuntu1.6, meta-common-packages@meta
+  From: glibc/libc-bin@2.27-3ubuntu1.6
+  From: glibc/locales@2.27-3ubuntu1.6 > glibc/libc-bin@2.27-3ubuntu1.6
+  From: glibc/locales@2.27-3ubuntu1.6
+  and 1 more...
+  Image layer: Introduced by your base image (ubuntu:18.04)
+
+Γ£ù Low severity vulnerability found in glibc/libc-bin
+  Description: Improper Data Handling
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-GLIBC-356503
+  Introduced through: glibc/libc-bin@2.27-3ubuntu1.6, glibc/locales@2.27-3ubuntu1.6, meta-common-packages@meta
+  From: glibc/libc-bin@2.27-3ubuntu1.6
+  From: glibc/locales@2.27-3ubuntu1.6 > glibc/libc-bin@2.27-3ubuntu1.6
+  From: glibc/locales@2.27-3ubuntu1.6
+  and 1 more...
+  Image layer: Introduced by your base image (ubuntu:18.04)
+
+Γ£ù Low severity vulnerability found in coreutils
+  Description: Improper Input Validation
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-COREUTILS-317469
+  Introduced through: coreutils@8.28-1ubuntu1
+  From: coreutils@8.28-1ubuntu1
+  Image layer: Introduced by your base image (ubuntu:18.04)
+
+Γ£ù Medium severity vulnerability found in zlib/zlib1g
+  Description: Out-of-bounds Write
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-ZLIB-2975635
+  Introduced through: meta-common-packages@meta
+  From: meta-common-packages@meta > zlib/zlib1g@1:1.2.11.dfsg-0ubuntu2.1
+  Image layer: Introduced by your base image (ubuntu:18.04)
+  Fixed in: 1:1.2.11.dfsg-0ubuntu2.2
+
+Γ£ù Medium severity vulnerability found in systemd/libsystemd0
+  Description: CVE-2022-2526
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-SYSTEMD-2992447
+  Introduced through: systemd/libsystemd0@237-3ubuntu10.53, apt/libapt-pkg5.0@1.6.14, procps/libprocps6@2:3.3.12-3ubuntu1.2, util-linux/bsdutils@1:2.31.1-0.4ubuntu3.7, util-linux/mount@2.31.1-0.4ubuntu3.7, systemd/libudev1@237-3ubuntu10.53
+  From: systemd/libsystemd0@237-3ubuntu10.53
+  From: apt/libapt-pkg5.0@1.6.14 > systemd/libsystemd0@237-3ubuntu10.53
+  From: procps/libprocps6@2:3.3.12-3ubuntu1.2 > systemd/libsystemd0@237-3ubuntu10.53
+  and 5 more...
+  Image layer: Introduced by your base image (ubuntu:18.04)
+  Fixed in: 237-3ubuntu10.54
+
+Γ£ù Medium severity vulnerability found in sqlite3/libsqlite3-0
+  Description: Out-of-bounds Read
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-SQLITE3-571706
+  Introduced through: curl@7.58.0-2ubuntu3.19
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > openldap/libldap-2.4-2@2.4.45+dfsg-1ubuntu1.11 > heimdal/libgssapi3-heimdal@7.5.0+dfsg-1 > heimdal/libheimntlm0-heimdal@7.5.0+dfsg-1 > heimdal/libkrb5-26-heimdal@7.5.0+dfsg-1 > sqlite3/libsqlite3-0@3.22.0-1ubuntu0.5
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Medium severity vulnerability found in samba/libwbclient0
+  Description: Use After Free
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-SAMBA-2960894
+  Introduced through: gss-ntlmssp@0.7.0-4build3
+  From: gss-ntlmssp@0.7.0-4build3 > samba/libwbclient0@2:4.7.6+dfsg~ubuntu-0ubuntu2.28
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Medium severity vulnerability found in perl/perl-base
+  Description: Improper Verification of Cryptographic Signature
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-PERL-1930908
+  Introduced through: meta-common-packages@meta
+  From: meta-common-packages@meta > perl/perl-base@5.26.1-6ubuntu0.5
+  Image layer: Introduced by your base image (ubuntu:18.04)
+
+Γ£ù Medium severity vulnerability found in nghttp2/libnghttp2-14
+  Description: CVE-2019-9513
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-NGHTTP2-459190
+  Introduced through: curl@7.58.0-2ubuntu3.19
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > nghttp2/libnghttp2-14@1.30.0-1ubuntu1
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Medium severity vulnerability found in nghttp2/libnghttp2-14
+  Description: Allocation of Resources Without Limits or Throttling
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-NGHTTP2-459213
+  Introduced through: curl@7.58.0-2ubuntu3.19
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > nghttp2/libnghttp2-14@1.30.0-1ubuntu1
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Medium severity vulnerability found in krb5/libkrb5support0
+  Description: NULL Pointer Dereference
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-KRB5-1533539
+  Introduced through: curl@7.58.0-2ubuntu3.19, gss-ntlmssp@0.7.0-4build3, openssh/openssh-client@1:7.6p1-4ubuntu0.7, powershell@7.2.6-1.deb
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > krb5/libgssapi-krb5-2@1.16-2ubuntu0.2 > krb5/libkrb5support0@1.16-2ubuntu0.2
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > krb5/libgssapi-krb5-2@1.16-2ubuntu0.2 > krb5/libk5crypto3@1.16-2ubuntu0.2 > krb5/libkrb5support0@1.16-2ubuntu0.2
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > krb5/libgssapi-krb5-2@1.16-2ubuntu0.2 > krb5/libkrb5-3@1.16-2ubuntu0.2 > krb5/libkrb5support0@1.16-2ubuntu0.2
+  and 7 more...
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Medium severity vulnerability found in krb5/libkrb5support0
+  Description: NULL Pointer Dereference
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-KRB5-1570245
+  Introduced through: curl@7.58.0-2ubuntu3.19, gss-ntlmssp@0.7.0-4build3, openssh/openssh-client@1:7.6p1-4ubuntu0.7, powershell@7.2.6-1.deb
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > krb5/libgssapi-krb5-2@1.16-2ubuntu0.2 > krb5/libkrb5support0@1.16-2ubuntu0.2
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > krb5/libgssapi-krb5-2@1.16-2ubuntu0.2 > krb5/libk5crypto3@1.16-2ubuntu0.2 > krb5/libkrb5support0@1.16-2ubuntu0.2
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > krb5/libgssapi-krb5-2@1.16-2ubuntu0.2 > krb5/libkrb5-3@1.16-2ubuntu0.2 > krb5/libkrb5support0@1.16-2ubuntu0.2
+  and 7 more...
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Medium severity vulnerability found in krb5/libkrb5support0
+  Description: Reachable Assertion
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-KRB5-396230
+  Introduced through: curl@7.58.0-2ubuntu3.19, gss-ntlmssp@0.7.0-4build3, openssh/openssh-client@1:7.6p1-4ubuntu0.7, powershell@7.2.6-1.deb
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > krb5/libgssapi-krb5-2@1.16-2ubuntu0.2 > krb5/libkrb5support0@1.16-2ubuntu0.2
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > krb5/libgssapi-krb5-2@1.16-2ubuntu0.2 > krb5/libk5crypto3@1.16-2ubuntu0.2 > krb5/libkrb5support0@1.16-2ubuntu0.2
+  From: curl@7.58.0-2ubuntu3.19 > curl/libcurl4@7.58.0-2ubuntu3.19 > krb5/libgssapi-krb5-2@1.16-2ubuntu0.2 > krb5/libkrb5-3@1.16-2ubuntu0.2 > krb5/libkrb5support0@1.16-2ubuntu0.2
+  and 7 more...
+  Image layer: 'apt-get install --no-install-recommends -y curl less locales ca-certificates gss-ntlmssp openssh-client'
+
+Γ£ù Medium severity vulnerability found in gcc-8/libstdc++6
+  Description: Information Exposure
+  Info: https://snyk.io/vuln/SNYK-UBUNTU1804-GCC8-572149
+  Introduced through: gcc-8/libstdc++6@8.4.0-1ubuntu1~18.04, apt/libapt-pkg5.0@1.6.14, apt@1.6.14, powershell@7.2.6-1.deb, meta-common-packages@meta
+  From: gcc-8/libstdc++6@8.4.0-1ubuntu1~18.04
+  From: apt/libapt-pkg5.0@1.6.14 > gcc-8/libstdc++6@8.4.0-1ubuntu1~18.04
+  From: apt@1.6.14 > gcc-8/libstdc++6@8.4.0-1ubuntu1~18.04
+  and 4 more...
+  Image layer: Introduced by your base image (ubuntu:18.04)
+
+
+
+Organization:      travisez13
+Package manager:   deb
+Project name:      docker-image|mcr.microsoft.com/powershell
+Docker image:      mcr.microsoft.com/powershell:ubuntu-18.04
+Platform:          linux/amd64
+Base image:        ubuntu:18.04
+Licenses:          enabled
+
+Tested 127 dependencies for known issues, found 33 issues.
+
+Base Image    Vulnerabilities  Severity
+ubuntu:18.04  18               0 critical, 0 high, 5 medium, 13 low
+
+Recommendations for base image upgrade:
+
+Major upgrades
+Base Image     Vulnerabilities  Severity
+ubuntu:latest  13               0 critical, 0 high, 3 medium, 10 low
+
+
+
