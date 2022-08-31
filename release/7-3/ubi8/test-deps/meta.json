@@ -1,20 +1,19 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "osVersion": "Universal Base Image 8.4",
+    "osVersion": "Universal Base Image 8",
     "SkipGssNtlmSspTests": true,
     "shortTags": [
-        {"Tag": "8.4"}
+        {"Tag": "8"}
     ],
     "tagTemplates": [
-        "#psversion#-ubi-#shorttag#",
         "ubi-#shorttag#"
     ],
     "OptionalTests": [
         "test-deps"
     ],
     "TestProperties": {
-        "size": 788
+        "size": 750
     },
     "DistributionState": "Validating",
     "EndOfLife": "2023-05-30"
