@@ -107,6 +107,7 @@ function Get-ChannelPackageTag
         $Channel
     )
 
+    $channelData = Get-ChannelData
     return $channelData | Where-Object {$_.Name -eq $Channel} | Select-Object -ExpandProperty PackageTag -First 1
 }
 
@@ -118,6 +119,7 @@ function Get-PwshInstallVersion
         $Channel
     )
 
+    $channelData = Get-ChannelData
     return $channelData | Where-Object {$_.Name -eq $Channel} | Select-Object -ExpandProperty pwshInstallVersion -First 1
 }
 
@@ -128,6 +130,7 @@ function Get-ChannelTagPrefix {
         $Channel
     )
 
+    $channelData = Get-ChannelData
     return $channelData | Where-Object {$_.Name -eq $Channel} | Select-Object -ExpandProperty TagPrefix -First 1
 }
 
@@ -809,7 +812,7 @@ function Get-TestParams
                 $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
             }
             catch {
-                throw "Downloading file from $pwshSourceInstallerFile to $cachedPwshFilePath with actual channel: $actualChannel, package format: $($allMeta.meta.PackageFormat), package version: $packageVersion, channelTag: $channelTag failed due to $_"
+                Write-Warning "Downloading file from $pwshSourceInstallerFile to $cachedPwshFilePath with actual channel: $actualChannel, package format: $($allMeta.meta.PackageFormat), package version: $packageVersion, channelTag: $channelTag failed due to $_"
             }
         }
 
@@ -832,7 +835,7 @@ function Get-TestParams
             $packageName = $packageName -replace '\${channelTag}', $channelTag
             $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
-            $packageUrl.Query = $sasData.sasQueryn
+            $packageUrl.Query = $sasData.sasQuery
             if($allMeta.meta.Base64EncodePackageUrl)
             {
                 $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.ToString())
