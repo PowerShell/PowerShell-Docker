@@ -3,10 +3,10 @@
     "UseLinuxVersion": false,
     "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.rh.x86_64.rpm",
     "SkipGssNtlmSspTests": true,
-    "osVersion": "Universal Base Image 8.4",
+    "osVersion": "Universal Base Image 8",
     "ShortDistroName": "ubi",
     "shortTags": [
-        {"Tag": "8.4"}
+        {"Tag": "8"}
     ],
     "SubImage": "test-deps",
     "TestProperties": {

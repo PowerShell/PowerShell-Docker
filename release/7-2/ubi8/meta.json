@@ -1,0 +1,23 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.rh.x86_64.rpm",
+    "SkipGssNtlmSspTests": true,
+    "osVersion": "Universal Base Image 8",
+    "tagTemplates": [
+        "#psversion#-ubi-#shorttag#",
+        "ubi-#shorttag#"
+    ],
+    "shortTags": [
+        {"Tag": "8"}
+    ],
+    "manifestLists": [
+        "ubi"
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 725
+    },
+    "DistributionState": "Validating",
+    "EndOfLife": "2023-05-30"
+}
