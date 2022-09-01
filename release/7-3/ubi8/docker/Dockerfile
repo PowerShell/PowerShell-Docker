@@ -11,7 +11,7 @@ ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$
 # create folder at install location
 RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.rpm
 # start new stage so that the tar.gz layers are left behind in multi-stage build
-FROM registry.access.redhat.com/ubi8/ubi:8.4 AS final-image
+FROM registry.access.redhat.com/ubi8/ubi:8.6 AS final-image
 ARG PS_VERSION=7.3.0-preview.1
 ARG PS_INSTALL_VERSION=7-preview
 
