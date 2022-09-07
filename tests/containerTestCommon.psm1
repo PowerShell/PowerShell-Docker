@@ -519,7 +519,6 @@ function Invoke-DockerBuild
             $buildArgList += '--pull'
         }
 
-        $buildArgList += '--quiet'
         $buildArgList += '--progress=plain'
     }
 
