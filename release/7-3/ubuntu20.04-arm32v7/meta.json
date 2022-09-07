@@ -6,7 +6,7 @@
     "SkipGssNtlmSspTests": true,
     "ShortDistroName": "ubuntu",
     "Base64EncodePackageUrl": true,
-    "UseAcr": true,
+    "UseAcr": false,
     "shortTags": [
         {"Tag": "focal-arm32"},
         {"Tag": "20.04-arm32"}
