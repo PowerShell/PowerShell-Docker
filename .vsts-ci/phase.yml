@@ -30,6 +30,7 @@ jobs:
   variables:
     ContinueOnError: ${{ parameters.continueonerror }}
     scanType: Register
+    pool: ${{ parameters.pool }}
 
   pool:
     ${{ if eq(parameters['pool'],'')}}:
@@ -110,7 +111,7 @@ jobs:
     continueOnError: ${{ variables.continueonerror }}
 
   - task: PublishTestResults@2
-    condition: and( succeededOrFailed(), ne(variables['Channel'],''), eq(parameters['pool'],''))
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''), eq(variables['pool'],''))
     displayName: Publish $(ImageName) Test Results **\test*.xml
     continueOnError: ${{ variables.continueonerror }}
 
