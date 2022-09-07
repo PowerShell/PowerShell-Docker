@@ -429,7 +429,7 @@ End {
                     continue
                 }
 
-                $architecture = 'amd64'
+                $architecture = $allMeta.meta.Architecture
                 $imagePath = $allMeta.imagePath
                 $relativeImagePath = $imagePath.Replace($PSScriptRoot,'')
                 $relativeImagePath = $relativeImagePath -replace '\\', '/'
