@@ -34,7 +34,6 @@ jobs:
   pool:
     ${{ if eq(parameters['pool'],'')}}:
       vmImage: ${{ parameters.vmImage }}
-
     ${{ if ne(variables['pool'],'')}}:
       name: ${{ parameters.pool }}
       demands:
