@@ -1,13 +1,24 @@
 parameters:
-  name: ''
-  vmImage: 'ubuntu-latest'
-  continueonerror: false
-  ciParameter: '-CI'
-  useacr: 'false'
-  matrix: ''
-  dependsOn: 'GenerateYaml'
-  jobName: 'Build'
-  maxParallel: 5
+  - name: name
+    default: ''
+  - name: vmImage
+    default: 'ubuntu-latest'
+  - name: pool
+    default: ''
+  - name: continueonerror
+    default: false
+  - name: ciParameter
+    default: '-CI'
+  - name: useacr
+    default: 'false'
+  - name: matrix
+    default: ''
+  - name: dependsOn
+    default: 'GenerateYaml'
+  - name: jobName
+    default: 'Build'
+  - name: maxParallel
+    default: 5
 
 jobs:
 - job: ${{ parameters.jobName }}
@@ -21,7 +32,14 @@ jobs:
     scanType: Register
 
   pool:
-    vmImage: ${{ parameters.vmImage }}
+    ${{ if eq(parameters['pool'],'')}}:
+      vmImage: ${{ parameters.vmImage }}
+
+    ${{ if ne(variables['pool'],'')}}:
+      name: ${{ parameters.pool }}
+      demands:
+        - ImageOverride -equals ${{ parameters.vmImage }}
+
   steps:
   - ${{ if eq(parameters.useacr, 'true') }}:
     - pwsh: |
