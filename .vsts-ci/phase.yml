@@ -48,6 +48,12 @@ jobs:
       condition: ne(variables['ACR'], 'no')
 
   - pwsh: |
+      Write-Verbose -verbose "pshome: $pshome"
+      $psversiontable
+    displayName: PowerShell Info
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
+  - pwsh: |
       Write-Host "##vso[task.setvariable variable=scanType;]LogOnly"
     displayName: Set scanType to LogOnly For PRs
     condition: eq(variables['Build.Reason'], 'PullRequest')
@@ -89,6 +95,11 @@ jobs:
     inputs:
       packageType: 'sdk'
       version: 6.x
+
+  - pwsh: |
+      dotnet --list-sdks
+    displayName: dotnet info
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - task: ComponentGovernanceComponentDetection@0
     inputs:
