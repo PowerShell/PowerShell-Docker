@@ -17,5 +17,6 @@
     },
     "EndOfLife": "2023-04-02",
     "DistributionState": "Validated",
-    "UseInCi": false
+    "UseInCi": false,
+    "Architecture": "arm64"
 }
