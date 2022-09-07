@@ -84,6 +84,11 @@ jobs:
     displayName: 'Capture Docker* Environment Variables'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: 3.x
+
   - task: ComponentGovernanceComponentDetection@0
     inputs:
       dockerImagesToScan: $(dockerImagesToScan)
