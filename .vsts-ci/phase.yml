@@ -34,7 +34,7 @@ jobs:
   pool:
     ${{ if eq(parameters['pool'],'')}}:
       vmImage: ${{ parameters.vmImage }}
-    ${{ if ne(variables['pool'],'')}}:
+    ${{ else }}:
       name: ${{ parameters.pool }}
       demands:
         - ImageOverride -equals ${{ parameters.vmImage }}
