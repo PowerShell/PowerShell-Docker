@@ -98,7 +98,7 @@ jobs:
       alertWarningLevel: 'High'
       failOnAlert: true
     displayName: Component Governance - $(ImageName) $(Channel)
-    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''), eq(variables['pool'],''))
 
   - pwsh: |
       if ( '$env:CHANNEL' -eq '' ) { exit }
