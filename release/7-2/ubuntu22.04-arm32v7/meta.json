@@ -2,24 +2,28 @@
     "IsLinux" : true,
     "UseLinuxVersion": false,
     "PackageFormat": "powershell-${PS_VERSION}-linux-arm32.tar.gz",
-    "osVersion": "Ubuntu 20.04 ARM 32v7",
+    "osVersion": "Ubuntu 22.04 ARM 32v7",
     "SkipGssNtlmSspTests": true,
     "ShortDistroName": "ubuntu",
     "Base64EncodePackageUrl": true,
-    "UseAcr": true,
+    "UseAcr": false,
     "tagTemplates": [
         "#psversion#-ubuntu-#shorttag#-arm32",
         "ubuntu-#shorttag#-arm32"
     ],
     "shortTags": [
-        {"Tag": "focal"},
-        {"Tag": "20.04"}
+        {"Tag": "jammy"},
+        {"Tag": "22.04"}
     ],
     "TestProperties": {
         "size": 550,
         "Arm32": true
     },
+    "manifestLists": [
+        "latest"
+    ],
     "EndOfLife": "2023-04-02",
     "DistributionState": "Validated",
-    "UseInCi": false
+    "UseInCi": false,
+    "Architecture": "arm32"
 }
