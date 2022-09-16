@@ -142,7 +142,7 @@ jobs:
       alertWarningLevel: 'High'
       failOnAlert: true
     displayName: Component Governance - $(ImageName) $(Channel)
-    condition: and( succeededOrFailed(), ne(variables['Channel'],''), eq(variables['pool'],'PowerShell1ES', ne(variables['ACR'],'No'))
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''), eq(variables['pool'],'PowerShell1ES'), ne(variables['ACR'],'No'))
 
   - pwsh: 'docker logout $(dockerHost)'
     displayName: 'docker logout'
