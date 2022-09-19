@@ -45,4 +45,5 @@ stages:
           - GenerateYaml_${{ parameters.channel }}
         jobName: Build_Win
         vmImage: PSMMS2019-Secure
+        imageVersion: 32.0.0
         ACR: yes

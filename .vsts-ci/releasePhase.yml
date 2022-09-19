@@ -13,7 +13,8 @@ parameters:
     default: []
     type: object
   - name: matrix
-
+  - name: imageVersion
+    default: 'latest'
 jobs:
 - job: ${{ parameters.jobName }}
   dependsOn:
@@ -31,6 +32,9 @@ jobs:
     name: PowerShell1ES
     demands:
       - ImageOverride -equals ${{ parameters.vmImage }}
+      - ${{ if ne(parameters.imageVersion, latest') }}:
+        - ImageVersionOverride -equals ${{ parameters.imageVersion }}
+
 
   timeoutInMinutes: 135
 
