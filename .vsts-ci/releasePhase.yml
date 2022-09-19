@@ -32,7 +32,7 @@ jobs:
     name: PowerShell1ES
     demands:
       - ImageOverride -equals ${{ parameters.vmImage }}
-      - ${{ if ne(parameters.imageVersion, latest') }}:
+      - ${{ if ne(parameters.imageVersion, 'latest') }}:
         - ImageVersionOverride -equals ${{ parameters.imageVersion }}
 
 
