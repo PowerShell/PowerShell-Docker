@@ -210,25 +210,25 @@ function Test-SkipLinux
 
     $os = Get-DockerEngineOs
 
-    switch -wildcard ($os)
+    switch -RegEx ($os)
     {
-        '*Linux*' {
+        'Linux' {
             return $false
         }
-        '*Mac' {
+        '.*Mac' {
             return $false
         }
-        'Ubuntu*' {
+        '^Ubuntu.*' {
             return $false
         }
         # Docker for Windows means we are running the linux kernel
-        'Docker for Windows' {
+        '^Docker for Windows' {
             return $false
         }
-        'Windows*' {
+        '^(Microsoft )?Windows.*' {
             return $true
         }
-        'Docker Desktop' {
+        '^Docker Desktop' {
             return $false
         }
         default {
