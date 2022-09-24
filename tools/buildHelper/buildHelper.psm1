@@ -107,6 +107,7 @@ function Get-ChannelPackageTag
         $Channel
     )
 
+    $channelData = Get-ChannelData
     return $channelData | Where-Object {$_.Name -eq $Channel} | Select-Object -ExpandProperty PackageTag -First 1
 }
 
@@ -118,6 +119,7 @@ function Get-PwshInstallVersion
         $Channel
     )
 
+    $channelData = Get-ChannelData
     return $channelData | Where-Object {$_.Name -eq $Channel} | Select-Object -ExpandProperty pwshInstallVersion -First 1
 }
 
@@ -128,6 +130,7 @@ function Get-ChannelTagPrefix {
         $Channel
     )
 
+    $channelData = Get-ChannelData
     return $channelData | Where-Object {$_.Name -eq $Channel} | Select-Object -ExpandProperty TagPrefix -First 1
 }
 
@@ -152,6 +155,53 @@ function Get-ImageList
         $channelPath = Get-ChannelPath -Channel $channelName
         Get-ChildItem -Path $channelPath -Directory | Select-Object -ExpandProperty Name | Write-Output
     }
+}
+
+function Get-CacheFolder
+{
+    $tmpPath = ([System.IO.Path]::GetTempPath())
+    $cacheFolderPath = Join-Path -Path $tmpPath -ChildPath "PSDockerCache"
+    if (!(Test-Path $cacheFolderPath))
+    {
+        New-Item -Path $cacheFolderPath -ItemType Directory
+    }
+
+    return $cacheFolderPath
+}
+
+function Reset-CacheFolder
+{
+    $cacheFolderPath = Get-CacheFolder
+    if (Test-Path -Path $cacheFolderPath)
+    {
+        Remove-Item $cacheFolderPath -Recurse
+    }
+}
+
+function Get-PowerShellReleaseUrl
+{
+    return "https://github.com/PowerShell/PowerShell/releases/download/"
+}
+
+function Get-PackageName
+{
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $packageNameFromMetadata,
+
+        [Parameter(Mandatory)]
+        [string]
+        $packageVersion,
+
+        [string]
+        $channelTag
+    )
+
+    $packageNameFromMetadata = $packageNameFromMetadata -replace '\${PS_VERSION}', $packageVersion
+    $packageNameFromMetadata = $packageNameFromMetadata -replace '\${channelTag}', $channelTag
+
+    return $packageNameFromMetadata
 }
 
 enum DistributionState {
@@ -717,7 +767,14 @@ function Get-TestParams
         $imageNameParam = 'pshorg/powershellcommunity:' + $actualTagData.TagList[0]
     }
 
-    $packageVersion = $psversion
+    # psversion must always be preprended with "v" i.e v7.2.2 or v7.3.0-preview6
+    if ($psversion -notlike "v*")
+    {
+        $psversion = "v" + $psversion
+    }
+
+    # packageVersion should be prepended with "v"
+    $packageVersion = $psversion.TrimStart("v")
 
     # if the package name ends with rpm
     # then replace the - in the filename with _ as fpm creates the packages this way.
@@ -736,12 +793,44 @@ function Get-TestParams
 
     if ($allMeta.meta.PackageFormat)
     {
+        $channelTag = ""
+        $channelTag = Get-ChannelPackageTag -Channel $actualChannel
+
+        $packageName = Get-PackageName $allMeta.meta.PackageFormat $packageVersion $channelTag
+
+        # check if package file already exists in cache
+        $tmpCacheFolder = Get-CacheFolder
+        $cachedPwshFilePath = Join-Path -Path $tmpCacheFolder -ChildPath $packageName
+
+        if (!(Test-Path $cachedPwshFilePath))
+        {
+            # download the powershell installer file
+            $pwshReleaseUrl = Get-PowerShellReleaseUrl
+            $pwshSourceInstallerFile = $pwshReleaseUrl + $psversion + '/' + $packageName
+            $wc=[System.Net.WebClient]::new()
+            try {
+                $wc.DownloadFile($pwshSourceInstallerFile, $cachedPwshFilePath)
+            }
+            catch {
+                Write-Warning "Downloading file from $pwshSourceInstallerFile to $cachedPwshFilePath with actual channel: $actualChannel, package format: $($allMeta.meta.PackageFormat), package version: $packageVersion, channelTag: $channelTag failed due to $_"
+            }
+        }
+
+        # copy file over if it doesn't already exist in context path.
+        $pwshLocalFilePath = Join-Path $contextPath -ChildPath $packageName
+
+        if (!(Test-Path $pwshLocalFilePath))
+        {
+            Copy-Item -Path $cachedPwshFilePath -Destination $pwshLocalFilePath
+        }
+
+        $buildArgs.Add('PS_INSTALL_PATH', $pwshLocalFilePath)
+
         if($sasData.sasUrl)
         {
             $packageUrl = [System.UriBuilder]::new($sasData.sasBase)
 
             $channelTag = Get-ChannelPackageTag -Channel $actualChannel
-
             $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
             $packageName = $packageName -replace '\${channelTag}', $channelTag
             $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
@@ -760,7 +849,8 @@ function Get-TestParams
         }
         else
         {
-            $packageUrl = [System.UriBuilder]::new('https://github.com/PowerShell/PowerShell/releases/download/')
+            $pwshReleaseUrl = Get-PowerShellReleaseUrl
+            $packageUrl = [System.UriBuilder]::new($pwshReleaseUrl)
 
             $channelTag = Get-ChannelPackageTag -Channel $actualChannel
 
@@ -770,6 +860,9 @@ function Get-TestParams
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
             $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
         }
+    }
+    else {
+        Write-Verbose -Message "Package format is null or empty for this image, likely due to being a test-deps image"
     }
 
     $testArgs = @{

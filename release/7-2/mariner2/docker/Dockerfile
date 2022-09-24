@@ -3,27 +3,31 @@
 
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS installer-env
 
-# Define Args for the needed to add the package
-ARG PS_VERSION=7.2.5
-ARG PS_PACKAGE=powershell-${PS_VERSION}-1.cm1.x86_64.rpm
-ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=7-preview
+COPY ${PS_INSTALL_PATH} /tmp/linux.tar.gz
 
-# Download the Linux tar.gz and save it
-ADD ${PS_PACKAGE_URL} /tmp/powershell.rpm
+# define the folder we will be installing PowerShell to
+ENV PS_INSTALL_VERSION=7 \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION}
 
-RUN echo ${PS_PACKAGE_URL}
+# Create the install folder
+RUN mkdir -p ${PS_INSTALL_FOLDER}
 
-# Start a new stage so we lose all the tar.gz layers from the final image
-FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS powershell
+# Install tar a gzip so we can unzip the tar.gz
+RUN --mount=type=cache,target=/var/cache/tdnf \
+    tdnf install -y \
+    tar \
+    gzip \
+    && tdnf clean all
 
-ARG PS_VERSION=7.2.5
-ARG PS_INSTALL_VERSION=7-preview
+# Unzip the Linux tar.gz
+RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
+
+# Start a new stage so we lose all the tar.gz layers in the final image
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS final-image
 
 # Define Args and Env needed to create links
-ARG PS_INSTALL_VERSION=7-preview
-ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
-    \
+ENV PS_INSTALL_VERSION=7 \
+    PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION} \
     # Define ENVs for Localization/Globalization
     DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     LC_ALL=en_US.UTF-8 \
@@ -49,18 +53,16 @@ RUN --mount=type=cache,target=/var/cache/tdnf \
     # upgrade packages
     && tdnf upgrade -y \
     # clean cached data
-    && tdnf clean all
-
-RUN --mount=type=cache,target=/var/cache/tdnf,rw \
-    --mount=from=installer-env,target=/mnt/rpm,source=/tmp \
-    rpm -i /mnt/rpm/powershell.rpm
-
-# Create the pwsh symbolic link that points to powershell
-RUN if [ -f "/opt/microsoft/powershell/7-preview/pwsh" ]; then ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh; fi
-
-# intialize powershell module cache
-# and disable telemetry for this ONE session
-RUN export POWERSHELL_TELEMETRY_OPTOUT=1 \
+    && tdnf clean all \
+    # Give all user execute permissions and remove write permissions for others
+    && chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
+    # Create the pwsh symbolic link that points to powershell
+    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
+    # Create the pwsh symbolic link that points to powershell
+    && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh-preview \
+    # intialize powershell module cache
+    # and disable telemetry
+    && export POWERSHELL_TELEMETRY_OPTOUT=1 \
     && pwsh \
         -NoLogo \
         -NoProfile \
