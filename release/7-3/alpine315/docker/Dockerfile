@@ -65,6 +65,8 @@ RUN apk add --no-cache \
   # PowerShell remoting over SSH dependencies
   openssh-client \
   \
+  && apk update \
+  && apk upgrade \
   # Create the pwsh symbolic link that points to powershell
   && ln -s ${PS_INSTALL_FOLDER}/pwsh /usr/bin/pwsh \
   \
