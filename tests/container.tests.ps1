@@ -580,7 +580,8 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             })
         }
 
-        it "Verify size of <name>" -TestCases $sizeTestCases  -Skip:$script:skipLinuxRun {
+        # -Skip:$script:skipLinuxRun
+        it "Verify size of <name>" -TestCases $sizeTestCases -Pending {
             param(
                 [Parameter(Mandatory=$true)]
                 [string]
