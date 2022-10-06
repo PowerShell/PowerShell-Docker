@@ -2,10 +2,6 @@
 
 ARG BaseImage=mcr.microsoft.com/powershell:alpine-3.14
 
-FROM node:14.17.6-alpine as node
-
-# Do nothing, just added to borrow the already built node files.
-
 FROM ${BaseImage}
 
 ENV NODE_VERSION=14.17.6 \
@@ -16,19 +12,18 @@ ENV NODE_VERSION=14.17.6 \
 # workaround for Alpine to run in Azure DevOps
 ENV NODE_NO_WARNINGS=1
 
-# Copy node and yarn into image
-COPY --from=node /usr/local/bin/node /usr/local/bin/node
-COPY --from=node /opt/yarn-v${YARN_VERSION} /opt/yarn-v${YARN_VERSION}
-
 RUN apk add --no-cache --virtual .pipeline-deps readline linux-pam \
     && apk add  --no-cache \
-    bash \
-    sudo \
-    shadow \
-    openssl \
-    curl \
-    git \
-    unzip \
+        bash \
+        sudo \
+        shadow \
+        openssl \
+        curl \
+        git \
+        unzip \
+        nodejs \
+    && apk update \
+    && apk upgrade \
     && apk del .pipeline-deps \
     && ln -s /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
     && ln -s /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg
