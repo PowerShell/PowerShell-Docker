@@ -505,7 +505,6 @@ Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
             $muslCommands = @(
                 @{
                     command = 'node'
-                    path = '/usr/local/bin/node'
                 }
             )
 
