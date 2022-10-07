@@ -36,7 +36,7 @@ function Invoke-Docker
     $cliCommand = @()
     if($UseAcr)
     {
-        $cli = @('az')
+        $cli = @('az.cmd')
         $cliCommand += 'acr'
     }
     else {
