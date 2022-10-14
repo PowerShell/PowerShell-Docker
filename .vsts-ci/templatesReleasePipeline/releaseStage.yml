@@ -41,8 +41,8 @@ stages:
 
       - template: ./releaseJob.yml
         parameters:
-          jobName: ${{ parameters.channel }}_${{ parameters.osFilter }}
-          matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_windows']
+          jobName: ${{ parameters.channel }}_${{ parameters.osFilter }}_x64
+          matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_windows_amd64']
           WhatIf: ${{ parameters.WhatIf }}
           vmImage: "PSMMS2019-Secure"
           dependsOn:
@@ -50,12 +50,21 @@ stages:
 
       - template: ./releaseJob.yml
         parameters:
-          jobName: ${{ parameters.channel }}_linux
-          matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux']
+          jobName: ${{ parameters.channel }}_linux_x64
+          matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_amd64']
           WhatIf: ${{ parameters.WhatIf }}
           vmImage: "PSMMSUbuntu20.04-Secure"
           dependsOn:
             - GenerateYaml_${{ parameters.channel }}
+
+      # - template: ./releaseJob.yml
+      #   parameters:
+      #     jobName: ${{ parameters.channel }}_linux_arm
+      #     matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm64']
+      #     WhatIf: ${{ parameters.WhatIf }}
+      #     vmImage: "PSMMSUbuntu20.04-Secure"
+      #     dependsOn:
+      #       - GenerateYaml_${{ parameters.channel }}
 
     - stage: Release_ManifestList_${{ parameters.channel }}
       jobs:

@@ -35,15 +35,23 @@ stages:
         condition: succeededOrFailed()
     - template: phase.yml
       parameters:
-        matrix: dependencies.GenerateYaml_${{ variables.jobName }}.outputs['matrix.matrix_${{ parameters.channel }}_linux']
+        matrix: dependencies.GenerateYaml_${{ variables.jobName }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_amd64']
         dependsOn: GenerateYaml_${{ variables.jobName }}
-        jobName: Build_Linux
+        jobName: Build_Linux_x64
         useacr: ${{ parameters.useacr }}
     - template: phase.yml
       parameters:
-        matrix: dependencies.GenerateYaml_${{ variables.jobName }}.outputs['matrix.matrix_${{ parameters.channel }}_windows']
+        matrix: dependencies.GenerateYaml_${{ variables.jobName }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm64']
         dependsOn: GenerateYaml_${{ variables.jobName }}
-        jobName: Build_Win
+        jobName: Build_Linux_ARM
+        useacr: ${{ parameters.useacr }}
+        pool: PS-PowerShell-ARM
+        vmImage: PSMMSUbuntu20.04-ARM64-secure
+    - template: phase.yml
+      parameters:
+        matrix: dependencies.GenerateYaml_${{ variables.jobName }}.outputs['matrix.matrix_${{ parameters.channel }}_windows_amd64']
+        dependsOn: GenerateYaml_${{ variables.jobName }}
+        jobName: Build_Win_x64
         vmImage: windows-2022
         ciParameter: ${{ parameters.winCiParameter }}
         useacr: ${{ parameters.useacr }}

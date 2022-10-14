@@ -6,7 +6,7 @@
     "SkipGssNtlmSspTests": true,
     "ShortDistroName": "ubuntu",
     "Base64EncodePackageUrl": true,
-    "UseAcr": true,
+    "UseAcr": false,
     "shortTags": [
         {"Tag": "jammy-arm32"},
         {"Tag": "22.04-arm32"}
@@ -20,5 +20,6 @@
     ],
     "EndOfLife": "2023-04-02",
     "DistributionState": "Validated",
-    "UseInCi": false
+    "UseInCi": false,
+    "Architecture": "arm64"
 }

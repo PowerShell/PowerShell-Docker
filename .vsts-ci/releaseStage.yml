@@ -34,15 +34,25 @@ stages:
         condition: succeededOrFailed()
     - template: releasePhase.yml
       parameters:
-        matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux']
+        matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_amd64']
         dependsOn:
           - GenerateYaml_${{ parameters.channel }}
-        jobName: Build_Linux
+        jobName: Build_Linux_x64
+
+    # - template: releasePhase.yml
+    #   parameters:
+    #     matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm64']
+    #     dependsOn:
+    #       - GenerateYaml_${{ parameters.channel }}
+    #     jobName: Build_Linux_arm
+    #     pool: PS-mscodehub-ARM
+    #     vmImage: PSMMSUbuntu20.04-ARM64-secure
+
     - template: releasePhase.yml
       parameters:
-        matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_windows']
+        matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_windows_amd64']
         dependsOn:
           - GenerateYaml_${{ parameters.channel }}
-        jobName: Build_Win
+        jobName: Build_Win_x64
         vmImage: PSMMS2019-Secure
         ACR: yes

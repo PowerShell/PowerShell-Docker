@@ -6,10 +6,14 @@
     "SkipGssNtlmSspTests": true,
     "ShortDistroName": "ubuntu",
     "Base64EncodePackageUrl": true,
-    "UseAcr": true,
+    "UseAcr": false,
+    "tagTemplates": [
+        "#psversion#-ubuntu-#shorttag#-arm32",
+        "ubuntu-#shorttag#-arm32"
+    ],
     "shortTags": [
-        {"Tag": "focal-arm32"},
-        {"Tag": "20.04-arm32"}
+        {"Tag": "focal"},
+        {"Tag": "20.04"}
     ],
     "TestProperties": {
         "size": 550,
@@ -17,5 +21,6 @@
     },
     "EndOfLife": "2023-04-02",
     "DistributionState": "Validated",
-    "UseInCi": false
+    "UseInCi": false,
+    "Architecture": "arm64"
 }

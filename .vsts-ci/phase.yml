@@ -1,13 +1,24 @@
 parameters:
-  name: ''
-  vmImage: 'ubuntu-latest'
-  continueonerror: false
-  ciParameter: '-CI'
-  useacr: 'false'
-  matrix: ''
-  dependsOn: 'GenerateYaml'
-  jobName: 'Build'
-  maxParallel: 5
+  - name: name
+    default: ''
+  - name: vmImage
+    default: 'ubuntu-latest'
+  - name: pool
+    default: ''
+  - name: continueonerror
+    default: false
+  - name: ciParameter
+    default: '-CI'
+  - name: useacr
+    default: 'false'
+  - name: matrix
+    default: ''
+  - name: dependsOn
+    default: 'GenerateYaml'
+  - name: jobName
+    default: 'Build'
+  - name: maxParallel
+    default: 5
 
 jobs:
 - job: ${{ parameters.jobName }}
@@ -19,15 +30,28 @@ jobs:
   variables:
     ContinueOnError: ${{ parameters.continueonerror }}
     scanType: Register
+    pool: ${{ parameters.pool }}
 
   pool:
-    vmImage: ${{ parameters.vmImage }}
+    ${{ if eq(parameters['pool'],'')}}:
+      vmImage: ${{ parameters.vmImage }}
+    ${{ else }}:
+      name: ${{ parameters.pool }}
+      demands:
+        - ImageOverride -equals ${{ parameters.vmImage }}
+
   steps:
   - ${{ if eq(parameters.useacr, 'true') }}:
     - pwsh: |
         Write-Host "##vso[task.setvariable variable=ACR_NAME;]$env:ACR_NAME_VAR"
       displayName: 'Enable ACR'
       condition: ne(variables['ACR'], 'no')
+
+  - pwsh: |
+      Write-Verbose -verbose "pshome: $pshome"
+      $psversiontable
+    displayName: PowerShell Info
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: |
       Write-Host "##vso[task.setvariable variable=scanType;]LogOnly"
@@ -67,6 +91,16 @@ jobs:
     displayName: 'Capture Docker* Environment Variables'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: 6.x
+
+  - pwsh: |
+      dotnet --list-sdks
+    displayName: dotnet info
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
   - task: ComponentGovernanceComponentDetection@0
     inputs:
       dockerImagesToScan: $(dockerImagesToScan)
@@ -75,6 +109,7 @@ jobs:
       alertWarningLevel: 'High'
       failOnAlert: true
     displayName: Component Governance - $(ImageName) $(Channel)
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''), eq(variables['pool'],''))
 
   - pwsh: |
       if ( '$env:CHANNEL' -eq '' ) { exit }
@@ -87,7 +122,7 @@ jobs:
     continueOnError: ${{ variables.continueonerror }}
 
   - task: PublishTestResults@2
-    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''), eq(variables['pool'],''))
     displayName: Publish $(ImageName) Test Results **\test*.xml
     continueOnError: ${{ variables.continueonerror }}
 

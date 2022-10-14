@@ -153,6 +153,19 @@ This file *is **required*** for all containers. Here is the bare minimum:
 }
 ```
 
+### Host architecture
+
+You can specify the host architecture.
+Currently, `amd64` is supported everywhere and
+`arm64` is supported on Linux.
+Linux `arm64` can build both `arm32` and `arm64`.
+
+```json
+{
+    "Architecture" : "amd64"
+}
+```
+
 You should also add [tags](#tags) as a field.
 
 ## Dependabot

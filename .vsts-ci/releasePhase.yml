@@ -13,8 +13,11 @@ parameters:
     default: []
     type: object
   - name: matrix
+  - name: pool
+    default: PowerShell1ES
   - name: imageVersion
     default: 'latest'
+
 jobs:
 - job: ${{ parameters.jobName }}
   dependsOn:
@@ -29,7 +32,7 @@ jobs:
     scanType: Register
 
   pool:
-    name: PowerShell1ES
+    name: ${{ parameters.pool }}
     demands:
       - ImageOverride -equals ${{ parameters.vmImage }}
       - ${{ if ne(parameters.imageVersion, 'latest') }}:
@@ -41,11 +44,30 @@ jobs:
   displayName: ${{ parameters.jobName }}
 
   steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: 6.x
+
+  - pwsh: |
+      dotnet --list-sdks
+    displayName: dotnet info
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
+  - pwsh: |
+      if (!(get-Command -name 'az' -errorAction SilentlyContinue)) {
+        Write-Host "Installing Az CLI"
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      }
+    displayName: Install Azure CLI
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
   - task: DownloadBuildArtifacts@0
     displayName: 'Download Build Artifacts'
     inputs:
       downloadType: specific
       itemPattern: buildMeta/**/*.json
+
   - powershell: |
       $json = Get-ChildItem $(System.ArtifactsDirectory)/buildmeta.json -recurse -File
       if($json.Count -ge 1)
@@ -125,7 +147,7 @@ jobs:
       alertWarningLevel: 'High'
       failOnAlert: true
     displayName: Component Governance - $(ImageName) $(Channel)
-    condition: and( succeededOrFailed(), ne(variables['Channel'],''), ne(variables['ACR'],'No'))
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''), eq(variables['pool'],'PowerShell1ES'), ne(variables['ACR'],'No'))
 
   - pwsh: 'docker logout $(dockerHost)'
     displayName: 'docker logout'

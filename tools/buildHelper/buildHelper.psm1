@@ -99,6 +99,17 @@ function Get-ChannelPath
     return Join-Path -Path $resolvedRepoRoot -ChildPath $relativePath
 }
 
+function Get-ChannelEndOfLife {
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $Channel
+    )
+
+    $endOfLife = $channelData | Where-Object { $_.Name -eq $Channel } | Select-Object -ExpandProperty EndOfLife -First 1
+    return $endOfLife
+}
+
 function Get-ChannelPackageTag
 {
     param(
@@ -245,6 +256,9 @@ class DockerImageMetaData {
 
     [bool]
     $UseAcr = $false
+
+    [string]
+    $Architecture = 'amd64'
 
     [bool]
     $IsBroken = $false
