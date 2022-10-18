@@ -101,6 +101,17 @@ jobs:
     displayName: dotnet info
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
+  - pwsh: |
+      $dotnetFolder = split-path (gcm dotnet).source
+      Write-Host "##vso[task.setvariable variable=GOVERNANCE_SYSTEM_DOTNET;]$dotnetFolder"
+    displayName: Set GOVERNANCE_SYSTEM_DOTNET
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
+  - pwsh: |
+      Get-ChildItem env:\GOVERNANCE*
+    displayName: 'Capture GOVERNANCE* Environment Variables'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
   - task: ComponentGovernanceComponentDetection@0
     inputs:
       dockerImagesToScan: $(dockerImagesToScan)
@@ -109,7 +120,11 @@ jobs:
       alertWarningLevel: 'High'
       failOnAlert: true
     displayName: Component Governance - $(ImageName) $(Channel)
-    condition: and( succeededOrFailed(), ne(variables['Channel'],''), eq(variables['pool'],''))
+    condition: |
+      and(
+          succeededOrFailed(),
+          ne(variables['Channel'],'')
+        )
 
   - pwsh: |
       if ( '$env:CHANNEL' -eq '' ) { exit }
