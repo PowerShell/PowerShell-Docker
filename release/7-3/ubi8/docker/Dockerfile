@@ -2,8 +2,8 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 FROM registry.access.redhat.com/ubi8/ubi:8.6 AS installer-env
-ARG PS_VERSION=7.3.0-preview.1
-ARG PACKAGE_VERSION=7.3.0_preview.1
+ARG PS_VERSION=7.3.0-preview.8
+ARG PACKAGE_VERSION=7.3.0_preview.8
 ARG PS_PACKAGE=powershell-preview-${PACKAGE_VERSION}-1.rh.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 
@@ -12,7 +12,7 @@ ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v$
 RUN curl -sSL ${PS_PACKAGE_URL} -o /tmp/linux.rpm
 # start new stage so that the tar.gz layers are left behind in multi-stage build
 FROM registry.access.redhat.com/ubi8/ubi:8.6 AS final-image
-ARG PS_VERSION=7.3.0-preview.1
+ARG PS_VERSION=7.3.0-preview.8
 ARG PS_INSTALL_VERSION=7-preview
 
 RUN --mount=type=cache,target=/var/cache/yum,rw \

@@ -10,7 +10,7 @@
         {"Tag": "20.04"}
     ],
     "TestProperties": {
-        "size": 355
+        "size": 340
     },
     "SubImage": "test-deps",
     "EndOfLife": "2023-12-15",

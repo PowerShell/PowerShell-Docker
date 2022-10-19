@@ -13,7 +13,7 @@
         "test-deps"
     ],
     "TestProperties": {
-        "size": 502
+        "size": 566
     },
     "DistributionState": "ImageCreation",
     "EndOfLife": "2023-05-30"

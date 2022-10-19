@@ -4,8 +4,9 @@
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=7.3.0-preview.4
-ARG PS_PACKAGE=powershell-preview-${PS_VERSION}-1.cm1.x86_64.rpm
+ARG PS_VERSION=7.3.0-preview.8
+ARG PACKAGE_VERSION=7.3.0_preview.8
+ARG PS_PACKAGE=powershell-preview-${PACKAGE_VERSION}-1.cm.x86_64.rpm
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7-preview
 
@@ -17,7 +18,7 @@ RUN echo ${PS_PACKAGE_URL}
 # Start a new stage so we lose all the tar.gz layers from the final image
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS powershell
 
-ARG PS_VERSION=7.3.0-preview.4
+ARG PS_VERSION=7.3.0-preview.8
 ARG PS_INSTALL_VERSION=7-preview
 
 # Define Args and Env needed to create links

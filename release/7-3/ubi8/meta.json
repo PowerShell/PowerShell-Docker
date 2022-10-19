@@ -10,7 +10,7 @@
     ],
     "SubImage": "test-deps",
     "TestProperties": {
-        "size": 726
+        "size": 504
     },
     "DistributionState": "Validating",
     "EndOfLife": "2023-05-30"

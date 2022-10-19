@@ -11,6 +11,6 @@
         "test-deps-debian"
     ],
     "TestProperties": {
-        "size": 350
+        "size": 402
     }
 }

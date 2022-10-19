@@ -10,7 +10,7 @@
     "SkipGssNtlmSspTests": true,
     "SubImage": "test-deps",
     "TestProperties": {
-        "size": 221
+        "size": 252
     },
     "EndOfLife": "2023-11-01",
     "DistributionState": "Validating",
