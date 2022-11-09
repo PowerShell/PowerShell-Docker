@@ -1,7 +1,7 @@
 [
     {
         "name": "stable",
-        "path": "release/7-2",
+        "path": "release/7-3",
         "pwshInstallVersion": "7",
         "packageTag": ""
     },
