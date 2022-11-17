@@ -52,6 +52,18 @@ if (!$diffFound) {
 if ($diffFound) {
     Write-Verbose -message "diff found" -Verbose
     $json > $jsonPath
+
+    $hasNode = Get-Command -Name 'node' -ErrorAction SilentlyContinue
+    $hasNpx = Get-Command -Name 'npx' -ErrorAction SilentlyContinue
+    if ($hasNode && $hasNpx) {
+        Write-Verbose -Message "Sorting the keys of the matrix JSON..." -Verbose
+        start-nativeExecution {
+            npx -y json-sort-cli assets/matrix.json
+        }
+        Write-Verbose -Message "Sorting complete." -Verbose
+    } else {
+        Write-Verbose -Message "Node or npx are not available, skipping matrix JSON sorting." -Verbose
+    }
 }
 else {
     Write-Verbose -Message "no diff found" -Verbose

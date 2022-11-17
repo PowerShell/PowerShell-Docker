@@ -600,21 +600,21 @@ End {
                     foreach ($architectureGroup in $architectureGroups) {
                         $architectureName = $architectureGroup.Name
 
-                    # Filter out subimages.  We cannot directly build subimages.
+                        # Filter out subimages.  We cannot directly build subimages.
                         foreach ($tag in $architectureGroup.Group | Where-Object { $_.Name -notlike '*/*' } | Sort-Object -Property dockerfile) {
-                        if (-not $matrix.ContainsKey($channelName)) {
-                            $matrix.Add($channelName, @{ })
-                        }
+                            if (-not $matrix.ContainsKey($channelName)) {
+                                $matrix.Add($channelName, @{ })
+                            }
 
-                        if (-not $matrix.$channelName.ContainsKey($osName)) {
-                            $matrix.$channelName.Add($osName, @{ })
-                        }
+                            if (-not $matrix.$channelName.ContainsKey($osName)) {
+                                $matrix.$channelName.Add($osName, @{ })
+                            }
 
                             if (-not $matrix.$channelName.$osName.ContainsKey($architectureName)) {
                                 $matrix.$channelName.$osName.Add($architectureName, @{})
                             }
 
-                        $jobName = $tag.Name -replace '-', '_'
+                            $jobName = $tag.Name -replace '-', '_'
                             if (-not $matrix.$channelName[$osName][$architectureName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
                                 $matrix.$channelName[$osName][$architectureName].Add($jobName, (ConvertTo-SortedDictionary -Hashtable @{
                                     Channel           = $tag.Channel
@@ -628,10 +628,8 @@ End {
                                     TagList           = $tag.Tags -join ';'
                                     IsLinux           = $tag.IsLinux
                                     UseInCI           = $tag.UseInCI
-                                            Architecture      = $tag.Architecture
-                                        }
-                                    )
-                                )
+                                    Architecture      = $tag.Architecture
+                                }))
                             }
                         }
                     }

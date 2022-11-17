@@ -58,9 +58,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Auto-update JSON
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Auto-update Matrix JSON
         run: |
           ./tools/updateJson.ps1
+
       - name: Create Pull Request
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         id: cpr
