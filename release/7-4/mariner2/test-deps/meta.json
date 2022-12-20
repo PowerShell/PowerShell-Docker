@@ -1,0 +1,17 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "SkipGssNtlmSspTests": true,
+    "osVersion": "Mariner 2.0",
+    "tagTemplates": [
+        "mariner-#shorttag#"
+    ],
+    "SubRepository": "test-deps",
+    "OptionalTests": [
+        "test-deps",
+        "test-deps-redhat"
+    ],
+    "TestProperties": {
+        "size": 760
+    }
+}

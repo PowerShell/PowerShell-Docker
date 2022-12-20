@@ -1,0 +1,18 @@
+{
+    "IsLinux": false,
+    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip",
+    "osVersion": "Nano Server, version 1809",
+    "shortTags": [
+        {
+            "Tag": "1809"
+        }
+    ],
+    "ShortDistroName": "nanoserver",
+    "Base64EncodePackageUrl": true,
+    "TestProperties": {
+        "size": 1
+    },
+    "UseAcr": true,
+    "EndOfLife": "2023-12-15",
+    "DistributionState": "Validated"
+}
