@@ -1,0 +1,19 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "osVersion": "Ubuntu 20.04",
+    "SkipGssNtlmSspTests": false,
+    "ShortDistroName": "ubuntu",
+    "shortTags": [
+        {"Tag": "focal"},
+        {"Tag": "20.04"}
+    ],
+    "TestProperties": {
+        "size": 340
+    },
+    "SubImage": "test-deps",
+    "EndOfLife": "2023-12-15",
+    "DistributionState": "Validated",
+    "UseInCi": false
+}

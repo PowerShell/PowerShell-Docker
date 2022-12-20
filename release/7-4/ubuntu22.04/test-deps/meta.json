@@ -1,0 +1,16 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "osVersion": "Ubuntu 22.04",
+    "tagTemplates": [
+        "ubuntu-#shorttag#"
+    ],
+    "SubRepository": "test-deps",
+    "OptionalTests": [
+        "test-deps",
+        "test-deps-debian"
+    ],
+    "TestProperties": {
+        "size": 390
+    }
+}
