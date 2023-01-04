@@ -96,7 +96,7 @@ jobs:
       packageType: 'sdk'
       version: 6.x
 
-    - pwsh: |
+  - pwsh: |
       if ( '$env:CHANNEL' -eq '' ) { exit }
       $files = @(Get-ChildItem -Recurse test*.xml)
       if($files.count -eq 0) {
