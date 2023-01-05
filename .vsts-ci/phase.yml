@@ -101,10 +101,21 @@ jobs:
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
     continueOnError: ${{ variables.continueonerror }}
 
+  - task: PublishTestResults@2
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''), eq(variables['pool'],''))
+    displayName: Publish $(ImageName) Test Results **\test*.xml
+    continueOnError: ${{ variables.continueonerror }}
+
+    inputs:
+      testRunner: NUnit
+      testResultsFiles: '**\test*.xml'
+      testRunTitle: $(ImageName)
+      mergeTestResults: true
+
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
-      version: 6.x
+      version: 7.x
 
   - pwsh: |
       dotnet --list-sdks
@@ -125,13 +136,3 @@ jobs:
           ne(variables['Channel'],'')
         )
 
-  - task: PublishTestResults@2
-    condition: and( succeededOrFailed(), ne(variables['Channel'],''), eq(variables['pool'],''))
-    displayName: Publish $(ImageName) Test Results **\test*.xml
-    continueOnError: ${{ variables.continueonerror }}
-
-    inputs:
-      testRunner: NUnit
-      testResultsFiles: '**\test*.xml'
-      testRunTitle: $(ImageName)
-      mergeTestResults: true
