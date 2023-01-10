@@ -91,30 +91,6 @@ jobs:
     displayName: 'Capture Docker* Environment Variables'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-  - task: UseDotNet@2
-    inputs:
-      packageType: 'sdk'
-      version: 6.x
-
-  - pwsh: |
-      dotnet --list-sdks
-    displayName: dotnet info
-    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
-
-  - task: ComponentGovernanceComponentDetection@0
-    inputs:
-      dockerImagesToScan: $(dockerImagesToScan)
-      scanType: $(scanType)
-      verbosity: 'Verbose'
-      alertWarningLevel: 'High'
-      failOnAlert: true
-    displayName: Component Governance - $(ImageName) $(Channel)
-    condition: |
-      and(
-          succeededOrFailed(),
-          ne(variables['Channel'],'')
-        )
-
   - pwsh: |
       if ( '$env:CHANNEL' -eq '' ) { exit }
       $files = @(Get-ChildItem -Recurse test*.xml)
@@ -135,3 +111,28 @@ jobs:
       testResultsFiles: '**\test*.xml'
       testRunTitle: $(ImageName)
       mergeTestResults: true
+
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: 7.x
+
+  - pwsh: |
+      dotnet --list-sdks
+    displayName: dotnet info
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
+  - task: ComponentGovernanceComponentDetection@0
+    inputs:
+      dockerImagesToScan: $(dockerImagesToScan)
+      scanType: $(scanType)
+      verbosity: 'Verbose'
+      alertWarningLevel: 'High'
+      failOnAlert: true
+    displayName: Component Governance - $(ImageName) $(Channel)
+    condition: |
+      and(
+          succeededOrFailed(),
+          ne(variables['Channel'],'')
+        )
+
