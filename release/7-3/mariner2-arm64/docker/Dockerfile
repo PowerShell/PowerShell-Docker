@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS installer-env
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20221222-arm64 AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.3.1
@@ -38,7 +38,7 @@ RUN ls -l /tmp/powershell.tar.gz
 # Unzip the linux powershell.tar.gz
 RUN tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
 
-FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS final-image
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20221222-arm64 AS final-image
 
 # Define Args and Env needed to create links
 ARG PS_INSTALL_VERSION=7
