@@ -122,6 +122,18 @@ jobs:
     displayName: dotnet info
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
+  - pwsh: |
+      $dotnetFolder = split-path (gcm dotnet).source
+      Write-Host "##vso[task.setvariable variable=GOVERNANCE_SYSTEM_DOTNET;]$dotnetFolder"
+    displayName: Set GOVERNANCE_SYSTEM_DOTNET
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
+  - pwsh: |
+      Get-ChildItem env:\GOVERNANCE*
+    displayName: 'Capture GOVERNANCE* Environment Variables'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
+
   - task: ComponentGovernanceComponentDetection@0
     inputs:
       dockerImagesToScan: $(dockerImagesToScan)

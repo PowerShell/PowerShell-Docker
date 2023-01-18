@@ -57,14 +57,14 @@ stages:
           dependsOn:
             - GenerateYaml_${{ parameters.channel }}
 
-      # - template: ./releaseJob.yml
-      #   parameters:
-      #     jobName: ${{ parameters.channel }}_linux_arm
-      #     matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm64']
-      #     WhatIf: ${{ parameters.WhatIf }}
-      #     vmImage: "PSMMSUbuntu20.04-Secure"
-      #     dependsOn:
-      #       - GenerateYaml_${{ parameters.channel }}
+      - template: ./releaseJob.yml
+        parameters:
+          jobName: ${{ parameters.channel }}_linux_arm
+          matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm64']
+          WhatIf: ${{ parameters.WhatIf }}
+          vmImage: "PSMMSUbuntu20.04-Secure"
+          dependsOn:
+            - GenerateYaml_${{ parameters.channel }}
 
     - stage: Release_ManifestList_${{ parameters.channel }}
       jobs:
