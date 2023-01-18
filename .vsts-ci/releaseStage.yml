@@ -39,14 +39,14 @@ stages:
           - GenerateYaml_${{ parameters.channel }}
         jobName: Build_Linux_x64
 
-    # - template: releasePhase.yml
-    #   parameters:
-    #     matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm64']
-    #     dependsOn:
-    #       - GenerateYaml_${{ parameters.channel }}
-    #     jobName: Build_Linux_arm
-    #     pool: PS-mscodehub-ARM
-    #     vmImage: PSMMSUbuntu20.04-ARM64-secure
+    - template: releasePhase.yml
+      parameters:
+        matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm64']
+        dependsOn:
+          - GenerateYaml_${{ parameters.channel }}
+        jobName: Build_Linux_arm
+        pool: PS-mscodehub-ARM
+        vmImage: PSMMSUbuntu20.04-ARM64-secure
 
     - template: releasePhase.yml
       parameters:
