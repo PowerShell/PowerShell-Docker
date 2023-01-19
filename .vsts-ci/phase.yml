@@ -115,7 +115,7 @@ jobs:
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
-      version: 7.x
+      version: 6.x
 
   - pwsh: |
       dotnet --list-sdks
