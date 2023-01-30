@@ -26,10 +26,15 @@ jobs:
       matrix: $[ ${{ parameters.matrix }} ]
       maxParallel: ${{ parameters.maxParallel }}
   variables:
-    dockerImage: 'powershell'
-    ACR: ${{ parameters.ACR }}
-    releaseTag: ${{ parameters.releaseTag }}
-    scanType: Register
+  - name: dockerImage
+    value: 'powershell'
+  - name: ACR
+    value: ${{ parameters.ACR }}
+  - name: releaseTag
+    value: ${{ parameters.releaseTag }}
+  - name: scanType
+    value: Register
+  - group: Azure Blob Variable Group
 
   pool:
     name: ${{ parameters.pool }}
@@ -67,6 +72,7 @@ jobs:
     inputs:
       downloadType: specific
       itemPattern: buildMeta/**/*.json
+      azureSubscription: '$(AzureFileCopySubscription)'
 
   - powershell: |
       $json = Get-ChildItem $(System.ArtifactsDirectory)/buildmeta.json -recurse -File
@@ -99,13 +105,15 @@ jobs:
     displayName: 'docker login $(dockerHost)'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-  - pwsh: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
+  - pwsh: |
+      $cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $(az_url), $(az_key)
+      Connect-AzAccount -ServicePrincipal -TenantId $(az_name) -Credential $cred
     displayName: 'az login'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: |
-      az account set --subscription $(StorageSubscriptionName)
-      $querystring = az storage account generate-sas --account-name $(StorageAccount) --services b --resource-types o --expiry ((get-date).AddDays(1).ToString("yyyy-MM-dd")) --permission r --https-only | convertfrom-json
+      $context = New-AzStorageContext -StorageAccountName $(StorageAccount) -UseConnectedAccount
+      $querystring = New-AzStorageContainerSASToken -Context $context -Name <container> -Permission racwdl -ExpiryTime ((get-date).AddDays(1).ToString("yyyy-MM-dd")) | convertfrom-json
       $url = "https://$(StorageAccount).blob.core.windows.net/?$querystring"
       Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
     displayName: 'Set SasUrl variable'
