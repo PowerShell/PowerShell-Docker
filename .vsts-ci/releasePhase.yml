@@ -72,7 +72,6 @@ jobs:
     inputs:
       downloadType: specific
       itemPattern: buildMeta/**/*.json
-      azureSubscription: '$(AzureFileCopySubscription)'
 
   - powershell: |
       $json = Get-ChildItem $(System.ArtifactsDirectory)/buildmeta.json -recurse -File
@@ -105,17 +104,27 @@ jobs:
     displayName: 'docker login $(dockerHost)'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
+    
   - pwsh: |
-      $cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $(az_url), $(az_key)
-      Connect-AzAccount -ServicePrincipal -TenantId $(az_name) -Credential $cred
+      if($env:ACR -eq 'yes')
+      {
+        Write-Host 'Using ACR, will need to az login'
+        az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)
+      }
     displayName: 'az login'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-  - pwsh: |
-      $context = New-AzStorageContext -StorageAccountName $(StorageAccount) -UseConnectedAccount
-      $querystring = New-AzStorageContainerSASToken -Context $context -Name $(ImageName) -Permission racwdl -ExpiryTime ((get-date).AddDays(1).ToString("yyyy-MM-dd")) | convertfrom-json
-      $url = "https://$(StorageAccount).blob.core.windows.net/?$querystring"
-      Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
+  - task: AzurePowerShell@5
+    inputs:
+      azureSubscription: '$(AzureFileCopySubscription)'
+      scriptType: inlineScript
+      azurePowerShellVersion: latestVersion
+      pwsh: true
+      inline: |
+        $context = New-AzStorageContext -StorageAccountName $(StorageAccount) -UseConnectedAccount
+        $querystring = New-AzStorageContainerSASToken -Context $context -Name $(ImageName) -Permission racwdl -ExpiryTime ((get-date).AddDays(1).ToString("yyyy-MM-dd")) | convertfrom-json
+        $url = "https://$(StorageAccount).blob.core.windows.net/?$querystring"
+        Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
     displayName: 'Set SasUrl variable'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
@@ -124,7 +133,6 @@ jobs:
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: |
-      az account set --subscription $(AcrSubscriptionName)
       $extraParams = @{}
       if($env:ACR -eq 'no')
       {
@@ -133,6 +141,7 @@ jobs:
       }
       else
       {
+        az account set --subscription $(AcrSubscriptionName)
         Write-Host 'Using ACR, will NOT test behavior...'
         $extraParams.Add('SkipTest',$true)
       }
@@ -161,7 +170,12 @@ jobs:
     displayName: 'docker logout'
     condition: and( always(), ne(variables['Channel'],''))
 
-  - pwsh: 'az logout'
+  - pwsh: | 
+      if($env:ACR -eq 'yes')
+      {
+        Write-Host 'Using ACR, will need to az logout'
+        az logout
+      }
     displayName: 'az logout'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
