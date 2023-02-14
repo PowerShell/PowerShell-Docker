@@ -121,7 +121,7 @@ jobs:
       azurePowerShellVersion: latestVersion
       pwsh: true
       inline: |
-        $context = New-AzStorageContext -StorageAccountName $(StorageAccount) -UseConnectedAccount
+        $context = New-AzStorageContext -StorageAccountName $(StorageAccount)
         $querystring = New-AzStorageContainerSASToken -Context $context -Name $(ImageName) -Permission racwdl -ExpiryTime ((get-date).AddDays(1).ToString("yyyy-MM-dd")) | convertfrom-json
         $url = "https://$(StorageAccount).blob.core.windows.net/?$querystring"
         Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
