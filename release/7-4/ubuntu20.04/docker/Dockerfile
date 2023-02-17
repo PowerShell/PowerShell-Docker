@@ -2,7 +2,8 @@
 # Licensed under the MIT License.
 
 # Docker image file that describes an Ubuntu20.04 image with PowerShell installed from Microsoft APT Repo
-FROM ubuntu:20.04 AS installer-env
+ARG hostRegistry=psdockercache.azurecr.io
+FROM ${hostRegistry}/ubuntu:20.04 AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.3.0-preview.8
@@ -25,7 +26,8 @@ RUN mkdir -p ${PS_INSTALL_FOLDER}
 RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER}
 
 # Start a new stage so we lose all the tar.gz layers from the final image
-FROM ubuntu:20.04 AS powershell
+ARG hostRegistry=psdockercache.azurecr.io
+FROM ${hostRegistry}/ubuntu:20.04 AS powershell
 
 ARG PS_VERSION=7.3.0-preview.8
 ARG PS_INSTALL_VERSION=7-preview

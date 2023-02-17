@@ -1,7 +1,8 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-FROM --platform=linux/arm/v7 ubuntu:jammy AS installer-env
+ARG hostRegistry=psdockercache.azurecr.io
+FROM --platform=linux/arm/v7 ${hostRegistry}/ubuntu:jammy AS installer-env
 
 ARG PS_VERSION=7.3.0-preview.4
 ENV PS_PACKAGE=powershell-${PS_VERSION}-linux-arm32.tar.gz
@@ -30,7 +31,8 @@ RUN ls -l /tmp/powershell.tar.gz
     # Unzip the Linux tar.gz
 RUN tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
 
-FROM --platform=linux/arm/v7 ubuntu:jammy AS final-image
+ARG hostRegistry=psdockercache.azurecr.io
+FROM --platform=linux/arm/v7 ${hostRegistry}/ubuntu:jammy AS final-image
 
 # Define Args and Env needed to create links
 ARG PS_INSTALL_VERSION=7-preview

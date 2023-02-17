@@ -2,7 +2,8 @@
 # Licensed under the MIT License.
 
 # Docker image file that describes an Ubuntu20.04 image with PowerShell installed from Microsoft APT Repo
-FROM ubuntu:22.04 AS installer-env
+ARG hostRegistry=psdockercache.azurecr.io
+FROM ${hostRegistry}/ubuntu:22.04 AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.3.0-preview.8
@@ -27,7 +28,8 @@ RUN --mount=type=cache,target=/var/lib/apt \
     && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb
 
 # Install the deb file in this image and make powershell available
-FROM ubuntu:22.04 AS final-image
+ARG hostRegistry=psdockercache.azurecr.io
+FROM ${hostRegistry}/ubuntu:22.04 AS final-image
 
 # # Define args needed to add the package
 ARG PS_VERSION=7.3.0-preview.8
