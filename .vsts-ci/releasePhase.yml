@@ -121,6 +121,15 @@ jobs:
       azurePowerShellVersion: latestVersion
       pwsh: true
       inline: |
+        $modules = 'Az.Accounts'
+        foreach ($module in $modules) {
+          if (!(Get-Module $module -listavailable)) {
+            Write-Verbose "installing $module..." -verbose
+            Install-Module $module -force -allowclobber
+          } else {
+            Write-Verbose "$module is already installed" -verbose
+          }
+        }
         $context = New-AzStorageContext -StorageAccountName $(StorageAccount)
         $querystring = New-AzStorageContainerSASToken -Context $context -Name $(ImageName) -Permission racwdl -ExpiryTime ((get-date).AddDays(1).ToString("yyyy-MM-dd")) | convertfrom-json
         $url = "https://$(StorageAccount).blob.core.windows.net/?$querystring"
