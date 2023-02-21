@@ -123,6 +123,7 @@ jobs:
       inline: |
         $modules = 'Az.Accounts'
         foreach ($module in $modules) {
+          Get-Module $module -AllVersions
           if (!(Get-Module $module -listavailable)) {
             Write-Verbose "installing $module..." -verbose
             Install-Module $module -force -allowclobber
