@@ -114,6 +114,21 @@ jobs:
     displayName: 'az login'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
+  - pwsh: |
+      $modules = 'Az.Accounts'
+      foreach ($module in $modules) {
+        $modulesOnMachine = get-module -listavailable
+        Write-Host $modulesOnMachine -Verbose
+        if (!(Get-Module $module -listavailable)) {
+          Write-Verbose "installing $module..." -verbose
+          Install-Module $module -force -allowclobber
+        } else {
+          Write-Verbose "$module is already installed" -verbose
+        }
+      }
+    displayName: 'Install AzAccounts'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
   - task: AzurePowerShell@5
     inputs:
       azureSubscription: '$(AzureFileCopySubscription)'
@@ -121,17 +136,6 @@ jobs:
       azurePowerShellVersion: latestVersion
       pwsh: true
       inline: |
-        $modules = 'Az.Accounts'
-        foreach ($module in $modules) {
-          $modulesOnMachine = get-module -listavailable
-          Write-Host $modulesOnMachine -Verbose
-          if (!(Get-Module $module -listavailable)) {
-            Write-Verbose "installing $module..." -verbose
-            Install-Module $module -force -allowclobber
-          } else {
-            Write-Verbose "$module is already installed" -verbose
-          }
-        }
         $context = New-AzStorageContext -StorageAccountName $(StorageAccount)
         $querystring = New-AzStorageContainerSASToken -Context $context -Name $(ImageName) -Permission racwdl -ExpiryTime ((get-date).AddDays(1).ToString("yyyy-MM-dd")) | convertfrom-json
         $url = "https://$(StorageAccount).blob.core.windows.net/?$querystring"
