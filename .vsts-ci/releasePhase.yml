@@ -120,10 +120,10 @@ jobs:
         $modulesOnMachine = get-module -listavailable
         Write-Host $modulesOnMachine -Verbose
         if (!(Get-Module $module -listavailable)) {
-          Write-Verbose "installing $module..." -verbose
+          Write-Host "installing $module..." -verbose
           Install-Module $module -force -allowclobber
         } else {
-          Write-Verbose "$module is already installed" -verbose
+          Write-Host "$module is already installed" -verbose
         }
       }
     displayName: 'Install AzAccounts'
@@ -137,7 +137,8 @@ jobs:
       pwsh: true
       inline: |
         $context = New-AzStorageContext -StorageAccountName $(StorageAccount)
-        $querystring = New-AzStorageContainerSASToken -Context $context -Name $(ImageName) -Permission racwdl -ExpiryTime ((get-date).AddDays(1).ToString("yyyy-MM-dd")) | convertfrom-json
+        $querystring = New-AzStorageContainerSASToken -Context $context -Name $(ImageName) -Permission racwdl -ExpiryTime ((get-date).AddDays(1).ToString("yyyy-MM-dd"))
+        Write-Host $queryString -Verbose
         $url = "https://$(StorageAccount).blob.core.windows.net/?$querystring"
         Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
     displayName: 'Set SasUrl variable'
