@@ -115,7 +115,7 @@ jobs:
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: |
-      $modules = 'Az.Accounts'
+      $modules = 'Az.Accounts', 'Az.Storage'
       foreach ($module in $modules) {
         $modulesOnMachine = get-module -listavailable
         Write-Host $modulesOnMachine -Verbose
