@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
 
-name: Update Release Build Parameters
+name: Daily Updates
 
 on:
   workflow_dispatch:
@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-20.04
     permissions:
       pull-requests: write
+      contents: write  # for peter-evans/create-pull-request to create branch
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -59,6 +60,7 @@ jobs:
     runs-on: ubuntu-20.04
     permissions:
       pull-requests: write
+      contents: write  # for peter-evans/create-pull-request to create branch
     steps:
       - name: Checkout
         uses: actions/checkout@v2
