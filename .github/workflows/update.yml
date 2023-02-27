@@ -1,19 +1,13 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
 
-name: Update Release Build Parameters
+name: Daily Updates
+
+permissions:
+  contents: read
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/update.yml'
-    branches:
-      - master
-      - add-gh-action
-  pull_request:
-    paths:
-      - '.github/workflows/update.yml'
   schedule:
     # At 20:20 UTC on every day-of-week from Monday through Friday.
     - cron:  '0 0/4 * * *'
@@ -27,6 +21,9 @@ jobs:
     name: Update Release Build Parameters
     timeout-minutes: 15
     runs-on: ubuntu-20.04
+    permissions:
+      pull-requests: write
+      contents: write  # for peter-evans/create-pull-request to create branch
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -37,23 +34,24 @@ jobs:
       - name: Create Pull Request
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         id: cpr
-        uses: peter-evans/create-pull-request@v3
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        uses: peter-evans/create-pull-request@v4
         with:
+          token: "${{ secrets.PR_PAT }}"
           commit-message: "Update the release build yaml with the latest versions"
-          committer: GitHub <noreply@github.com>
-          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          committer: PwshBot <pwshbot@microsoft.com>
+          author: PwshBot <pwshbot@microsoft.com>
           title: "Update the release build yaml with the latest versions"
-          assignees: travisez13
-          reviewers: travisez13
           base: master
           draft: false
           branch: update-release-build
+          push-to-fork: pwshBot/PowerShell-Docker
   update-matrix-json:
     name: Update Matrix Json
     timeout-minutes: 15
     runs-on: ubuntu-20.04
+    permissions:
+      pull-requests: write
+      contents: write  # for peter-evans/create-pull-request to create branch
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -70,16 +68,14 @@ jobs:
       - name: Create Pull Request
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         id: cpr
-        uses: peter-evans/create-pull-request@v3
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        uses: peter-evans/create-pull-request@v4
         with:
+          token: "${{ secrets.PR_PAT }}"
           commit-message: "Update the matrix json"
-          committer: GitHub <noreply@github.com>
-          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          committer: PwshBot <pwshbot@microsoft.com>
+          author: PwshBot <pwshbot@microsoft.com>
           title: "Update the matrix json"
-          assignees: travisez13
-          reviewers: travisez13
           base: master
           draft: false
           branch: update-matrix-json
+          push-to-fork: pwshBot/PowerShell-Docker

@@ -1,5 +1,8 @@
 name: 'Process reminders'
 
+permissions:
+  contents: read
+
 on:
   schedule:
     - cron: '*/15 * * * *'

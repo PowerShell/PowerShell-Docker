@@ -1,5 +1,8 @@
 name: 'Create reminder'
 
+permissions:
+  contents: read
+
 on:
   issue_comment:
     types: [created, edited]
