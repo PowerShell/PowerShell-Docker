@@ -137,7 +137,7 @@ jobs:
       pwsh: true
       inline: |
         $context = New-AzStorageContext -StorageAccountName $(StorageAccount)
-        $querystring = New-AzStorageBlobSASToken -Context $context -Container $(StorageAccount) -Blob $(ImageName) -Permission r -ExpiryTime ((get-date).AddMinutes(180)) -Protocol HttpsOnly
+        $querystring = New-AzStorageContainerSASToken -Context $context -Name $(StorageAccount) -Permission r -ExpiryTime ((get-date).AddMinutes(180)) -Protocol HttpsOnly
         Write-Host $queryString -Verbose
         $url = "https://$(StorageAccount).blob.core.windows.net/$querystring"
         Write-Host $url -Verbose
