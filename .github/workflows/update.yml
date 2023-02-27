@@ -27,6 +27,8 @@ jobs:
     name: Update Release Build Parameters
     timeout-minutes: 15
     runs-on: ubuntu-20.04
+    permissions:
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -54,6 +56,8 @@ jobs:
     name: Update Matrix Json
     timeout-minutes: 15
     runs-on: ubuntu-20.04
+    permissions:
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v2
