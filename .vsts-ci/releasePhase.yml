@@ -140,7 +140,7 @@ jobs:
         $querystring = New-AzStorageBlobSASToken -Context $context -Container $(StorageAccount) -Blob $(ImageName) -Permission r -ExpiryTime ((get-date).AddMinutes(180)) -Protocol HttpsOnly
         Write-Host $queryString -Verbose
         $url = "https://$(StorageAccount).blob.core.windows.net/?$querystring"
-        Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
+        Write-Host "##vso[task.setvariable variable=SasUrl;]$url" -Verbose
     displayName: 'Set SasUrl variable'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
