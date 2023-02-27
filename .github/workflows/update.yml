@@ -47,8 +47,6 @@ jobs:
           committer: PwshBot <pwshbot@microsoft.com>
           author: PwshBot <pwshbot@microsoft.com>
           title: "Update the release build yaml with the latest versions"
-          assignees: travisez13
-          reviewers: travisez13
           base: master
           draft: false
           branch: update-release-build
@@ -83,8 +81,6 @@ jobs:
           committer: PwshBot <pwshbot@microsoft.com>
           author: PwshBot <pwshbot@microsoft.com>
           title: "Update the matrix json"
-          assignees: travisez13
-          reviewers: travisez13
           base: master
           draft: false
           branch: update-matrix-json
