@@ -8,15 +8,6 @@ permissions:
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/update.yml'
-    branches:
-      - master
-      - add-gh-action
-  pull_request:
-    paths:
-      - '.github/workflows/update.yml'
   schedule:
     # At 20:20 UTC on every day-of-week from Monday through Friday.
     - cron:  '0 0/4 * * *'
