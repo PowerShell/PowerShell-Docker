@@ -41,9 +41,8 @@ jobs:
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         id: cpr
         uses: peter-evans/create-pull-request@v4
-        env:
-          GITHUB_TOKEN: "${{ secrets.PR_PAT }}"
         with:
+          token: "${{ secrets.PR_PAT }}"
           commit-message: "Update the release build yaml with the latest versions"
           committer: PwshBot <pwshbot@microsoft.com>
           author: PwshBot <pwshbot@microsoft.com>
@@ -78,9 +77,8 @@ jobs:
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         id: cpr
         uses: peter-evans/create-pull-request@v4
-        env:
-          GITHUB_TOKEN: "${{ secrets.PR_PAT }}"
         with:
+          token: "${{ secrets.PR_PAT }}"
           commit-message: "Update the matrix json"
           committer: PwshBot <pwshbot@microsoft.com>
           author: PwshBot <pwshbot@microsoft.com>
