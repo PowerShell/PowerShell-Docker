@@ -136,7 +136,7 @@ jobs:
       azurePowerShellVersion: latestVersion
       pwsh: true
       inline: |
-        $containerName = $(DOCKERNAMESPACE).Replace('.', '-')
+        $containerName = $dockerNamespace.replace('.', '-')
         $context = New-AzStorageContext -StorageAccountName $(StorageAccount)
         $querystring = New-AzStorageContainerSASToken -Context $context -Name $containerName -Permission r -ExpiryTime ((get-date).AddMinutes(180)) -Protocol HttpsOnly
         Write-Host $queryString -Verbose
