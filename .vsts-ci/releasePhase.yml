@@ -26,10 +26,15 @@ jobs:
       matrix: $[ ${{ parameters.matrix }} ]
       maxParallel: ${{ parameters.maxParallel }}
   variables:
-    dockerImage: 'powershell'
-    ACR: ${{ parameters.ACR }}
-    releaseTag: ${{ parameters.releaseTag }}
-    scanType: Register
+  - name: dockerImage
+    value: 'powershell'
+  - name: ACR
+    value: ${{ parameters.ACR }}
+  - name: releaseTag
+    value: ${{ parameters.releaseTag }}
+  - name: scanType
+    value: Register
+  - group: Azure Blob Variable Group
 
   pool:
     name: ${{ parameters.pool }}
@@ -47,7 +52,7 @@ jobs:
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
-      version: 6.x
+      version: 7.x
 
   - pwsh: |
       dotnet --list-sdks
@@ -99,15 +104,42 @@ jobs:
     displayName: 'docker login $(dockerHost)'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-  - pwsh: ' az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)'
+    
+  - pwsh: |
+      if($env:ACR -eq 'yes')
+      {
+        Write-Host 'Using ACR, will need to az login'
+        az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)
+      }
     displayName: 'az login'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: |
-      az account set --subscription $(StorageSubscriptionName)
-      $querystring = az storage account generate-sas --account-name $(StorageAccount) --services b --resource-types o --expiry ((get-date).AddDays(1).ToString("yyyy-MM-dd")) --permission r --https-only | convertfrom-json
-      $url = "https://$(StorageAccount).blob.core.windows.net/?$querystring"
-      Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
+      $modules = 'Az.Accounts', 'Az.Storage'
+      foreach ($module in $modules) {
+        if (!(Get-Module $module -listavailable)) {
+          Write-Host "installing $module..." -verbose
+          Install-Module $module -force -allowclobber
+        } else {
+          Write-Host "$module is already installed" -verbose
+        }
+      }
+    displayName: 'Install AzAccounts'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
+  - task: AzurePowerShell@5
+    inputs:
+      azureSubscription: '$(AzureFileCopySubscription)'
+      scriptType: inlineScript
+      azurePowerShellVersion: latestVersion
+      pwsh: true
+      inline: |
+        $containerName = Out-String -InputObject $(DOCKERNAMESPACE) -NoNewline
+        $containerName = $containerName.Replace('.', '-')
+        $context = New-AzStorageContext -StorageAccountName $(StorageAccount)
+        $querystring = New-AzStorageContainerSASToken -Context $context -Name $containerName -Permission r -ExpiryTime ((get-date).AddMinutes(180)) -Protocol HttpsOnly
+        $url = "https://$(StorageAccount).blob.core.windows.net/$querystring"
+        Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
     displayName: 'Set SasUrl variable'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
@@ -116,7 +148,6 @@ jobs:
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: |
-      az account set --subscription $(AcrSubscriptionName)
       $extraParams = @{}
       if($env:ACR -eq 'no')
       {
@@ -125,6 +156,7 @@ jobs:
       }
       else
       {
+        az account set --subscription $(AcrSubscriptionName)
         Write-Host 'Using ACR, will NOT test behavior...'
         $extraParams.Add('SkipTest',$true)
       }
@@ -153,7 +185,12 @@ jobs:
     displayName: 'docker logout'
     condition: and( always(), ne(variables['Channel'],''))
 
-  - pwsh: 'az logout'
+  - pwsh: | 
+      if($env:ACR -eq 'yes')
+      {
+        Write-Host 'Using ACR, will need to az logout'
+        az logout
+      }
     displayName: 'az logout'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
