@@ -117,8 +117,6 @@ jobs:
   - pwsh: |
       $modules = 'Az.Accounts', 'Az.Storage'
       foreach ($module in $modules) {
-        $modulesOnMachine = get-module -listavailable
-        Write-Host $modulesOnMachine -Verbose
         if (!(Get-Module $module -listavailable)) {
           Write-Host "installing $module..." -verbose
           Install-Module $module -force -allowclobber
@@ -140,9 +138,7 @@ jobs:
         $containerName = $containerName.Replace('.', '-')
         $context = New-AzStorageContext -StorageAccountName $(StorageAccount)
         $querystring = New-AzStorageContainerSASToken -Context $context -Name $containerName -Permission r -ExpiryTime ((get-date).AddMinutes(180)) -Protocol HttpsOnly
-        Write-Host $queryString -Verbose
         $url = "https://$(StorageAccount).blob.core.windows.net/$querystring"
-        Write-Host $url -Verbose
         Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
     displayName: 'Set SasUrl variable'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
