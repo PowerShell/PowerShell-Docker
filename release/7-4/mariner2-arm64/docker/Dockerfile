@@ -5,12 +5,9 @@ FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20221222-arm64 AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.4.0-preview.1
-#ARG PACKAGE_VERSION=7.4.0_preview.1
 ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-arm64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7-preview
-
-# https://github.com/PowerShell/PowerShell/releases/download/v7.4.0-preview.1/powershell-7.4.0-preview.1-linux-arm64.tar.gz
 
 # Define the folder we will be installing PowerShell to.
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION}
