@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 ARG hostRegistry=psdockercache.azurecr.io
-FROM --platform=linux/arm/v7 ${hostRegistry}/ubuntu:jammy AS installer-env
+FROM --platform=linux/arm32v7 ${hostRegistry}/ubuntu:jammy AS installer-env
 
 ARG PS_VERSION=7.3.0-preview.4
 ENV PS_PACKAGE=powershell-${PS_VERSION}-linux-arm32.tar.gz
