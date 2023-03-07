@@ -43,7 +43,15 @@ stages:
       parameters:
         matrix: dependencies.GenerateYaml_${{ variables.jobName }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm64']
         dependsOn: GenerateYaml_${{ variables.jobName }}
-        jobName: Build_Linux_ARM
+        jobName: Build_Linux_ARM64
+        useacr: ${{ parameters.useacr }}
+        pool: PS-PowerShell-ARM
+        vmImage: PSMMSUbuntu20.04-ARM64-secure
+    - template: phase.yml
+      parameters:
+        matrix: dependencies.GenerateYaml_${{ variables.jobName }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm32']
+        dependsOn: GenerateYaml_${{ variables.jobName }}
+        jobName: Build_Linux_ARM32
         useacr: ${{ parameters.useacr }}
         pool: PS-PowerShell-ARM
         vmImage: PSMMSUbuntu20.04-ARM64-secure
