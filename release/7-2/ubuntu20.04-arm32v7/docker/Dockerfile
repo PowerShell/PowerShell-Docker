@@ -33,7 +33,7 @@ FROM --platform=linux/arm32v7 ubuntu:focal AS installer-env
         # Unzip the Linux tar.gz
     RUN tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
 
-FROM --platform=linux/arm32v7 ubuntu:focal AS final-image
+FROM --platform=linux/arm/v7 ubuntu:focal AS final-image
 
     # Define Args and Env needed to create links
     ARG PS_INSTALL_VERSION=7
