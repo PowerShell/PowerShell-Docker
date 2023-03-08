@@ -22,5 +22,5 @@
     "EndOfLife": "2023-04-02",
     "DistributionState": "Validated",
     "UseInCi": false,
-    "Architecture": "arm64"
+    "Architecture": "arm32"
 }
