@@ -21,7 +21,7 @@ parameters:
     default: 5
 
 jobs:
-- job: ${{ parameters.jobName }}    
+- job: ${{ parameters.jobName }}
   dependsOn: ${{ parameters.dependsOn }}
   
   strategy:
