@@ -33,7 +33,6 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Mariner-2.0
 
-# Install dependencies and clean up
 RUN --mount=type=cache,target=/var/cache/tdnf \
     tdnf install -y mariner-repos-microsoft-preview \
     && tdnf makecache \
@@ -46,9 +45,18 @@ RUN --mount=type=cache,target=/var/cache/tdnf \
     # required for SSH
     openssh-clients \
     ca-certificates \
-    dotnet-runtime-7.0 \
-    # upgrade packages
-    && tdnf upgrade -y \
+    wget
+
+RUN --mount=type=cache,target=/var/cache/tdnf \
+    --mount=type=cache,target=/installTmp \
+    cd /installTmp \
+    && wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh \
+    && chmod +x ./dotnet-install.sh \
+    && ./dotnet-install.ps1 -Channel 8.0 -Quality preview -InstallDir C:\cli
+    
+# Install dependencies and clean up
+RUN --mount=type=cache,target=/var/cache/tdnf \
+    tdnf upgrade -y \
     # clean cached data
     && tdnf clean all
 
