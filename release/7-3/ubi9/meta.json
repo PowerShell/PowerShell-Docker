@@ -9,7 +9,7 @@
         {"Tag": "9"}
     ],
     "manifestLists": [
-        "ubi-preview"
+        "ubi${channelTagPostfix}"
     ],
     "SubImage": "test-deps",
     "TestProperties": {

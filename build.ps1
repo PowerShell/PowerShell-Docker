@@ -672,6 +672,20 @@ End {
             $channelGroups = $tagGroups.$repo | Group-Object -Property Channel
             foreach ($channelGroup in $channelGroups) {
                 $channelName = $channelGroup.Name
+                $channelTag = switch($channelNames) {
+                        'stable' {
+                            $channelTag = 'latest'
+                            $channelTagPrefix = ''
+                            $channelTagPostfix = ''
+                        }
+
+                        default {
+                            $channelTag = $channelName.ToLower()
+                            $channelTagPrefix = $channelTag + '-'
+                            $channelTagPostfix = '-' + $channelTag
+                        }
+                    }
+
                 Write-Verbose "generating $channelName json"
                 $osGroups = $channelGroup.Group | Group-Object -Property os
                 foreach ($osGroup in $osGroups) {
@@ -681,6 +695,9 @@ End {
                     foreach ($tag in $osGroup.Group | Where-Object { $_.Name -notlike '*/*' } | Sort-Object -Property ManifestLists) {
                         if ($tag.ManifestLists) {
                             foreach ($manifestList in $tag.ManifestLists) {
+                                $manifestList = $manifestList -replace '\${channelTag}', $channelTag
+                                $manifestList = $manifestList -replace '\${channelTagPrefix}', $channelTagPrefix
+                                $manifestList = $manifestList -replace '\${channelTagPostfix}', $channelTagPostfix
 
                                 if ($manifestLists -notcontains $manifestList) {
                                     $manifestLists += $manifestList
@@ -699,6 +716,7 @@ End {
         $matrix = @{}
         foreach ($manifestList in $manifestLists) {
             $jobName = $manifestList -replace '-', '_'
+            $formattedManifestList = $manifestList -replace '\${channelTag}', $channelTag
             $manifestListTags = [PSCustomObject]@{
                 ManifestList = $manifestList
                 Channel      = ""
