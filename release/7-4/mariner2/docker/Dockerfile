@@ -1,7 +1,14 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS installer-env
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS setup-tdnf-repa
+
+RUN --mount=type=cache,target=/var/cache/tdnf \
+    tdnf install -y mariner-repos-microsoft-preview \
+    && tdnf makecache
+
+# Move to
+FROM setup-tdnf-repa AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.3.0-preview.8
@@ -13,10 +20,24 @@ ARG PS_INSTALL_VERSION=7-preview
 # Download the Linux tar.gz and save it
 ADD ${PS_PACKAGE_URL} /tmp/powershell.rpm
 
+RUN --mount=type=cache,target=/var/cache/tdnf \
+    tdnf install -y \
+        wget \
+        awk \
+        tar \
+        ca-certificates
+
+RUN --mount=type=cache,target=/var/cache/tdnf \
+    --mount=type=cache,target=/installTmp \
+    cd /installTmp \
+    && wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh \
+    && chmod +x ./dotnet-install.sh \
+    && ./dotnet-install.sh -Channel 8.0 -Quality preview -Runtime dotnet -InstallDir /usr/share/dotnet
+
 RUN echo ${PS_PACKAGE_URL}
 
 # Start a new stage so we lose all the tar.gz layers from the final image
-FROM mcr.microsoft.com/cbl-mariner/base/core:2.0 AS powershell
+FROM setup-tdnf-repa AS powershell
 
 ARG PS_VERSION=7.3.0-preview.8
 ARG PS_INSTALL_VERSION=7-preview
@@ -33,28 +54,30 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Mariner-2.0
 
-# Install dependencies and clean up
 RUN --mount=type=cache,target=/var/cache/tdnf \
-    tdnf install -y mariner-repos-microsoft-preview \
-    && tdnf makecache \
     # install dependencies
-    && tdnf install -y \
+    tdnf install -y \
     # required for localization
     icu \
     # required for help in PowerShell
     less \
     # required for SSH
     openssh-clients \
-    ca-certificates \
-    dotnet-runtime-7.0 \
-    # upgrade packages
-    && tdnf upgrade -y \
+    ca-certificates
+
+# Install dependencies and clean up
+RUN --mount=type=cache,target=/var/cache/tdnf \
+    tdnf upgrade -y \
     # clean cached data
     && tdnf clean all
 
+COPY --from=installer-env /usr/share/dotnet /usr/share/dotnet
+
+RUN ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+
 RUN --mount=type=cache,target=/var/cache/tdnf,rw \
     --mount=from=installer-env,target=/mnt/rpm,source=/tmp \
-    rpm -i /mnt/rpm/powershell.rpm
+    rpm -i --nodeps /mnt/rpm/powershell.rpm
 
 # Create the pwsh symbolic link that points to powershell
 RUN if [ -f "/opt/microsoft/powershell/7-preview/pwsh" ]; then ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh; fi

@@ -23,14 +23,19 @@ parameters:
 jobs:
 - job: ${{ parameters.jobName }}
   dependsOn: ${{ parameters.dependsOn }}
+  
   strategy:
       matrix: $[ ${{ parameters.matrix }} ]
       maxParallel: ${{ parameters.maxParallel }}
 
   variables:
-    ContinueOnError: ${{ parameters.continueonerror }}
-    scanType: Register
-    pool: ${{ parameters.pool }}
+    - group: Cache-ACR
+    - name: ContinueOnError
+      value: ${{ parameters.continueonerror }}
+    - name: scanType
+      value: Register
+    - name: pool
+      value: ${{ parameters.pool }}
 
   pool:
     ${{ if eq(parameters['pool'],'')}}:
@@ -71,6 +76,11 @@ jobs:
       if ( '$env:CHANNEL' -eq '' ) { exit }
       Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
     displayName: Install Pester
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+    
+  - pwsh: |
+      docker login psdockercache.azurecr.io -u $(dockerCacheUserName) -p $(dockerCacheKey)
+    displayName: 'docker cache login'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: |

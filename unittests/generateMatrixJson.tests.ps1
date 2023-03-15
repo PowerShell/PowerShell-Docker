@@ -43,7 +43,7 @@ Describe "build.ps1 -GenerateMatrixJson" {
                 $json = $vstsVariable.Value
                 { $script:matrix += $json | ConvertFrom-Json -AsHashtable } | should -not -Throw
             }
-            $script:matrix.count | Should -Be 3
+            $script:matrix.count | Should -Be 4
         }
         It "Should have multiple images" {
             foreach($platforMatrix in $Script:matrix) {
