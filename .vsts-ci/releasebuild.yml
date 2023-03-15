@@ -2,7 +2,7 @@ name: s_$(stableReleaseTag)_p_$(previewReleaseTag)_l_$(ltsReleaseTag)$(Rev:_rr)
 
 parameters:
   - name: 'previewReleaseTag'
-    default: 'v7.4.0-preview.1'
+    default: 'v7.4.0-preview.2'
   - name: 'ltsReleaseTag'
     default: 'v7.2.10'
   - name: 'stableReleaseTag'
