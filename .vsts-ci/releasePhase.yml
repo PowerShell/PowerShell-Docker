@@ -104,7 +104,11 @@ jobs:
     displayName: 'docker login $(dockerHost)'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-    
+  - pwsh: |
+      docker login psdockercache.azurecr.io -u $(dockerCacheUserName) -p $(dockerCacheKey)
+    displayName: 'docker cache login'
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+
   - pwsh: |
       if($env:ACR -eq 'yes')
       {
@@ -185,7 +189,7 @@ jobs:
     displayName: 'docker logout'
     condition: and( always(), ne(variables['Channel'],''))
 
-  - pwsh: | 
+  - pwsh: |
       if($env:ACR -eq 'yes')
       {
         Write-Host 'Using ACR, will need to az logout'
