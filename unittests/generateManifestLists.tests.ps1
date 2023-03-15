@@ -19,11 +19,13 @@ Describe "build.ps1 -GenerateManifestLists" {
         $tags = @{}
         $json | ForEach-Object {
             $channel = $_.channel
-            foreach($tag in $_.tags) {
-                if(!$tags.ContainsKey($tag)){
+            foreach ($tag in $_.tags) {
+                if (!$tags.ContainsKey($tag)) {
                     $tags[$tag] = @()
                 }
-                $tags[$tag] += $channel
+                if ($tags[$tag] -notcontains $channel) {
+                    $tags[$tag] += $channel
+                }
             }
         }
 
