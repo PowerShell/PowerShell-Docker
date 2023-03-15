@@ -14,7 +14,7 @@ Describe "build.ps1 -GenerateManifestLists" {
         $json | ConvertFrom-Json -AsHashtable | Should -Not -BeNullOrEmpty
     }
 
-    It "Each tag sholud only be in one channel" {
+    It "Each tag should only be in one channel" {
         $json = & $buildScript -GenerateManifestLists -Channel stable, preview, lts -OsFilter All | ConvertFrom-Json
         $tags = @{}
         $json | ForEach-Object {
