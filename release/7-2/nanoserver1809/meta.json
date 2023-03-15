@@ -12,7 +12,7 @@
         "nanoserver-#shorttag#"
     ],
     "manifestLists": [
-        "nanoserver"
+        "${channelTagPrefix}nanoserver"
     ],
     "Base64EncodePackageUrl": true,
     "TestProperties": {

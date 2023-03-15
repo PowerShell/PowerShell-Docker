@@ -12,7 +12,7 @@
         {"Tag": "8"}
     ],
     "manifestLists": [
-        "ubi"
+        "ubi${channelTagPostfix}"
     ],
     "SubImage": "test-deps",
     "TestProperties": {

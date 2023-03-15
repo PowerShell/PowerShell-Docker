@@ -266,7 +266,7 @@ class DockerImageMetaData {
     [bool]
     $ContinueOnError = $false
 
-    [string]
+    [string[]]
     $ManifestLists = @()
 
     [bool]

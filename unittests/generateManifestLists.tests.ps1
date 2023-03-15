@@ -13,4 +13,22 @@ Describe "build.ps1 -GenerateManifestLists" {
         $json | Should -Not -BeNullOrEmpty
         $json | ConvertFrom-Json -AsHashtable | Should -Not -BeNullOrEmpty
     }
+
+    It "Each tag sholud only be in one channel" {
+        $json = & $buildScript -GenerateManifestLists -Channel stable, preview, lts -OsFilter All | ConvertFrom-Json
+        $tags = @{}
+        $json | ForEach-Object {
+            $channel = $_.channel
+            foreach($tag in $_.tags) {
+                if(!$tags.ContainsKey($tag)){
+                    $tags[$tag] = @()
+                }
+                $tags[$tag] += $channel
+            }
+        }
+
+        foreach($tag in $tags.Keys) {
+            $tags.$tag.count | should -Be 1 -Because "$Tag should not be in multilpe channels ($($tags.$tag))"
+        }
+    }
 }

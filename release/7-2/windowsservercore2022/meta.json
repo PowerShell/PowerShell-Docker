@@ -13,7 +13,7 @@
         "windowsservercore-#shorttag#"
     ],
     "manifestLists": [
-        "latest"
+        "${channelTag}"
     ],
     "TestProperties": {
         "size": 1
