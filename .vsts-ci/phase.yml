@@ -21,19 +21,21 @@ parameters:
     default: 5
 
 jobs:
-- job: ${{ parameters.jobName }}
-  variables:
-    - group: Cache-ACR
-    
+- job: ${{ parameters.jobName }}    
   dependsOn: ${{ parameters.dependsOn }}
+  
   strategy:
       matrix: $[ ${{ parameters.matrix }} ]
       maxParallel: ${{ parameters.maxParallel }}
 
   variables:
-    ContinueOnError: ${{ parameters.continueonerror }}
-    scanType: Register
-    pool: ${{ parameters.pool }}
+    - group: Cache-ACR
+    - name: ContinueOnError
+      value: ${{ parameters.continueonerror }}
+    - name: scanType
+      value: Register
+    - name: pool
+      value: ${{ parameters.pool }}
 
   pool:
     ${{ if eq(parameters['pool'],'')}}:
