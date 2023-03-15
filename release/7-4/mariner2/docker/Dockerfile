@@ -52,7 +52,7 @@ RUN --mount=type=cache,target=/var/cache/tdnf \
     cd /installTmp \
     && wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh \
     && chmod +x ./dotnet-install.sh \
-    && ./dotnet-install.ps1 -Channel 8.0 -Quality preview -InstallDir C:\cli
+    && ./dotnet-install.sh -Channel 8.0 -Quality preview -InstallDir C:\cli
     
 # Install dependencies and clean up
 RUN --mount=type=cache,target=/var/cache/tdnf \
