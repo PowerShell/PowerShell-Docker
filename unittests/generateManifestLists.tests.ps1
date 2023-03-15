@@ -28,7 +28,7 @@ Describe "build.ps1 -GenerateManifestLists" {
         }
 
         foreach($tag in $tags.Keys) {
-            $tags.$tag.count | should -Be 1 -Because "$Tag should not be in multilpe channels ($($tags.$tag))"
+            $tags.$tag.count | should -Be 1 -Because "$Tag should not be in multiple channels ($($tags.$tag))"
         }
     }
 }
