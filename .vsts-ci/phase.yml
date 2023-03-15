@@ -19,6 +19,7 @@ parameters:
     default: 'Build'
   - name: maxParallel
     default: 5
+  - group: Cache-ACR
 
 jobs:
 - job: ${{ parameters.jobName }}
@@ -71,6 +72,11 @@ jobs:
       if ( '$env:CHANNEL' -eq '' ) { exit }
       Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
     displayName: Install Pester
+    condition: and( succeededOrFailed(), ne(variables['Channel'],''))
+    
+  - pwsh: |
+      docker login psdockercache.azurecr.io -u $(dockerCacheUserName) -p $(dockerCacheKey)
+    displayName: 'docker cache login'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
   - pwsh: |
