@@ -46,7 +46,8 @@ RUN --mount=type=cache,target=/var/cache/tdnf \
     openssh-clients \
     ca-certificates \
     wget \
-    awk
+    awk \
+    tar
 
 RUN --mount=type=cache,target=/var/cache/tdnf \
     --mount=type=cache,target=/installTmp \
