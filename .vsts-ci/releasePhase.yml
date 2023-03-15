@@ -104,13 +104,13 @@ jobs:
     displayName: 'docker login $(dockerHost)'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-
+    
   - pwsh: |
-      Write-Host 'Logging into az'
-      az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)
-
-      Write-Host 'Logging into psdockercache'
-      az acr login -n psdockercache
+      if($env:ACR -eq 'yes')
+      {
+        Write-Host 'Using ACR, will need to az login'
+        az login --service-principal -u $(az_url) -p $(az_key) --tenant $(az_name)
+      }
     displayName: 'az login'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
@@ -185,7 +185,7 @@ jobs:
     displayName: 'docker logout'
     condition: and( always(), ne(variables['Channel'],''))
 
-  - pwsh: |
+  - pwsh: | 
       if($env:ACR -eq 'yes')
       {
         Write-Host 'Using ACR, will need to az logout'
