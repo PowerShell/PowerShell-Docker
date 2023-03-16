@@ -102,6 +102,7 @@ jobs:
               }
             }
       displayName: 'release - $(channel) - $(imagename)'
+      condition: and( succeeded(), ne(variables['Channel'],''))
 
     - pwsh: 'az logout'
       displayName: 'az logout'

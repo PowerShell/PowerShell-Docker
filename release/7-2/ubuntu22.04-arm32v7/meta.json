@@ -20,7 +20,7 @@
         "Arm32": true
     },
     "manifestLists": [
-        "latest"
+        "${channelTag}"
     ],
     "EndOfLife": "2023-04-02",
     "DistributionState": "Validated",

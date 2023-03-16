@@ -18,11 +18,5 @@
         "tagPrefix": "lts",
         "pwshInstallVersion": "7-lts",
         "packageTag": "-lts"
-    },
-    {
-        "name": "community-stable",
-        "path": "release/community-stable",
-        "pwshInstallVersion": "7",
-        "packageTag": ""
     }
 ]

@@ -27,26 +27,31 @@ param(
 
     [switch]
     $SkipPush
-
 )
 
 $first = $true
 $manifestList = @()
 foreach($tag in $TagList)
 {
+    $arguments = @()
     $amend = ""
     if (!$first) {
-        $amend = '--amend'
+        $arguments += '--amend'
     }
+    $arguments += @(
+        "$ContainerRegistry/${Image}:$ManifestTag"
+        "$ContainerRegistry/${Image}:$tag"
+    )
 
-    Write-Verbose -Message "running: docker manifest create $ammend $ContainerRegistry/${Image}:$ManifestTag $ContainerRegistry/${Image}:$tag" -Verbose
-    docker manifest create $amend $ContainerRegistry/${Image}:$ManifestTag "$ContainerRegistry/${Image}:$tag"
+    Write-Verbose -Message "running: docker manifest create $arguments" -Verbose
+    docker manifest create $arguments
     $first = $false
 }
 
 # Create the manifest
 
 # Inspect (print) the manifest
+Write-Verbose -Verbose "capturing the manifest..."
 docker manifest inspect $ContainerRegistry/${Image}:$ManifestTag
 
 # push the manifest

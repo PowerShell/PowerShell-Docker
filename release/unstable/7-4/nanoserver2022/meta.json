@@ -9,7 +9,7 @@
     ],
     "ShortDistroName": "nanoserver",
     "manifestLists": [
-        "nanoserver"
+        "${channelTagPrefix}nanoserver"
     ],
     "Base64EncodePackageUrl": true,
     "TestProperties": {

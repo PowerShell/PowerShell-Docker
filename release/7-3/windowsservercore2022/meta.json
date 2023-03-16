@@ -8,7 +8,7 @@
         }
     ],
     "manifestLists": [
-        "preview"
+        "${channelTag}"
     ],
     "Base64EncodePackageUrl": true,
     "ShortDistroName": "windowsservercore",

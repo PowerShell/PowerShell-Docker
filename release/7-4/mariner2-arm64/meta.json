@@ -12,7 +12,7 @@
     ],
     "TestProperties": {
         "size": 404,
-        "arm64": true
+        "Arm32": true
     },
     "EndOfLife": "2023-12-14",
     "DistributionState": "Validating",

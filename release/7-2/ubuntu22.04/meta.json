@@ -13,7 +13,7 @@
         {"Tag": "22.04"}
     ],
     "manifestLists": [
-        "latest"
+        "${channelTag}"
     ],
     "TestProperties": {
         "size": 343

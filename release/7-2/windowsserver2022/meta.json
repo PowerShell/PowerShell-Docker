@@ -13,7 +13,7 @@
         "windowsserver-#shorttag#"
     ],
     "manifestLists": [
-        "windowsserver"
+        "${channelTagPrefix}windowsserver"
     ],
     "TestProperties": {
         "size": 1

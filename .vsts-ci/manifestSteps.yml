@@ -7,6 +7,10 @@ steps:
 - powershell: 'Get-ChildItem env:'
   displayName: 'Capture Environment'
 
+- pwsh: |
+    $PSVersionTable
+  displayName: Capture pwsh Version
+
 - powershell: |
       $dockerConfigFolder = "$env:userprofile/.docker"
       if(!(Test-Path $dockerConfigFolder)){ $null = new-item -Type Directory -Path $dockerConfigFolder}

@@ -31,10 +31,6 @@ stages:
   - template: .vsts-ci/stage.yml
     parameters:
       channel: lts
-  - template: .vsts-ci/stage.yml
-    parameters:
-      channel: community-stable
-      jobName: community_stable
 
   - stage: CheckForDuplicateTags
     displayName: Check for duplicate tags

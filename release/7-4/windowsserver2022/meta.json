@@ -10,7 +10,7 @@
     "Base64EncodePackageUrl": true,
     "ShortDistroName": "windowsserver",
     "manifestLists": [
-        "windowsserver"
+        "${channelTagPrefix}windowsserver"
     ],
     "TestProperties": {
         "size": 1
