@@ -53,7 +53,7 @@ stages:
 
       - template: ./testJob.yml
         parameters:
-          jobName: ${{ parameters.channel }}_linux
+          jobName: ${{ parameters.channel }}_linux_arm64
           matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm64']
           vmImage: ubuntu-latest
           dependsOn:
@@ -61,9 +61,9 @@ stages:
 
       - template: ./testJob.yml
         parameters:
-          jobName: ${{ parameters.channel }}_linux
+          jobName: ${{ parameters.channel }}_linux_arm32
           matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm32']
           vmImage: ubuntu-latest
           dependsOn:
             - GenerateYaml_${{ parameters.channel }}
-            
+
