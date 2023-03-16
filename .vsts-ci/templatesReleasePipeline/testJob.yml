@@ -84,6 +84,8 @@ jobs:
             }
             .\build.ps1 -test -Channel $(Channel) -Pull -ImageName $(dockerHost) -name '$(ImageName)' -Version $(Version) -TestLogPostfix windows-$(Channel) -Repository $(dockerNamespace)/powershell @extraParams
       displayName: 'Run Tests for $(Channel) - $(ImageName)'
+      condition: and( succeeded(), ne(variables['Channel'],''))
+
 
     - task: PublishTestResults@2
       displayName: 'Publish Test Results **/test*.xml'
