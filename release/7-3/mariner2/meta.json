@@ -9,7 +9,8 @@
     "ShortDistroName": "mariner",
     "SubImage": "test-deps",
     "TestProperties": {
-        "size": 303
+        "size": 303,
+        "Arm32": true
     },
     "EndOfLife": "2022-10-14",
     "DistributionState": "Validated"
