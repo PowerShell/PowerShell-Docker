@@ -1,13 +1,13 @@
 # Docker image file that describes an Alpine image with PowerShell and test dependencies
 
-ARG BaseImage=mcr.microsoft.com/powershell:alpine-3.15
+ARG BaseImage=mcr.microsoft.com/powershell:alpine-3.17
 
 FROM ${BaseImage}
 
 ENV NODE_VERSION=14.17.6 \
     YARN_VERSION=1.22.5 \
     NVM_DIR="/root/.nvm" \
-    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Alpine-3.15
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Alpine-3.17
 
 # workaround for Alpine to run in Azure DevOps
 ENV NODE_NO_WARNINGS=1

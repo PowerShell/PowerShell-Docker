@@ -2,7 +2,7 @@
     "IsLinux" : true,
     "UseLinuxVersion": false,
     "SkipGssNtlmSspTests": true,
-    "osVersion": "Alpine 3.14",
+    "osVersion": "Alpine 3.16",
     "tagTemplates": [
         "alpine-#shorttag#"
     ],
