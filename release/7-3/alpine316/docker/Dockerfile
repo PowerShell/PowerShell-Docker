@@ -25,7 +25,7 @@ RUN tar zxf /tmp/linux.tar.gz -C ${PS_INSTALL_FOLDER} -v
 
 # Start a new stage so we lose all the tar.gz layers from the final image
 ARG hostRegistry=psdockercache.azurecr.io
-FROM ${hostRegistry}/alpine:3.15
+FROM ${hostRegistry}/alpine:3.16
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
