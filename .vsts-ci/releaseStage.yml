@@ -65,3 +65,4 @@ stages:
         jobName: Build_Win_x64
         vmImage: PSMMS2019-Secure
         ACR: yes
+        maxParallel: 4
