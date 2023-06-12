@@ -2,8 +2,9 @@
 # Licensed under the MIT License.
 
 # Docker image file that describes an Debian image with PowerShell installed from Microsoft APT Repo
-ARG hostRegistry=psdockercache.azurecr.io
-FROM ${hostRegistry}/debian:bookworm AS installer-env
+# ARG hostRegistry=psdockercache.azurecr.io
+ARG hostRegistry=mcr.microsoft.com
+FROM ${hostRegistry}/debian:8.0.0-preview.4-bookworm-slim AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.3.0-preview.8
@@ -28,8 +29,9 @@ RUN --mount=type=cache,target=/var/lib/apt \
     && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb
 
 # Install the deb file in this image and make powershell available
-ARG hostRegistry=psdockercache.azurecr.io
-FROM ${hostRegistry}/debian:bookworm AS final-image
+# ARG hostRegistry=psdockercache.azurecr.io
+ARG hostRegistry=mcr.microsoft.com
+FROM ${hostRegistry}/debian:8.0.0-preview.4-bookworm-slim AS final-image
 
 # # Define args needed to add the package
 ARG PS_VERSION=7.3.0-preview.8
