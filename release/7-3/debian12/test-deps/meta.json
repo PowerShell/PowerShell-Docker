@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "osVersion": "Debian 11 (Testing)",
+    "osVersion": "Debian 12 (Testing)",
     "tagTemplates": [
         "debian-#shorttag#"
     ],
@@ -11,6 +11,6 @@
         "test-deps-debian"
     ],
     "TestProperties": {
-        "size": 402
+        "size": 409
     }
 }

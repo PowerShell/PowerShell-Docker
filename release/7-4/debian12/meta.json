@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion" : false,
-    "PackageFormat": "powershell-${PS_VERSION}-linux-x64.tar.gz",
+    "PackageFormat": "powershell-preview_${PS_VERSION}-1.deb_amd64.deb",
     "osVersion": "Debian 12",
     "SkipGssNtlmSspTests": false,
     "ShortDistroName": "debian",
@@ -11,7 +11,7 @@
     ],
     "SubImage": "test-deps",
     "TestProperties": {
-        "size": 340
+        "size": 409
     },
     "EndOfLife": "2025-12-25",
     "DistributionState": "Validating"

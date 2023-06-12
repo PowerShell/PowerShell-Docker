@@ -7,9 +7,9 @@ FROM ${hostRegistry}/debian:bookworm AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.3.0-preview.8
-ARG PS_PACKAGE=powershell_${PS_VERSION}.deb_amd64.deb
+ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.deb_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=7
+ARG PS_INSTALL_VERSION=7-preview
 
 RUN --mount=type=cache,target=/var/lib/apt \
     --mount=type=cache,target=/var/cache/apt \
@@ -33,9 +33,9 @@ FROM ${hostRegistry}/debian:bookworm AS final-image
 
 # # Define args needed to add the package
 ARG PS_VERSION=7.3.0-preview.8
-ARG PS_PACKAGE=powershell_${PS_VERSION}.deb_amd64.deb
+ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.deb_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=7
+ARG PS_INSTALL_VERSION=7-preview
 
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \

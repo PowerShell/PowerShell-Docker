@@ -1,5 +1,5 @@
 # Docker image file that describes an Debian image with PowerShell and test dependencies
-ARG BaseImage=mcr.microsoft.com/powershell:preview-debian-11
+ARG BaseImage=mcr.microsoft.com/powershell:preview-debian-12
 
 FROM ${BaseImage}
 
@@ -17,7 +17,7 @@ RUN --mount=type=cache,target=/var/lib/apt/lists \
         unzip \
     && apt-get clean
 
-ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Debian-11
+ENV POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-TestDeps-Debian-12
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
