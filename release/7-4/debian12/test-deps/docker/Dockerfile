@@ -1,7 +1,9 @@
 # Docker image file that describes an Debian image with PowerShell and test dependencies
 ARG BaseImage=mcr.microsoft.com/powershell:preview-debian-12
 
-FROM ${BaseImage}
+# FROM ${BaseImage}
+FROM debian:bookworm
+
 
 # Install dependencies and clean up
 RUN --mount=type=cache,target=/var/lib/apt/lists \
