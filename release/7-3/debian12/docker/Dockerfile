@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 # Docker image file that describes an Debian image with PowerShell installed from Microsoft APT Repo
-
 ARG hostRegistry=psdockercache.azurecr.io
 FROM ${hostRegistry}/debian:bookworm AS installer-env
 
@@ -24,16 +23,6 @@ RUN --mount=type=cache,target=/var/lib/apt \
         locales \
     # required for SSL
         ca-certificates \
-        gss-ntlmssp \
-        libicu67 \
-        libssl1.1 \
-        libc6 \
-        libgcc1 \
-        libgssapi-krb5-2 \
-        libstdc++6 \
-        zlib1g \
-    # PowerShell remoting over SSH dependencies
-        openssh-client \
     # Download the Linux package and save it
     && echo ${PS_PACKAGE_URL} \
     && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb
@@ -71,10 +60,10 @@ RUN --mount=from=installer-env,target=/mnt/pwsh,source=/tmp \
     # required for SSL
         ca-certificates \
         gss-ntlmssp \
-        libicu70 \
+        libicu72 \
         libssl3 \
         libc6 \
-        libgcc1 \
+        libgcc-s1 \
         libgssapi-krb5-2 \
         liblttng-ust1 \
         libstdc++6 \
