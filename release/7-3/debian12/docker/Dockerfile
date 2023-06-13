@@ -38,7 +38,7 @@ RUN --mount=type=cache,target=/var/lib/apt \
 RUN tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
 
 # Install the deb file in this image and make powershell available
-# ARG hostRegistry=psdockercache.azurecr.io
+ARG hostRegistry=psdockercache.azurecr.io
 FROM ${hostRegistry}/debian:bookworm AS final-image
 
 # # Define args needed to add the package
