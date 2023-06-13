@@ -2,14 +2,20 @@
 # Licensed under the MIT License.
 
 # Docker image file that describes an Debian image with PowerShell installed from Microsoft APT Repo
-# ARG hostRegistry=psdockercache.azurecr.io
-FROM debian:bookworm AS installer-env
+ARG hostRegistry=psdockercache.azurecr.io
+FROM ${hostRegistry}/debian:bookworm AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=7.3.0-preview.8
-ARG PS_PACKAGE=powershell_${PS_VERSION}-1.deb_amd64.deb
+ARG PS_VERSION=7.3.1
+ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=7-preview
+ARG PS_INSTALL_VERSION=7
+
+# Define the folder we will be installing PowerShell to.
+ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/${PS_INSTALL_VERSION}
+
+# Create the install folder.
+RUN mkdir -p ${PS_INSTALL_FOLDER}
 
 RUN --mount=type=cache,target=/var/lib/apt \
     --mount=type=cache,target=/var/cache/apt \
@@ -17,6 +23,7 @@ RUN --mount=type=cache,target=/var/lib/apt \
     && apt-get install --no-install-recommends -y \
     # curl is required to grab the Linux package
         curl \
+        tar \
     # less is required for help in powershell
         less \
     # requied to setup the locale
@@ -25,17 +32,20 @@ RUN --mount=type=cache,target=/var/lib/apt \
         ca-certificates \
     # Download the Linux package and save it
     && echo ${PS_PACKAGE_URL} \
-    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb
+    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.tar.gz
+
+# Unzip the linux powershell.tar.gz
+RUN tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
 
 # Install the deb file in this image and make powershell available
 # ARG hostRegistry=psdockercache.azurecr.io
-FROM debian:bookworm AS final-image
+FROM ${hostRegistry}/debian:bookworm AS final-image
 
 # # Define args needed to add the package
-ARG PS_VERSION=7.3.0-preview.8
-ARG PS_PACKAGE=powershell_${PS_VERSION}-1.deb_amd64.deb
+ARG PS_VERSION=7.3.1
+ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=7-preview
+ARG PS_INSTALL_VERSION=7
 
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
@@ -46,12 +56,13 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     POWERSHELL_DISTRIBUTION_CHANNEL=Debian-12
 
+# Copy only the files we need from the previous stage
+COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
+
 # Install dependencies and clean up
-RUN --mount=from=installer-env,target=/mnt/pwsh,source=/tmp \
-    --mount=type=cache,target=/var/lib/apt \
+RUN --mount=type=cache,target=/var/lib/apt \
     --mount=type=cache,target=/var/cache/apt \
       apt-get update \
-    && apt-get install --no-install-recommends -y /mnt/pwsh/powershell.deb \
     && apt-get install --no-install-recommends -y \
     # less is required for help in powershell
         less \
