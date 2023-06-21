@@ -54,7 +54,7 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     # set a fixed location for the Module analysis cache
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-    POWERSHELL_DISTRIBUTION_CHANNEL=Debian-12
+    POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Debian-12
 
 # Copy only the files we need from the previous stage
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
