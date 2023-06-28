@@ -7,7 +7,7 @@ FROM ${hostRegistry}/debian:bookworm AS installer-env
 
 # Define Args for the needed to add the package
 ARG PS_VERSION=7.3.0-preview.8
-ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
+ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.deb_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7-preview
 
@@ -32,10 +32,7 @@ RUN --mount=type=cache,target=/var/lib/apt \
         ca-certificates \
     # Download the Linux package and save it
     && echo ${PS_PACKAGE_URL} \
-    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.tar.gz
-
-# Unzip the linux powershell.tar.gz
-RUN tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
+    && curl -sSL ${PS_PACKAGE_URL} -o /tmp/powershell.deb
 
 # Install the deb file in this image and make powershell available
 ARG hostRegistry=psdockercache.azurecr.io
@@ -43,7 +40,7 @@ FROM ${hostRegistry}/debian:bookworm AS final-image
 
 # # Define args needed to add the package
 ARG PS_VERSION=7.3.0-preview.8
-ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-x64.tar.gz
+ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.deb_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7-preview
 
@@ -56,13 +53,12 @@ ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
     PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
     POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-Debian-12
 
-# Copy only the files we need from the previous stage
-COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
-
 # Install dependencies and clean up
-RUN --mount=type=cache,target=/var/lib/apt \
+RUN --mount=from=installer-env,target=/mnt/pwsh,source=/tmp \
+    --mount=type=cache,target=/var/lib/apt \
     --mount=type=cache,target=/var/cache/apt \
       apt-get update \
+    && apt-get install --no-install-recommends -y /mnt/pwsh/powershell.deb \
     && apt-get install --no-install-recommends -y \
     # less is required for help in powershell
         less \
