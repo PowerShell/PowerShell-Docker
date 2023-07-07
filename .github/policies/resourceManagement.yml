@@ -1,0 +1,257 @@
+id: 
+name: GitOps.PullRequestIssueManagement
+description: GitOps.PullRequestIssueManagement primitive
+owner: 
+resource: repository
+disabled: false
+where: 
+configuration:
+  resourceManagementConfiguration:
+    scheduledSearches:
+    - description: 
+      frequencies:
+      - hourly:
+          hour: 12
+      filters:
+      - isPullRequest
+      - isOpen
+      - hasLabel:
+          label: Waiting on Author
+      - hasLabel:
+          label: Stale
+      - noActivitySince:
+          days: 7
+      actions:
+      - closeIssue
+    - description: 
+      frequencies:
+      - hourly:
+          hour: 12
+      filters:
+      - isPullRequest
+      - isOpen
+      - hasLabel:
+          label: Waiting on Author
+      - noActivitySince:
+          days: 7
+      - isNotLabeledWith:
+          label: Stale
+      actions:
+      - addLabel:
+          label: Stale
+      - addReply:
+          reply: This pull request has been automatically marked as stale because it has been marked as requiring author feedback but has not had any activity for **7 days**. It will be closed if no further activity occurs **within 7 days of this comment**.
+    - description: 
+      frequencies:
+      - hourly:
+          hour: 12
+      filters:
+      - isIssue
+      - isOpen
+      - hasLabel:
+          label: Waiting on Author
+      - hasLabel:
+          label: Stale
+      - noActivitySince:
+          days: 10
+      actions:
+      - closeIssue
+    - description: 
+      frequencies:
+      - hourly:
+          hour: 3
+      filters:
+      - isIssue
+      - isOpen
+      - hasLabel:
+          label: Waiting on Author
+      - noActivitySince:
+          days: 30
+      - isNotLabeledWith:
+          label: Stale
+      actions:
+      - addLabel:
+          label: Stale
+      - addReply:
+          reply: This issue has been automatically marked as stale because it has been marked as requiring author feedback but has not had any activity for **30 days**. It will be closed if no further activity occurs **within 10 days of this comment**.
+    - description: 
+      frequencies:
+      - hourly:
+          hour: 3
+      filters:
+      - isIssue
+      - isOpen
+      - hasLabel:
+          label: Resolution-Duplicate
+      - noActivitySince:
+          days: 1
+      actions:
+      - addReply:
+          reply: This issue has been marked as duplicate and has not had any activity for **1 day**. It has been closed for housekeeping purposes.
+      - closeIssue
+    - description: 
+      frequencies:
+      - hourly:
+          hour: 3
+      filters:
+      - isIssue
+      - isOpen
+      - hasLabel:
+          label: Resolution-Fixed
+      - noActivitySince:
+          days: 1
+      actions:
+      - addReply:
+          reply: This issue has been marked as fixed and has not had any activity for **1 day**. It has been closed for housekeeping purposes.
+      - closeIssue
+    - description: 
+      frequencies:
+      - hourly:
+          hour: 3
+      filters:
+      - isIssue
+      - isOpen
+      - hasLabel:
+          label: Resolution-Answered
+      - noActivitySince:
+          days: 1
+      actions:
+      - addReply:
+          reply: This issue has been marked as answered and has not had any activity for **1 day**. It has been closed for housekeeping purposes.
+      - closeIssue
+    - description: 
+      frequencies:
+      - hourly:
+          hour: 3
+      filters:
+      - isIssue
+      - isOpen
+      - hasLabel:
+          label: Resolution-External
+      - noActivitySince:
+          days: 1
+      actions:
+      - addReply:
+          reply: This issue has been marked as external and has not had any activity for **1 day**. It has been be closed for housekeeping purposes.
+      - closeIssue
+    eventResponderTasks:
+    - if:
+      - payloadType: Pull_Request_Review
+      - isAction:
+          action: Submitted
+      - isReviewState:
+          reviewState: Changes_requested
+      then:
+      - addLabel:
+          label: Waiting on Author
+      description: 
+    - if:
+      - payloadType: Pull_Request
+      - isActivitySender:
+          issueAuthor: True
+      - not:
+          isAction:
+            action: Closed
+      - hasLabel:
+          label: Waiting on Author
+      then:
+      - removeLabel:
+          label: Waiting on Author
+      description: 
+    - if:
+      - payloadType: Issue_Comment
+      - isActivitySender:
+          issueAuthor: True
+      - hasLabel:
+          label: Waiting on Author
+      then:
+      - removeLabel:
+          label: Waiting on Author
+      description: 
+    - if:
+      - payloadType: Pull_Request_Review
+      - isActivitySender:
+          issueAuthor: True
+      - hasLabel:
+          label: Waiting on Author
+      then:
+      - removeLabel:
+          label: Waiting on Author
+      description: 
+    - if:
+      - payloadType: Pull_Request
+      - not:
+          isAction:
+            action: Closed
+      - hasLabel:
+          label: Stale
+      then:
+      - removeLabel:
+          label: Stale
+      description: 
+    - if:
+      - payloadType: Issue_Comment
+      - hasLabel:
+          label: Stale
+      then:
+      - removeLabel:
+          label: Stale
+      description: 
+    - if:
+      - payloadType: Pull_Request_Review
+      - hasLabel:
+          label: Stale
+      then:
+      - removeLabel:
+          label: Stale
+      description: 
+    - if:
+      - payloadType: Pull_Request
+      - hasLabel:
+          label: AutoMerge
+      then:
+      - enableAutoMerge:
+          mergeMethod: Squash
+      description: 
+    - if:
+      - payloadType: Pull_Request
+      - labelRemoved:
+          label: AutoMerge
+      then:
+      - disableAutoMerge
+      description: 
+    - if:
+      - payloadType: Issue_Comment
+      - isAction:
+          action: Created
+      - isActivitySender:
+          issueAuthor: True
+      - hasLabel:
+          label: Waiting on Author
+      then:
+      - addLabel:
+          label: 'Needs: Attention :wave:'
+      - removeLabel:
+          label: Waiting on Author
+      description: 
+    - if:
+      - payloadType: Issues
+      - not:
+          isAction:
+            action: Closed
+      - hasLabel:
+          label: Stale
+      then:
+      - removeLabel:
+          label: Stale
+      description: 
+    - if:
+      - payloadType: Issue_Comment
+      - hasLabel:
+          label: Stale
+      then:
+      - removeLabel:
+          label: Stale
+      description: 
+onFailure: 
+onSuccess: 
