@@ -14,7 +14,6 @@
         "size": 490
     },
     "EndOfLife": "2025-12-25",
-    "DistributionState": "Validating",
-    "UseInCi": false
+    "DistributionState": "Validating"
 }
 
