@@ -48,9 +48,9 @@ For our support policy, see [PowerShell Core Support Lifecycle](https://docs.mic
 
 ## Feedback
 
-- To give feedback for PowerShell Core,
+- To provide feedback for PowerShell Core,
   file an issue at [PowerShell/Powershell](https://github.com/PowerShell/PowerShell/issues/new/choose)
-- To give feedback for how the images are built,
+- To provide feedback on how the images are built,
   file an issue at [PowerShell/PowerShell-Docker](https://github.com/PowerShell/PowerShell-Docker/issues/new/choose)
 
 ## License
@@ -71,7 +71,7 @@ and consent to the Supplemental License Terms available on Docker Hub:
 
 **ADDITIONAL LICENSING REQUIREMENTS AND/OR USE RIGHTS**
 Your use of the Supplement as specified in the preceding paragraph may result in the creation or
-modification of a container image (“Container Image”) that includes certain Supplement components.
+modification of a container image (“Container Image”) that includes certain supplement components.
 For clarity, a Container Image is separate and distinct from a virtual machine or virtual appliance image.
 Pursuant to these license terms,
 we grant you a restricted right to redistribute such Supplement components under the following conditions:
@@ -90,3 +90,4 @@ We reserve all other rights not expressly granted herein.
 As part of the Supplemental License Terms for this Container OS Image for Windows containers,
 you are also subject to the underlying Windows Server host software license terms,
 which are located at https://www.microsoft.com/en-us/useterms.
+
