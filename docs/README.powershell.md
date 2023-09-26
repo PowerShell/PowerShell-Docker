@@ -71,7 +71,7 @@ and consent to the Supplemental License Terms available on Docker Hub:
 
 **ADDITIONAL LICENSING REQUIREMENTS AND/OR USE RIGHTS**
 Your use of the Supplement as specified in the preceding paragraph may result in the creation or
-modification of a container image (“Container Image”) that includes certain supplement components.
+modification of a container image (“Container Image”) that includes certain Supplement components.
 For clarity, a Container Image is separate and distinct from a virtual machine or virtual appliance image.
 Pursuant to these license terms,
 we grant you a restricted right to redistribute such Supplement components under the following conditions:
