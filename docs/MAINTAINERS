@@ -15,7 +15,7 @@
     # can't solve, they show up and fix it with bizarre devices and weaponry.
     # They have final say on technical implementation and coding style.
     # They are ultimately responsible for quality in all its forms: usability polish,
-    # bugfixes, performance, stability, etc. When ownership  can cleanly be passed to
+    # Bug fixes, performance, stability, etc. When ownership  can cleanly be passed to
     # a subsystem, they are responsible for doing so and holding the
     # subsystem maintainers accountable. If ownership is unclear, they are the de facto owners.
 
@@ -85,3 +85,4 @@
         Name = "Travis Plunk"
         Email = "github@ez13.net"
         GitHub = "TravisEz13"
+

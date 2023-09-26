@@ -48,9 +48,9 @@ For our support policy, see [PowerShell Core Support Lifecycle](https://docs.mic
 
 ## Feedback
 
-- To give feedback for PowerShell Core,
+- To provide feedback for PowerShell Core,
   file an issue at [PowerShell/Powershell](https://github.com/PowerShell/PowerShell/issues/new/choose)
-- To give feedback for how the images are built,
+- To provide feedback on how the images are built,
   file an issue at [PowerShell/PowerShell-Docker](https://github.com/PowerShell/PowerShell-Docker/issues/new/choose)
 
 ## License
@@ -90,3 +90,4 @@ We reserve all other rights not expressly granted herein.
 As part of the Supplemental License Terms for this Container OS Image for Windows containers,
 you are also subject to the underlying Windows Server host software license terms,
 which are located at https://www.microsoft.com/en-us/useterms.
+

@@ -2,11 +2,11 @@
 
 ## Building the images
 
-To build an image run `./build.ps1 -build -name <ImageFolderName>`.
+To build an image, run `./build.ps1 -build -name <ImageFolderName>`.
 
 ### Example
 
-For example to build Ubuntu 16.04/xenial, which is in `./release/stable/ubuntu16.04`:
+For example, to build Ubuntu 16.04/xenial, which is in `./release/stable/ubuntu16.04`:
 
 ```sh
 PS /powershell-docker> ./build.ps1 -Build -Name ubuntu16.04
@@ -46,7 +46,7 @@ WSManStackVersion              3.0
 
 ### Folder structure
 
-The top level folder with the `Dockerfile`s is `release`.
+The top-level folder with the `Dockerfile`s is `release`.
 This should only have folders under it.
 The three folders are:
 
@@ -68,7 +68,7 @@ In this folder, there are 4 items:
 
 All `Dockerfile`s should follow certain standards:
 
-- The following comments should be applied at the beginning of the `Dockerfile`:
+- The following remarks should be applied at the beginning of the `Dockerfile`:
 
   - Copyright notice
   - Software license
@@ -191,3 +191,4 @@ You will also need to add an entry in the `/.dependabot/config.yml` file. Here i
 ```
 
 > **Do not use `latest` as the base**, as this makes the whole purpose invalid!
+
