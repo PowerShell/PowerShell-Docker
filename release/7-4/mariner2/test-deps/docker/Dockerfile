@@ -8,7 +8,7 @@ FROM ${BaseImage}
 
 # Install dependencies and clean up
 RUN --mount=type=cache,target=/var/cache/tdnf \
-    tdnf update -y \
+    tdnf update -y --exclude=powershell-preview \
     # install dependencies
     && tdnf install -y \
     dnf-utils \
