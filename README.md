@@ -6,22 +6,22 @@ This requires Docker 17.05 or newer.
 It also expects you to be able to run Docker without `sudo`.
 Please follow [Docker's official instructions][install] to install Docker correctly.
 
-[install]: https://docs.docker.com/engine/installation/
+[install]: https://docs.docker.com/engine/install/
 
 ## Release
 
 The release containers derive from the official distribution image,
-such as `centos:7`, then install dependencies,
+such as `debian:11`, then install dependencies,
 and finally install the PowerShell package.
 
-These containers live at [hub.docker.com/r/microsoft/powershell][docker-release].
+These containers live at [Microsoft Artifact Registry][docker-release].
 
 At about 440 megabytes, they are decently minimal,
 with their size being the sum of the base image (200 megabytes)
 plus the uncompressed package (120 megabytes),
 and about 120 megabytes of .NET Core and bootstrapping dependencies.
 
-[docker-release]: https://hub.docker.com/r/microsoft/powershell/
+[docker-release]: [https://mcr.microsoft.com/powershell](https://mcr.microsoft.com/en-us/product/powershell/about)
 
 ## Community
 
