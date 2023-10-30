@@ -59,9 +59,7 @@ RUN apk add --no-cache \
   tzdata \
   userspace-rcu \
   zlib \
-  icu-dev \
   icu-libs \
-  icu-data-full \
   && apk -X https://dl-cdn.alpinelinux.org/alpine/edge/main add --no-cache \
   lttng-ust \
   \

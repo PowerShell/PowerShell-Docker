@@ -21,6 +21,8 @@ RUN apk add --no-cache --virtual .pipeline-deps readline linux-pam \
         curl \
         git \
         unzip \
+        musl \
+        musl-locales \
         nodejs \
     && apk update \
     && apk upgrade \
