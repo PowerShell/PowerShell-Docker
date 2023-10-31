@@ -13,6 +13,7 @@ pr:
     - .github/*
     - .vsts-ci/releasebuild.yml
     - assets/matrix.json
+    - README.md
 
 resources:
 - repo: self
