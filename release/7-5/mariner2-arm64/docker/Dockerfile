@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-FROM --platform=linux/arm64 mcr.microsoft.com/cbl-mariner/base/core:2.0 AS setup-tdnf-repa
+FROM --platform=linux/arm64 mcr.microsoft.com/cbl-mariner/base/core:2.0 AS installer-eng
 
     # Define Args for the needed to add the package
     ARG PS_VERSION=7.4.0-preview.1
