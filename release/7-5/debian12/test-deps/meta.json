@@ -1,0 +1,16 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "osVersion": "Debian 12 (Testing)",
+    "tagTemplates": [
+        "debian-#shorttag#"
+    ],
+    "SubRepository": "test-deps",
+    "OptionalTests": [
+        "test-deps",
+        "test-deps-debian"
+    ],
+    "TestProperties": {
+        "size": 490
+    }
+}

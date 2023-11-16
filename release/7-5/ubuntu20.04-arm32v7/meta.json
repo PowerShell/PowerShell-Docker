@@ -1,0 +1,22 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-arm32.tar.gz",
+    "osVersion": "Ubuntu 20.04 ARM 32v7",
+    "SkipGssNtlmSspTests": true,
+    "ShortDistroName": "ubuntu",
+    "Base64EncodePackageUrl": true,
+    "UseAcr": false,
+    "shortTags": [
+        {"Tag": "focal-arm32"},
+        {"Tag": "20.04-arm32"}
+    ],
+    "TestProperties": {
+        "size": 550,
+        "Arm32": true
+    },
+    "EndOfLife": "2023-04-02",
+    "DistributionState": "Validated",
+    "UseInCi": false,
+    "Architecture": "arm32"
+}
