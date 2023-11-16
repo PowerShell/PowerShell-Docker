@@ -1,0 +1,21 @@
+{
+    "IsLinux": false,
+    "PackageFormat": "PowerShell-${PS_VERSION}-win-x64.zip",
+    "osVersion": "Windows Server, LTSC 2022",
+    "shortTags": [
+        {
+            "Tag": "ltsc2022"
+        }
+    ],
+    "Base64EncodePackageUrl": true,
+    "ShortDistroName": "windowsserver",
+    "manifestLists": [
+        "${channelTagPrefix}windowsserver"
+    ],
+    "TestProperties": {
+        "size": 1
+    },
+    "UseAcr": true,
+    "EndOfLife": "2023-12-15",
+    "DistributionState": "Validated"
+}

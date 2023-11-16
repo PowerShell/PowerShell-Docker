@@ -1,0 +1,21 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell${channelTag}_${PS_VERSION}-1.deb_amd64.deb",
+    "osVersion": "Ubuntu 22.04",
+    "SkipGssNtlmSspTests": false,
+    "ShortDistroName": "ubuntu",
+    "shortTags": [
+        {"Tag": "jammy"},
+        {"Tag": "22.04"}
+    ],
+    "manifestLists": [
+        "${channelTag}"
+    ],
+    "TestProperties": {
+        "size": 338
+    },
+    "SubImage": "test-deps",
+    "EndOfLife": "2023-12-15",
+    "DistributionState": "Validated"
+}

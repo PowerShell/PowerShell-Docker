@@ -7,7 +7,7 @@
     },
     {
         "name": "preview",
-        "path": "release/7-4",
+        "path": "release/7-5",
         "tagPrefix": "preview",
         "pwshInstallVersion": "7-preview",
         "packageTag": "-preview"

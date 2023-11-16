@@ -1,0 +1,19 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion" : false,
+    "PackageFormat": "powershell${channelTag}_${PS_VERSION}-1.deb_amd64.deb",
+    "osVersion": "Debian 12",
+    "SkipGssNtlmSspTests": false,
+    "ShortDistroName": "debian",
+    "shortTags": [
+        {"Tag": "bookworm"},
+        {"Tag": "12"}
+    ],
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 490
+    },
+    "EndOfLife": "2025-12-25",
+    "DistributionState": "Validating"
+}
+
