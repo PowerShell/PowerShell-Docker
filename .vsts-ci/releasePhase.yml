@@ -104,7 +104,6 @@ jobs:
     displayName: 'docker login $(dockerHost)'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
 
-    
   - pwsh: |
       if($env:ACR -eq 'yes')
       {
@@ -138,7 +137,9 @@ jobs:
         $containerName = $containerName.Replace('.', '-')
         $context = New-AzStorageContext -StorageAccountName $(StorageAccount)
         $querystring = New-AzStorageContainerSASToken -Context $context -Name $containerName -Permission r -ExpiryTime ((get-date).AddMinutes(180)) -Protocol HttpsOnly
-        $url = "https://$(StorageAccount).blob.core.windows.net/$querystring"
+        $uriBuilder = [System.UriBuilder]::new("https://$(StorageAccount).blob.core.windows.net")
+        $uriBuilder.Query = $querystring.ToString()
+        $url = $uriBuilder.ToString()
         Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
     displayName: 'Set SasUrl variable'
     condition: and( succeededOrFailed(), ne(variables['Channel'],''))
@@ -185,7 +186,7 @@ jobs:
     displayName: 'docker logout'
     condition: and( always(), ne(variables['Channel'],''))
 
-  - pwsh: | 
+  - pwsh: |
       if($env:ACR -eq 'yes')
       {
         Write-Host 'Using ACR, will need to az logout'
