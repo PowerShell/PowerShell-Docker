@@ -20,8 +20,8 @@ FROM setup-tdnf-repa AS installer-env
     # Download the Linux tar.gz and save it
     ADD ${PS_PACKAGE_URL} /tmp/powershell.rpm
 
-    RUN --mount=type=cache,target=/var/cache/tdnf \
-        tdnf install -y \
+    # Don't use the cache mount since this image doesn't go into the final product and it causes issues with parralel operations with the next layer
+    RUN tdnf install -y \
             wget \
             awk \
             tar \
