@@ -1,0 +1,62 @@
+[
+  {
+    "Tags": [
+      "ps.local/public/powershell:7.2-ubuntu-bionic",
+      "ps.local/public/powershell:7.2-ubuntu-18.04",
+      "ps.local/public/powershell:ubuntu-bionic",
+      "ps.local/public/powershell:ubuntu-18.04"
+    ],
+    "BuildArgs": {
+      "fromTag": "notUsed",
+      "PS_VERSION": "7.4.0",
+      "PACKAGE_VERSION": "7.4.0",
+      "IMAGE_NAME": "mcr.microsoft.com/public/powershell:7.4-ubuntu-bionic",
+      "BaseImage": "",
+      "PS_INSTALL_VERSION": "7",
+      "PS_PACKAGE_URL": "https://github.com:443/PowerShell/PowerShell/releases/download/v7.4.2/powershell_7.4.0.deb_amd64.deb"
+    },
+    "ContextPath": "C:\\Users\\annavied\\Documents\\PowerShell-Docker\\release\\7-4\\ubuntu18.04\\docker",
+    "OS": "linux",
+    "ExpectedVersion": "7.4.0",
+    "SkipVerification": false,
+    "SkipWebCmdletTests": false,
+    "SkipGssNtlmSspTests": false,
+    "BaseImage": "",
+    "OptionalTests": null,
+    "TestProperties": {
+      "size": 355
+    },
+    "Channel": "stable",
+    "UseAcr": false
+  },
+  {
+    "Tags": [
+      "ps.local/public/powershell/test-deps:ubuntu-bionic",
+      "ps.local/public/powershell/test-deps:ubuntu-18.04"
+    ],
+    "BuildArgs": {
+      "fromTag": "notUsed",
+      "PS_VERSION": "7.4.0",
+      "PACKAGE_VERSION": "7.4.0",
+      "IMAGE_NAME": "mcr.microsoft.com/public/powershell/test-deps:ubuntu-bionic",
+      "BaseImage": "ps.local/public/powershell:7.4-ubuntu-bionic",
+      "PS_INSTALL_VERSION": "7"
+    },
+    "ContextPath": "C:\\Users\\annavied\\Documents\\PowerShell-Docker\\release\\7-2\\ubuntu18.04\\test-deps\\docker",
+    "OS": "linux",
+    "ExpectedVersion": "7.4.0",
+    "SkipVerification": false,
+    "SkipWebCmdletTests": false,
+    "SkipGssNtlmSspTests": false,
+    "BaseImage": "ps.local/public/powershell:7.4-ubuntu-bionic",
+    "OptionalTests": [
+      "test-deps",
+      "test-deps-debian"
+    ],
+    "TestProperties": {
+      "size": 380
+    },
+    "Channel": "stable",
+    "UseAcr": false
+  }
+]
