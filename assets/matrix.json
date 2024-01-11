@@ -10,7 +10,7 @@
       "IsLinux": true,
       "JobName": "alpine316",
       "OsVersion": "Alpine 3.16 (In Validation)",
-      "TagList": "lts-7.2-alpine-3.16;lts-alpine-3.16",
+      "TagList": "lts-7.4-alpine-3.16;lts-alpine-3.16",
       "UseInCI": false
     },
     {
@@ -23,7 +23,7 @@
       "IsLinux": true,
       "JobName": "mariner2",
       "OsVersion": "Mariner 2.0 (End of Life)",
-      "TagList": "lts-7.2-mariner-2.0;lts-mariner-2.0",
+      "TagList": "lts-7.4-mariner-2.0;lts-mariner-2.0",
       "UseInCI": true
     },
     {
@@ -62,7 +62,7 @@
       "IsLinux": true,
       "JobName": "alpine317",
       "OsVersion": "Alpine 3.17 (In Validation)",
-      "TagList": "lts-7.2-alpine-3.17;lts-alpine-3.17",
+      "TagList": "lts-7.4-alpine-3.17;lts-alpine-3.17",
       "UseInCI": false
     },
     {
