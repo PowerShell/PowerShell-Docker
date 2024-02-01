@@ -5,8 +5,6 @@
     "osVersion": "Mariner 2.0 ARM 64v7",
     "SkipGssNtlmSspTests": true,
     "ShortDistroName": "mariner",
-    "Base64EncodePackageUrl": true,
-    "UseAcr": false,
     "shortTags": [
         {"Tag": "2.0-arm64"}
     ],
@@ -15,7 +13,7 @@
         "Arm32": true
     },
     "EndOfLife": "2023-12-14",
-    "DistributionState": "Validating",
+    "DistributionState": "Validated",
     "UseInCi": false,
     "Architecture": "arm64"
 }
