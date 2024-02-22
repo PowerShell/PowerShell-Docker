@@ -33,7 +33,7 @@ FROM setup-tdnf-repa AS installer-env
         cd /installTmp \
         && wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh \
         && chmod +x ./dotnet-install.sh \
-        && ./dotnet-install.sh -Channel 8.0 -Quality preview -Runtime dotnet -InstallDir /usr/share/dotnet
+        && ./dotnet-install.sh -Channel 9.0 -Quality preview -Runtime dotnet -InstallDir /usr/share/dotnet
 
     RUN echo ${PS_PACKAGE_URL}
 
