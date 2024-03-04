@@ -52,7 +52,7 @@ FROM --platform=linux/arm64 mcr.microsoft.com/cbl-mariner/base/core:2.0 AS final
         LANG=en_US.UTF-8 \
         # set a fixed location for the Module analysis cache
         PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-        POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-arm64v7-Mariner-2
+        POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-arm64v8-Mariner-2
 
     # Copy only the files we need from the previous stage
     COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]

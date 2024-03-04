@@ -388,7 +388,7 @@
       "ImageName": "mariner2-arm64",
       "IsLinux": true,
       "JobName": "mariner2_arm64",
-      "OsVersion": "Mariner 2.0 ARM 64v7 (In Validation)",
+      "OsVersion": "Mariner 2.0 ARM 64v8 (In Validation)",
       "TagList": "preview-7.4-mariner-2.0-arm64;preview-mariner-2.0-arm64",
       "UseInCI": false
     },
@@ -611,7 +611,7 @@
       "ImageName": "mariner2-arm64",
       "IsLinux": true,
       "JobName": "mariner2_arm64",
-      "OsVersion": "Mariner 2.0 ARM 64v7 (In Validation)",
+      "OsVersion": "Mariner 2.0 ARM 64v8 (In Validation)",
       "TagList": "7.3-mariner-2.0-arm64;mariner-2.0-arm64",
       "UseInCI": false
     },
