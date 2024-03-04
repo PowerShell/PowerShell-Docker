@@ -1,12 +1,14 @@
 {
-    "IsLinux" : true,
+    "IsLinux": true,
     "UseLinuxVersion": false,
     "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.cm.aarch64.rpm",
-    "osVersion": "Mariner 2.0 ARM 64v7",
+    "osVersion": "Mariner 2.0 ARM 64v8",
     "SkipGssNtlmSspTests": true,
     "ShortDistroName": "mariner",
     "shortTags": [
-        {"Tag": "2.0-arm64"}
+        {
+            "Tag": "2.0-arm64"
+        }
     ],
     "TestProperties": {
         "size": 404,
