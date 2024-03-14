@@ -3,6 +3,8 @@
 parameters:
 - name: channel
   default: 'preview'
+- name: channelPath
+  default: ''
 - name: vmImage
   default: PSMMSUbuntu20.04-Secure
 - name: acr
@@ -12,17 +14,19 @@ parameters:
 - name: osFilter
   default: 'All'
 stages:
-- stage: GenerateYaml_${{ parameters.channel }}
-  dependsOn: ['GenerateFullTag']
+- stage: StageGenerateYaml_${{ parameters.channel }}
+  dependsOn: ['StageGenerateFullTag']
   displayName: Build ${{ parameters.channel }}
   jobs:
-  - job: GenerateYaml_${{ parameters.channel }}
+  - job: JobGenerateYaml_${{ parameters.channel }}
     pool:
       type: windows
     displayName: Generate Matrix YAML ${{ parameters.channel }}
     variables:
     - name: ob_outputDirectory
       value: '$(Build.ArtifactStagingDirectory)/ONEBRANCH_ARTIFACT'
+    - name: repoRoot
+      value: $(Build.SourcesDirectory)
     steps:
     - pwsh: |
         ./build.ps1 -GenerateMatrixJson -Channel ${{ parameters.channel }} -Verbose -Acr ${{ parameters.acr }} -OsFilter ${{ parameters.osFilter }}
@@ -35,32 +39,45 @@ stages:
       condition: succeededOrFailed()
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
-      matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_amd64']
+      matrix: dependencies.JobGenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_amd64']
       dependsOn:
-      - GenerateYaml_${{ parameters.channel }}
+      - JobGenerateYaml_${{ parameters.channel }}
       jobName: Build_Linux_x64
+      pool: linux
+      channelPath: ${{ parameters.channelPath }}
+      channel: ${{ parameters.channel }}
+      hostArchitecture: 'amd64'
+      buildKitValue: 1
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
-      matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm64']
+      matrix: dependencies.JobGenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm64']
       dependsOn:
-      - GenerateYaml_${{ parameters.channel }}
+      - JobGenerateYaml_${{ parameters.channel }}
       jobName: Build_Linux_arm64
-      pool: PS-mscodehub-ARM
-      vmImage: PSMMSUbuntu20.04-ARM64-secure
+      pool: linux
+      channelPath: ${{ parameters.channelPath }}
+      channel: ${{ parameters.channel }}
+      hostArchitecture: 'arm64'
+      buildKitValue: 1
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
-      matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm32']
+      matrix: dependencies.JobGenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_linux_arm32']
       dependsOn:
-      - GenerateYaml_${{ parameters.channel }}
+      - JobGenerateYaml_${{ parameters.channel }}
       jobName: Build_Linux_arm32
-      pool: PS-mscodehub-ARM
-      vmImage: PSMMSUbuntu20.04-ARM64-secure
+      pool: linux
+      channelPath: ${{ parameters.channelPath }}
+      channel: ${{ parameters.channel }}
+      hostArchitecture: 'arm64'
+      buildKitValue: 1
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
-      matrix: dependencies.GenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_windows_amd64']
+      matrix: dependencies.JobGenerateYaml_${{ parameters.channel }}.outputs['matrix.matrix_${{ parameters.channel }}_windows_amd64']
       dependsOn:
-      - GenerateYaml_${{ parameters.channel }}
+      - JobGenerateYaml_${{ parameters.channel }}
       jobName: Build_Win_x64
+      channelPath: ${{ parameters.channelPath }}
+      channel: ${{ parameters.channel }}
       vmImage: PSMMS2019-Secure
       ACR: yes
       maxParallel: 3

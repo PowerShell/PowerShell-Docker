@@ -1,0 +1,13 @@
+parameters:
+- name: distro
+  default: ''
+jobs:
+- job: Job_Preppy
+  pool:
+    type: linux
+  timeoutInMinutes: 135
+  displayName: 'Prep data for docker build of ${{ parameters.jobName }}'
+  steps:
+  - pwsh: |
+      Write-Verbose -Verbose "distro is ${{ parameters.distro }}""
+    displayName: 'testing'

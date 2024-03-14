@@ -27,6 +27,7 @@ param(
     [Parameter(ParameterSetName="localBuildAll")]
     [Parameter(ParameterSetName="TestByName")]
     [Parameter(ParameterSetName="TestAll")]
+    [Parameter(ParameterSetName="GetSASData")]
     [switch]
     $Pull,
 
@@ -57,11 +58,13 @@ param(
 
     [Parameter(ParameterSetName="localBuildByName")]
     [Parameter(ParameterSetName="localBuildAll")]
+    [Parameter(ParameterSetName="GetSASData")]
     [switch]
     $Push,
 
     [Parameter(ParameterSetName="localBuildByName")]
     [Parameter(ParameterSetName="localBuildAll")]
+    [Parameter(ParameterSetName="GetSASData")]
     [switch]
     $SkipTest,
 
@@ -97,6 +100,7 @@ param(
 
     [Parameter(ParameterSetName="localBuildByName")]
     [Parameter(ParameterSetName="localBuildAll")]
+    [Parameter(Mandatory, ParameterSetName="GetSASData")]
     [ValidateScript({([uri]$_).Scheme -eq 'https'})]
     [string]
     $SasUrl,
@@ -107,6 +111,7 @@ param(
     [Parameter(Mandatory, ParameterSetName="TestAll")]
     [Parameter(Mandatory, ParameterSetName="GetTagsByName")]
     [Parameter(Mandatory, ParameterSetName="GetTagsByChannel")]
+    [Parameter(ParameterSetName="GetSASData")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
     $Version,
@@ -188,6 +193,7 @@ DynamicParam {
     Add-ParameterAttribute -ParameterSetName 'localBuildByName' -Attributes $Attributes
     Add-ParameterAttribute -ParameterSetName 'GetTagsByName' -Attributes $Attributes
     Add-ParameterAttribute -ParameterSetName 'GenerateTagsYaml' -Attributes $Attributes -Mandatory $false
+    Add-ParameterAttribute -ParameterSetName 'GetSASData' -Attributes $Attributes
 
     if($dockerFileNames.Count -gt 0)
     {
@@ -208,6 +214,7 @@ DynamicParam {
     Add-ParameterAttribute -ParameterSetName 'TestAll' -Attributes $channelAttributes
     Add-ParameterAttribute -ParameterSetName 'TestByName' -Attributes $channelAttributes
     Add-ParameterAttribute -ParameterSetName 'localBuildAll' -Attributes $channelAttributes
+    Add-ParameterAttribute -ParameterSetName 'GetSASData' -Attributes $channelAttributes
     Add-ParameterAttribute -ParameterSetName 'localBuildByName' -Attributes $channelAttributes
     Add-ParameterAttribute -ParameterSetName 'GetTagsByName' -Attributes $channelAttributes
     Add-ParameterAttribute -ParameterSetName 'GetTagsByChannel' -Attributes $channelAttributes
@@ -248,6 +255,8 @@ Begin {
         $Channels = $channelNames
     } elseif ($FullJson) {
         $Channels = $channelNames | Where-Object { $_ -notlike 'community*' }
+    } elseif ( $PSCmdlet.ParameterSetName -eq 'GetSASData' ) {
+        $Channels = $Channel
     } else {
         $Channels = $Channel
     }
@@ -374,6 +383,28 @@ End {
             $actualChannel = $allMeta.Channel
             $useAcr = $allMeta.meta.UseAcr
             $continueOnError = $allMeta.meta.ContinueOnError
+
+            if ($SasUrl)
+            {
+                $params = @{
+                    Dockerfile    = $dockerFileName
+                    psversion     = $allMeta.psversion
+                    SasData       = $sasData
+                    actualChannel = $actualChannel
+                    actualTagData = $actualTagData
+                    actualVersion = $windowsVersion
+                    AllMeta       = $allMeta
+                    CI            = $CI.IsPresent
+                }
+
+                if($allMeta.BaseImage)
+                {
+                    $params.Add('BaseImage',$allMeta.BaseImage)
+                }
+
+                $testParams = Get-SASBuildArgs @params
+                return $testParams
+            }
 
             if ($Build.IsPresent -or $Test.IsPresent)
             {
@@ -596,14 +627,38 @@ End {
         }
     }
 
-    if ($GenerateMatrixJson.IsPresent) {
+    $channelsUsed = @{}
+    if ($UpdateBuildYaml.IsPresent) {
         $matrix = @{ }
         foreach ($repo in $tagGroups.Keys | Sort-Object) {
+            Write-Verbose -Verbose "repo: $repo"
             $channelGroups = $tagGroups.$repo | Group-Object -Property Channel
+            Write-Verbose -Verbose "$($channelGroups.Name) $($channelGroups.Values)"
             foreach($channelGroup in $channelGroups)
             {
                 $channelName = $channelGroup.Name
                 Write-Verbose "generating $channelName json"
+                $ciFolder = Join-Path -Path $PSScriptRoot -ChildPath '.vsts-ci'
+                $channelReleaseStagePath = Join-Path -Path $ciFolder -ChildPath "$($channelName)ReleaseStage.yml"
+                Write-Verbose -Verbose "releaseStage file: $channelReleaseStagePath"
+
+                if (!$channelsUsed.Contains($channelName))
+                {
+                    Write-Verbose -Verbose "channel was not in there already"
+                    # Note: channelGroup contains entry for a channels' regular and channel's test-deps images.
+                    # But, we want the releaseStage.yml to be 1 per channel, ie stableReleaseStage.yml
+                    $channelReleaseStageFileExists = Test-Path $channelReleaseStagePath
+                    if ($channelReleaseStageFileExists)
+                    {
+                        Remove-Item -Path $channelReleaseStagePath
+                    }
+                    New-Item -Type File -Path $channelReleaseStagePath
+    
+                    # Call method to write generic lines needed at start of releaseStage file
+                    Get-StartOfYamlPopulated -Channel $channelName -YamlFilePath $channelReleaseStagePath
+                    $channelsUsed.Add($channelName, $channelGroup.Values)
+                }
+
                 $osGroups = $channelGroup.Group | Group-Object -Property os
                 foreach ($osGroup in $osGroups) {
                     $osName = $osGroup.Name
@@ -628,19 +683,104 @@ End {
                             $jobName = $tag.Name -replace '-', '_'
                             if (-not $matrix.$channelName[$osName][$architectureName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
                                 $matrix.$channelName[$osName][$architectureName].Add($jobName, (ConvertTo-SortedDictionary -Hashtable @{
-                                    Channel           = $tag.Channel
-                                    ImageName         = $tag.Name
-                                    JobName           = $jobName
-                                    ContinueOnError   = $tag.ContinueOnError
-                                    EndOfLife         = $tag.EndOfLife
-                                    DistributionState = $tag.DistributionState
-                                    OsVersion         = $tag.OsVersion
+                                    Channel            = $tag.Channel
+                                    ImageName          = $tag.Name
+                                    ArtifactSuffixName = $tag.Name.ToString().Replace("\", "_").Replace("-","_")
+                                    JobName            = $jobName
+                                    ContinueOnError    = $tag.ContinueOnError
+                                    EndOfLife          = $tag.EndOfLife
+                                    DistributionState  = $tag.DistributionState
+                                    OsVersion          = $tag.OsVersion
                                     # azDevOps doesn't support arrays
-                                    TagList           = $tag.Tags -join ';'
-                                    IsLinux           = $tag.IsLinux
-                                    UseInCI           = $tag.UseInCI
-                                    Architecture      = $tag.Architecture
+                                    TagList            = $tag.Tags -join ';'
+                                    IsLinux            = $tag.IsLinux
+                                    UseInCI            = $tag.UseInCI
+                                    Architecture       = $tag.Architecture
                                 }))
+
+                                #perhaps write here
+                                Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    # keep
+    if ($GenerateMatrixJson.IsPresent) {
+        $matrix = @{ }
+        foreach ($repo in $tagGroups.Keys | Sort-Object) {
+            Write-Verbose -Verbose "repo: $repo"
+            $channelGroups = $tagGroups.$repo | Group-Object -Property Channel
+            Write-Verbose -Verbose "$($channelGroups.Name) $($channelGroups.Values)"
+            foreach($channelGroup in $channelGroups)
+            {
+                $channelName = $channelGroup.Name
+                Write-Verbose "generating $channelName json"
+                $ciFolder = Join-Path -Path $PSScriptRoot -ChildPath '.vsts-ci'
+                $channelReleaseStagePath = Join-Path -Path $ciFolder -ChildPath "$($channelName)ReleaseStage.yml"
+                Write-Verbose -Verbose "releaseStage file: $channelReleaseStagePath"
+
+                if (!$channelsUsed.Contains($channelName))
+                {
+                    Write-Verbose -Verbose "channel was not in there already"
+                    # Note: channelGroup contains entry for a channels' regular and channel's test-deps images.
+                    # But, we want the releaseStage.yml to be 1 per channel, ie stableReleaseStage.yml
+                    $channelReleaseStageFileExists = Test-Path $channelReleaseStagePath
+                    if ($channelReleaseStageFileExists)
+                    {
+                        Remove-Item -Path $channelReleaseStagePath
+                    }
+                    New-Item -Type File -Path $channelReleaseStagePath
+    
+                    # Call method to write generic lines needed at start of releaseStage file
+                    Get-StartOfYamlPopulated -Channel $channelName -YamlFilePath $channelReleaseStagePath
+                    $channelsUsed.Add($channelName, $channelGroup.Values)
+                }
+
+                $osGroups = $channelGroup.Group | Group-Object -Property os
+                foreach ($osGroup in $osGroups) {
+                    $osName = $osGroup.Name
+                    $architectureGroups = $osGroup.Group | Group-Object -Property Architecture
+                    foreach ($architectureGroup in $architectureGroups) {
+                        $architectureName = $architectureGroup.Name
+
+                        # Filter out subimages.  We cannot directly build subimages.
+                        foreach ($tag in $architectureGroup.Group | Where-Object { $_.Name -notlike '*/*' } | Sort-Object -Property dockerfile) {
+                            if (-not $matrix.ContainsKey($channelName)) {
+                                $matrix.Add($channelName, @{ })
+                            }
+
+                            if (-not $matrix.$channelName.ContainsKey($osName)) {
+                                $matrix.$channelName.Add($osName, @{ })
+                            }
+
+                            if (-not $matrix.$channelName.$osName.ContainsKey($architectureName)) {
+                                $matrix.$channelName.$osName.Add($architectureName, @{})
+                            }
+
+                            $jobName = $tag.Name -replace '-', '_'
+                            if (-not $matrix.$channelName[$osName][$architectureName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
+                                $matrix.$channelName[$osName][$architectureName].Add($jobName, (ConvertTo-SortedDictionary -Hashtable @{
+                                    Channel            = $tag.Channel
+                                    ImageName          = $tag.Name
+                                    ArtifactSuffixName = $tag.Name.ToString().Replace("\", "_").Replace("-","_")
+                                    JobName            = $jobName
+                                    ContinueOnError    = $tag.ContinueOnError
+                                    EndOfLife          = $tag.EndOfLife
+                                    DistributionState  = $tag.DistributionState
+                                    OsVersion          = $tag.OsVersion
+                                    # azDevOps doesn't support arrays
+                                    TagList            = $tag.Tags -join ';'
+                                    IsLinux            = $tag.IsLinux
+                                    UseInCI            = $tag.UseInCI
+                                    Architecture       = $tag.Architecture
+                                }))
+
+                                #perhaps write here
+                                Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
                             }
                         }
                     }

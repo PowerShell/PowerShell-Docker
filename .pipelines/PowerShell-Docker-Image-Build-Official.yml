@@ -1,0 +1,139 @@
+# This Yaml Document has been converted by ESAI Yaml Pipeline Conversion Tool.
+# Please make sure to check all the converted content, it is your team's responsibility to make sure that the pipeline is still valid and functions as expected.
+# This pipeline will be extended to the OneBranch template
+name: PSDocker-Build-$(Build.BuildId)-s_$(stableReleaseTag)_p_$(previewReleaseTag)_l_$(ltsReleaseTag)$(Rev:_rr)
+trigger: none
+parameters:
+- name: 'previewReleaseTag'
+  default: 'v7.4.0-preview.5'
+- name: 'ltsReleaseTag'
+  default: 'v7.2.12'
+- name: 'stableReleaseTag'
+  default: 'v7.3.5'
+variables:
+- name: POWERSHELL_TELEMETRY_OPTOUT
+  value: 1
+- name: DOCKER_RELEASE
+  value: true
+- name: previewReleaseTag
+  value: ${{ parameters.previewReleaseTag }}
+- name: ltsReleaseTag
+  value: ${{ parameters.ltsReleaseTag }}
+- name: stableReleaseTag
+  value: ${{ parameters.stableReleaseTag }}
+- name: previewChannelPath
+  value: ''
+- name: ltsChannelPath
+  value: ''
+- name: stableChannelPath
+  value: ''
+- name: runCodesignValidationInjection
+  value: false
+- name: DisableDockerDetector
+  value: true
+- name: LinuxContainerImage
+  value: mcr.microsoft.com/onebranch/cbl-mariner/build:2.0
+- name: WindowsContainerImage
+  value: onebranch.azurecr.io/windows/ltsc2019/vse2022:latest
+- name: ob_sdl_sbom_enabled
+  value: true
+- name: ob_signing_setup_enabled
+  value: true
+#CodeQL tasks added manually to workaround signing failures
+- name: ob_sdl_codeql_compiled_enabled
+  value: false
+resources:
+  repositories:
+  - repository: onebranchTemplates
+    type: git
+    name: OneBranch.Pipelines/GovernedTemplates
+    ref: refs/heads/main
+extends:
+  template: v2/OneBranch.Official.CrossPlat.yml@onebranchTemplates
+  parameters:
+    featureFlags:
+      runHostSDL: true
+    customTags: 'ES365AIMigrationTooling-BulkMigrated'
+    stages:
+    - stage: StageResolveVersionandYaml
+      displayName: Resolve Versions and Populate Channel Based Yamls
+      jobs:
+      - job: JobResolveVersions
+        displayName: Resolve Versions
+        condition: succeededOrFailed()
+        variables:
+        - name: ob_outputDirectory
+          value: '$(Build.ArtifactStagingDirectory)/ONEBRANCH_ARTIFACT'
+        - name: repoRoot
+          value: $(Build.SourcesDirectory)
+        - name: ob_sdl_tsa_configFile
+          value: $(Build.SourcesDirectory)\.config\tsaoptions.json
+        - name: signSrcPath
+          value: $(repoRoot)/out
+        - name: ob_sdl_sbom_enabled
+          value: false
+        - name: ob_signing_setup_enabled
+          value: true
+        #CodeQL tasks added manually to workaround signing failures
+        - name: ob_sdl_codeql_compiled_enabled
+          value: false
+        pool:
+          timeoutInMinutes: 30
+          type: windows
+        steps:
+        - pwsh: |
+            if (-not (Test-Path $(repoRoot)/.config/tsaoptions.json)) {
+              Get-ChildItem $(Build.SourcesDirectory) -recurse -ErrorAction SilentlyContinue
+              throw "tsaoptions.json does not exist under $(repoRoot)/.config"
+            }
+          displayName: Test if tsaoptions.json exists
+        - pwsh: |
+            if ($env:PREVIEWRELEASETAG -notmatch '^v\d+\.\d+\.\d+-(preview|rc)\.\d+$') {
+              throw "preview release tag is not for a preview build: '${env:PREVIEWRELEASETAG}'"
+            }
+          displayName: stop build if preview release tag does not match preview format
+        - pwsh: |
+            if ($env:STABLERELEASETAG -notmatch '^v\d+\.\d+\.\d+$') {
+              throw "stable release tag is not for a stable build: '${env:STABLERELEASETAG}'"
+            }
+          displayName: stop build if stable release tag does not match stable format
+        - pwsh: |
+            if ($env:LTSRELEASETAG -notmatch '^v\d+\.\d+\.\d+$') {
+              throw "LTS release tag is not for a stable build: '${env:LTSRELEASETAG}'"
+            }
+          displayName: stop build if LTS release tag does not match stable format
+        - pwsh: |
+            $toolsFolderPath = Join-Path -Path $(repoRoot) -ChildPath 'tools'
+            $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
+            $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
+            Import-Module $buildHelperModulePath
+            $channelsInfo = Get-ChannelData
+            if ($channelsInfo)
+            {
+              foreach ($channelEntry in $channelsInfo)
+              {
+                if ($($channelEntry.Name) -eq "stable")
+                {
+                  $stablePath = $($channelEntry.Path)
+                  Write-Host "##vso[task.setvariable variable=stableChannelPath;isOutput=true]$stablePath"
+                }
+                elseif ($($channelEntry.Name) -eq "preview")
+                {
+                  $previewPath = $($channelEntry.Path)
+                  Write-Host "##vso[task.setvariable variable=previewChannelPath;isOutput=true]$previewPath"
+                }
+                elseif ($($channelEntry.Name) -eq "lts")
+                {
+                  $ltsPath = $($channelEntry.Path)
+                  Write-Host "##vso[task.setvariable variable=ltsChannelPath;isOutput=true]$ltsPath"
+                }
+              }
+            }
+          displayName: 'Get Channel path info'
+        - pwsh: |
+            Get-ChildItem env: | Out-String -Width 1000
+          displayName: 'Capture Environment'
+    - template: /.vsts-ci/stableReleaseStage.yml@self
+      parameters:
+        channel: stable
+        channelPath: 'release/7-4'

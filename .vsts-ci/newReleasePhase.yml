@@ -66,11 +66,12 @@ jobs:
   - pwsh: |
       $finalImageName = '${{ parameters.imageName }}'
       $finalContextFolder = 'docker'
-      $testDepsString = 'test-deps'
+      $testDepsString = 'test_deps'
+      $testDepsFolderName = 'test-deps'
       if ($finalImageName.Contains($testDepsString))
       {
         $finalImageName = $finalImageName.TrimEnd("\$testDepsString")
-        $finalContextFolder = Join-Path -Path $testDepsString -ChildPath $finalContextFolder
+        $finalContextFolder = Join-Path -Path $testDepsFolderName -ChildPath $finalContextFolder
       }
       $pathToContextFolder = "${{ parameters.channelPath }}/$finalImageName/$finalContextFolder"
       $hostVersionValue = ''
