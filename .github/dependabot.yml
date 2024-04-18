@@ -3,31 +3,11 @@ version: 2
 # update_schedule: live is not supported by docker
 
   - package-ecosystem: "docker"
-    directory: "/release/7-3/alpine314/docker"
+    directory: "/release/*"
     schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "docker"
-    directory: "/release/7-3/centos8/dependabot"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "docker"
-    directory: "/release/7-3/debian11/dependabot"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "docker"
-    directory: "/release/7-3/nanoserver20H2/dependabot"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "docker"
-    directory: "/release/7-3/ubuntu20.04/docker"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "docker"
-    directory: "/release/community-stable/oraclelinux/docker"
+      interval: "daily"
+      
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
       interval: "weekly"
