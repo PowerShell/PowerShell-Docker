@@ -4,7 +4,7 @@ parameters:
   - name: 'previewReleaseTag'
     default: 'v7.5.0-preview.2'
   - name: 'ltsReleaseTag'
-    default: 'v7.4.1'
+    default: 'v7.2.19'
   - name: 'stableReleaseTag'
     default: 'v7.4.1'
 
