@@ -12,6 +12,7 @@ on:
       stableReleaseTag:
         description: 'release tag for stable'
         required: true
+  pull_request:
 
 defaults:
   run:
