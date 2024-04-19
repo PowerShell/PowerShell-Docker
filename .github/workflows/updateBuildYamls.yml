@@ -1,0 +1,55 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
+name: Update Channel Based ReleaseStage Yaml Files
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      stableReleaseTag:
+        description: 'release tag for stable'
+        required: true
+
+defaults:
+  run:
+    shell: pwsh
+jobs:
+  update-yaml-stable:
+    name: Update ReleaseStageYaml for Stable Channel
+    timeout-minutes: 15
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Validate Version Syntax
+        run: |
+          $stableValue = ${{ inputs.stableReleaseTag }}
+          if ($stableValue-notmatch '^v\d+\.\d+\.\d+$') {
+            throw "stable release tag is not for a stable build: '$stableValue'"
+          }
+      - name: Update ReleaseStageYaml file
+        run: |
+          $toolsFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath 'tools'
+          $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
+          $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
+          Import-Module $buildHelperModulePath
+          ./build.ps1 -GenerateMatrixJson -Channel stable -Verbose -Acr All -OsFilter All
+      - name: Create Pull Request
+        if: github.event_name == 'workflow_dispatch'
+        id: cpr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: "${{ secrets.PR_PAT }}"
+          commit-message: "Update the stableReleaseStage yaml file"
+          committer: PwshBot <pwshbot@microsoft.com>
+          author: PwshBot <pwshbot@microsoft.com>
+          title: "Update the stableReleaseStage json"
+          base: master
+          draft: false
+          branch: update-matrix-json
+          push-to-fork: pwshBot/PowerShell-Docker
