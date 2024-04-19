@@ -29,8 +29,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Validate Version Syntax
         run: |
-          $stableValue = ${{ inputs.stableReleaseTag }}
-          if ($stableValue-notmatch '^v\d+\.\d+\.\d+$') {
+          $stableValue = '${{ inputs.stableReleaseTag }}'
+          if ($stableValue -notmatch '^v\d+\.\d+\.\d+$') {
             throw "stable release tag is not for a stable build: '$stableValue'"
           }
       - name: Update ReleaseStageYaml file
