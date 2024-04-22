@@ -192,8 +192,7 @@ class DockerImageMetaData {
                 $this.OsVersion = $this.OsVersion + ' (In Validation)'
             }
             'EndOfLife' {
-                # add this back if we get the EOL information to be accurate
-                # $this.OsVersion = $this.OsVersion + ' (End of Life)'
+                $this.OsVersion = $this.OsVersion + ' (End of Life)'
             }
         }
     }
@@ -1029,4 +1028,90 @@ Function ConvertTo-SortedDictionary {
         $sortedDictionary.Add($key, $Hashtable[$key])
     }
     return $sortedDictionary
+}
+
+function Get-StartOfYamlPopulated {
+    param(
+        [string]
+        $Channel,
+
+        [string]
+        $YamlFilePath
+    )
+
+    if (!$YamlFilePath)
+    {
+        throw "yaml file DNE"
+    }
+    
+    $doubleSpace = " "*2
+
+    Add-Content -Path $YamlFilePath -Value "parameters:"
+    Add-Content -Path $YamlFilePath -Value "- name: channel"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: 'preview'"
+    Add-Content -Path $YamlFilePath -Value "- name: channelPath"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: ''"
+    Add-Content -Path $YamlFilePath -Value "- name: vmImage" #not sure if this is needed really
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: PSMMSUbuntu20.04-Secure"
+    Add-Content -Path $YamlFilePath -Value "stages:"
+    Add-Content -Path $YamlFilePath -Value "- stage: StageGenerateBuild_$Channel"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)dependsOn: ['StageResolveVersionandYaml']"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)displayName: Build $Channel"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)jobs:"
+}
+
+function Get-TemplatePopulatedYaml {
+    param(
+        [string]
+        $YamlFilePath,
+
+        [psobject]
+        $ImageInfo
+    )
+
+    if (!$YamlFilePath)
+    {
+        throw "yaml file DNE"
+    }
+
+    $doubleSpace = " "*2
+    $fourSpace = " "*4
+    $sixSpace = " "*6
+
+    $imageName = $ImageInfo.Name
+    $artifactSuffix = $ImageInfo.Name.ToString().Replace("\", "_").Replace("-","_")
+    $architecture = $ImageInfo.Architecture
+    $poolOS = $ImageInfo.IsLinux ? "linux" : "windows"
+    $archBasedJobName = "Build_$($poolOS)_$($architecture)"
+
+    if ($architecture -eq "arm32")
+    {
+        $architecture = "arm64" # we need to use hostArchicture arm64 for pool for arm32
+    }
+
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)- template: /.vsts-ci/newReleasePhase.yml@self" #this is where for loop should begin
+    Add-Content -Path $YamlFilePath -Value "$($fourSpace)parameters:"
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)archName: '$archBasedJobName'" #Build_Linux_arm32
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)imageName: $imageName" # differs from artifactSuffix for test deps image names
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)artifactSuffix: $artifactSuffix"
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolOS: '$poolOS'"
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolHostArchitecture: '$architecture'"
+    if ($poolOS -eq "linux")
+    {
+        # only need to specify buildKitValue set to 1 for linux
+        Add-Content -Path $YamlFilePath -Value "$($sixSpace)buildKitValue: 1"
+    }
+    else
+    {
+        if ($imageName -contains "2022")
+        {
+            Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolHostVersion: '1ESWindows2022'"
+            Add-Content -Path $YamlFilePath -Value "$($sixSpace)windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'"
+        }
+
+        Add-Content -Path $YamlFilePath -Value "$($sixSpace)maxParallel: 3"#do we really need?
+    }
+
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)channel: `${{ parameters.channel }}"
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)channelPath: `${{ parameters.channelPath }}"
 }
