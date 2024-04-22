@@ -44,12 +44,12 @@ jobs:
             }
 
             Write-Verbose -Verbose "echo here"
-            echo "STABLE_VERSION=$stableValue" >> "$GITHUB_OUTPUT"
+            echo "STABLE_VERSION=$stableValue" >> $env:GITHUB_OUTPUT
           }
           else
           {
             $stableValue = ''
-            echo "STABLE_VERSION=$stableValue" >> "$GITHUB_OUTPUT"
+            echo "STABLE_VERSION=$stableValue" >> $env:GITHUB_OUTPUT
           }
 
           $previewValue = '${{ inputs.previewReleaseTag }}'
@@ -59,12 +59,12 @@ jobs:
               throw "preview release tag is not for a preview build: '$previewValue'"
             }
 
-            echo "PREVIEW_VERSION=$previewValue" >> "$GITHUB_OUTPUT"
+            echo "PREVIEW_VERSION=$previewValue" >> $env:GITHUB_OUTPUT
           }
           else
           {
             $previewValue = ''
-            echo "PREVIEW_VERSION=$previewValue" >> $GITHUB_OUTPUT
+            echo "PREVIEW_VERSION=$previewValue" >> $env:GITHUB_OUTPUT
           }
 
           $ltsValue = '${{ inputs.ltsReleaseTag }}'
@@ -74,12 +74,12 @@ jobs:
               throw "lts release tag is not for a lts build: '$ltsValue'"
             }
 
-            echo "LTS_VERSION=$ltsValue" >> $GITHUB_OUTPUT
+            echo "LTS_VERSION=$ltsValue" >> $env:GITHUB_OUTPUT
           }
           else
           {
             $ltsValue = ''
-            echo "LTS_VERSION=$ltsValue" >> $GITHUB_OUTPUT
+            echo "LTS_VERSION=$ltsValue" >> $env:GITHUB_OUTPUT
           }
       - name: Update ReleaseStageYaml file for Stable
         env:
