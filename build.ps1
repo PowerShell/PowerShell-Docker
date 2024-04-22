@@ -600,9 +600,7 @@ End {
     if ($UpdateBuildYaml.IsPresent) {
         $matrix = @{ }
         foreach ($repo in $tagGroups.Keys | Sort-Object) {
-            Write-Verbose -Verbose "repo: $repo"
             $channelGroups = $tagGroups.$repo | Group-Object -Property Channel
-            Write-Verbose -Verbose "$($channelGroups.Name) $($channelGroups.Values)"
             foreach($channelGroup in $channelGroups)
             {
                 $channelName = $channelGroup.Name
@@ -613,9 +611,8 @@ End {
 
                 if (!$channelsUsed.Contains($channelName))
                 {
-                    Write-Verbose -Verbose "channel was not in there already"
                     # Note: channelGroup contains entry for a channels' regular and channel's test-deps images.
-                    # But, we want the releaseStage.yml to be 1 per channel, ie stableReleaseStage.yml
+                    # But, we only want 1 <channel>ReleaseStage.yml file to be created per channel (ie 1 stableReleaseStage.yml)
                     $channelReleaseStageFileExists = Test-Path $channelReleaseStagePath
                     if ($channelReleaseStageFileExists)
                     {
@@ -623,7 +620,7 @@ End {
                     }
                     New-Item -Type File -Path $channelReleaseStagePath
     
-                    # Call method to write generic lines needed at start of releaseStage file
+                    # Note: only populate the start of the <channel>ReleaseStage.yml file once per channel
                     Get-StartOfYamlPopulated -Channel $channelName -YamlFilePath $channelReleaseStagePath
                     $channelsUsed.Add($channelName, $channelGroup.Values)
                 }
@@ -667,7 +664,7 @@ End {
                                     Architecture       = $tag.Architecture
                                 }))
 
-                                #perhaps write here
+                                # Call method to write the part of the yaml file that is unique for each image based template call.
                                 Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
                             }
                         }
