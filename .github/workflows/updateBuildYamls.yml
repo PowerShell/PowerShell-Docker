@@ -9,14 +9,14 @@ permissions:
 on:
   workflow_dispatch:
     inputs:
-      stableReleaseTag:
-        description: 'release tag for stable'
+      stableVersion:
+        description: 'stable release version (i.e: 7.4.1)'
         required: false
-      previewReleaseTag:
-        description: 'release tag for preview'
+      previewVersion:
+        description: 'preview release version (i.e: 7.4.0-preview.5)'
         required: false
-      ltsReleaseTag:
-        description: 'release tag for lts'
+      ltsVersion:
+        description: 'lts release version (i.e: 7.2.12)'
         required: false
   pull_request:
 
@@ -36,7 +36,7 @@ jobs:
       - name: Validate Version Syntax
         id: validate-version
         run: |
-          $stableValue = '${{ inputs.stableReleaseTag }}'
+          $stableValue = '${{ inputs.stableVersion }}'
           if (!($stableValue -eq ""))
           {
             if ($stableValue -notmatch '\d+\.\d+\.\d+$') {
@@ -44,7 +44,7 @@ jobs:
             }
           }
 
-          $previewValue = '${{ inputs.previewReleaseTag }}'
+          $previewValue = '${{ inputs.previewVersion }}'
           if (!($previewValue -eq ""))
           {
             if ($previewValue -notmatch '\d+\.\d+\.\d+-(preview|rc)\.\d+$') {
@@ -52,7 +52,7 @@ jobs:
             }
           }
 
-          $ltsValue = '${{ inputs.ltsReleaseTag }}'
+          $ltsValue = '${{ inputs.ltsVersion }}'
           if (!($ltsValue -eq ""))
           {
             if ($ltsValue -notmatch '\d+\.\d+\.\d+$') {
@@ -61,7 +61,7 @@ jobs:
           }
       - name: Update ReleaseStageYaml file for Stable
         run: |
-          $stableValue = '${{ inputs.stableReleaseTag }}'
+          $stableValue = '${{ inputs.stableVersion }}'
           $toolsFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath 'tools'
           $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
           $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
@@ -74,34 +74,34 @@ jobs:
           else
           {
             # Use the version from channels.json when no version is provided
-            Write-Verbose -Verbose "not using stable version from input as value was $stableValue"
             ./build.ps1 -UpdateBuildYaml -Channel stable -Verbose -Acr All -OsFilter All
           }
       - name: Update ReleaseStageYaml file for Preview
         run: |
-          $previewValue = '${{ inputs.previewReleaseTag }}'
+          $previewValue = '${{ inputs.previewVersion }}'
           $toolsFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath 'tools'
           $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
           $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
           Import-Module $buildHelperModulePath
           if (!($previewValue -eq ""))
           {
+            Write-Verbose -Verbose "using preview version: $previewValue"
             ./build.ps1 -UpdateBuildYaml -Channel preview -PreviewVersion $previewValue -Verbose -Acr All -OsFilter All
           }
           else
           {
-            # Use the version from channels.json when no version is provided
             ./build.ps1 -UpdateBuildYaml -Channel preview -Verbose -Acr All -OsFilter All
           }
       - name: Update ReleaseStageYaml file for LTS
         run: |
-          $ltsValue = '${{ inputs.ltsReleaseTag }}'
+          $ltsValue = '${{ inputs.ltsVersion }}'
           $toolsFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath 'tools'
           $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
           $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
           Import-Module $buildHelperModulePath
           if (!($ltsValue -eq ""))
           {
+            Write-Verbose -Verbose "using lts version: $ltsValue"
             ./build.ps1 -UpdateBuildYaml -Channel lts -LtsVersion $ltsValue -Verbose -Acr All -OsFilter All
           }
           else
