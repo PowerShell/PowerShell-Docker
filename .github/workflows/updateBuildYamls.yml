@@ -54,7 +54,7 @@ jobs:
           $previewValue = '${{ inputs.previewReleaseTag }}'
           if (!($previewValue -eq ""))
           {
-            if ($previewValue -notmatch '^v\d+\.\d+\.\d+$') {
+            if ($previewValue -notmatch '^v\d+\.\d+\.\d+-(preview|rc)\.\d+$') {
               throw "preview release tag is not for a preview build: '$previewValue'"
             }
 
