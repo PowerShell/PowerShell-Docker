@@ -684,7 +684,7 @@ End {
             foreach($channelGroup in $channelGroups)
             {
                 $channelName = $channelGroup.Name
-                Write-Verbose "generating $channelName json for $($channelGroup.Values)"
+                Write-Verbose "generating $channelName json for $($channelGroup.Values) for $repo"
                 $ciFolder = Join-Path -Path $PSScriptRoot -ChildPath '.vsts-ci'
                 $channelReleaseStagePath = Join-Path -Path $ciFolder -ChildPath "$($channelName)ReleaseStage.yml"
                 Write-Verbose -Verbose "releaseStage file: $channelReleaseStagePath"
