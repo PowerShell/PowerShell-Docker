@@ -37,7 +37,7 @@ jobs:
         id: validateversion
         run: |
           $stableValue = '${{ inputs.stableReleaseTag }}'
-          if (!($stableValue -not -eq ""))
+          if (!($stableValue -eq ""))
           {
             if ($stableValue -notmatch '^v\d+\.\d+\.\d+$') {
               throw "stable release tag is not for a stable build: '$stableValue'"
@@ -52,7 +52,7 @@ jobs:
           }
 
           $previewValue = '${{ inputs.previewReleaseTag }}'
-          if (!($previewValue -not -eq ""))
+          if (!($previewValue -eq ""))
           {
             if ($previewValue -notmatch '^v\d+\.\d+\.\d+$') {
               throw "preview release tag is not for a preview build: '$previewValue'"
@@ -67,7 +67,7 @@ jobs:
           }
 
           $ltsValue = '${{ inputs.ltsReleaseTag }}'
-          if (!($ltsValue -not -eq ""))
+          if (!($ltsValue -eq ""))
           {
             if ($ltsValue -notmatch '^v\d+\.\d+\.\d+$') {
               throw "lts release tag is not for a lts build: '$ltsValue'"
