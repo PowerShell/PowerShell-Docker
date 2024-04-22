@@ -684,7 +684,7 @@ End {
             foreach($channelGroup in $channelGroups)
             {
                 $channelName = $channelGroup.Name
-                Write-Verbose "generating $channelName json"
+                Write-Verbose "generating $channelName json for $($channelGroup.Values)"
                 $ciFolder = Join-Path -Path $PSScriptRoot -ChildPath '.vsts-ci'
                 $channelReleaseStagePath = Join-Path -Path $ciFolder -ChildPath "$($channelName)ReleaseStage.yml"
                 Write-Verbose -Verbose "releaseStage file: $channelReleaseStagePath"
@@ -745,6 +745,7 @@ End {
                                 }))
 
                                 # Call method to write the part of the yaml file that is unique for each image based template call.
+                                Write-Verbose -Verbose "calling method to populate yaml for $channelName for $($channelGroup.Values)"
                                 Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
                             }
                         }
