@@ -691,6 +691,7 @@ End {
 
                 if (!$channelsUsed.Contains($channelName))
                 {
+                    Write-Verbose "newly seen channel"
                     # Note: channelGroup contains entry for a channels' regular and channel's test-deps images.
                     # But, we only want 1 <channel>ReleaseStage.yml file to be created per channel (ie 1 stableReleaseStage.yml)
                     $channelReleaseStageFileExists = Test-Path $channelReleaseStagePath
@@ -708,12 +709,18 @@ End {
                 $osGroups = $channelGroup.Group | Group-Object -Property os
                 foreach ($osGroup in $osGroups) {
                     $osName = $osGroup.Name
+                    Write-Verbose -Verbose "osName: $osName"
                     $architectureGroups = $osGroup.Group | Group-Object -Property Architecture
                     foreach ($architectureGroup in $architectureGroups) {
                         $architectureName = $architectureGroup.Name
 
+                        foreach ($tag in $architectureGroup.Group | Where-Object { $_.Name -like '*/*' } | Sort-Object -Property dockerfile) {
+                            Write-Verbose -Verbose "tag name: $($tag.Name)"
+                        }
+
                         # Filter out subimages.  We cannot directly build subimages.
                         foreach ($tag in $architectureGroup.Group | Where-Object { $_.Name -notlike '*/*' } | Sort-Object -Property dockerfile) {
+                            Write-Verbose -Verbose "filtered in name: $($tag.Name)"
                             if (-not $matrix.ContainsKey($channelName)) {
                                 $matrix.Add($channelName, @{ })
                             }
