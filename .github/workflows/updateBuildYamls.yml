@@ -11,7 +11,13 @@ on:
     inputs:
       stableReleaseTag:
         description: 'release tag for stable'
-        required: true
+        required: false
+      previewReleaseTag:
+        description: 'release tag for preview'
+        required: false
+      ltsReleaseTag:
+        description: 'release tag for lts'
+        required: false
   pull_request:
 
 defaults:
@@ -28,22 +34,103 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Validate Version Syntax
+        id: validateversion
         run: |
           $stableValue = '${{ inputs.stableReleaseTag }}'
-          if ($stableValue -notmatch '^v\d+\.\d+\.\d+$') {
-            throw "stable release tag is not for a stable build: '$stableValue'"
+          if (!($stableValue -not -eq ""))
+          {
+            if ($stableValue -notmatch '^v\d+\.\d+\.\d+$') {
+              throw "stable release tag is not for a stable build: '$stableValue'"
+            }
+
+            echo "stableVersion=$stableValue" >> $GITHUB_OUTPUT
           }
-      - name: Update ReleaseStageYaml file
+          else
+          {
+            $stableValue = ''
+            echo "stableVersion=$stableValue" >> $GITHUB_OUTPUT
+          }
+
+          $previewValue = '${{ inputs.previewReleaseTag }}'
+          if (!($previewValue -not -eq ""))
+          {
+            if ($previewValue -notmatch '^v\d+\.\d+\.\d+$') {
+              throw "preview release tag is not for a preview build: '$previewValue'"
+            }
+
+            echo "previewVersion=$previewValue" >> $GITHUB_OUTPUT
+          }
+          else
+          {
+            $previewValue = ''
+            echo "previewVersion=$previewValue" >> $GITHUB_OUTPUT
+          }
+
+          $ltsValue = '${{ inputs.ltsReleaseTag }}'
+          if (!($ltsValue -not -eq ""))
+          {
+            if ($ltsValue -notmatch '^v\d+\.\d+\.\d+$') {
+              throw "lts release tag is not for a lts build: '$ltsValue'"
+            }
+
+            echo "ltsVersion=$ltsValue" >> $GITHUB_OUTPUT
+          }
+          else
+          {
+            $ltsValue = ''
+            echo "ltsVersion=$ltsValue" >> $GITHUB_OUTPUT
+          }
+      - name: Update ReleaseStageYaml file for Stable
         run: |
           $toolsFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath 'tools'
           $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
           $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
           Import-Module $buildHelperModulePath
-          ./build.ps1 -GenerateMatrixJson -Channel stable -Verbose -Acr All -OsFilter All
+          if (!${{ steps.validateversion.outputs.stableVersion }})
+          {
+            ./build.ps1 -UpdateBuildYaml -Channel stable -StableVersion ${{ steps.validateversion.outputs.stableVersion }} -Verbose -Acr All -OsFilter All
+          }
+          else
+          {
+            # Use the version from channels.json when no version is provided
+            ./build.ps1 -UpdateBuildYaml -Channel stable -Verbose -Acr All -OsFilter All
+          }
+      - name: Update ReleaseStageYaml file for Preview
+        run: |
+          $toolsFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath 'tools'
+          $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
+          $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
+          Import-Module $buildHelperModulePath
+          if (!${{ steps.validateversion.outputs.previewVersion }})
+          {
+            ./build.ps1 -UpdateBuildYaml -Channel preview -PreviewVersion ${{ steps.validateversion.outputs.previewVersion }} -Verbose -Acr All -OsFilter All
+          }
+          else
+          {
+            # Use the version from channels.json when no version is provided
+            ./build.ps1 -UpdateBuildYaml -Channel preview -Verbose -Acr All -OsFilter All
+          }
+      - name: Update ReleaseStageYaml file for LTS
+        run: |
+          $toolsFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath 'tools'
+          $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
+          $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
+          Import-Module $buildHelperModulePath
+          if (!${{ steps.validateversion.outputs.ltsVersion }})
+          {
+            ./build.ps1 -UpdateBuildYaml -Channel lts -LtsVersion ${{ steps.validateversion.outputs.ltsVersion }} -Verbose -Acr All -OsFilter All
+          }
+          else
+          {
+            # Use the version from channels.json when no version is provided
+            ./build.ps1 -UpdateBuildYaml -Channel lts -Verbose -Acr All -OsFilter All
+          }
       - name: View Updated Files Content
         run: |
           $ciFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath '.vsts-ci'
           $releaseStageFilePath = Join-Path -Path $ciFolderPath -ChildPath 'stableReleaseStage.yml'
+          $content = Get-Content -Path $releaseStageFilePath
+          Write-Verbose -Verbose $content
       - name: Create Pull Request
         if: github.event_name == 'workflow_dispatch'
         id: cpr
