@@ -745,7 +745,7 @@ End {
                                 }))
 
                                 # Call method to write the part of the yaml file that is unique for each image based template call.
-                                Write-Verbose -Verbose "calling method to populate yaml for $channelName for $($channelGroup.Values)"
+                                Write-Verbose -Verbose "calling method to populate yaml for $channelName for $($channelGroup.Values) for $($tag.Name)"
                                 Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
                             }
                         }
