@@ -748,6 +748,10 @@ End {
                                 Write-Verbose -Verbose "calling method to populate yaml for $channelName for $($channelGroup.Values) for $($tag.Name)"
                                 Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
                             }
+                            else
+                            {
+                                Write-Verbose -Verbose "NOT calling method to populate yaml for $channelName for $($channelGroup.Values) for $($tag.Name)"
+                            }
                         }
                     }
                 }
