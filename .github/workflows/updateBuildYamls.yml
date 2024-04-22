@@ -133,7 +133,10 @@ jobs:
           $ciFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath '.vsts-ci'
           $releaseStageFilePath = Join-Path -Path $ciFolderPath -ChildPath 'stableReleaseStage.yml'
           $content = Get-Content -Path $releaseStageFilePath
-          Write-Verbose -Verbose $content
+          for($i=0; $i<$content.Length;$i++)
+          {
+            Write-Verbose -Verbose $content[$i]
+          }
       - name: Create Pull Request
         if: github.event_name == 'workflow_dispatch'
         id: cpr
