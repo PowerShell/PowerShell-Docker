@@ -34,6 +34,10 @@ param(
     [switch]
     $GenerateMatrixJson,
 
+    [Parameter(Mandatory, ParameterSetName="UpdateBuildYaml")]
+    [switch]
+    $UpdateBuildYaml,
+
     [Parameter(ParameterSetName="GenerateMatrixJson")]
     [switch]
     $FullJson,
