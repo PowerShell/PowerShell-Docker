@@ -596,6 +596,61 @@ End {
         }
     }
 
+    if ($GenerateMatrixJson.IsPresent) {
+        $matrix = @{ }
+        foreach ($repo in $tagGroups.Keys | Sort-Object) {
+            $channelGroups = $tagGroups.$repo | Group-Object -Property Channel
+            foreach($channelGroup in $channelGroups)
+            {
+                $channelName = $channelGroup.Name
+                Write-Verbose "generating $channelName json"
+
+                $osGroups = $channelGroup.Group | Group-Object -Property os
+                foreach ($osGroup in $osGroups) {
+                    $osName = $osGroup.Name
+                    $architectureGroups = $osGroup.Group | Group-Object -Property Architecture
+                    foreach ($architectureGroup in $architectureGroups) {
+                        $architectureName = $architectureGroup.Name
+
+                        # Filter out subimages.  We cannot directly build subimages.
+                        foreach ($tag in $architectureGroup.Group | Where-Object { $_.Name -notlike '*/*' } | Sort-Object -Property dockerfile) {
+                            if (-not $matrix.ContainsKey($channelName)) {
+                                $matrix.Add($channelName, @{ })
+                            }
+
+                            if (-not $matrix.$channelName.ContainsKey($osName)) {
+                                $matrix.$channelName.Add($osName, @{ })
+                            }
+
+                            if (-not $matrix.$channelName.$osName.ContainsKey($architectureName)) {
+                                $matrix.$channelName.$osName.Add($architectureName, @{})
+                            }
+
+                            $jobName = $tag.Name -replace '-', '_'
+                            if (-not $matrix.$channelName[$osName][$architectureName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
+                                $matrix.$channelName[$osName][$architectureName].Add($jobName, (ConvertTo-SortedDictionary -Hashtable @{
+                                    Channel            = $tag.Channel
+                                    ImageName          = $tag.Name
+                                    ArtifactSuffixName = $tag.Name.ToString().Replace("\", "_").Replace("-","_")
+                                    JobName            = $jobName
+                                    ContinueOnError    = $tag.ContinueOnError
+                                    EndOfLife          = $tag.EndOfLife
+                                    DistributionState  = $tag.DistributionState
+                                    OsVersion          = $tag.OsVersion
+                                    # azDevOps doesn't support arrays
+                                    TagList            = $tag.Tags -join ';'
+                                    IsLinux            = $tag.IsLinux
+                                    UseInCI            = $tag.UseInCI
+                                    Architecture       = $tag.Architecture
+                                }))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     $channelsUsed = @{}
     if ($UpdateBuildYaml.IsPresent) {
         $matrix = @{ }
@@ -698,61 +753,6 @@ End {
         if($FullJson) {
             $matrixJson = $fullMatrix | ConvertTo-Json -Depth 100
             Write-Output $matrixJson
-        }
-    }
-
-    if ($GenerateMatrixJson.IsPresent) {
-        $matrix = @{ }
-        foreach ($repo in $tagGroups.Keys | Sort-Object) {
-            $channelGroups = $tagGroups.$repo | Group-Object -Property Channel
-            foreach($channelGroup in $channelGroups)
-            {
-                $channelName = $channelGroup.Name
-                Write-Verbose "generating $channelName json"
-
-                $osGroups = $channelGroup.Group | Group-Object -Property os
-                foreach ($osGroup in $osGroups) {
-                    $osName = $osGroup.Name
-                    $architectureGroups = $osGroup.Group | Group-Object -Property Architecture
-                    foreach ($architectureGroup in $architectureGroups) {
-                        $architectureName = $architectureGroup.Name
-
-                        # Filter out subimages.  We cannot directly build subimages.
-                        foreach ($tag in $architectureGroup.Group | Where-Object { $_.Name -notlike '*/*' } | Sort-Object -Property dockerfile) {
-                            if (-not $matrix.ContainsKey($channelName)) {
-                                $matrix.Add($channelName, @{ })
-                            }
-
-                            if (-not $matrix.$channelName.ContainsKey($osName)) {
-                                $matrix.$channelName.Add($osName, @{ })
-                            }
-
-                            if (-not $matrix.$channelName.$osName.ContainsKey($architectureName)) {
-                                $matrix.$channelName.$osName.Add($architectureName, @{})
-                            }
-
-                            $jobName = $tag.Name -replace '-', '_'
-                            if (-not $matrix.$channelName[$osName][$architectureName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
-                                $matrix.$channelName[$osName][$architectureName].Add($jobName, (ConvertTo-SortedDictionary -Hashtable @{
-                                    Channel            = $tag.Channel
-                                    ImageName          = $tag.Name
-                                    ArtifactSuffixName = $tag.Name.ToString().Replace("\", "_").Replace("-","_")
-                                    JobName            = $jobName
-                                    ContinueOnError    = $tag.ContinueOnError
-                                    EndOfLife          = $tag.EndOfLife
-                                    DistributionState  = $tag.DistributionState
-                                    OsVersion          = $tag.OsVersion
-                                    # azDevOps doesn't support arrays
-                                    TagList            = $tag.Tags -join ';'
-                                    IsLinux            = $tag.IsLinux
-                                    UseInCI            = $tag.UseInCI
-                                    Architecture       = $tag.Architecture
-                                }))
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 
