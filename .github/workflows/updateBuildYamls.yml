@@ -86,8 +86,8 @@ jobs:
           $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
           $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
           Import-Module $buildHelperModulePath
-          $stableVersion = '${{ steps.validateversion.outputs.stableVersion }}'
-          if (!($stableVersion -eq ""))
+          $stableVersionValue = '${{ steps.validateversion.outputs.stableVersion }}'
+          if (!($stableVersionValue -eq ""))
           {
             ./build.ps1 -UpdateBuildYaml -Channel stable -StableVersion ${{ steps.validateversion.outputs.stableVersion }} -Verbose -Acr All -OsFilter All
           }
@@ -102,7 +102,8 @@ jobs:
           $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
           $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
           Import-Module $buildHelperModulePath
-          if (!${{ steps.validateversion.outputs.previewVersion }})
+          $previewVersionValue = '${{ steps.validateversion.outputs.previewVersion }}'
+          if (!($previewVersionValue -eq ""))
           {
             ./build.ps1 -UpdateBuildYaml -Channel preview -PreviewVersion ${{ steps.validateversion.outputs.previewVersion }} -Verbose -Acr All -OsFilter All
           }
@@ -117,7 +118,8 @@ jobs:
           $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
           $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
           Import-Module $buildHelperModulePath
-          if (!${{ steps.validateversion.outputs.ltsVersion }})
+          $ltsVersionValue = '${{ steps.validateversion.outputs.ltsVersion }}'
+          if (!($ltsVersionValue -eq ""))
           {
             ./build.ps1 -UpdateBuildYaml -Channel lts -LtsVersion ${{ steps.validateversion.outputs.ltsVersion }} -Verbose -Acr All -OsFilter All
           }
