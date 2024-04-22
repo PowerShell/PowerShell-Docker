@@ -192,7 +192,8 @@ class DockerImageMetaData {
                 $this.OsVersion = $this.OsVersion + ' (In Validation)'
             }
             'EndOfLife' {
-                $this.OsVersion = $this.OsVersion + ' (End of Life)'
+                # add this back if we get the EOL information to be accurate
+                # $this.OsVersion = $this.OsVersion + ' (End of Life)'
             }
         }
     }
