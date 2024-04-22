@@ -89,11 +89,13 @@ jobs:
           $stableVersionValue = '${{ steps.validateversion.outputs.stableVersion }}'
           if (!($stableVersionValue -eq ""))
           {
+            Write-Verbose -Verbose "using stable version: $stableVersionValue"
             ./build.ps1 -UpdateBuildYaml -Channel stable -StableVersion ${{ steps.validateversion.outputs.stableVersion }} -Verbose -Acr All -OsFilter All
           }
           else
           {
             # Use the version from channels.json when no version is provided
+            Write-Verbose -Verbose "not using stable version from input"
             ./build.ps1 -UpdateBuildYaml -Channel stable -Verbose -Acr All -OsFilter All
           }
       - name: Update ReleaseStageYaml file for Preview
@@ -133,6 +135,7 @@ jobs:
           $ciFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath '.vsts-ci'
           $releaseStageFilePath = Join-Path -Path $ciFolderPath -ChildPath 'stableReleaseStage.yml'
           $content = Get-Content -Path $releaseStageFilePath
+          Write-Verbose -Verbose "length of content: $content.Length"
           for($i=0; $i -lt $content.Length;$i++)
           {
             Write-Verbose -Verbose $content[$i]
