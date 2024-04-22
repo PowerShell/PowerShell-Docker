@@ -1042,7 +1042,7 @@ function Get-StartOfYamlPopulated {
 
     if (!$YamlFilePath)
     {
-        throw "yaml file DNE"
+        throw "Yaml file $YamlFilePath provided as parameter cannot be found."
     }
     
     $doubleSpace = " "*2
@@ -1052,7 +1052,7 @@ function Get-StartOfYamlPopulated {
     Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: 'preview'"
     Add-Content -Path $YamlFilePath -Value "- name: channelPath"
     Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: ''"
-    Add-Content -Path $YamlFilePath -Value "- name: vmImage" #not sure if this is needed really
+    Add-Content -Path $YamlFilePath -Value "- name: vmImage"
     Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: PSMMSUbuntu20.04-Secure"
     Add-Content -Path $YamlFilePath -Value "stages:"
     Add-Content -Path $YamlFilePath -Value "- stage: StageGenerateBuild_$Channel"
@@ -1072,7 +1072,7 @@ function Get-TemplatePopulatedYaml {
 
     if (!$YamlFilePath)
     {
-        throw "yaml file DNE"
+        throw "Yaml file $YamlFilePath provided as parameter cannot be found."
     }
 
     $doubleSpace = " "*2
@@ -1090,16 +1090,16 @@ function Get-TemplatePopulatedYaml {
         $architecture = "arm64" # we need to use hostArchicture arm64 for pool for arm32
     }
 
-    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)- template: /.vsts-ci/newReleasePhase.yml@self" #this is where for loop should begin
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)- template: /.vsts-ci/newReleasePhase.yml@self"
     Add-Content -Path $YamlFilePath -Value "$($fourSpace)parameters:"
-    Add-Content -Path $YamlFilePath -Value "$($sixSpace)archName: '$archBasedJobName'" #Build_Linux_arm32
-    Add-Content -Path $YamlFilePath -Value "$($sixSpace)imageName: $imageName" # differs from artifactSuffix for test deps image names
-    Add-Content -Path $YamlFilePath -Value "$($sixSpace)artifactSuffix: $artifactSuffix"
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)archName: '$archBasedJobName'" # ie: Build_Linux_arm32
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)imageName: $imageName" # ie. imageName: alpine317\test-deps (since this differs from artifactSuffix for test-deps images only, we have a separate entry as the yaml param)
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)artifactSuffix: $artifactSuffix" # i.e artifactSuffix: alpine317_test_deps 
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolOS: '$poolOS'"
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolHostArchitecture: '$architecture'"
     if ($poolOS -eq "linux")
     {
-        # only need to specify buildKitValue set to 1 for linux
+        # only need to specify buildKitValue=1 for linux
         Add-Content -Path $YamlFilePath -Value "$($sixSpace)buildKitValue: 1"
     }
     else
@@ -1110,7 +1110,7 @@ function Get-TemplatePopulatedYaml {
             Add-Content -Path $YamlFilePath -Value "$($sixSpace)windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'"
         }
 
-        Add-Content -Path $YamlFilePath -Value "$($sixSpace)maxParallel: 3"#do we really need?
+        Add-Content -Path $YamlFilePath -Value "$($sixSpace)maxParallel: 3"
     }
 
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)channel: `${{ parameters.channel }}"

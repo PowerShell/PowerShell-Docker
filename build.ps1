@@ -678,118 +678,42 @@ End {
 
     $channelsUsed = @{}
     if ($UpdateBuildYaml.IsPresent) {
-        $matrix = @{ }
         foreach ($repo in $tagGroups.Keys | Sort-Object) {
             $channelGroups = $tagGroups.$repo | Group-Object -Property Channel
             foreach($channelGroup in $channelGroups)
             {
                 $channelName = $channelGroup.Name
-                Write-Verbose "generating $channelName json for $($channelGroup.Values) for $repo"
                 $ciFolder = Join-Path -Path $PSScriptRoot -ChildPath '.vsts-ci'
                 $channelReleaseStagePath = Join-Path -Path $ciFolder -ChildPath "$($channelName)ReleaseStage.yml"
-                Write-Verbose -Verbose "releaseStage file: $channelReleaseStagePath"
 
                 if (!$channelsUsed.Contains($channelName))
                 {
-                    Write-Verbose "newly seen channel"
                     # Note: channelGroup contains entry for a channels' regular and channel's test-deps images.
-                    # But, we only want 1 <channel>ReleaseStage.yml file to be created per channel (ie 1 stableReleaseStage.yml)
+                    # But, we only want 1 <channel>ReleaseStage.yml file to be created per channel (ie 1 stableReleaseStage.yml) so only populate start of yaml file once per channel.
                     $channelReleaseStageFileExists = Test-Path $channelReleaseStagePath
                     if ($channelReleaseStageFileExists)
                     {
                         Remove-Item -Path $channelReleaseStagePath
                     }
+
                     New-Item -Type File -Path $channelReleaseStagePath
     
-                    # Note: only populate the start of the <channel>ReleaseStage.yml file once per channel
                     Get-StartOfYamlPopulated -Channel $channelName -YamlFilePath $channelReleaseStagePath
                     $channelsUsed.Add($channelName, $channelGroup.Values)
                 }
 
                 $osGroups = $channelGroup.Group | Group-Object -Property os
                 foreach ($osGroup in $osGroups) {
-                    $osName = $osGroup.Name
-                    Write-Verbose -Verbose "osName: $osName"
                     $architectureGroups = $osGroup.Group | Group-Object -Property Architecture
                     foreach ($architectureGroup in $architectureGroups) {
-                        # $architectureName = $architectureGroup.Name
-
-                        # Filter out subimages.  We cannot directly build subimages.
+                        # Note: For each image to be built (including test-deps images) the <channel>ReleaseStage.yml file needs to have a template call for the image.
                         foreach ($tag in $architectureGroup.Group | Sort-Object -Property dockerfile) {
-                            # Call method to write the part of the yaml file that is unique for each image based template call.
-                            Write-Verbose -Verbose "calling method to populate yaml for $channelName for $($channelGroup.Values) for $($tag.Name)"
+                            Write-Verbose -Verbose "calling method to populate template call in yaml file for channel: $channelName for image: $($tag.Name)"
                             Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
-
-                            # Write-Verbose -Verbose "filtered in name: $($tag.Name)"
-                            # if (-not $matrix.ContainsKey($channelName)) {
-                            #     $matrix.Add($channelName, @{ })
-                            # }
-
-                            # if (-not $matrix.$channelName.ContainsKey($osName)) {
-                            #     $matrix.$channelName.Add($osName, @{ })
-                            # }
-
-                            # if (-not $matrix.$channelName.$osName.ContainsKey($architectureName)) {
-                            #     $matrix.$channelName.$osName.Add($architectureName, @{})
-                            # }
-
-                            # $jobName = $tag.Name -replace '-', '_'
-                            # if (-not $matrix.$channelName[$osName][$architectureName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
-                            #     $matrix.$channelName[$osName][$architectureName].Add($jobName, (ConvertTo-SortedDictionary -Hashtable @{
-                            #         Channel            = $tag.Channel
-                            #         ImageName          = $tag.Name
-                            #         ArtifactSuffixName = $tag.Name.ToString().Replace("\", "_").Replace("-","_")
-                            #         JobName            = $jobName
-                            #         ContinueOnError    = $tag.ContinueOnError
-                            #         EndOfLife          = $tag.EndOfLife
-                            #         DistributionState  = $tag.DistributionState
-                            #         OsVersion          = $tag.OsVersion
-                            #         # azDevOps doesn't support arrays
-                            #         TagList            = $tag.Tags -join ';'
-                            #         IsLinux            = $tag.IsLinux
-                            #         UseInCI            = $tag.UseInCI
-                            #         Architecture       = $tag.Architecture
-                            #     }))
-
-                            #     # Call method to write the part of the yaml file that is unique for each image based template call.
-                            #     Write-Verbose -Verbose "calling method to populate yaml for $channelName for $($channelGroup.Values) for $($tag.Name)"
-                            #     Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
-                            #}
-                            # else
-                            # {
-                            #     Write-Verbose -Verbose "NOT calling method to populate yaml for $channelName for $($channelGroup.Values) for $($tag.Name)"
-                            # }
                         }
                     }
                 }
             }
-        }
-
-        foreach ($channelName in $matrix.Keys | Sort-Object) {
-            $fullMatrix[$channelName] = @()
-            foreach ($osName in $matrix.$channelName.Keys | Sort-Object) {
-                $osMatrix = $matrix.$channelName.$osName
-                foreach ($architectureName in $osMatrix.Keys | Sort-Object) {
-                    $architectureMatrix = $osMatrix.$architectureName
-
-                $channelMatrix = [System.Collections.ArrayList]::new()
-                    $architectureMatrix.Values | Sort-Object -Property ImageName | ForEach-Object {
-                    $null = $channelMatrix.Add($_)
-                }
-                $fullMatrix[$channelName] += $channelMatrix
-                    $matrixJson = $architectureMatrix | ConvertTo-Json -Compress
-                    $variableName = "matrix_${channelName}_${osName}_${architectureName}"
-                if (!$FullJson) {
-                    Set-BuildVariable -Name $variableName -Value $matrixJson -IsOutput
-                        Write-Verbose -Verbose "*********END of JSON*********************"
-                    }
-                }
-            }
-        }
-
-        if($FullJson) {
-            $matrixJson = $fullMatrix | ConvertTo-Json -Depth 100
-            Write-Output $matrixJson
         }
     }
 
