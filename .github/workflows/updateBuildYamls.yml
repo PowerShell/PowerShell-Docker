@@ -86,7 +86,8 @@ jobs:
           $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
           $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
           Import-Module $buildHelperModulePath
-          if (!${{ steps.validateversion.outputs.stableVersion }})
+          $stableVersion = '${{ steps.validateversion.outputs.stableVersion }}'
+          if (!($stableVersion -eq ""))
           {
             ./build.ps1 -UpdateBuildYaml -Channel stable -StableVersion ${{ steps.validateversion.outputs.stableVersion }} -Verbose -Acr All -OsFilter All
           }
