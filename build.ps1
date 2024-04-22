@@ -712,53 +712,53 @@ End {
                     Write-Verbose -Verbose "osName: $osName"
                     $architectureGroups = $osGroup.Group | Group-Object -Property Architecture
                     foreach ($architectureGroup in $architectureGroups) {
-                        $architectureName = $architectureGroup.Name
-
-                        foreach ($tag in $architectureGroup.Group | Where-Object { $_.Name -like '*/*' } | Sort-Object -Property dockerfile) {
-                            Write-Verbose -Verbose "tag name: $($tag.Name)"
-                        }
+                        # $architectureName = $architectureGroup.Name
 
                         # Filter out subimages.  We cannot directly build subimages.
-                        foreach ($tag in $architectureGroup.Group | Where-Object { $_.Name -notlike '*/*' } | Sort-Object -Property dockerfile) {
-                            Write-Verbose -Verbose "filtered in name: $($tag.Name)"
-                            if (-not $matrix.ContainsKey($channelName)) {
-                                $matrix.Add($channelName, @{ })
-                            }
+                        foreach ($tag in $architectureGroup.Group | Sort-Object -Property dockerfile) {
+                            # Call method to write the part of the yaml file that is unique for each image based template call.
+                            Write-Verbose -Verbose "calling method to populate yaml for $channelName for $($channelGroup.Values) for $($tag.Name)"
+                            Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
 
-                            if (-not $matrix.$channelName.ContainsKey($osName)) {
-                                $matrix.$channelName.Add($osName, @{ })
-                            }
+                            # Write-Verbose -Verbose "filtered in name: $($tag.Name)"
+                            # if (-not $matrix.ContainsKey($channelName)) {
+                            #     $matrix.Add($channelName, @{ })
+                            # }
 
-                            if (-not $matrix.$channelName.$osName.ContainsKey($architectureName)) {
-                                $matrix.$channelName.$osName.Add($architectureName, @{})
-                            }
+                            # if (-not $matrix.$channelName.ContainsKey($osName)) {
+                            #     $matrix.$channelName.Add($osName, @{ })
+                            # }
 
-                            $jobName = $tag.Name -replace '-', '_'
-                            if (-not $matrix.$channelName[$osName][$architectureName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
-                                $matrix.$channelName[$osName][$architectureName].Add($jobName, (ConvertTo-SortedDictionary -Hashtable @{
-                                    Channel            = $tag.Channel
-                                    ImageName          = $tag.Name
-                                    ArtifactSuffixName = $tag.Name.ToString().Replace("\", "_").Replace("-","_")
-                                    JobName            = $jobName
-                                    ContinueOnError    = $tag.ContinueOnError
-                                    EndOfLife          = $tag.EndOfLife
-                                    DistributionState  = $tag.DistributionState
-                                    OsVersion          = $tag.OsVersion
-                                    # azDevOps doesn't support arrays
-                                    TagList            = $tag.Tags -join ';'
-                                    IsLinux            = $tag.IsLinux
-                                    UseInCI            = $tag.UseInCI
-                                    Architecture       = $tag.Architecture
-                                }))
+                            # if (-not $matrix.$channelName.$osName.ContainsKey($architectureName)) {
+                            #     $matrix.$channelName.$osName.Add($architectureName, @{})
+                            # }
 
-                                # Call method to write the part of the yaml file that is unique for each image based template call.
-                                Write-Verbose -Verbose "calling method to populate yaml for $channelName for $($channelGroup.Values) for $($tag.Name)"
-                                Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
-                            }
-                            else
-                            {
-                                Write-Verbose -Verbose "NOT calling method to populate yaml for $channelName for $($channelGroup.Values) for $($tag.Name)"
-                            }
+                            # $jobName = $tag.Name -replace '-', '_'
+                            # if (-not $matrix.$channelName[$osName][$architectureName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
+                            #     $matrix.$channelName[$osName][$architectureName].Add($jobName, (ConvertTo-SortedDictionary -Hashtable @{
+                            #         Channel            = $tag.Channel
+                            #         ImageName          = $tag.Name
+                            #         ArtifactSuffixName = $tag.Name.ToString().Replace("\", "_").Replace("-","_")
+                            #         JobName            = $jobName
+                            #         ContinueOnError    = $tag.ContinueOnError
+                            #         EndOfLife          = $tag.EndOfLife
+                            #         DistributionState  = $tag.DistributionState
+                            #         OsVersion          = $tag.OsVersion
+                            #         # azDevOps doesn't support arrays
+                            #         TagList            = $tag.Tags -join ';'
+                            #         IsLinux            = $tag.IsLinux
+                            #         UseInCI            = $tag.UseInCI
+                            #         Architecture       = $tag.Architecture
+                            #     }))
+
+                            #     # Call method to write the part of the yaml file that is unique for each image based template call.
+                            #     Write-Verbose -Verbose "calling method to populate yaml for $channelName for $($channelGroup.Values) for $($tag.Name)"
+                            #     Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
+                            #}
+                            # else
+                            # {
+                            #     Write-Verbose -Verbose "NOT calling method to populate yaml for $channelName for $($channelGroup.Values) for $($tag.Name)"
+                            # }
                         }
                     }
                 }
