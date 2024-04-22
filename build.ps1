@@ -604,7 +604,6 @@ End {
             {
                 $channelName = $channelGroup.Name
                 Write-Verbose "generating $channelName json"
-
                 $osGroups = $channelGroup.Group | Group-Object -Property os
                 foreach ($osGroup in $osGroups) {
                     $osName = $osGroup.Name
@@ -629,25 +628,51 @@ End {
                             $jobName = $tag.Name -replace '-', '_'
                             if (-not $matrix.$channelName[$osName][$architectureName].ContainsKey($jobName) -and -not $tag.ContinueOnError) {
                                 $matrix.$channelName[$osName][$architectureName].Add($jobName, (ConvertTo-SortedDictionary -Hashtable @{
-                                    Channel            = $tag.Channel
-                                    ImageName          = $tag.Name
-                                    ArtifactSuffixName = $tag.Name.ToString().Replace("\", "_").Replace("-","_")
-                                    JobName            = $jobName
-                                    ContinueOnError    = $tag.ContinueOnError
-                                    EndOfLife          = $tag.EndOfLife
-                                    DistributionState  = $tag.DistributionState
-                                    OsVersion          = $tag.OsVersion
+                                    Channel           = $tag.Channel
+                                    ImageName         = $tag.Name
+                                    JobName           = $jobName
+                                    ContinueOnError   = $tag.ContinueOnError
+                                    EndOfLife         = $tag.EndOfLife
+                                    DistributionState = $tag.DistributionState
+                                    OsVersion         = $tag.OsVersion
                                     # azDevOps doesn't support arrays
-                                    TagList            = $tag.Tags -join ';'
-                                    IsLinux            = $tag.IsLinux
-                                    UseInCI            = $tag.UseInCI
-                                    Architecture       = $tag.Architecture
+                                    TagList           = $tag.Tags -join ';'
+                                    IsLinux           = $tag.IsLinux
+                                    UseInCI           = $tag.UseInCI
+                                    Architecture      = $tag.Architecture
                                 }))
                             }
                         }
                     }
                 }
             }
+        }
+
+        foreach ($channelName in $matrix.Keys | Sort-Object) {
+            $fullMatrix[$channelName] = @()
+            foreach ($osName in $matrix.$channelName.Keys | Sort-Object) {
+                $osMatrix = $matrix.$channelName.$osName
+                foreach ($architectureName in $osMatrix.Keys | Sort-Object) {
+                    $architectureMatrix = $osMatrix.$architectureName
+
+                $channelMatrix = [System.Collections.ArrayList]::new()
+                    $architectureMatrix.Values | Sort-Object -Property ImageName | ForEach-Object {
+                    $null = $channelMatrix.Add($_)
+                }
+                $fullMatrix[$channelName] += $channelMatrix
+                    $matrixJson = $architectureMatrix | ConvertTo-Json -Compress
+                    $variableName = "matrix_${channelName}_${osName}_${architectureName}"
+                if (!$FullJson) {
+                    Set-BuildVariable -Name $variableName -Value $matrixJson -IsOutput
+                        Write-Verbose -Verbose "*********END of JSON*********************"
+                    }
+                }
+            }
+        }
+
+        if($FullJson) {
+            $matrixJson = $fullMatrix | ConvertTo-Json -Depth 100
+            Write-Output $matrixJson
         }
     }
 
