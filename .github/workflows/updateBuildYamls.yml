@@ -43,12 +43,13 @@ jobs:
               throw "stable release tag is not for a stable build: '$stableValue'"
             }
 
-            echo "stableVersion=$stableValue" >> "$GITHUB_OUTPUT"
+            Write-Verbose -Verbose "echo here"
+            echo "STABLE_VERSION=$stableValue" >> "$GITHUB_OUTPUT"
           }
           else
           {
             $stableValue = ''
-            echo "stableVersion=$stableValue" >> "$GITHUB_OUTPUT"
+            echo "STABLE_VERSION=$stableValue" >> "$GITHUB_OUTPUT"
           }
 
           $previewValue = '${{ inputs.previewReleaseTag }}'
@@ -58,12 +59,12 @@ jobs:
               throw "preview release tag is not for a preview build: '$previewValue'"
             }
 
-            echo "previewVersion=$previewValue" >> "$GITHUB_OUTPUT"
+            echo "PREVIEW_VERSION=$previewValue" >> "$GITHUB_OUTPUT"
           }
           else
           {
             $previewValue = ''
-            echo "previewVersion=$previewValue" >> $GITHUB_OUTPUT
+            echo "PREVIEW_VERSION=$previewValue" >> $GITHUB_OUTPUT
           }
 
           $ltsValue = '${{ inputs.ltsReleaseTag }}'
@@ -73,16 +74,16 @@ jobs:
               throw "lts release tag is not for a lts build: '$ltsValue'"
             }
 
-            echo "ltsVersion=$ltsValue" >> $GITHUB_OUTPUT
+            echo "LTS_VERSION=$ltsValue" >> $GITHUB_OUTPUT
           }
           else
           {
             $ltsValue = ''
-            echo "ltsVersion=$ltsValue" >> $GITHUB_OUTPUT
+            echo "LTS_VERSION=$ltsValue" >> $GITHUB_OUTPUT
           }
       - name: Update ReleaseStageYaml file for Stable
         env:
-          STABLE_VERSION: ${{ steps.validate-version.outputs.stableVersion }}
+          STABLE_VERSION: ${{ steps.validate-version.outputs.STABLE_VERSION }}
         run: |
           $toolsFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath 'tools'
           $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
@@ -101,7 +102,7 @@ jobs:
           }
       - name: Update ReleaseStageYaml file for Preview
         env:
-          PREVIEW_VERSION: ${{ steps.validateversion.outputs.previewVersion }}
+          PREVIEW_VERSION: ${{ steps.validateversion.outputs.PREVIEW_VERSION }}
         run: |
           $toolsFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath 'tools'
           $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
@@ -118,7 +119,7 @@ jobs:
           }
       - name: Update ReleaseStageYaml file for LTS
         env:
-          LTS_VERSION: ${{ steps.validateversion.outputs.ltsVersion }}
+          LTS_VERSION: ${{ steps.validateversion.outputs.LTS_VERSION }}
         run: |
           $toolsFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath 'tools'
           $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
