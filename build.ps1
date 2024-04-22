@@ -672,6 +672,33 @@ End {
                 }
             }
         }
+
+        foreach ($channelName in $matrix.Keys | Sort-Object) {
+            $fullMatrix[$channelName] = @()
+            foreach ($osName in $matrix.$channelName.Keys | Sort-Object) {
+                $osMatrix = $matrix.$channelName.$osName
+                foreach ($architectureName in $osMatrix.Keys | Sort-Object) {
+                    $architectureMatrix = $osMatrix.$architectureName
+
+                $channelMatrix = [System.Collections.ArrayList]::new()
+                    $architectureMatrix.Values | Sort-Object -Property ImageName | ForEach-Object {
+                    $null = $channelMatrix.Add($_)
+                }
+                $fullMatrix[$channelName] += $channelMatrix
+                    $matrixJson = $architectureMatrix | ConvertTo-Json -Compress
+                    $variableName = "matrix_${channelName}_${osName}_${architectureName}"
+                if (!$FullJson) {
+                    Set-BuildVariable -Name $variableName -Value $matrixJson -IsOutput
+                        Write-Verbose -Verbose "*********END of JSON*********************"
+                    }
+                }
+            }
+        }
+
+        if($FullJson) {
+            $matrixJson = $fullMatrix | ConvertTo-Json -Depth 100
+            Write-Output $matrixJson
+        }
     }
 
     if ($GenerateMatrixJson.IsPresent) {
@@ -682,26 +709,6 @@ End {
             {
                 $channelName = $channelGroup.Name
                 Write-Verbose "generating $channelName json"
-                $ciFolder = Join-Path -Path $PSScriptRoot -ChildPath '.vsts-ci'
-                $channelReleaseStagePath = Join-Path -Path $ciFolder -ChildPath "$($channelName)ReleaseStage.yml"
-                Write-Verbose -Verbose "releaseStage file: $channelReleaseStagePath"
-
-                if (!$channelsUsed.Contains($channelName))
-                {
-                    Write-Verbose -Verbose "channel was not in there already"
-                    # Note: channelGroup contains entry for a channels' regular and channel's test-deps images.
-                    # But, we want the releaseStage.yml to be 1 per channel, ie stableReleaseStage.yml
-                    $channelReleaseStageFileExists = Test-Path $channelReleaseStagePath
-                    if ($channelReleaseStageFileExists)
-                    {
-                        Remove-Item -Path $channelReleaseStagePath
-                    }
-                    New-Item -Type File -Path $channelReleaseStagePath
-    
-                    # Call method to write generic lines needed at start of releaseStage file
-                    Get-StartOfYamlPopulated -Channel $channelName -YamlFilePath $channelReleaseStagePath
-                    $channelsUsed.Add($channelName, $channelGroup.Values)
-                }
 
                 $osGroups = $channelGroup.Group | Group-Object -Property os
                 foreach ($osGroup in $osGroups) {
@@ -741,40 +748,11 @@ End {
                                     UseInCI            = $tag.UseInCI
                                     Architecture       = $tag.Architecture
                                 }))
-
-                                Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
                             }
                         }
                     }
                 }
             }
-        }
-
-        foreach ($channelName in $matrix.Keys | Sort-Object) {
-            $fullMatrix[$channelName] = @()
-            foreach ($osName in $matrix.$channelName.Keys | Sort-Object) {
-                $osMatrix = $matrix.$channelName.$osName
-                foreach ($architectureName in $osMatrix.Keys | Sort-Object) {
-                    $architectureMatrix = $osMatrix.$architectureName
-
-                $channelMatrix = [System.Collections.ArrayList]::new()
-                    $architectureMatrix.Values | Sort-Object -Property ImageName | ForEach-Object {
-                    $null = $channelMatrix.Add($_)
-                }
-                $fullMatrix[$channelName] += $channelMatrix
-                    $matrixJson = $architectureMatrix | ConvertTo-Json -Compress
-                    $variableName = "matrix_${channelName}_${osName}_${architectureName}"
-                if (!$FullJson) {
-                    Set-BuildVariable -Name $variableName -Value $matrixJson -IsOutput
-                        Write-Verbose -Verbose "*********END of JSON*********************"
-                    }
-                }
-            }
-        }
-
-        if($FullJson) {
-            $matrixJson = $fullMatrix | ConvertTo-Json -Depth 100
-            Write-Output $matrixJson
         }
     }
 
