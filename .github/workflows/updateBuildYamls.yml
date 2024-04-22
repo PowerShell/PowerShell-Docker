@@ -45,12 +45,12 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
-          token: "${{ secrets.PR_PAT }}"
+          token: "${{ secrets.MY_PR_PAT }}"
           commit-message: "Update the stableReleaseStage yaml file"
-          committer: PwshBot <pwshbot@microsoft.com>
-          author: PwshBot <pwshbot@microsoft.com>
+          committer: anamnavi <anam.naviyou@gmail.com>
+          author: anamnavi <anam.naviyou@gmail.com>
           title: "Update the stableReleaseStage json"
           base: master
           draft: false
-          branch: update-matrix-json
-          push-to-fork: pwshBot/PowerShell-Docker
+          branch: update-releasestage-files
+          push-to-fork: anamnavi/PowerShell-Docker
