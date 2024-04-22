@@ -40,17 +40,21 @@ jobs:
           $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
           Import-Module $buildHelperModulePath
           ./build.ps1 -GenerateMatrixJson -Channel stable -Verbose -Acr All -OsFilter All
+      - name: View Updated Files Content
+        run: |
+          $ciFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath '.vsts-ci'
+          $releaseStageFilePath = Join-Path -Path $ciFolderPath -ChildPath 'stableReleaseStage.yml'
       - name: Create Pull Request
         if: github.event_name == 'workflow_dispatch'
         id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
-          token: "${{ secrets.MY_PR_PAT }}"
+          token: "${{ secrets.PR_PAT }}"
           commit-message: "Update the stableReleaseStage yaml file"
-          committer: anamnavi <anam.naviyou@gmail.com>
-          author: anamnavi <anam.naviyou@gmail.com>
+          committer: PwshBot <pwshbot@microsoft.com>
+          author: PwshBot <pwshbot@microsoft.com>
           title: "Update the stableReleaseStage json"
           base: master
           draft: false
-          branch: update-releasestage-files
-          push-to-fork: anamnavi/PowerShell-Docker
+          branch: update-build-yaml-files
+          push-to-fork: pwshBot/PowerShell-Docker
