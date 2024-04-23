@@ -2,7 +2,7 @@
 
 ## Context
 
-This script needs to be run before the build pipeline for PowerShell-Docker is kicked off. Running the script will produce a channel based yaml file, like &lt;channel&gt;ReleaseStage.yml for each channel. Then a PR must be created with these newly added/updated yaml files as the build will rely on them.
+This `updateBuildYamls.ps1` script needs to be run before the build pipeline for PowerShell-Docker is kicked off. Running the script will produce a channel based yaml file, like &lt;channel&gt;ReleaseStage.yml for each channel. Then a PR must be created with these newly added/updated yaml files as the build will rely on them.
 
 ## Running the Script
 
