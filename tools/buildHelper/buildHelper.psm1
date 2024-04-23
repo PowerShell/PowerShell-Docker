@@ -1030,3 +1030,89 @@ Function ConvertTo-SortedDictionary {
     }
     return $sortedDictionary
 }
+
+function Get-StartOfYamlPopulated {
+    param(
+        [string]
+        $Channel,
+
+        [string]
+        $YamlFilePath
+    )
+
+    if (!$YamlFilePath)
+    {
+        throw "Yaml file $YamlFilePath provided as parameter cannot be found."
+    }
+    
+    $doubleSpace = " "*2
+
+    Add-Content -Path $YamlFilePath -Value "parameters:"
+    Add-Content -Path $YamlFilePath -Value "- name: channel"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: 'preview'"
+    Add-Content -Path $YamlFilePath -Value "- name: channelPath"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: ''"
+    Add-Content -Path $YamlFilePath -Value "- name: vmImage"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: PSMMSUbuntu20.04-Secure"
+    Add-Content -Path $YamlFilePath -Value "stages:"
+    Add-Content -Path $YamlFilePath -Value "- stage: StageGenerateBuild_$Channel"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)dependsOn: ['StageResolveVersionandYaml']"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)displayName: Build $Channel"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)jobs:"
+}
+
+function Get-TemplatePopulatedYaml {
+    param(
+        [string]
+        $YamlFilePath,
+
+        [psobject]
+        $ImageInfo
+    )
+
+    if (!$YamlFilePath)
+    {
+        throw "Yaml file $YamlFilePath provided as parameter cannot be found."
+    }
+
+    $doubleSpace = " "*2
+    $fourSpace = " "*4
+    $sixSpace = " "*6
+
+    $imageName = $ImageInfo.Name
+    $artifactSuffix = $ImageInfo.Name.ToString().Replace("\", "_").Replace("-","_")
+    $architecture = $ImageInfo.Architecture
+    $poolOS = $ImageInfo.IsLinux ? "linux" : "windows"
+    $archBasedJobName = "Build_$($poolOS)_$($architecture)"
+
+    if ($architecture -eq "arm32")
+    {
+        $architecture = "arm64" # we need to use hostArchicture arm64 for pool for arm32
+    }
+
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)- template: /.vsts-ci/releasePhase.yml@self"
+    Add-Content -Path $YamlFilePath -Value "$($fourSpace)parameters:"
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)archName: '$archBasedJobName'" # ie: Build_Linux_arm32
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)imageName: $imageName" # ie. imageName: alpine317\test-deps (since this differs from artifactSuffix for test-deps images only, we have a separate entry as the yaml param)
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)artifactSuffix: $artifactSuffix" # i.e artifactSuffix: alpine317_test_deps 
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolOS: '$poolOS'"
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolHostArchitecture: '$architecture'"
+    if ($poolOS -eq "linux")
+    {
+        # only need to specify buildKitValue=1 for linux
+        Add-Content -Path $YamlFilePath -Value "$($sixSpace)buildKitValue: 1"
+    }
+    else
+    {
+        if ($imageName -contains "2022")
+        {
+            Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolHostVersion: '1ESWindows2022'"
+            Add-Content -Path $YamlFilePath -Value "$($sixSpace)windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'"
+        }
+
+        Add-Content -Path $YamlFilePath -Value "$($sixSpace)maxParallel: 3"
+    }
+
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)channel: `${{ parameters.channel }}"
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)channelPath: `${{ parameters.channelPath }}"
+}
