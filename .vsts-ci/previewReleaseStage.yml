@@ -84,7 +84,7 @@ stages:
     parameters:
       archName: 'Build_linux_amd64'
       imageName: ubuntu20.04
-      artifactSuffix: ubuntu20.04
+      artifactSuffix: ubuntu2004
       poolOS: 'linux'
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
@@ -94,7 +94,7 @@ stages:
     parameters:
       archName: 'Build_linux_amd64'
       imageName: ubuntu22.04
-      artifactSuffix: ubuntu22.04
+      artifactSuffix: ubuntu2204
       poolOS: 'linux'
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
@@ -104,7 +104,7 @@ stages:
     parameters:
       archName: 'Build_linux_arm32'
       imageName: ubuntu20.04-arm32v7
-      artifactSuffix: ubuntu20.04_arm32v7
+      artifactSuffix: ubuntu2004_arm32v7
       poolOS: 'linux'
       poolHostArchitecture: 'arm64'
       buildKitValue: 1
@@ -114,7 +114,7 @@ stages:
     parameters:
       archName: 'Build_linux_arm32'
       imageName: ubuntu22.04-arm32v7
-      artifactSuffix: ubuntu22.04_arm32v7
+      artifactSuffix: ubuntu2204_arm32v7
       poolOS: 'linux'
       poolHostArchitecture: 'arm64'
       buildKitValue: 1
@@ -224,7 +224,7 @@ stages:
     parameters:
       archName: 'Build_linux_amd64'
       imageName: ubuntu20.04\test-deps
-      artifactSuffix: ubuntu20.04_test_deps
+      artifactSuffix: ubuntu2004_test_deps
       poolOS: 'linux'
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
@@ -234,7 +234,7 @@ stages:
     parameters:
       archName: 'Build_linux_amd64'
       imageName: ubuntu22.04\test-deps
-      artifactSuffix: ubuntu22.04_test_deps
+      artifactSuffix: ubuntu2204_test_deps
       poolOS: 'linux'
       poolHostArchitecture: 'amd64'
       buildKitValue: 1

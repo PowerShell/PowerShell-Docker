@@ -1080,7 +1080,7 @@ function Get-TemplatePopulatedYaml {
     $sixSpace = " "*6
 
     $imageName = $ImageInfo.Name
-    $artifactSuffix = $ImageInfo.Name.ToString().Replace("\", "_").Replace("-","_")
+    $artifactSuffix = $ImageInfo.Name.ToString().Replace("\", "_").Replace("-","_").Replace(".","")
     $architecture = $ImageInfo.Architecture
     $poolOS = $ImageInfo.IsLinux ? "linux" : "windows"
     $archBasedJobName = "Build_$($poolOS)_$($architecture)"
