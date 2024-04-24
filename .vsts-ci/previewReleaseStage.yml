@@ -1,0 +1,242 @@
+parameters:
+- name: channel
+  default: 'preview'
+- name: channelPath
+  default: ''
+- name: vmImage
+  default: PSMMSUbuntu20.04-Secure
+stages:
+- stage: StageGenerateBuild_preview
+  dependsOn: ['StageResolveVersionandYaml']
+  displayName: Build preview
+  jobs:
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: alpine316
+      artifactSuffix: alpine316
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: alpine317
+      artifactSuffix: alpine317
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: debian11
+      artifactSuffix: debian11
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: debian12
+      artifactSuffix: debian12
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: mariner2
+      artifactSuffix: mariner2
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: ubi8
+      artifactSuffix: ubi8
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: ubi9
+      artifactSuffix: ubi9
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: ubuntu20.04
+      artifactSuffix: ubuntu20.04
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: ubuntu22.04
+      artifactSuffix: ubuntu22.04
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_arm32'
+      imageName: ubuntu20.04-arm32v7
+      artifactSuffix: ubuntu20.04_arm32v7
+      poolOS: 'linux'
+      poolHostArchitecture: 'arm64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_arm32'
+      imageName: ubuntu22.04-arm32v7
+      artifactSuffix: ubuntu22.04_arm32v7
+      poolOS: 'linux'
+      poolHostArchitecture: 'arm64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_arm64'
+      imageName: mariner2-arm64
+      artifactSuffix: mariner2_arm64
+      poolOS: 'linux'
+      poolHostArchitecture: 'arm64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_windows_amd64'
+      imageName: windowsserver2022
+      artifactSuffix: windowsserver2022
+      poolOS: 'windows'
+      poolHostArchitecture: 'amd64'
+      maxParallel: 3
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_windows_amd64'
+      imageName: windowsservercore2022
+      artifactSuffix: windowsservercore2022
+      poolOS: 'windows'
+      poolHostArchitecture: 'amd64'
+      maxParallel: 3
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: alpine316\test-deps
+      artifactSuffix: alpine316_test_deps
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: alpine317\test-deps
+      artifactSuffix: alpine317_test_deps
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: debian11\test-deps
+      artifactSuffix: debian11_test_deps
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: debian12\test-deps
+      artifactSuffix: debian12_test_deps
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: mariner2\test-deps
+      artifactSuffix: mariner2_test_deps
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: ubi8\test-deps
+      artifactSuffix: ubi8_test_deps
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: ubi9\test-deps
+      artifactSuffix: ubi9_test_deps
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: ubuntu20.04\test-deps
+      artifactSuffix: ubuntu20.04_test_deps
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releasePhase.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: ubuntu22.04\test-deps
+      artifactSuffix: ubuntu22.04_test_deps
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
