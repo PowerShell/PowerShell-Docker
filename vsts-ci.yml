@@ -12,6 +12,9 @@ pr:
     exclude:
     - .github/*
     - .vsts-ci/releasebuild.yml
+    - .vsts-ci/ltsReleaseStage.yml
+    - .vsts-ci/previewReleaseStage.yml
+    - .vsts-ci/stableReleaseStage.yml
     - assets/matrix.json
     - README.md
 
