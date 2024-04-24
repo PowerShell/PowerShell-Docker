@@ -1,0 +1,124 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
+name: Update Channel Based ReleaseStage Yaml Files
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      stableVersion:
+        description: 'stable release version (i.e: 7.4.1)'
+        required: false
+      previewVersion:
+        description: 'preview release version (i.e: 7.4.0-preview.5)'
+        required: false
+      ltsVersion:
+        description: 'lts release version (i.e: 7.2.12)'
+        required: false
+
+defaults:
+  run:
+    shell: pwsh
+jobs:
+  update-yamls:
+    name: Update ReleaseStageYaml for Stable Channel
+    timeout-minutes: 15
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Validate Version Syntax
+        id: validate-version
+        run: |
+          $stableValue = '${{ inputs.stableVersion }}'
+          if (!($stableValue -eq ""))
+          {
+            if ($stableValue -notmatch '\d+\.\d+\.\d+$') {
+              throw "stable release tag is not for a stable build: '$stableValue'"
+            }
+          }
+
+          $previewValue = '${{ inputs.previewVersion }}'
+          if (!($previewValue -eq ""))
+          {
+            if ($previewValue -notmatch '\d+\.\d+\.\d+-(preview|rc)\.\d+$') {
+              throw "preview release tag is not for a preview build: '$previewValue'"
+            }
+          }
+
+          $ltsValue = '${{ inputs.ltsVersion }}'
+          if (!($ltsValue -eq ""))
+          {
+            if ($ltsValue -notmatch '\d+\.\d+\.\d+$') {
+              throw "lts release tag is not for a lts build: '$ltsValue'"
+            }
+          }
+      - name: Update ReleaseStageYaml file for Stable
+        run: |
+          $stableValue = '${{ inputs.stableVersion }}'
+          $toolsFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath 'tools'
+          $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
+          $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
+          Import-Module $buildHelperModulePath
+          if (!($stableValue -eq ""))
+          {
+            Write-Verbose -Verbose "using stable version: $stableValue"
+            ./build.ps1 -UpdateBuildYaml -Channel stable -StableVersion $stableValue -Verbose -Acr All -OsFilter All
+          }
+          else
+          {
+            # Use the version from channels.json when no version is provided
+            ./build.ps1 -UpdateBuildYaml -Channel stable -Verbose -Acr All -OsFilter All
+          }
+      - name: Update ReleaseStageYaml file for Preview
+        run: |
+          $previewValue = '${{ inputs.previewVersion }}'
+          $toolsFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath 'tools'
+          $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
+          $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
+          Import-Module $buildHelperModulePath
+          if (!($previewValue -eq ""))
+          {
+            Write-Verbose -Verbose "using preview version: $previewValue"
+            ./build.ps1 -UpdateBuildYaml -Channel preview -PreviewVersion $previewValue -Verbose -Acr All -OsFilter All
+          }
+          else
+          {
+            ./build.ps1 -UpdateBuildYaml -Channel preview -Verbose -Acr All -OsFilter All
+          }
+      - name: Update ReleaseStageYaml file for LTS
+        run: |
+          $ltsValue = '${{ inputs.ltsVersion }}'
+          $toolsFolderPath = Join-Path -Path ${{ github.workspace }} -ChildPath 'tools'
+          $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
+          $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
+          Import-Module $buildHelperModulePath
+          if (!($ltsValue -eq ""))
+          {
+            Write-Verbose -Verbose "using lts version: $ltsValue"
+            ./build.ps1 -UpdateBuildYaml -Channel lts -LtsVersion $ltsValue -Verbose -Acr All -OsFilter All
+          }
+          else
+          {
+            # Use the version from channels.json when no version is provided
+            ./build.ps1 -UpdateBuildYaml -Channel lts -Verbose -Acr All -OsFilter All
+          }
+      - name: Create Pull Request
+        if: github.event_name == 'workflow_dispatch'
+        id: cpr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: "${{ secrets.PR_PAT }}"
+          commit-message: "Update the stableReleaseStage yaml file"
+          committer: PwshBot <pwshbot@microsoft.com>
+          author: PwshBot <pwshbot@microsoft.com>
+          title: "Update the stableReleaseStage json"
+          base: master
+          draft: false
+          branch: update-build-yaml-files
+          push-to-fork: pwshBot/PowerShell-Docker
