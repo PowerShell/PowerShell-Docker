@@ -7,7 +7,6 @@
         {"Tag": "2.0"}
     ],
     "ShortDistroName": "mariner",
-    "SubImage": "test-deps",
     "TestProperties": {
         "size": 332
     },

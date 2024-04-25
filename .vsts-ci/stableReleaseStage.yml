@@ -136,7 +136,8 @@ stages:
       imageName: windowsserver2022
       artifactSuffix: windowsserver2022
       poolOS: 'windows'
-      poolHostArchitecture: 'amd64'
+      poolHostVersion: '1ESWindows2022'
+      windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'
       maxParallel: 3
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
@@ -146,7 +147,8 @@ stages:
       imageName: windowsservercore2022
       artifactSuffix: windowsservercore2022
       poolOS: 'windows'
-      poolHostArchitecture: 'amd64'
+      poolHostVersion: '1ESWindows2022'
+      windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'
       maxParallel: 3
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
@@ -185,16 +187,6 @@ stages:
       archName: 'Build_linux_amd64'
       imageName: debian12\test-deps
       artifactSuffix: debian12_test_deps
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
-    parameters:
-      archName: 'Build_linux_amd64'
-      imageName: mariner2\test-deps
-      artifactSuffix: mariner2_test_deps
       poolOS: 'linux'
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
