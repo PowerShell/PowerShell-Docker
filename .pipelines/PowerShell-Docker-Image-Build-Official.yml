@@ -112,9 +112,10 @@ extends:
             {
               foreach ($channelEntry in $channelsInfo)
               {
+                Write-Verbose -Verbose "channel path is: $($channelEntry.Path)"
                 if ($($channelEntry.Name) -eq "stable")
                 {
-                  $stablePath = $($channelEntry.Path)
+                  $stablePath = "$($channelEntry.Path)"
                   Write-Host "##vso[task.setvariable variable=stableChannelPath;isOutput=true]$stablePath"
                 }
                 elseif ($($channelEntry.Name) -eq "preview")
@@ -130,10 +131,12 @@ extends:
               }
             }
           displayName: 'Get Channel path info'
+          name: setChannelPathInfo
         - pwsh: |
             Get-ChildItem env: | Out-String -Width 1000
           displayName: 'Capture Environment'
     - template: /.vsts-ci/stableReleaseStage.yml@self
       parameters:
         channel: stable
-        channelPath: 'release/7-4'
+        # channelPath: 'release/7-4'
+        channelPath: ${{ stages.StageResolveVersionAndYaml.outputs['setChannelPathInfo.stableChannelPath'] }}
