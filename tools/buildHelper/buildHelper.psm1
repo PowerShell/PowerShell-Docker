@@ -1227,15 +1227,16 @@ function Get-TemplatePopulatedYaml {
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)imageName: $imageName" # ie. imageName: alpine317\test-deps (since this differs from artifactSuffix for test-deps images only, we have a separate entry as the yaml param)
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)artifactSuffix: $artifactSuffix" # i.e artifactSuffix: alpine317_test_deps 
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolOS: '$poolOS'"
-    Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolHostArchitecture: '$architecture'"
     if ($poolOS -eq "linux")
     {
+        # only need to specify host architecture for the pool for linux
+        Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolHostArchitecture: '$architecture'"
         # only need to specify buildKitValue=1 for linux
         Add-Content -Path $YamlFilePath -Value "$($sixSpace)buildKitValue: 1"
     }
     else
     {
-        if ($imageName -contains "2022")
+        if ($imageName.Contains("2022"))
         {
             Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolHostVersion: '1ESWindows2022'"
             Add-Content -Path $YamlFilePath -Value "$($sixSpace)windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'"
