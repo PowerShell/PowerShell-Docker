@@ -1,6 +1,8 @@
 parameters:
 - name: channel
   default: 'preview'
+- name: channelPath
+  default: ''
 - name: vmImage
   default: PSMMSUbuntu20.04-Secure
 stages:
@@ -17,7 +19,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -27,7 +29,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -37,7 +39,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -47,7 +49,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -57,7 +59,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -67,7 +69,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -77,7 +79,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -87,7 +89,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -97,7 +99,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_arm32'
@@ -107,7 +109,7 @@ stages:
       poolHostArchitecture: 'arm64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_arm32'
@@ -117,7 +119,7 @@ stages:
       poolHostArchitecture: 'arm64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_arm64'
@@ -127,7 +129,7 @@ stages:
       poolHostArchitecture: 'arm64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_windows_amd64'
@@ -138,7 +140,7 @@ stages:
       windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'
       maxParallel: 3
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_windows_amd64'
@@ -149,7 +151,7 @@ stages:
       windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'
       maxParallel: 3
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -159,7 +161,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -169,7 +171,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -179,7 +181,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -189,7 +191,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -199,7 +201,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -209,7 +211,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -219,7 +221,7 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releasePhase.yml@self
     parameters:
       archName: 'Build_linux_amd64'
@@ -229,4 +231,4 @@ stages:
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
       channel: ${{ parameters.channel }}
-      channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
+      channelPath: ${{ parameters.channelPath }}

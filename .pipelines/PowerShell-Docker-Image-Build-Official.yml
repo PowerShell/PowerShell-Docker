@@ -138,3 +138,12 @@ extends:
     - template: /.vsts-ci/stableReleaseStage.yml@self
       parameters:
         channel: stable
+        channelPath: 'release/7-4'
+    - template: /.vsts-ci/previewReleaseStage.yml@self
+      parameters:
+        channel: preview
+        channelPath: 'release/7-5'
+    - template: /.vsts-ci/ltsReleaseStage.yml@self
+      parameters:
+        channel: lts
+        channelPath: 'release/7-2'
