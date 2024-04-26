@@ -138,5 +138,3 @@ extends:
     - template: /.vsts-ci/stableReleaseStage.yml@self
       parameters:
         channel: stable
-        # channelPath: 'release/7-4'
-        channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
