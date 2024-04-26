@@ -139,4 +139,4 @@ extends:
       parameters:
         channel: stable
         # channelPath: 'release/7-4'
-        channelPath: ${{ stages.StageResolveVersionAndYaml.outputs['setChannelPathInfo.stableChannelPath'] }}
+        channelPath: $[ dependencies.JobResolveVersions.outputs['setChannelPathInfo.stableChannelPath'] ]
