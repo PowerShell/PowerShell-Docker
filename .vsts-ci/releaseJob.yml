@@ -56,6 +56,11 @@ jobs:
     displayName: Set ACR Channel ImageName vars
     name: setImageNameStep
   - template: /.vsts-ci/templatesGeneric/setVersionStepsTemplate.yml@self
+  - pwsh: |
+      $buildHelperPath = Join-Path -Path $(repoRoot) -ChildPath 'tools/buildHelper'
+      Import-Module $buildHelperPath
+      Get-AzModulesInstalled
+    displayName: 'Install AzAccounts'
   - task: AzurePowerShell@5
     inputs:
       azureSubscription: az-blob-cicd-infra
@@ -99,6 +104,8 @@ jobs:
     value: $[ dependencies.Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}.outputs['setImageNameStep.acrName'] ]
   - name: SasBuildArgs
     value: $[ dependencies.Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}.outputs['setSASVariableStep.sasBuildArgs'] ]
+  - name: HostVersionValue
+    value: $[ dependencies.Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}.outputs['setImageNameStep.hostVersion'] ]
   pool:
     type: docker
     os: ${{ parameters.poolOS }}
