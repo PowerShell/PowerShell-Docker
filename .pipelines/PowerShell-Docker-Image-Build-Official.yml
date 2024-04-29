@@ -4,32 +4,15 @@
 name: PSDocker-Build-$(Build.BuildId)-s_$(stableReleaseTag)_p_$(previewReleaseTag)_l_$(ltsReleaseTag)$(Rev:_rr)
 trigger: none
 parameters:
-- name: 'version'
-  default: '7.4.1'
-# - name: 'previewReleaseTag'
-#   default: 'v7.4.0-preview.5'
-# - name: 'ltsReleaseTag'
-#   default: 'v7.2.12'
-# - name: 'stableReleaseTag'
-#   default: 'v7.3.5'
-- name: 'channel'
+- name: 'releaseTag'
+  default: 'v7.4.1'
+- name: 'releaseChannel'
+  default: stable
 variables:
 - name: POWERSHELL_TELEMETRY_OPTOUT
   value: 1
 - name: DOCKER_RELEASE
   value: true
-# - name: previewReleaseTag
-#   value: ${{ parameters.previewReleaseTag }}
-# - name: ltsReleaseTag
-#   value: ${{ parameters.ltsReleaseTag }}
-# - name: stableReleaseTag
-#   value: ${{ parameters.stableReleaseTag }}
-- name: previewChannelPath
-  value: ''
-- name: ltsChannelPath
-  value: ''
-- name: stableChannelPath
-  value: ''
 - name: runCodesignValidationInjection
   value: false
 - name: DisableDockerDetector
@@ -85,19 +68,19 @@ extends:
           type: windows
         steps:
         - pwsh: |
-            if ($env:CHANNEL -eq "preview")
+            if ($env:RELEASECHANNEL -eq "preview")
             {
-              if ($env:VERSION -notmatch '^\d+\.\d+\.\d+-(preview|rc)\.\d+$') {
-                throw "${env:CHANNEL} release tag is not for a preview build: '${env:VERSION}'"
+              if ($env:RELEASETAG -notmatch '^v\d+\.\d+\.\d+-(preview|rc)\.\d+$') {
+                throw "${env:releaseChannel} release tag is not for a preview build: '${env:RELEASETAG}'"
               }
             }
-            elseif (($env:CHANNEL -eq "stable") -or ($env:CHANNEL -eq "lts")) {
-              if ($env:VERSION -notmatch '^\d+\.\d+\.\d+$') {
-                throw "${env:CHANNEL} release tag is not for a stable build: '${env:VERSION}'"
+            elseif (($env:RELEASECHANNEL -eq "stable") -or ($env:RELEASECHANNEL -eq "lts")) {
+              if ($env:RELEASETAG -notmatch '^v\d+\.\d+\.\d+$') {
+                throw "${env:RELEASECHANNEL} release tag is not for a stable build: '${env:RELEASETAG}'"
               }
             }
             else {
-              throw "${env:CHANNEL} is not a supported channel type"
+              throw "${env:RELEASECHANNEL} is not a supported channel type"
             }
           displayName: stop build if channel or version is not valid
         - pwsh: |
@@ -133,17 +116,17 @@ extends:
         - pwsh: |
             Get-ChildItem env: | Out-String -Width 1000
           displayName: 'Capture Environment'
-    - ${{ if eq(parameters.channel, 'stable') }}:
+    - ${{ if eq(parameters.releaseChannel, 'stable') }}:
       - template: /.vsts-ci/stableReleaseStage.yml@self
         parameters:
           channel: ${{ parameters.channel }}
           channelPath: 'release/7-4'
-    - ${{ elseif eq(parameters.channel, 'preview')}}:
+    - ${{ elseif eq(parameters.releaseChannel, 'preview')}}:
       - template: /.vsts-ci/previewReleaseStage.yml@self
         parameters:
           channel: preview
           channelPath: 'release/7-5'
-    - ${{ elseif eq(parameters.channel, 'lts')}}:
+    - ${{ elseif eq(parameters.releaseChannel, 'lts')}}:
       - template: /.vsts-ci/ltsReleaseStage.yml@self
         parameters:
           channel: lts
