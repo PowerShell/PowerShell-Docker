@@ -142,7 +142,7 @@ extends:
         parameters:
           channel: preview
           channelPath: 'release/7-5'
-    - ${{ if ne(parameters.ltsReleaseTag) }}:
+    - ${{ if ne(parameters.ltsReleaseTag, '') }}:
       - template: /.vsts-ci/ltsReleaseStage.yml@self
         parameters:
           channel: lts
