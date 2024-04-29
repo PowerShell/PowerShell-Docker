@@ -70,7 +70,7 @@ jobs:
       inline: |
         $buildHelperPath = Join-Path -Path $(repoRoot) -ChildPath 'tools/buildHelper'
         Import-Module $buildHelperPath
-        Set-SASVariable -DockerNamespace $(dockerNamespace) -DockerHost $(dockerHost) -DockerImage $(dockerImage) -StorageAccountName $(StorageAccount) -ImageName $(setVariablesStep.dockerBuildImageName) -Channel $(channel) -Version '$(Version)'
+        Set-SASVariable -DockerNamespace $(dockerNamespace) -DockerHost $(dockerHost) -DockerImage $(dockerImage) -StorageAccountName $(StorageAccount) -ImageName '$(setImageNameStep.dockerBuildImageName)' -Channel $(channel) -Version '$(Version)'
     displayName: Set SasURL
   - pwsh: |
       if($env:SASURL)
