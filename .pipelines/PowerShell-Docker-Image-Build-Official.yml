@@ -9,7 +9,6 @@ parameters:
 - name: 'ltsReleaseTag'
   default: 'v7.2.12'
 - name: 'stableReleaseTag'
-  default: 'v7.3.5'
 variables:
 - name: POWERSHELL_TELEMETRY_OPTOUT
   value: 1
@@ -135,10 +134,11 @@ extends:
         - pwsh: |
             Get-ChildItem env: | Out-String -Width 1000
           displayName: 'Capture Environment'
-    - template: /.vsts-ci/stableReleaseStage.yml@self
-      parameters:
-        channel: stable
-        channelPath: 'release/7-4'
+    - ${{ if ne(parameters.stableReleaseTag, '') }}:
+      - template: /.vsts-ci/stableReleaseStage.yml@self
+        parameters:
+          channel: stable
+          channelPath: 'release/7-4'
     # - template: /.vsts-ci/previewReleaseStage.yml@self
     #   parameters:
     #     channel: preview
