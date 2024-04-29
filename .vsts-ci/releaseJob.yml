@@ -62,6 +62,9 @@ jobs:
   - pwsh: |
       Write-Host "##vso[task.setvariable variable=channel;]${{ parameters.channel }}"
     displayName: 'Set channel variable'
+  - pwsh: |
+      Get-ChildItem env: | Out-String -Width 1000
+    displayName: 'Capture Environment'
   - template: /.vsts-ci/templatesGeneric/setVersionStepsTemplate.yml@self
   - pwsh: |
       $finalImageName = '${{ parameters.imageName }}'
