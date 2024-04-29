@@ -2,10 +2,26 @@
 # Please make sure to check all the converted content, it is your team's responsibility to make sure that the pipeline is still valid and functions as expected.
 steps:
 - pwsh: |
-    $tag = '$(releaseTag)'
-    $namespace = $tag.ToLowerInvariant()
+    switch('$(Channel)') {
+      'stable' {
+        $releaseTag = '$(stableReleaseTag)'
+        $version = '$(stableReleaseTag)' -replace '^v', ''
+      }
+      'preview' {
+        $releaseTag = '$(previewReleaseTag)'
+        $version = '$(previewReleaseTag)' -replace '^v', ''
+      }
+      'lts' {
+        $releaseTag = '$(ltsReleaseTag)'
+        $version = '$(ltsReleaseTag)' -replace '^v', ''
+      }
+      default {
+        throw "Unknown channel '$(Channel)'"
+      }
+    }
+    $namespace = $releaseTag.ToLowerInvariant()
     Write-Host "##vso[task.setvariable variable=dockerNamespace;]$namespace"
-    $version = $tag -replace '^v', ''
+    $version = $releaseTag -replace '^v', ''
     $command = "vso[task.setvariable variable=version]$version"
     Write-Host $command
     Write-Host "##$command"
