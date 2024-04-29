@@ -68,9 +68,6 @@ extends:
           type: windows
         steps:
         - pwsh: |
-            Get-ChildItem env: | Out-String -Width 1000
-          displayName: 'Capture Environment'
-        - pwsh: |
             if ($env:RELEASECHANNEL -eq "preview")
             {
               if ($env:RELEASETAG -notmatch '^v\d+\.\d+\.\d+-(preview|rc)\.\d+$') {
