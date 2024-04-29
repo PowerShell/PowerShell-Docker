@@ -9,6 +9,10 @@ parameters:
 - name: 'releaseChannel'
   default: stable
 variables:
+- name: releaseTag
+  value: ${{ parameters.releaseTag }}
+- name: releaseChannel
+  value: ${{ parameters.releaseChannel }}
 - name: POWERSHELL_TELEMETRY_OPTOUT
   value: 1
 - name: DOCKER_RELEASE
