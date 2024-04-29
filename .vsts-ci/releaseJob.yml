@@ -95,6 +95,9 @@ jobs:
         }
       }
     displayName: 'Install AzAccounts'
+  - pwsh: |
+      Get-ChildItem env: | Out-String -Width 1000
+    displayName: 'Capture Environment'
   - task: AzurePowerShell@5
     inputs:
       azureSubscription: az-blob-cicd-infra
@@ -102,6 +105,7 @@ jobs:
       azurePowerShellVersion: latestVersion
       pwsh: true
       inline: |
+        Write-Verbose -Verbose "namespace: $(DOCKERNAMESPACE)"
         $containerName = Out-String -InputObject $(DOCKERNAMESPACE) -NoNewline
         $containerName = $containerName.Replace('.', '-')
         $context = New-AzStorageContext -StorageAccountName $(StorageAccount)

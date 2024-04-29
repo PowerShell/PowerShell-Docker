@@ -4,6 +4,7 @@ steps:
 - pwsh: |
     $tag = '$(releaseTag)'
     $namespace = $tag.ToLowerInvariant()
+    Write-Verbose -Verbose $namespace
     Write-Host "##vso[task.setvariable variable=dockerNamespace;]$namespace"
     $version = $tag -replace '^v', ''
     $command = "vso[task.setvariable variable=version]$version"
