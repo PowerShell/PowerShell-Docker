@@ -1283,7 +1283,7 @@ function Set-ReleaseJobVariables
 
     Set-BuildVariable -Name "dockerBuildImageName" -Value $finalImageName -IsOutput
     Set-BuildVariable -Name "dockerBuildContextFolder" -Value $finalContextFolder -IsOutput
-    # Set-BuildVariable -Name "hostVersion" -Value $hostVersionValue -IsOutput
+    Set-BuildVariable -Name "hostVersion" -Value $hostVersionValue -IsOutput
     Write-Host "##vso[task.setvariable variable=hostVersion;isOutput=true]$hostVersionValue"
 }
 
