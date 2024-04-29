@@ -2,11 +2,11 @@ parameters:
 - name: archName
   default: ''
 - name: imageName
-  default: 'none'
+  default: none
 - name: artifactSuffix
   default: ''
 - name: ACR
-  default: 'No'
+  default: No
 - name: maxParallel
   default: 5
 - name: poolOS
@@ -20,20 +20,14 @@ parameters:
 - name: buildKitValue
   default: 0
 - name: channel
-  default: 'preview'
-- name: releaseTag
-  default: ''
+  default: preview
 - name: windowsContainerImageValue
   default: ''
 jobs:
 - job: Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}
   variables:
-  - name: dockerImage #?
+  - name: dockerImage
     value: 'powershell'
-  - name: releaseTag
-    value: ${{ parameters.releaseTag }}
-  - name: scanType #?
-    value: Register
   - group: 'Azure Blob variable group'
   - group: Build Docker Group
   - group: Staging_ACR
@@ -56,44 +50,16 @@ jobs:
       dotnet --list-sdks
     displayName: dotnet info
   - pwsh: |
-      Write-Host "##vso[task.setvariable variable=acrName;isOutput=true]$env:ACR_NAME_VAR"
-    displayName: 'Set ACR name variable'
-    name: setACRVariableStep
-  - pwsh: |
-      Write-Host "##vso[task.setvariable variable=channel;]${{ parameters.channel }}"
-    displayName: 'Set channel variable'
+      $buildHelperPath = Join-Path -Path $(repoRoot) -ChildPath 'tools/buildHelper'
+      Import-Module $buildHelperPath
+      Set-ReleaseJobVariables -Channel ${{ parameters.channel }} -ImageName  ${{ parameters.imageName }}
+    displayName: Set ACR Channel ImageName vars
+    name: setImageNameStep
   - template: /.vsts-ci/templatesGeneric/setVersionStepsTemplate.yml@self
   - pwsh: |
-      $finalImageName = '${{ parameters.imageName }}'
-      $finalContextFolder = 'docker'
-      $testDepsString = 'test-deps'
-      if ($finalImageName.Contains($testDepsString))
-      {
-        $finalImageName = $finalImageName.TrimEnd("\$testDepsString")
-        $finalContextFolder = Join-Path -Path $testDepsString -ChildPath $finalContextFolder
-      }
-      $pathToContextFolder = "${{ parameters.channelPath }}/$finalImageName/$finalContextFolder"
-      $hostVersionValue = ''
-      if ($finalImageName.Contains('windowsserver') -or ($finalImageName -eq 'nanoserver2022'))
-      {
-        $hostVersionValue = '1ESWindows2022'
-      }
-
-      Write-Host "##vso[task.setvariable variable=dockerBuildImageName;isOutput=true]$finalImageName"
-      Write-Host "##vso[task.setvariable variable=dockerBuildContextFolder;isOutput=true]$finalContextFolder"
-      Write-Host "##vso[task.setvariable variable=hostVersion;isOutput=true]$hostVersionValue"
-    displayName: Get Proper ImageName and ContextFolder
-    name: setImageNameStep
-  - pwsh: |
-      $modules = 'Az.Accounts', 'Az.Storage'
-      foreach ($module in $modules) {
-        if (!(Get-Module $module -listavailable)) {
-          Write-Host "installing $module..." -verbose
-          Install-Module $module -force -allowclobber
-        } else {
-          Write-Host "$module is already installed" -verbose
-        }
-      }
+      $buildHelperPath = Join-Path -Path $(repoRoot) -ChildPath 'tools/buildHelper'
+      Import-Module $buildHelperPath
+      Get-AzModulesInstalled
     displayName: 'Install AzAccounts'
   - task: AzurePowerShell@5
     inputs:
@@ -102,22 +68,13 @@ jobs:
       azurePowerShellVersion: latestVersion
       pwsh: true
       inline: |
-        $containerName = Out-String -InputObject $(DOCKERNAMESPACE) -NoNewline
-        $containerName = $containerName.Replace('.', '-')
-        $context = New-AzStorageContext -StorageAccountName $(StorageAccount)
-        $querystring = New-AzStorageContainerSASToken -Context $context -Name $containerName -Permission r -ExpiryTime ((get-date).AddMinutes(180)) -Protocol HttpsOnly
-        $uriBuilder = [System.UriBuilder]::new("https://$(StorageAccount).blob.core.windows.net")
-        $uriBuilder.Query = $querystring.ToString()
-        $url = $uriBuilder.ToString()
-        Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
-    displayName: 'Set SasUrl variable'
-  - pwsh: |
-      Get-ChildItem env: | Out-String -Width 1000
-    displayName: 'Capture Environment'
+        $buildHelperPath = Join-Path -Path $(repoRoot) -ChildPath 'tools/buildHelper'
+        Import-Module $buildHelperPath
+        Set-SASVariable -DockerNamespace $(dockerNamespace) -DockerHost $(dockerHost) -DockerImage $(dockerImage) -StorageAccountName $(StorageAccount) -ImageName $(setVariablesStep.dockerBuildImageName) -Channel $(channel) -Version '$(Version)'
+    displayName: Set SasURL
   - pwsh: |
       if($env:SASURL)
       {
-        Write-Host 'Using SasUrl...'
         $buildArgsString = ./build.ps1 -SasUrl $env:SASURL -ImageName $(dockerHost) -name '$(setImageNameStep.dockerBuildImageName)' -Channel ${{ parameters.channel }} -TestLogPostfix '${{ parameters.imageName }}-${{ parameters.channel }}' -version '$(Version)' -Repository $(dockerNamespace)/$(dockerImage)
         Write-Host "##vso[task.setvariable variable=sasBuildArgs;isOutput=true]$buildArgsString"
       }
@@ -132,19 +89,19 @@ jobs:
   dependsOn:
     - Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}
   variables:
-  - name: ob_outputDirectory # this directory is uploaded to pipeline artifacts
+  - name: ob_outputDirectory
     value: '$(Build.SourcesDirectory)/dst'
   - name: ob_git_checkout
     value: true
   - name: OB_build_container
-    value: true # Set this variable to enable Mixed Mode
+    value: true
   - ${{ if ne(parameters.windowsContainerImageValue, '')}}:
     - name: WindowsContainerImage
       value: ${{ parameters.windowsContainerImageValue }}
   - name: dockerBuildImageName
     value: $[ dependencies.Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}.outputs['setImageNameStep.dockerBuildImageName'] ]
   - name: ACRName
-    value: $[ dependencies.Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}.outputs['setACRVariableStep.acrName'] ]
+    value: $[ dependencies.Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}.outputs['setImageNameStep.acrName'] ]
   - name: SasBuildArgs
     value: $[ dependencies.Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}.outputs['setSASVariableStep.sasBuildArgs'] ]
   - name: HostVersionValue

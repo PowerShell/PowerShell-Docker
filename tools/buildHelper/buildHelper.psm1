@@ -1248,3 +1248,81 @@ function Get-TemplatePopulatedYaml {
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)channel: `${{ parameters.channel }}"
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)channelPath: `${{ parameters.channelPath }}"
 }
+
+# Section for release job functions
+function Set-ReleaseJobVariables
+{
+    param(
+        [string]
+        $channel,
+
+        [string]
+        $imageName)
+
+    # Set ACR Name variable
+    Set-BuildVariable -Name "acrName" -Value $env:ACR_NAME_VAR -IsOutput
+
+    # Set channel variable
+    Set-BuildVariable -Name "channel" -Value $channel
+
+    # Set imageName, context folder variables
+    $finalImageName = $imageName
+    $finalContextFolder = 'docker'
+    $testDepsString = 'test-deps'
+    if ($finalImageName.Contains($testDepsString))
+    {
+      $finalImageName = $finalImageName.TrimEnd("\$testDepsString")
+      $finalContextFolder = Join-Path -Path $testDepsString -ChildPath $finalContextFolder
+    }
+
+    $hostVersionValue = ''
+    if ($finalImageName.Contains('windowsserver') -or ($finalImageName -eq 'nanoserver2022'))
+    {
+      $hostVersionValue = '1ESWindows2022'
+    }
+
+    Set-BuildVariable -Name "dockerBuildImageName" -Value $finalImageName -IsOutput
+    Set-BuildVariable -Name "dockerBuildContextFolder" -Value $finalContextFolder -IsOutput
+    Set-BuildVariable -Name "hostVersion" -Value $hostVersionValue -IsOutput
+}
+
+function Get-AzModulesInstalled {
+    $modules = 'Az.Accounts', 'Az.Storage'
+    foreach ($module in $modules) {
+      if (!(Get-Module $module -listavailable)) {
+        Write-Host "installing $module..." -verbose
+        Install-Module $module -force -allowclobber
+      } else {
+        Write-Host "$module is already installed" -verbose
+      }
+    }
+}
+
+function Set-SASVariable {
+    param(
+        [string]
+        $DockerNamespace,
+
+        [string]
+        $StorageAccountName
+    )
+
+    $containerName = Out-String -InputObject $DockerNamespace -NoNewline
+    $containerName = $containerName.Replace('.', '-')
+    $context = New-AzStorageContext -StorageAccountName $StorageAccountName
+    $querystring = New-AzStorageContainerSASToken -Context $context -Name $containerName -Permission r -ExpiryTime ((get-date).AddMinutes(180)) -Protocol HttpsOnly
+    $uriBuilder = [System.UriBuilder]::new("https://$StorageAccountName.blob.core.windows.net")
+    $uriBuilder.Query = $querystring.ToString()
+    $url = $uriBuilder.ToString()
+    Set-BuildVariable -Name "SasUrl" -Value $url
+    # Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
+
+    # if($url)
+    # {
+    #   Write-Host 'Using SasUrl...'
+    #   $buildScriptPath = 
+    #   $buildArgsString = ./build.ps1 -SasUrl $env:SASURL -ImageName $DockerHost -name $ImageName -Channel $Channel -TestLogPostfix "$ImageName-$Channel" -version $Version -Repository "$DockerNamespace/$DockerImage"
+    #   Set-BuildVariable -Name "sasBuildArgs" -Value $buildArgsString -IsOutput
+    # #   Write-Host "##vso[task.setvariable variable=sasBuildArgs;isOutput=true]$buildArgsString"
+    # }
+}
