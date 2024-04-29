@@ -1,28 +1,23 @@
 # This Yaml Document has been converted by ESAI Yaml Pipeline Conversion Tool.
 # Please make sure to check all the converted content, it is your team's responsibility to make sure that the pipeline is still valid and functions as expected.
 # This pipeline will be extended to the OneBranch template
-name: PSDocker-Build-$(Build.BuildId)-s_$(stableReleaseTag)_p_$(previewReleaseTag)_l_$(ltsReleaseTag)$(Rev:_rr)
+name: PSDocker-Build-$(Build.BuildId)-version_$(releaseVersionTag)_channel_$(releaseChannel)$(Rev:_rr)
 trigger: none
 parameters:
-- name: 'previewReleaseTag'
-- name: 'ltsReleaseTag'
-- name: 'stableReleaseTag'
+- name: 'releaseVersionTag'
+  default: 'v7.4.0-preview.5'
+- name: 'releaseChannel'
+  default: 'stable'
 variables:
 - name: POWERSHELL_TELEMETRY_OPTOUT
   value: 1
 - name: DOCKER_RELEASE
   value: true
-- name: previewReleaseTag
-  value: ${{ parameters.previewReleaseTag }}
-- name: ltsReleaseTag
-  value: ${{ parameters.ltsReleaseTag }}
-- name: stableReleaseTag
-  value: ${{ parameters.stableReleaseTag }}
-- name: previewChannelPath
-  value: ''
-- name: ltsChannelPath
-  value: ''
-- name: stableChannelPath
+- name: releaseVersionTag
+  value: ${{ parameters.releaseVersionTag }}
+- name: releaseChannel
+  value: ${{ parameters.releaseChannel }}
+- name: releaseChannelPath
   value: ''
 - name: runCodesignValidationInjection
   value: false
@@ -79,26 +74,23 @@ extends:
           type: windows
         steps:
         - pwsh: |
-            if (-not (Test-Path $(repoRoot)/.config/tsaoptions.json)) {
-              Get-ChildItem $(Build.SourcesDirectory) -recurse -ErrorAction SilentlyContinue
-              throw "tsaoptions.json does not exist under $(repoRoot)/.config"
+            if (($env:RELEASECHANNEL -eq "stable") -or ($env:RELEASECHANNEL -eq "lts"))
+            {
+              if ($env:RELEASEVERSIONTAG -notmatch '^v\d+\.\d+\.\d+$') {
+                throw "${$env:RELEASECHANNEL} release tag is not for a ${$env:RELEASECHANNEL} build: '${$env:RELEASEVERSIONTAG}'"
+              }
             }
-          displayName: Test if tsaoptions.json exists
-        - pwsh: |
-            if ($env:PREVIEWRELEASETAG -notmatch '^v\d+\.\d+\.\d+-(preview|rc)\.\d+$') {
-              throw "preview release tag is not for a preview build: '${env:PREVIEWRELEASETAG}'"
+            elseif ($env:RELEASECHANNEL -eq "preview")
+            {
+              if ($env:RELEASEVERSIONTAG -notmatch '^v\d+\.\d+\.\d+-(preview|rc)\.\d+$') {
+                throw "${$env:RELEASECHANNEL} release tag is not for a ${$env:RELEASECHANNEL} build: '${$env:RELEASEVERSIONTAG}'"
+              }
             }
-          displayName: stop build if preview release tag does not match preview format
-        - pwsh: |
-            if ($env:STABLERELEASETAG -notmatch '^v\d+\.\d+\.\d+$') {
-              throw "stable release tag is not for a stable build: '${env:STABLERELEASETAG}'"
+            else
+            {
+              throw "channel ${$env:RELEASECHANNEL} is not a supported channel"
             }
-          displayName: stop build if stable release tag does not match stable format
-        - pwsh: |
-            if ($env:LTSRELEASETAG -notmatch '^v\d+\.\d+\.\d+$') {
-              throw "LTS release tag is not for a stable build: '${env:LTSRELEASETAG}'"
-            }
-          displayName: stop build if LTS release tag does not match stable format
+          displayName: stop build if release tag does not match release tag format for channel
         - pwsh: |
             $toolsFolderPath = Join-Path -Path $(repoRoot) -ChildPath 'tools'
             $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
@@ -132,18 +124,16 @@ extends:
         - pwsh: |
             Get-ChildItem env: | Out-String -Width 1000
           displayName: 'Capture Environment'
-    - ${{ if ne(parameters.stableReleaseTag, '') }}:
+    - ${{ if eq(parameters.releaseChannel, 'stable') }}:
       - template: /.vsts-ci/stableReleaseStage.yml@self
         parameters:
-          channel: stable
+          channel: ${{ parameters.releaseChannel }}
           channelPath: 'release/7-4'
-    - ${{ if ne(parameters.previewReleaseTag, '') }}:
-      - template: /.vsts-ci/previewReleaseStage.yml@self
-        parameters:
-          channel: preview
-          channelPath: 'release/7-5'
-    - ${{ if ne(parameters.ltsReleaseTag, '') }}:
-      - template: /.vsts-ci/ltsReleaseStage.yml@self
-        parameters:
-          channel: lts
-          channelPath: 'release/7-2'
+    # - template: /.vsts-ci/previewReleaseStage.yml@self
+    #   parameters:
+    #     channel: preview
+    #     channelPath: 'release/7-5'
+    # - template: /.vsts-ci/ltsReleaseStage.yml@self
+    #   parameters:
+    #     channel: lts
+    #     channelPath: 'release/7-2'
