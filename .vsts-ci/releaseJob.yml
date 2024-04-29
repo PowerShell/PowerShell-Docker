@@ -50,7 +50,8 @@ jobs:
       dotnet --list-sdks
     displayName: dotnet info
   - pwsh: |
-      Import-Module (Join-Path -Path $(repoRoot) -ChildPath 'tools/buildHelper')
+      $buildHelperPath = Join-Path -Path $(repoRoot) -ChildPath 'tools/buildHelper'
+      Import-Module $buildHelperPath
       Set-ReleaseJobVariables -Channel ${{ parameters.channel }} -ImageName  ${{ parameters.imageName }}
     displayName: Set ACR Channel ImageName vars
     name: setImageNameStep
@@ -62,7 +63,8 @@ jobs:
       azurePowerShellVersion: latestVersion
       pwsh: true
       inline: |
-        Import-Module (Join-Path -Path $(repoRoot) -ChildPath 'tools/buildHelper')
+        $buildHelperPath = Join-Path -Path $(repoRoot) -ChildPath 'tools/buildHelper'
+        Import-Module $buildHelperPath
         Set-SASVariable -DockerNamespace $(dockerNamespace) -DockerHost $(dockerHost) -DockerImage $(dockerImage) -StorageAccountName $(StorageAccount) -ImageName '$(setImageNameStep.dockerBuildImageName)' -Channel $(channel) -Version '$(Version)'
     displayName: Set SasURL
   - pwsh: |
@@ -129,3 +131,5 @@ jobs:
       enable_network: true
       enable_cache: true
       enable_pull: true
+
+
