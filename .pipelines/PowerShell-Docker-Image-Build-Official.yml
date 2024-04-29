@@ -119,15 +119,15 @@ extends:
     - ${{ if eq(parameters.releaseChannel, 'stable') }}:
       - template: /.vsts-ci/stableReleaseStage.yml@self
         parameters:
-          channel: ${{ parameters.releaseChannel }}
+          channel: ${{ parameters.channel }}
           channelPath: 'release/7-4'
     - ${{ elseif eq(parameters.releaseChannel, 'preview')}}:
       - template: /.vsts-ci/previewReleaseStage.yml@self
         parameters:
-          channel: ${{ parameters.releaseChannel }}
+          channel: preview
           channelPath: 'release/7-5'
     - ${{ elseif eq(parameters.releaseChannel, 'lts')}}:
       - template: /.vsts-ci/ltsReleaseStage.yml@self
         parameters:
-          channel: ${{ parameters.releaseChannel }}
+          channel: lts
           channelPath: 'release/7-2'
