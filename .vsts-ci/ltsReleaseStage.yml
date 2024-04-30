@@ -106,6 +106,8 @@ stages:
       imageName: nanoserver1809
       artifactSuffix: nanoserver1809
       poolOS: 'windows'
+      poolHostVersion: '1ESWindows2022'
+      windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'
       maxParallel: 3
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}

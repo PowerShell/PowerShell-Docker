@@ -73,15 +73,8 @@ jobs:
         $finalContextFolder = Join-Path -Path $testDepsString -ChildPath $finalContextFolder
       }
       $pathToContextFolder = "${{ parameters.channelPath }}/$finalImageName/$finalContextFolder"
-      $hostVersionValue = ''
-      if ($finalImageName.Contains('windowsserver') -or ($finalImageName -eq 'nanoserver2022'))
-      {
-        $hostVersionValue = '1ESWindows2022'
-      }
-
       Write-Host "##vso[task.setvariable variable=dockerBuildImageName;isOutput=true]$finalImageName"
       Write-Host "##vso[task.setvariable variable=dockerBuildContextFolder;isOutput=true]$finalContextFolder"
-      Write-Host "##vso[task.setvariable variable=hostVersion;isOutput=true]$hostVersionValue"
     displayName: Get Proper ImageName and ContextFolder
     name: setImageNameStep
   - pwsh: |
