@@ -1105,12 +1105,8 @@ function Get-TemplatePopulatedYaml {
     }
     else
     {
-        if ($imageName.Contains("2022"))
-        {
-            Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolHostVersion: '1ESWindows2022'"
-            Add-Content -Path $YamlFilePath -Value "$($sixSpace)windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'"
-        }
-
+        Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolHostVersion: '1ESWindows2022'"
+        Add-Content -Path $YamlFilePath -Value "$($sixSpace)windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'"
         Add-Content -Path $YamlFilePath -Value "$($sixSpace)maxParallel: 3"
     }
 
