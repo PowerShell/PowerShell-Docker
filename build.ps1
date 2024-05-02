@@ -27,6 +27,7 @@ param(
     [Parameter(ParameterSetName="localBuildAll")]
     [Parameter(ParameterSetName="TestByName")]
     [Parameter(ParameterSetName="TestAll")]
+    [Parameter(ParameterSetName="GetSASData")]
     [switch]
     $Pull,
 
@@ -57,11 +58,13 @@ param(
 
     [Parameter(ParameterSetName="localBuildByName")]
     [Parameter(ParameterSetName="localBuildAll")]
+    [Parameter(ParameterSetName="GetSASData")]
     [switch]
     $Push,
 
     [Parameter(ParameterSetName="localBuildByName")]
     [Parameter(ParameterSetName="localBuildAll")]
+    [Parameter(ParameterSetName="GetSASData")]
     [switch]
     $SkipTest,
 
@@ -97,6 +100,7 @@ param(
 
     [Parameter(ParameterSetName="localBuildByName")]
     [Parameter(ParameterSetName="localBuildAll")]
+    [Parameter(Mandatory, ParameterSetName="GetSASData")]
     [ValidateScript({([uri]$_).Scheme -eq 'https'})]
     [string]
     $SasUrl,
@@ -107,6 +111,7 @@ param(
     [Parameter(Mandatory, ParameterSetName="TestAll")]
     [Parameter(Mandatory, ParameterSetName="GetTagsByName")]
     [Parameter(Mandatory, ParameterSetName="GetTagsByChannel")]
+    [Parameter(ParameterSetName="GetSASData")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
     [string]
     $Version,
@@ -188,6 +193,7 @@ DynamicParam {
     Add-ParameterAttribute -ParameterSetName 'localBuildByName' -Attributes $Attributes
     Add-ParameterAttribute -ParameterSetName 'GetTagsByName' -Attributes $Attributes
     Add-ParameterAttribute -ParameterSetName 'GenerateTagsYaml' -Attributes $Attributes -Mandatory $false
+    Add-ParameterAttribute -ParameterSetName 'GetSASData' -Attributes $Attributes
 
     if($dockerFileNames.Count -gt 0)
     {
@@ -208,6 +214,7 @@ DynamicParam {
     Add-ParameterAttribute -ParameterSetName 'TestAll' -Attributes $channelAttributes
     Add-ParameterAttribute -ParameterSetName 'TestByName' -Attributes $channelAttributes
     Add-ParameterAttribute -ParameterSetName 'localBuildAll' -Attributes $channelAttributes
+    Add-ParameterAttribute -ParameterSetName 'GetSASData' -Attributes $channelAttributes
     Add-ParameterAttribute -ParameterSetName 'localBuildByName' -Attributes $channelAttributes
     Add-ParameterAttribute -ParameterSetName 'GetTagsByName' -Attributes $channelAttributes
     Add-ParameterAttribute -ParameterSetName 'GetTagsByChannel' -Attributes $channelAttributes
@@ -248,6 +255,8 @@ Begin {
         $Channels = $channelNames
     } elseif ($FullJson) {
         $Channels = $channelNames | Where-Object { $_ -notlike 'community*' }
+    } elseif ( $PSCmdlet.ParameterSetName -eq 'GetSASData' ) {
+        $Channels = $Channel
     } else {
         $Channels = $Channel
     }
@@ -374,6 +383,28 @@ End {
             $actualChannel = $allMeta.Channel
             $useAcr = $allMeta.meta.UseAcr
             $continueOnError = $allMeta.meta.ContinueOnError
+
+            if ($SasUrl)
+            {
+                $params = @{
+                    Dockerfile    = $dockerFileName
+                    psversion     = $allMeta.psversion
+                    SasData       = $sasData
+                    actualChannel = $actualChannel
+                    actualTagData = $actualTagData
+                    actualVersion = $windowsVersion
+                    AllMeta       = $allMeta
+                    CI            = $CI.IsPresent
+                }
+
+                if($allMeta.BaseImage)
+                {
+                    $params.Add('BaseImage',$allMeta.BaseImage)
+                }
+
+                $testParams = Get-SASBuildArgs @params
+                return $testParams
+            }
 
             if ($Build.IsPresent -or $Test.IsPresent)
             {

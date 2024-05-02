@@ -809,6 +809,137 @@ function Get-TestParams
     }
 }
 
+function Get-SASBuildArgs
+{
+    param(
+        [string]
+        $dockerFileName,
+        [string]
+        $psversion,
+        [SasData]
+        $SasData,
+        [string]
+        $actualChannel,
+        [TagData]
+        $actualTagData,
+        [string]
+        $actualVersion,
+        [DockerImageFullMetaData]
+        $allMeta,
+        [switch]
+        $CI,
+        [string]
+        $BaseImage
+    )
+
+    Write-Verbose -Message "To be tested, repository: $($allMeta.FullRepository) fromTag: $($actualTagData.FromTag) Tag: $($actualTagData.ActualTag) PSversion: $psversion" -Verbose
+    # $contextPath = Join-Path -Path $allMeta.imagePath -ChildPath 'docker'
+    $script:ErrorActionPreference = 'stop'
+    # Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
+    if ($allMeta.meta.IsLinux) {
+        $os = 'linux'
+    }
+    else {
+        $os = 'windows'
+    }
+
+    $skipVerification = $false
+    if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
+    {
+        Write-Verbose -Message "Skipping verification of $($actualTagData.ActualTags[0]) in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
+        # The version of nanoserver in CI doesn't have all the changes needed to verify the image
+        $skipVerification = $true
+    }
+
+    # for the image name label, always use the official image name
+    Write-Verbose -Verbose "made it here"
+    $imageNameParam = "mcr.microsoft.com/$($allMeta.FullRepository):" + $actualTagData.TagList[0]
+    Write-Verbose -Verbose "past first indexing"
+    if($actualChannel -like 'community-*')
+    {
+        # use the image name for pshorg for community images
+        $imageNameParam = 'pshorg/powershellcommunity:' + $actualTagData.TagList[0]
+    }
+
+    $packageVersion = $psversion
+
+    # if the package name ends with rpm
+    # then replace the - in the filename with _ as fpm creates the packages this way.
+    if($allMeta.meta.PackageFormat -and $allMeta.meta.PackageFormat -match 'rpm$')
+    {
+        $packageVersion = $packageVersion -replace '-', '_'
+    }
+
+    $buildArgs = [System.Collections.Generic.Dictionary[string,string]]::new()
+    $buildArgs['fromTag'] = $actualTagData.FromTag
+    $buildArgs['PS_VERSION'] = $psversion
+    $buildArgs['PACKAGE_VERSION'] = $packageVersion
+    $buildArgs['IMAGE_NAME'] = $imageNameParam
+    $buildArgs['BaseImage'] = $BaseImage
+    $buildArgs['PS_INSTALL_VERSION'] = Get-PwshInstallVersion -Channel $actualChannel
+
+    if ($allMeta.meta.PackageFormat)
+    {
+        if($sasData.sasUrl)
+        {
+            $packageUrl = [System.UriBuilder]::new($sasData.sasBase)
+
+            $channelTag = Get-ChannelPackageTag -Channel $actualChannel
+
+            $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+            $packageName = $packageName -replace '\${channelTag}', $channelTag
+            $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
+            $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
+            $packageUrl.Query = $sasData.sasQuery
+            if($allMeta.meta.Base64EncodePackageUrl)
+            {
+                $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.ToString())
+                $encodedUrl =[Convert]::ToBase64String($urlBytes)
+                $buildArgs.Add('PS_PACKAGE_URL_BASE64', $encodedUrl)
+            }
+            else
+            {
+                $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+            }
+        }
+    }
+
+    $testArgs = @{
+        tags = $actualTagData.ActualTags
+        BuildArgs = $buildArgs
+        ContextPath = $contextPath
+        OS = $os
+        ExpectedVersion = $actualVersion
+        SkipVerification = $skipVerification
+        SkipWebCmdletTests = $allMeta.meta.SkipWebCmdletTests
+        SkipGssNtlmSspTests = $allMeta.meta.SkipGssNtlmSspTests
+        BaseImage = $BaseImage
+        OptionalTests = $allMeta.meta.OptionalTests
+        TestProperties = $allMeta.meta.TestProperties
+        Channel = $actualChannel
+        UseAcr = $allMeta.meta.UseAcr
+    }
+
+    $buildArgsString = ""
+    $buildArgsDict = $testArgs.BuildArgs
+
+    foreach($argKey in $buildArgsDict.Keys)
+    {
+        $value = $buildArgsDict[$argKey]
+        if($UseAcr.IsPresent -and $env:ACR_NAME -and $value -match '&')
+        {
+            throw "$argKey contains '&' and this is not allowed in ACR using the az cli"
+        }
+
+        if($value)
+        {
+            $buildArgsString += " --build-arg $argKey=$value"
+        }
+    }
+
+    return $buildArgsString
+}
+
 class TagData{
     [string[]] $TagList
     [string] $FromTag

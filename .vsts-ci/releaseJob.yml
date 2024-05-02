@@ -1,0 +1,178 @@
+parameters:
+- name: archName
+  default: ''
+- name: imageName
+  default: 'none'
+- name: artifactSuffix
+  default: ''
+- name: ACR
+  default: 'No'
+- name: maxParallel
+  default: 5
+- name: poolOS
+  default: windows
+- name: poolHostArchitecture
+  default: ''
+- name: poolHostVersion
+  default: ''
+- name: channelPath
+  default: ''
+- name: buildKitValue
+  default: 0
+- name: channel
+  default: 'preview'
+- name: releaseTag
+  default: ''
+- name: windowsContainerImageValue
+  default: ''
+jobs:
+- job: Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}
+  variables:
+  - name: dockerImage
+    value: 'powershell'
+  - name: releaseTag
+    value: ${{ parameters.releaseTag }}
+  - name: scanType
+    value: Register
+  - group: 'Azure Blob variable group'
+  - group: Build Docker Group
+  - group: Staging_ACR
+  - name: repoRoot
+    value: $(Build.SourcesDirectory)
+  - name: ob_outputDirectory
+    value: '$(Build.ArtifactStagingDirectory)/ONEBRANCH_ARTIFACT'
+  - name: ob_git_checkout
+    value: true
+  pool:
+    type: linux
+  timeoutInMinutes: 135
+  displayName: 'Prep data to be used for docker build of ${{ parameters.artifactSuffix }}'
+  steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: 7.x
+  - pwsh: |
+      dotnet --list-sdks
+    displayName: dotnet info
+  - pwsh: |
+      Write-Host "##vso[task.setvariable variable=acrName;isOutput=true]$env:ACR_NAME_VAR"
+    displayName: 'Set ACR name variable'
+    name: setACRVariableStep
+  - pwsh: |
+      Write-Host "##vso[task.setvariable variable=channel;]${{ parameters.channel }}"
+    displayName: 'Set channel variable'
+  - template: /.vsts-ci/templatesGeneric/setVersionStepsTemplate.yml@self
+  - pwsh: |
+      $finalImageName = '${{ parameters.imageName }}'
+      $finalContextFolder = 'docker'
+      $testDepsString = 'test-deps'
+      if ($finalImageName.Contains($testDepsString))
+      {
+        $finalImageName = $finalImageName.TrimEnd("\$testDepsString")
+        $finalContextFolder = Join-Path -Path $testDepsString -ChildPath $finalContextFolder
+      }
+      $pathToContextFolder = "${{ parameters.channelPath }}/$finalImageName/$finalContextFolder"
+      Write-Host "##vso[task.setvariable variable=dockerBuildImageName;isOutput=true]$finalImageName"
+      Write-Host "##vso[task.setvariable variable=dockerBuildContextFolder;isOutput=true]$finalContextFolder"
+    displayName: Get Proper ImageName and ContextFolder
+    name: setImageNameStep
+  - pwsh: |
+      $modules = 'Az.Accounts', 'Az.Storage'
+      foreach ($module in $modules) {
+        if (!(Get-Module $module -listavailable)) {
+          Write-Host "installing $module..." -verbose
+          Install-Module $module -force -allowclobber
+        } else {
+          Write-Host "$module is already installed" -verbose
+        }
+      }
+    displayName: 'Install AzAccounts'
+  - task: AzurePowerShell@5
+    inputs:
+      azureSubscription: az-blob-cicd-infra
+      scriptType: inlineScript
+      azurePowerShellVersion: latestVersion
+      pwsh: true
+      inline: |
+        $containerName = Out-String -InputObject $(DOCKERNAMESPACE) -NoNewline
+        $containerName = $containerName.Replace('.', '-')
+        $context = New-AzStorageContext -StorageAccountName $(StorageAccount)
+        $querystring = New-AzStorageContainerSASToken -Context $context -Name $containerName -Permission r -ExpiryTime ((get-date).AddMinutes(180)) -Protocol HttpsOnly
+        $uriBuilder = [System.UriBuilder]::new("https://$(StorageAccount).blob.core.windows.net")
+        $uriBuilder.Query = $querystring.ToString()
+        $url = $uriBuilder.ToString()
+        Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
+    displayName: 'Set SasUrl variable'
+  - pwsh: |
+      Get-ChildItem env: | Out-String -Width 1000
+    displayName: 'Capture Environment'
+  - pwsh: |
+      if($env:SASURL)
+      {
+        Write-Host 'Using SasUrl...'
+        $buildArgsString = ./build.ps1 -SasUrl $env:SASURL -ImageName $(dockerHost) -name '$(setImageNameStep.dockerBuildImageName)' -Channel ${{ parameters.channel }} -TestLogPostfix '${{ parameters.imageName }}-${{ parameters.channel }}' -version '$(Version)' -Repository $(dockerNamespace)/$(dockerImage)
+        Write-Host "##vso[task.setvariable variable=sasBuildArgs;isOutput=true]$buildArgsString"
+      }
+    displayName: 'Set build args from SAS token'
+    name: setSASVariableStep
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: $(repoRoot)/${{ parameters.channelPath }}/$(setImageNameStep.dockerBuildImageName)/$(setImageNameStep.dockerBuildContextFolder)
+      TargetFolder: $(ob_outputDirectory)/$(setImageNameStep.dockerBuildImageName)
+    displayName: "Copy Dockerfile to ob_outputDirectory/ONEBRANCH_ARTIFACT - '$(ob_outputDirectory)'"
+- job: Job_Build_${{ parameters.archName }}_${{ parameters.artifactSuffix }}
+  dependsOn:
+    - Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}
+  variables:
+  - name: ob_outputDirectory # this directory is uploaded to pipeline artifacts
+    value: '$(Build.SourcesDirectory)/dst'
+  - name: ob_git_checkout
+    value: true
+  - name: OB_build_container
+    value: true # Set this variable to enable Mixed Mode
+  - ${{ if ne(parameters.windowsContainerImageValue, '')}}:
+    - name: WindowsContainerImage
+      value: ${{ parameters.windowsContainerImageValue }}
+  - name: dockerBuildImageName
+    value: $[ dependencies.Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}.outputs['setImageNameStep.dockerBuildImageName'] ]
+  - name: ACRName
+    value: $[ dependencies.Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}.outputs['setACRVariableStep.acrName'] ]
+  - name: SasBuildArgs
+    value: $[ dependencies.Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}.outputs['setSASVariableStep.sasBuildArgs'] ]
+  - name: HostVersionValue
+    value: $[ dependencies.Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}.outputs['setImageNameStep.hostVersion'] ]
+  pool:
+    type: docker
+    os: ${{ parameters.poolOS }}
+    ${{ if ne(parameters.poolHostArchitecture, '') }}:
+      hostArchitecture: ${{ parameters.poolHostArchitecture }}
+    ${{ if ne(parameters.poolHostVersion, '') }}:
+      hostVersion: ${{ parameters.poolHostVersion }}
+  steps:
+  - task: DownloadPipelineArtifact@2
+    inputs:
+      targetPath: $(Build.SourcesDirectory)/dst/$(dockerBuildImageName)
+      artifact: drop_StageGenerateBuild_${{ parameters.channel }}_Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}
+    displayName: 'Download artifact to which Dockerfile was uploaded'
+  - task: onebranch.pipeline.containercontrol@1
+    displayName: "Login to source ACR"
+    inputs:
+      command: login
+      acr_name: $(ACRName)
+      tenant: MSFT
+  - task: onebranch.pipeline.imagebuildinfo@1
+    displayName: image build
+    inputs:
+      dockerFileRelPath: $(dockerBuildImageName)/$(dockerBuildImageName)/Dockerfile
+      build_tag: $(Build.BuildNumber)
+      repositoryName: $(dockerBuildImageName)
+      saveImageToPath: $(dockerBuildImageName).tar
+      arguments: $(SasBuildArgs)
+      registry: $(ACRName)
+      buildkit: ${{ parameters.buildKitValue }}
+      enable_network: true
+      enable_cache: true
+      enable_pull: true
+
+

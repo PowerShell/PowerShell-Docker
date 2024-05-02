@@ -1,39 +1,26 @@
 steps:
-- powershell: |
+- pwsh: |
     $namespace = '$(releaseTag)'.ToLowerInvariant()
     Write-Host "##vso[task.setvariable variable=dockerNamespace;]$namespace"
   displayName: 'Set dockerNamespace'
-
-- powershell: 'Get-ChildItem env:'
+- pwsh: 'Get-ChildItem env:'
   displayName: 'Capture Environment'
-
 - pwsh: |
     $PSVersionTable
   displayName: Capture pwsh Version
-
-- powershell: |
-      $dockerConfigFolder = "$env:userprofile/.docker"
-      if(!(Test-Path $dockerConfigFolder)){ $null = new-item -Type Directory -Path $dockerConfigFolder}
-      $dockerCliConfig = "$env:userprofile/.docker/config.json"
-      $dockerCliBackup = "$env:userprofile/.docker/config-backup.json"
-      if(Test-Path $dockerCliConfig) { copy-item $dockerCliConfig $dockerCliBackup -force}
-      @{experimental='enabled'}|ConvertTo-Json | Out-File -Encoding ascii -FilePath $dockerCliConfig
-
-  displayName: 'enable docker cli experimental features'
-
-- powershell: 'docker login $(dockerHost) -u $(dockerUserName) -p $(dockerKey)'
-  displayName: 'docker login'
-
 - pwsh: |
-        ./createAllManifests.ps1 -Registry '$(dockerHost)/public/$(dockerNamespace)' -Channel $(Channel)
+    $dockerConfigFolder = "$env:userprofile/.docker"
+    if(!(Test-Path $dockerConfigFolder)){ $null = new-item -Type Directory -Path $dockerConfigFolder}
+    $dockerCliConfig = "$env:userprofile/.docker/config.json"
+    $dockerCliBackup = "$env:userprofile/.docker/config-backup.json"
+    if(Test-Path $dockerCliConfig) { copy-item $dockerCliConfig $dockerCliBackup -force}
+    @{experimental='enabled'}|ConvertTo-Json | Out-File -Encoding ascii -FilePath $dockerCliConfig
+  displayName: 'enable docker cli experimental features'
+- pwsh: 'docker login $(dockerHost) -u $(dockerUserName) -p $(dockerKey)'
+  displayName: 'docker login'
+- pwsh: |
+    ./createAllManifests.ps1 -Registry '$(dockerHost)/public/$(dockerNamespace)' -Channel $(Channel)
   displayName: 'Create $(Channel) Manifest Lists'
-
-- powershell: 'docker logout $(dockerHost)'
+- pwsh: 'docker logout $(dockerHost)'
   displayName: 'docker logout'
   condition: always()
-
-- task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
-  displayName: 'Component Detection'
-  inputs:
-    sourceScanPath: '$(Build.SourcesDirectory)'
-    snapshotForceEnabled: true
