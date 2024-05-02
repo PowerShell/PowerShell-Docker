@@ -10,7 +10,7 @@ stages:
   dependsOn: ['StageResolveVersionandYaml']
   displayName: Build stable
   jobs:
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: alpine316
@@ -20,7 +20,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: alpine317
@@ -30,7 +30,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: debian11
@@ -40,7 +40,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: debian12
@@ -50,7 +50,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: mariner2
@@ -60,7 +60,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: ubi8
@@ -70,7 +70,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: ubi9
@@ -80,7 +80,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: ubuntu20.04
@@ -90,7 +90,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: ubuntu22.04
@@ -100,7 +100,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_arm32'
       imageName: ubuntu20.04-arm32v7
@@ -110,7 +110,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_arm32'
       imageName: ubuntu22.04-arm32v7
@@ -120,7 +120,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_arm64'
       imageName: mariner2-arm64
@@ -130,7 +130,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_windows_amd64'
       imageName: windowsserver2022
@@ -141,7 +141,7 @@ stages:
       maxParallel: 3
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_windows_amd64'
       imageName: windowsservercore2022
@@ -152,7 +152,7 @@ stages:
       maxParallel: 3
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: alpine316\test-deps
@@ -162,7 +162,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: alpine317\test-deps
@@ -172,7 +172,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: debian11\test-deps
@@ -182,7 +182,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: debian12\test-deps
@@ -192,7 +192,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: ubi8\test-deps
@@ -202,7 +202,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: ubi9\test-deps
@@ -212,7 +212,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: ubuntu20.04\test-deps
@@ -222,7 +222,7 @@ stages:
       buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releasePhase.yml@self
+  - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
       imageName: ubuntu22.04\test-deps

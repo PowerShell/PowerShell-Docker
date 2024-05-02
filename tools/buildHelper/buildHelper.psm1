@@ -1090,7 +1090,7 @@ function Get-TemplatePopulatedYaml {
         $architecture = "arm64" # we need to use hostArchicture arm64 for pool for arm32
     }
 
-    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)- template: /.vsts-ci/releasePhase.yml@self"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)- template: /.vsts-ci/releaseJob.yml@self"
     Add-Content -Path $YamlFilePath -Value "$($fourSpace)parameters:"
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)archName: '$archBasedJobName'" # ie: Build_Linux_arm32
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)imageName: $imageName" # ie. imageName: alpine317\test-deps (since this differs from artifactSuffix for test-deps images only, we have a separate entry as the yaml param)
