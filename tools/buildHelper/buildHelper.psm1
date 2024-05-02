@@ -1183,7 +1183,7 @@ function Get-StartOfYamlPopulated {
     Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: 'preview'"
     Add-Content -Path $YamlFilePath -Value "- name: channelPath"
     Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: ''"
-    Add-Content -Path $YamlFilePath -Value "- name: vmImage" #not sure if this is needed really
+    Add-Content -Path $YamlFilePath -Value "- name: vmImage"
     Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: PSMMSUbuntu20.04-Secure"
     Add-Content -Path $YamlFilePath -Value "stages:"
     Add-Content -Path $YamlFilePath -Value "- stage: StageGenerateBuild_$Channel"
