@@ -28,11 +28,11 @@ parameters:
 jobs:
 - job: Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}
   variables:
-  - name: dockerImage #?
+  - name: dockerImage
     value: 'powershell'
   - name: releaseTag
     value: ${{ parameters.releaseTag }}
-  - name: scanType #?
+  - name: scanType
     value: Register
   - group: 'Azure Blob variable group'
   - group: Build Docker Group
