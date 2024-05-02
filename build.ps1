@@ -635,7 +635,6 @@ End {
             {
                 $channelName = $channelGroup.Name
                 Write-Verbose "generating $channelName json"
-
                 $osGroups = $channelGroup.Group | Group-Object -Property os
                 foreach ($osGroup in $osGroups) {
                     $osName = $osGroup.Name
