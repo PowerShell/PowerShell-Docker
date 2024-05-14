@@ -121,6 +121,11 @@ extends:
         - pwsh: |
             Get-ChildItem env: | Out-String -Width 1000
           displayName: 'Capture Environment'
+        - pwsh: |
+            $info = @{}
+            $info.Add("channel", $env:RELEASECHANNEL)
+            $info.Add("releaseVersionTag", $env:RELEASEVERSIONTAG)
+            $info | ConvertTo-Json -Encoding utf8NoBOM -FilePath ./BuildInfo.json
     - ${{ if eq(parameters.releaseChannel, 'stable') }}:
       - template: /.vsts-ci/stableReleaseStage.yml@self
         parameters:
