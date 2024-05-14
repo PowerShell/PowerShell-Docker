@@ -125,7 +125,8 @@ extends:
             $info = @{}
             $info.Add("channel", $env:RELEASECHANNEL)
             $info.Add("releaseVersionTag", $env:RELEASEVERSIONTAG)
-            $info | ConvertTo-Json -Encoding utf8NoBOM -FilePath ./BuildInfo.json
+            $info | ConvertTo-Json | Out-File -Encoding utf8NoBOM -FilePath ./BuildInfo.json
+          displayName: 'Write build info to file'
     - ${{ if eq(parameters.releaseChannel, 'stable') }}:
       - template: /.vsts-ci/stableReleaseStage.yml@self
         parameters:
