@@ -121,6 +121,17 @@ extends:
         - pwsh: |
             Get-ChildItem env: | Out-String -Width 1000
           displayName: 'Capture Environment'
+        - pwsh: |
+            $info = @{}
+            $info.Add("channel", $env:RELEASECHANNEL)
+            $info.Add("releaseVersionTag", $env:RELEASEVERSIONTAG)
+            $info | ConvertTo-Json | Out-File -Encoding utf8NoBOM -FilePath ./BuildInfo.json
+          displayName: 'Write build info to file'
+        - task: CopyFiles@2
+          inputs:
+            Contents: '*BuildInfo.json'
+            TargetFolder: $(ob_outputDirectory)
+          displayName: "Copy buildInfo.json file to ob_outputDirectory - '$(ob_outputDirectory)'"
     - ${{ if eq(parameters.releaseChannel, 'stable') }}:
       - template: /.vsts-ci/stableReleaseStage.yml@self
         parameters:
