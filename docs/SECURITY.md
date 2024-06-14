@@ -15,4 +15,4 @@ These versions are currently being supported with security updates:
 
 If you have found a potential security issue in PowerShell Core
 or any Docker images present in this repository,
-please email details to secure@microsoft.com.
+please see our [Security Policy](../.github/SECURITY.md).
