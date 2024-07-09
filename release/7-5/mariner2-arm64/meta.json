@@ -2,7 +2,7 @@
     "IsLinux" : true,
     "UseLinuxVersion": false,
     "PackageFormat": "powershell-${PS_VERSION}-linux-arm64.tar.gz",
-    "osVersion": "Mariner 2.0 ARM 64v7",
+    "osVersion": "Mariner 2.0 ARM 64v8",
     "SkipGssNtlmSspTests": true,
     "ShortDistroName": "mariner",
     "shortTags": [
