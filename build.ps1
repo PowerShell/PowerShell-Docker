@@ -769,7 +769,6 @@ End {
                 }
 
                 Get-ReleaseYamlPopulated -Channel $channelName -YamlFilePath $channelReleaseOperationYamlPath -ImageInfoObjects $imgInfoObjects
-                Write-Verbose "done with this population!"
             }
         }
     }

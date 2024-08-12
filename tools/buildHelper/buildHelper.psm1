@@ -1262,6 +1262,7 @@ function Get-ReleaseYamlPopulated {
         throw "Yaml file $YamlFilePath provided as parameter cannot be found."
     }
 
+    Write-Verbose -Verbose "about to call GET-DEFSTRNG HELPER"
     $defaultArtifactsValue = Get-DefaultArtifactNamesString -Channel $Channel -ImageInfoObjects $ImageInfoObjects
     if ($defaultArtifactsValue -eq "[]")
     {
@@ -1314,13 +1315,14 @@ function Get-DefaultArtifactNamesString {
         $architecture = $img.Architecture
         $poolOS = $img.IsLinux ? "linux" : "windows"
         $archBasedJobName = "Build_$($poolOS)_$($architecture)"
+        $artifactSuffix = $img.Name.ToString().Replace("\", "_").Replace("-","_").Replace(".","")
 
-        $artifactName = "'" + "drop_StageGenerateBuild_$($Channel)_Job_Build_" + $archBasedJobName + "_$name" + "'"
-        Write-Verbose "artifact name derived is: $artifactName"
+        $joiningDelimeter = $defaultArtifactString.Length -gt 1 ? "," : ""
+        $artifactName = "$joiningDelimeter" + "'" + "drop_StageGenerateBuild_$($Channel)_Job_Build_" + $archBasedJobName + "_$artifactSuffix" + "'"
         $defaultArtifactString += $artifactName
     }
 
-    $defaultArtifactString = "]"
+    $defaultArtifactString += "]"
     Write-Verbose -Verbose "default string is: $defaultArtifactString"
     return $defaultArtifactString
 }
