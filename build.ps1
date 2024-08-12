@@ -708,6 +708,7 @@ End {
     }
 
     $channelsUsed = @{}
+    $releaseChannelsUsed = @{}
     if ($UpdateBuildYaml.IsPresent) {
         foreach ($repo in $tagGroups.Keys | Sort-Object) {
             $channelGroups = $tagGroups.$repo | Group-Object -Property Channel
@@ -715,7 +716,12 @@ End {
             {
                 $channelName = $channelGroup.Name
                 $ciFolder = Join-Path -Path $PSScriptRoot -ChildPath '.vsts-ci'
+                $releaseTemplatesFolder = Join-Path -Path $ciFolder -ChildPath "templatesReleasePipeline"
+                # Build yaml file path
                 $channelReleaseStagePath = Join-Path -Path $ciFolder -ChildPath "$($channelName)ReleaseStage.yml"
+
+                # Release yaml file path
+                $channelReleaseOperationYamlPath = Join-Path -Path $releaseTemplatesFolder -ChildPath "$($channelName)ReleaseGetBuiltImages.yml"
 
                 if (!$channelsUsed.Contains($channelName))
                 {
@@ -733,7 +739,21 @@ End {
                     $channelsUsed.Add($channelName, $channelGroup.Values)
                 }
 
+                if (!$releaseChannelsUsed.Contains($channelName))
+                {
+                    # For release operation yaml:
+                    $channelReleaseOperationYamlFileExists = Test-Path $channelReleaseOperationYamlPath
+                    if ($channelReleaseOperationYamlFileExists)
+                    {
+                        Remove-Item -Path $channelReleaseOperationYamlPath
+                    }
+
+                    New-Item -Type File -Path $channelReleaseOperationYamlPath
+                    $releaseChannelsUsed.Add($channelName, $channelGroup.Values)
+                }
+
                 $osGroups = $channelGroup.Group | Group-Object -Property os
+                $imgInfoObjects = @()
                 foreach ($osGroup in $osGroups) {
                     $architectureGroups = $osGroup.Group | Group-Object -Property Architecture
                     foreach ($architectureGroup in $architectureGroups) {
@@ -741,9 +761,15 @@ End {
                         foreach ($tag in $architectureGroup.Group | Sort-Object -Property dockerfile) {
                             Write-Verbose -Verbose "calling method to populate template call in yaml file for channel: $channelName for image: $($tag.Name)"
                             Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
+
+                            # for release yaml, need to collect tag object (containing metadata for each image)
+                            $imgInfoObjects += $tag
                         }
                     }
                 }
+
+                Get-ReleaseYamlPopulated -Channel $channelName -YamlFilePath $channelReleaseOperationYamlPath -ImageInfoObjects $imgInfoObjects
+                Write-Verbose "done with this population!"
             }
         }
     }

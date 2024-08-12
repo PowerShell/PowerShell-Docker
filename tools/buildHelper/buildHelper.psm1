@@ -1244,3 +1244,83 @@ function Get-TemplatePopulatedYaml {
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)channel: `${{ parameters.channel }}"
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)channelPath: `${{ parameters.channelPath }}"
 }
+
+function Get-ReleaseYamlPopulated {
+    param(
+        [string]
+        $Channel,
+
+        [string]
+        $YamlFilePath,
+
+        [object[]]
+        $ImageInfoObjects
+    )
+
+    if (!$YamlFilePath)
+    {
+        throw "Yaml file $YamlFilePath provided as parameter cannot be found."
+    }
+
+    $defaultArtifactsValue = Get-DefaultArtifactNamesString -Channel $Channel -ImageInfoObjects $ImageInfoObjects
+    if ($defaultArtifactsValue -eq "[]")
+    {
+        throw "Default artifact names string $defaultArtifactsValue was empty."
+    }
+
+    $doubleSpace = " "*2
+    $fourSpace = " "*4
+
+    Add-Content -Path $YamlFilePath -Value "parameters:"
+    Add-Content -Path $YamlFilePath -Value "- name: channel"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: '$Channel'"
+    Add-Content -Path $YamlFilePath -Value "- name: artifactNames"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)type: object"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: $defaultArtifactsValue"
+    Add-Content -Path $YamlFilePath -Value "stages:"
+    Add-Content -Path $YamlFilePath -Value "- template: /.vsts-ci/templatesReleasePipeline/releaseTestPrepStage.yml@self"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)parameters:"
+    Add-Content -Path $YamlFilePath -Value "$($fourSpace)channel: `${{ parameters.channel }}"
+    Add-Content -Path $YamlFilePath -Value "$($fourSpace)artifactNames: `${{ parameters.artifactNames }}"
+
+
+#     parameters:
+#     - name: channel
+#       default: "stable"
+#     - name: "artifactNames"
+#       type: object
+#       default: ['drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine316', 'drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine316_test_deps', 'drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine317','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine317_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_debian11','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_debian11_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_debian12','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_debian12_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_mariner2','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubi8','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubi8_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubi9','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubi9_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubuntu2004','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubuntu2004_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubuntu2204','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubuntu2204_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_arm32_ubuntu2004_arm32v7','drop_StageGenerateBuild_stable_Job_Build_Build_linux_arm32_ubuntu2204_arm32v7','drop_StageGenerateBuild_stable_Job_Build_Build_linux_arm64_mariner2_arm64','drop_StageGenerateBuild_stable_Job_Build_Build_windows_amd64_windowsserver2022','drop_StageGenerateBuild_stable_Job_Build_Build_windows_amd64_windowsservercore2022']
+# #      default: ['drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine316', 'drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_debian11', 'drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine317_test_deps']
+
+# stages:
+#     - template: /.vsts-ci/templatesReleasePipeline/releaseTestPrepStage.yml@self
+#       parameters:
+#         channel: ${{ parameters.channel }}
+#         artifactNames: ${{ parameters.artifactNames }}
+}
+
+function Get-DefaultArtifactNamesString {
+    param(
+        [string]
+        $Channel,
+    
+        [object[]]
+        $ImageInfoObjects
+    )
+
+    $defaultArtifactString = "["
+    foreach ($img in $ImageInfoObjects)
+    {
+        $architecture = $img.Architecture
+        $poolOS = $img.IsLinux ? "linux" : "windows"
+        $archBasedJobName = "Build_$($poolOS)_$($architecture)"
+
+        $artifactName = "'" + "drop_StageGenerateBuild_$($Channel)_Job_Build_" + $archBasedJobName + "_$name" + "'"
+        Write-Verbose "artifact name derived is: $artifactName"
+        $defaultArtifactString += $artifactName
+    }
+
+    $defaultArtifactString = "]"
+    Write-Verbose -Verbose "default string is: $defaultArtifactString"
+    return $defaultArtifactString
+}
