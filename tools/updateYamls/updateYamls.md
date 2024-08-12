@@ -9,7 +9,7 @@ This `updateBuildYamls.ps1` script needs to be run before the build and release 
 To update the &lt;channel&gt;releaseStage.yml and templatesReleasePipeline/&lt;channel&gt;ReleaseGetBuiltImages.yml files for all the channels, run:
  `./updateBuildYamls.ps1 -StableVersion <stableVersion> -PreviewVersion <previewVersion> -LtsVersion <ltsVersion>`.
 
-If you want the channel versions from channels.json to be used, simply omit the -*Version parameters and run, `./updateBuildYamls.ps1`.
+If you want the channel versions from channels.json to be used, simply omit the -*Version parameters and run: `./updateBuildYamls.ps1`.
 
 ## Notes
 
