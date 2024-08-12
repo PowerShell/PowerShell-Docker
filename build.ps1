@@ -709,6 +709,7 @@ End {
 
     $channelsUsed = @{}
     $releaseChannelsUsed = @{}
+    $emptyArr = @()
     if ($UpdateBuildYaml.IsPresent) {
         foreach ($repo in $tagGroups.Keys | Sort-Object) {
             $channelGroups = $tagGroups.$repo | Group-Object -Property Channel
@@ -749,11 +750,10 @@ End {
                     }
 
                     New-Item -Type File -Path $channelReleaseOperationYamlPath
-                    $releaseChannelsUsed.Add($channelName, $channelGroup.Values)
+                    $releaseChannelsUsed.Add($channelName, $emptyArr)
                 }
 
                 $osGroups = $channelGroup.Group | Group-Object -Property os
-                $imgInfoObjects = @()
                 foreach ($osGroup in $osGroups) {
                     $architectureGroups = $osGroup.Group | Group-Object -Property Architecture
                     foreach ($architectureGroup in $architectureGroups) {
@@ -763,13 +763,18 @@ End {
                             Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
 
                             # for release yaml, need to collect tag object (containing metadata for each image)
-                            $imgInfoObjects += $tag
+                            $releaseChannelsUsed[$channelName] += $tag
                         }
                     }
                 }
-
-                Get-ReleaseYamlPopulated -Channel $channelName -YamlFilePath $channelReleaseOperationYamlPath -ImageInfoObjects $imgInfoObjects
             }
+        }
+
+        $channelsFound = $releaseChannelsUsed.Keys
+        foreach ($channelKey in $channelsFound)
+        {
+            $imgInfoObjArr = $releaseChannelsUsed[$channelKey]
+            Get-ReleaseYamlPopulated -Channel $channelName -YamlFilePath $channelReleaseOperationYamlPath -ImageInfoObjects $imgInfoObjArr
         }
     }
 
