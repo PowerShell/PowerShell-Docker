@@ -1262,7 +1262,6 @@ function Get-ReleaseYamlPopulated {
         throw "Yaml file $YamlFilePath provided as parameter cannot be found."
     }
 
-    Write-Verbose -Verbose "about to call GET-DEFSTRNG HELPER"
     $defaultArtifactsValue = Get-DefaultArtifactNamesString -Channel $Channel -ImageInfoObjects $ImageInfoObjects
     if ($defaultArtifactsValue -eq "[]")
     {
@@ -1283,21 +1282,6 @@ function Get-ReleaseYamlPopulated {
     Add-Content -Path $YamlFilePath -Value "$($doubleSpace)parameters:"
     Add-Content -Path $YamlFilePath -Value "$($fourSpace)channel: `${{ parameters.channel }}"
     Add-Content -Path $YamlFilePath -Value "$($fourSpace)artifactNames: `${{ parameters.artifactNames }}"
-
-
-#     parameters:
-#     - name: channel
-#       default: "stable"
-#     - name: "artifactNames"
-#       type: object
-#       default: ['drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine316', 'drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine316_test_deps', 'drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine317','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine317_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_debian11','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_debian11_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_debian12','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_debian12_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_mariner2','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubi8','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubi8_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubi9','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubi9_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubuntu2004','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubuntu2004_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubuntu2204','drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_ubuntu2204_test_deps','drop_StageGenerateBuild_stable_Job_Build_Build_linux_arm32_ubuntu2004_arm32v7','drop_StageGenerateBuild_stable_Job_Build_Build_linux_arm32_ubuntu2204_arm32v7','drop_StageGenerateBuild_stable_Job_Build_Build_linux_arm64_mariner2_arm64','drop_StageGenerateBuild_stable_Job_Build_Build_windows_amd64_windowsserver2022','drop_StageGenerateBuild_stable_Job_Build_Build_windows_amd64_windowsservercore2022']
-# #      default: ['drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine316', 'drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_debian11', 'drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine317_test_deps']
-
-# stages:
-#     - template: /.vsts-ci/templatesReleasePipeline/releaseTestPrepStage.yml@self
-#       parameters:
-#         channel: ${{ parameters.channel }}
-#         artifactNames: ${{ parameters.artifactNames }}
 }
 
 function Get-DefaultArtifactNamesString {
@@ -1323,6 +1307,5 @@ function Get-DefaultArtifactNamesString {
     }
 
     $defaultArtifactString += "]"
-    Write-Verbose -Verbose "default string is: $defaultArtifactString"
     return $defaultArtifactString
 }
