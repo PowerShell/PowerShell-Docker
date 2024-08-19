@@ -21,7 +21,7 @@ with their size being the sum of the base image (200 megabytes)
 plus the uncompressed package (120 megabytes),
 and about 120 megabytes of .NET Core and bootstrapping dependencies.
 
-[docker-release]: https://mcr.microsoft.com/en-us/product/powershell/about
+[docker-release]: https://mcr.microsoft.com/product/powershell/about
 
 ## Community
 
