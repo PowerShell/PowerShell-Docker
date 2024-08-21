@@ -1,0 +1,25 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-arm32.tar.gz",
+    "osVersion": "Ubuntu 24.04 ARM 32v7",
+    "SkipGssNtlmSspTests": true,
+    "ShortDistroName": "ubuntu",
+    "Base64EncodePackageUrl": true,
+    "UseAcr": false,
+    "shortTags": [
+        {"Tag": "noble-arm32"},
+        {"Tag": "24.04-arm32"}
+    ],
+    "TestProperties": {
+        "size": 550,
+        "Arm32": true
+    },
+    "manifestLists": [
+        "${channelTag}"
+    ],
+    "EndOfLife": "2029-04-01",
+    "DistributionState": "Validated",
+    "UseInCi": false,
+    "Architecture": "arm32"
+}
