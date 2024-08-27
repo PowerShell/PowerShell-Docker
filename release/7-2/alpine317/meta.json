@@ -1,7 +1,7 @@
 {
     "IsLinux" : true,
     "UseLinuxVersion": false,
-    "PackageFormat": "powershell-${PS_VERSION}-linux-alpine-x64.tar.gz",
+    "PackageFormat": "powershell-${PS_VERSION}-linux-musl-x64.tar.gz",
     "osVersion": "Alpine 3.17",
     "shortDistroName": "alpine",
     "shortTags": [
