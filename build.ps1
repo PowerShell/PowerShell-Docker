@@ -737,10 +737,13 @@ End {
                 foreach ($osGroup in $osGroups) {
                     $architectureGroups = $osGroup.Group | Group-Object -Property Architecture
                     foreach ($architectureGroup in $architectureGroups) {
-                        # Note: For each image to be built (including test-deps images) the <channel>ReleaseStage.yml file needs to have a template call for the image.
+                        # Note: For each image to be built the <channel>ReleaseStage.yml file needs to have a template call for the image.
                         foreach ($tag in $architectureGroup.Group | Sort-Object -Property dockerfile) {
-                            Write-Verbose -Verbose "calling method to populate template call in yaml file for channel: $channelName for image: $($tag.Name)"
-                            Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
+                            if (!$tag.Name.ToString().Contains('test-deps'))
+                            {
+                                Write-Verbose -Verbose "calling method to populate template call in yaml file for channel: $channelName for image: $($tag.Name)"
+                                Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
+                            }
                         }
                     }
                 }
