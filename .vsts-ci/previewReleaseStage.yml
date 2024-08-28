@@ -13,28 +13,8 @@ stages:
   - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
-      imageName: alpine316
-      artifactSuffix: alpine316
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releaseJob.yml@self
-    parameters:
-      archName: 'Build_linux_amd64'
       imageName: alpine317
       artifactSuffix: alpine317
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releaseJob.yml@self
-    parameters:
-      archName: 'Build_linux_amd64'
-      imageName: debian11
-      artifactSuffix: debian11
       poolOS: 'linux'
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
