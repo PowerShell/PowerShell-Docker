@@ -66,12 +66,6 @@ jobs:
   - pwsh: |
       $finalImageName = '${{ parameters.imageName }}'
       $finalContextFolder = 'docker'
-      $testDepsString = 'test-deps'
-      if ($finalImageName.Contains($testDepsString))
-      {
-        $finalImageName = $finalImageName.TrimEnd("\$testDepsString")
-        $finalContextFolder = Join-Path -Path $testDepsString -ChildPath $finalContextFolder
-      }
       $pathToContextFolder = "${{ parameters.channelPath }}/$finalImageName/$finalContextFolder"
       Write-Host "##vso[task.setvariable variable=dockerBuildImageName;isOutput=true]$finalImageName"
       Write-Host "##vso[task.setvariable variable=dockerBuildContextFolder;isOutput=true]$finalContextFolder"
