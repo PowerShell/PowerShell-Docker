@@ -4,7 +4,7 @@
     "PackageFormat": "powershell-${PS_VERSION}-linux-arm64.tar.gz",
     "osVersion": "Azure Linux 3.0 ARM 64v7",
     "SkipGssNtlmSspTests": true,
-    "ShortDistroName": "mariner",
+    "ShortDistroName": "azurelinux",
     "shortTags": [
         {"Tag": "3.0-arm64"}
     ],
