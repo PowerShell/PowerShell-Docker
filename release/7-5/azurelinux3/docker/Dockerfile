@@ -4,8 +4,9 @@
 FROM mcr.microsoft.com/azurelinux/base/core:3.0 AS setup-tdnf-repa
 
     # Use the cache mount since this image does go into the final product
+    # TODO: OR azurelinux-repos-preview
     RUN --mount=type=cache,target=/var/cache/tdnf \
-        tdnf install -y mariner-repos-microsoft-preview \
+        tdnf install -y azurelinux-repos \
         && tdnf makecache
 
 # Download packages into a container so they don't take up space in the final stage
