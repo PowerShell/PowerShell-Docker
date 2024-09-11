@@ -127,7 +127,7 @@ function Get-LinuxContainer
         # Only return results where:
         # OS eq linux
         # not (purpose eq verification -and SkipVerification)
-        if($testArgs.os -eq 'linux' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification))
+        if($testArgs.os -eq 'linux' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification) -and $testArgs.LoadPathParentFolder -eq "main")
         {
             $skipPull = ![string]::IsNullOrEmpty($testArgs.BaseImage)
             Write-Output @{
@@ -144,6 +144,8 @@ function Get-LinuxContainer
                 TestProperties = $testArgs.TestProperties
                 Channel = $testArgs.Channel
                 UseAcr = $testArgs.UseAcr
+                LoadPathParentFolder = $testArgs.LoadPathParentFolder
+                ShortImageName = $testArgs.ShortImageName
             }
         }
     }
@@ -164,7 +166,7 @@ function Get-WindowsContainer
 
     foreach($testArgs in $testArgsList)
     {
-        if($testArgs.os -eq 'windows' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification))
+        if($testArgs.os -eq 'windows' -and !($Purpose -eq 'Verification' -and $testArgs.SkipVerification) -and $testArgs.LoadPathParentFolder -eq "main")
         {
             $skipPull = ![string]::IsNullOrEmpty($testArgs.BaseImage)
             Write-Output @{
@@ -181,6 +183,8 @@ function Get-WindowsContainer
                 TestProperties = $testArgs.TestProperties
                 Channel = $testArgs.Channel
                 UseAcr = $testArgs.UseAcr
+                LoadPathParentFolder = $testArgs.LoadPathParentFolder
+                ShortImageName = $testArgs.ShortImageName
             }
         }
     }

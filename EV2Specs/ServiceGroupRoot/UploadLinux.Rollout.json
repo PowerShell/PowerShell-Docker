@@ -1,0 +1,73 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-01-01/rolloutParameters.json",
+    "contentVersion": "1.0.0.0",
+    "shellExtensions": [
+      {
+        "name": "Run",
+        "type": "Run",
+        "properties": {
+          "maxExecutionTime": "PT2H"
+        },
+        "package": {
+          "reference": {
+            "path": "Shell/Run.tar"
+          }
+        },
+        "launch": {
+          "command": [
+            "/bin/bash",
+            "-c",
+            "pwsh ./Run/Run.ps1"
+          ],
+          "environmentVariables": [
+            {
+              "name": "IMAGE_INFO_JSON",
+              "reference":
+              {
+                  "path": "Parameters\\ImageMetadata.json"
+              }
+            },
+            {
+              "name": "CHANNEL_INFO_JSON",
+              "reference":
+              {
+                  "path": "Parameters\\ChannelInfo.json"
+              }
+            },
+            {
+              "name": "DESTINATION_ACR_NAME",
+              "value": "default"
+            },
+            {
+              "name": "MI_NAME",
+              "value": "default"
+            },
+            {
+              "name": "MI_CLIENTID",
+              "value": "default"
+            },
+            {
+              "name": "LINUX_IMAGES_TARGZIP",
+              "reference": {
+                "path": "SrcFiles\\LinuxSrcFiles.tar.gz"
+              },
+              "asSecureValue": "true"
+            },
+            {
+              "name": "WINDOWS_IMAGES_TARGZIP",
+              "reference": {
+                "path": "SrcFiles\\WindowsSrcFiles.tar.gz"
+              },
+              "asSecureValue": "true"
+            }
+          ],
+          "identity": {
+            "type": "userAssigned",
+            "userAssignedIdentities": [
+              "default"
+            ]
+          }
+        }
+      }
+    ]
+  }
