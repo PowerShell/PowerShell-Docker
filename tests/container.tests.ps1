@@ -165,8 +165,829 @@ Describe "Pull Windows Containers" -Tags 'Windows', 'Pull' {
     }
 }
 
-Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
+Describe "Load Linux Containers" -Tags 'Linux', 'Load' {
+    BeforeAll {
+        # Get all files for loading:
+        if ($env:LOAD_PATH -eq $null)
+        {
+            throw "Load path was not set"
+        }
+
+        $pathToImgFolder = $env:LOAD_PATH
+        $pathToImgFolderExists = Test-Path -Path $pathToImgFolder
+        if (!$pathToImgFolderExists)
+        {
+            throw "Load path folder does not exist"
+        }
+
+        $distroFolder = Get-Item -Path $pathToImgFolder
+        $distroName = $distroFolder.Name
+        $imageFolderOnTestDrivePath = Join-Path -Path $TestDrive -ChildPath 'images'
+        New-Item -Path $imageFolderOnTestDrivePath -ItemType Directory
+        Copy-Item -Path $pathToImgFolder -Destination $imageFolderOnTestDrivePath -Recurse
+
+        $pathToDistroFolder = Join-Path -Path $imageFolderOnTestDrivePath -ChildPath $distroName
+
+        $loadTestCases = @()
+        foreach ($testObj in $script:linuxContainerRunTests)
+        {
+            $parentFolderPath = $testObj.LoadPathParentFolder
+            $shortImageName = $testObj.ShortImageName
+            $tarFileName = "$shortImageName.tar"
+
+            $filePath = Join-Path -Path $parentFolderPath -ChildPath $tarFileName
+            $fullFilePath = Join-Path -Path $pathToDistroFolder -ChildPath $filePath
+            $pathExistsInLoadPath = Test-Path -Path $fullFilePath
+            if ($pathExistsInLoadPath)
+            {
+                $loadTestCases += @{LoadPath = $fullFilePath; NewName = $shortImageName; NewTag = $parentFolderPath}
+            }
+        }
+    }
+
+    it ".tar file located at: <LoadPath> with <NewName>:<NewTag> loads without error" -TestCases $loadTestCases -Skip:$script:skipLinuxRun {
+        param(
+            [Parameter(Mandatory=$true)]
+            [string]
+            $LoadPath,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $NewName,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $NewTag
+        )
+
+        $result = Invoke-Docker -Command load -Params @(
+            "-i", "$LoadPath"
+        ) -PassThru
+
+        $loadedImgParts = $result.Split("Loaded image: ", [System.StringSplitOptions]::RemoveEmptyEntries)
+        $loadedImgNameAndTag = ""
+        if ($loadedImgParts.Count -ge 0)
+        {
+            $loadedImgNameAndTag = $loadedImgParts[0]
+        }
+
+        $newNameAndTagValue = $NewName + ":" + $NewTag
+        $renameResult = Invoke-Docker -Command tag -Params @(
+            $loadedImgNameAndTag, $newNameAndTagValue
+        ) -PassThru
+
+        $removeOldResult = Invoke-Docker -Command rmi -Params @(
+            $loadedImgNameAndTag
+        ) -PassThru
+    }
+}
+
+
+Describe "Load Windows Containers" -Tags 'Windows', 'Load' {
+    BeforeAll {
+        # Get all files for loading:
+        if ($env:LOAD_PATH -eq $null)
+        {
+            throw "Load path was not set"
+        }
+
+        $pathToImgFolder = $env:LOAD_PATH
+        $pathToImgFolderExists = Test-Path -Path $pathToImgFolder
+        if (!$pathToImgFolderExists)
+        {
+            throw "Load path folder does not exist"
+        }
+
+        $distroFolder = Get-Item -Path $pathToImgFolder
+        $distroName = $distroFolder.Name
+        $imageFolderOnTestDrivePath = Join-Path -Path $TestDrive -ChildPath 'images'
+        New-Item -Path $imageFolderOnTestDrivePath -ItemType Directory
+        Copy-Item -Path $pathToImgFolder -Destination $imageFolderOnTestDrivePath -Recurse
+        $pathToDistroFolder = Join-Path -Path $imageFolderOnTestDrivePath -ChildPath $distroName
+
+        $windowsLoadTestCases = @()
+        foreach ($testObj in $script:windowsContainerRunTests)
+        {
+            $parentFolderPath = $testObj.LoadPathParentFolder
+            $shortImageName = $testObj.ShortImageName
+            $tarFileName = "$shortImageName.tar"
+
+            $filePath = Join-Path -Path $parentFolderPath -ChildPath $tarFileName
+            $fullFilePath = Join-Path -Path $pathToDistroFolder -ChildPath $filePath
+            $pathExistsInLoadPath = Test-Path -Path $fullFilePath
+            if ($pathExistsInLoadPath)
+            {
+                $windowsLoadTestCases += @{LoadPath = $fullFilePath; NewName = $shortImageName; NewTag = $parentFolderPath}
+            }
+        }
+
+        $script:SkipWindowsLoad = $windowsLoadTestCases.Count -eq 0 
+    }
+
+    it ".tar file located at: <Path> with <NewName>:<NewTag> loads without error" -TestCases $windowsLoadTestCases -skip:$script:SkipWindowsLoad {
+        param(
+            [Parameter(Mandatory=$true)]
+            [string]
+            $LoadPath,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $NewName,
+
+            [Parameter(Mandatory=$true)]
+            [string]
+            $NewTag
+        )
+
+        $result = Invoke-Docker -Command load -Params @(
+            "-i", "$LoadPath"
+        ) -PassThru
+
+        $loadedImgParts = $result.Split("Loaded image: ", [System.StringSplitOptions]::RemoveEmptyEntries)
+        $loadedImgNameAndTag = ""
+        if ($loadedImgParts.Count -ge 0)
+        {
+            $loadedImgNameAndTag = $loadedImgParts[0]
+        }
+
+        $newNameAndTagValue = $NewName + ":" + $NewTag
+        $renameResult = Invoke-Docker -Command tag -Params @(
+            $loadedImgNameAndTag, $newNameAndTagValue
+        ) -PassThru
+
+        $removeOldResult = Invoke-Docker -Command rmi -Params @(
+            $loadedImgNameAndTag
+        ) -PassThru
+    }
+}
+
+
+Describe "Linux Containers" -Tags 'LoadBehavior', 'Linux' {
     BeforeAll{
+        $testContext = Get-TestContext -type Linux
+        $loadedRunTestCases = @()
+        $webTestCases = @()
+        $gssNtlmSspTestCases = @()
+
+        foreach ($testObj in $script:linuxContainerRunTests)
+        {
+            $loadedImageNameAndTag = "$($testObj.ShortImageName):$($testObj.LoadPathParentFolder)"
+            $shortName = $($testObj.LoadPathParentFolder) -eq "main" ? $($testObj.ShortImageName) : "$($testObj.ShortImageName)/$($testObj.LoadPathParentFolder)"
+            $arm32 = [bool] $testObj.TestProperties.Arm32
+            $loadedRunTestCases += @{
+                Name = $shortName
+                LoadedImageName = $loadedImageNameAndTag
+                ExpectedVersion = $testObj.ExpectedVersion
+                Channel = $testObj.Channel
+                Arm32 = $arm32
+            }
+
+            if ($testObj.SkipWebCmdletTests -ne $true)
+            {
+                $webTestCases += @{
+                    Name = $shortName
+                    LoadedImageName = $loadedImageNameAndTag
+                    Arm32 = $arm32
+                }
+            }
+
+            if ($testObj.SkipGssNtlmSspTests -ne $true)
+            {
+                $gssNtlmSspTestCases += @{
+                    Name = $shortName
+                    LoadedImageName = $loadedImageNameAndTag
+                    Arm32 = $arm32 
+                }
+            }
+        }
+    }
+    AfterAll {
+        # prune unused volumes
+        $null=Invoke-Docker -Command 'volume', 'prune' -Params '--force' -SuppressHostOutput
+    }
+    BeforeEach {
+        Remove-Item $testContext.resolvedXmlPath -ErrorAction SilentlyContinue
+        Remove-Item $testContext.resolvedLogPath -ErrorAction SilentlyContinue
+    }
+
+    Context "Run Powershell" {
+        it "PSVersion table from <Name> should contain <ExpectedVersion>" -TestCases $loadedRunTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $ExpectedVersion,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Channel,
+
+                [Bool]
+                $Arm32
+            )
+
+            if ($Arm32) {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
+
+            $actualVersion = Get-ContainerPowerShellVersion -TestContext $testContext -Name $LoadedImageName
+            $actualVersion | should -be $ExpectedVersion
+        }
+
+        it "Invoke-WebRequest from <Name> should not fail" -TestCases $webTestCases -Skip:($script:skipLinuxRun -or $webTestCases.count -eq 0) {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,                
+
+                [Bool]
+                $Arm32
+            )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
+
+            $metadataString = Get-MetadataUsingContainer -Name $LoadedImageName
+            try {
+                $metadataString | Should -Not -BeNullOrEmpty
+                $metadataJson = $metadataString | ConvertFrom-Json -ErrorAction Stop
+                $metadataJson | Select-Object -ExpandProperty StableReleaseTag | Should -Match '^v\d+\.\d+\.\d+.*$'
+            } catch {
+                Write-Verbose $metadataString -Verbose
+                throw
+            }
+        }
+
+        it "Get-UICulture from <Name> should return en-US" -TestCases $loadedRunTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $ExpectedVersion,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Channel,
+
+                [Bool]
+                $Arm32
+            )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
+
+            $culture = Get-UICultureUsingContainer -Name $LoadedImageName
+            $culture | Should -Not -BeNullOrEmpty
+            $culture | Should -BeExactly 'en-US'
+        }
+
+        it "gss-ntlmssp is installed in <Name>" -TestCases $gssNtlmSspTestCases -Skip:($script:skipLinuxRun -or $gssNtlmSspTestCases.count -eq 0) {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+
+                [Bool]
+                $Arm32
+            )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
+
+            $gssNtlmSspPath = Get-LinuxGssNtlmSsp -Name $LoadedImageName
+            $gssNtlmSspPath | Should -Not -BeNullOrEmpty
+        }
+
+        it "Has POWERSHELL_DISTRIBUTION_CHANNEL environment variable defined" -TestCases $loadedRunTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $ExpectedVersion,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Channel,
+
+                [Bool]
+                $Arm32
+            )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
+
+            $psDistChannel = Get-PowerShellDistibutionChannel -TestContext $testContext -Name $LoadedImageName
+            $psDistChannel | Should -BeLike "PSDocker-*"
+        }
+    }
+
+    Context "permissions" {
+        BeforeAll {
+            $permissionsTestCases = @()
+            foreach ($testObj in $script:linuxContainerRunTests)
+            {
+                $loadedImageNameAndTag = "$($testObj.ShortImageName):$($testObj.LoadPathParentFolder)"
+                $shortName = $($testObj.LoadPathParentFolder) -eq "main" ? $($testObj.ShortImageName) : "$($testObj.ShortImageName)/$($testObj.LoadPathParentFolder)"
+                $arm32 = [bool] $testObj.TestProperties.Arm32
+
+                $path = '/opt/microsoft/powershell/6/pwsh'
+                $pwshInstallFolder = Get-PwshInstallVersion -Channel $testObj.Channel
+                $path = "/opt/microsoft/powershell/$pwshInstallFolder/pwsh"
+
+                $permissionsTestCases += @{
+                    Name = $shortName
+                    LoadedImageName = $loadedImageNameAndTag
+                    Channel = $testObj.Channel
+                    Arm32 = $arm32
+                    Path = $path
+                }
+            }            
+        }
+
+        it "pwsh should be at <Path> in <channel>-<Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+
+                [string]
+                $Channel,
+
+                [Bool]
+                $Arm32,
+
+                [string]
+                $Path
+            )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is flaky on QEMU"
+            }
+
+            $paths = @(Get-DockerCommandSource -Name $LoadedImageName -Command 'pwsh')
+            $paths.count | Should -BeGreaterOrEqual 1
+            $pwshPath = $paths | Where-Object { $_ -like '*microsoft*' }
+            $pwshPath | Should -Be $Path
+        }
+
+        it "pwsh should have execute permissions for all in <channel>-<Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+
+                [string]
+                $Channel,
+
+                [Bool]
+                $Arm32,
+
+                [string]
+                $Path
+            )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
+
+            $permissions = Get-DockerImagePwshPermissions -Name $LoadedImageName -Path $path
+            $permissions | Should -Match '^[\-rw]{3}x([\-rw]{2}x){2}$' -Because 'Everyone should be able to execute'
+        }
+
+        it "pwsh should NOT have write permissions for others in <channel>-<Name>" -TestCases $permissionsTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+
+                [string]
+                $Channel,
+
+                [Bool]
+                $Arm32,
+
+                [string]
+                $Path
+            )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
+
+            $permissions = Get-DockerImagePwshPermissions -Name $LoadedImageName -Path $path
+            $permissions | Should -Match '^[\-rwx]{4}[\-rwx]{3}[\-rx]{3}$' -Because 'Others should not be able to write'
+        }
+    }
+
+    Context "default executables" {
+        BeforeAll {
+            #apt-utils ca-certificates curl wget apt-transport-https locales gnupg2 inetutils-ping git sudo less procps
+            $commands = @(
+                #'locale-gen'
+                # debian 'update-ca-certificates'
+                'less'
+            )
+
+            $testdepsTestCases = @()
+            foreach ($testObj in $script:linuxContainerRunTests)
+            {
+                $loadedImageNameAndTag = "$($testObj.ShortImageName):$($testObj.LoadPathParentFolder)"
+                $shortName = $($testObj.LoadPathParentFolder) -eq "main" ? $($testObj.ShortImageName) : "$($testObj.ShortImageName)/$($testObj.LoadPathParentFolder)"
+                $arm32 = [bool] $testObj.TestProperties.Arm32
+                foreach ($command in $commands)
+                {
+                    $testdepsTestCases += @{
+                        Name = $shortName
+                        LoadedImageName = $loadedImageNameAndTag
+                        Command = $command
+                        Arm32 = $arm32
+                    }
+                }
+            }
+        }
+
+        it "<Name> should have <command>" -TestCases $testdepsTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Command,
+
+                [Bool]
+                $Arm32
+            )
+
+            if($Arm32)
+            {
+                Set-ItResult -Pending -Because "Arm32 is falky on QEMU"
+            }
+
+            $source = Get-DockerCommandSource -Name $LoadedImageName -command $Command
+            $source | Should -Not -BeNullOrEmpty
+        }
+    }
+
+    Context "test-deps" {
+        BeforeAll{
+            #apt-utils ca-certificates curl wget apt-transport-https locales gnupg2 inetutils-ping git sudo less procps
+            $commands = @(
+                #@{command = 'adduser'}
+                @{command = 'bash'}
+                @{command = 'curl'}
+                @{command = 'find'}
+                @{command = 'git'}
+                @{command = 'hostname'}
+                @{command = 'openssl'}
+                @{command = 'ping'}
+                @{command = 'ps'}
+                @{command = 'su'}
+                @{command = 'sudo'}
+                @{command = 'tar'}
+                @{command = 'gzip'}
+                @{command = 'unzip'}
+                @{command = 'wget'}
+            )
+
+            $debianCommands = @(
+                @{command = 'apt'}
+                @{command = 'apt-get'}
+            )
+
+            $muslCommands = @(
+                @{
+                    command = 'node'
+                }
+            )
+
+            $testdepsTestCases = @()
+            foreach ($testObj in $script:linuxContainerRunTests)
+            {
+                $loadedImageNameAndTag = "$($testObj.ShortImageName):$($testObj.LoadPathParentFolder)"
+                $shortName = $($testObj.LoadPathParentFolder) -eq "main" ? $($testObj.ShortImageName) : "$($testObj.ShortImageName)/$($testObj.LoadPathParentFolder)"
+
+                if ($testObj.OptionalTests -contains 'test-deps')
+                {
+                    foreach($command in $commands)
+                    {
+                        $testdepsTestCases += @{
+                            Name = $shortName
+                            LoadedImageName = $loadedImageNameAndTag
+                            Command = $command.command
+                            ExpectedPath = $command.Path
+                        }
+                    }
+                }
+
+                if ($testObj.OptionalTests -contains 'test-deps-debian')
+                {
+                    foreach($command in $debianCommands)
+                    {
+                        $testdepsTestCases += @{
+                            Name = $shortName
+                            LoadedImageName = $loadedImageNameAndTag
+                            Command = $command.command
+                            ExpectedPath = $command.Path
+                        }
+                    }
+                }
+
+                if ($testObj.OptionalTests -contains 'test-deps-musl')
+                {
+                    foreach($command in $muslCommands)
+                    {
+                        $testdepsTestCases += @{
+                            Name = $shortName
+                            LoadedImageName = $loadedImageNameAndTag
+                            Command = $command.command
+                            ExpectedPath = $command.Path
+                        }
+                    }
+                }
+            }
+
+            $skipTestDeps = $testdepsTestCases.count -eq 0
+        }
+
+        it "<Name> should have <Command>" -TestCases $testdepsTestCases -Skip:$skipTestDeps {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Command,
+
+                [string]
+                $ExpectedPath
+            )
+
+            $source = Get-DockerCommandSource -Name $LoadedImageName -command $Command
+            $source | Should -Not -BeNullOrEmpty -Because "$Command should be found"
+            if($ExpectedPath)
+            {
+                $source | Should -BeExactly $ExpectedPath  -Because "$Command should be at $ExpectedPath"
+            }
+        }
+    }
+
+    Context "Size" {
+        BeforeAll {
+            $sizeTestCases = @()
+            foreach ($testObj in $script:linuxContainerRunTests)
+            {
+                $loadedImageNameAndTag = "$($testObj.ShortImageName):$($testObj.LoadPathParentFolder)"
+                $shortName = $($testObj.LoadPathParentFolder) -eq "main" ? $($testObj.ShortImageName) : "$($testObj.ShortImageName)/$($testObj.LoadPathParentFolder)"
+                $size = $testObj.TestProperties.size
+
+                $sizeTestCases += @{
+                    Name = $shortName
+                    LoadedImageName = $loadedImageNameAndTag
+                    ExpectedSize = $size
+                }
+            }
+        }
+
+        it "Verify size of <name>" -TestCases $sizeTestCases -Skip:$script:skipLinuxRun {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+                
+                [int]$ExpectedSize
+            )
+
+            if ($env:DOCKER_RELEASE) {
+                Set-ItResult -Skipped -Because "Test only used in CI"
+            }
+
+            $sizeMb = Get-DockerImageSize -name $LoadedImageName
+            Write-Verbose "image is $sizeMb MiB" -Verbose
+            if($ExpectedSize -and !$env:RELEASE_DEFINITIONID)
+            {
+                # allow for a 5% increase without an error
+                $sizeMb | Should -BeLessOrEqual ($ExpectedSize * 1.05) -Because "$name is set to be $ExpectedSize in meta.json"
+            }
+        }
+    }
+}
+
+Describe "Windows Containers" -Tags 'LoadBehavior', 'Windows' {
+    BeforeAll{
+        $testContext = Get-TestContext -type Windows
+        $windowsLoadedRunTestCases = @()
+        $webTestCases = @()
+
+        foreach ($testObj in $script:windowsContainerRunTests)
+        {
+            $loadedImageNameAndTag = "$($testObj.ShortImageName):$($testObj.LoadPathParentFolder)"
+            $shortName = $($testObj.LoadPathParentFolder) -eq "main" ? $($testObj.ShortImageName) : "$($testObj.ShortImageName)/$($testObj.LoadPathParentFolder)"
+            $windowsLoadedRunTestCases += @{
+                Name = $shortName
+                LoadedImageName = $loadedImageNameAndTag
+                ExpectedVersion = $testObj.ExpectedVersion
+                Channel = $testObj.Channel
+                UseAcr = [bool]$testObj.UseAcr
+            }
+
+            if ($testObj.SkipWebCmdletTests -ne $true)
+            {
+                $webTestCases += @{
+                    Name = $shortName
+                    LoadedImageName = $loadedImageNameAndTag
+                    UseAcr = [bool]$testObj.UseAcr
+                }
+            }
+        }
+
+        $script:SkipWindowsLoadBehavior = $windowsLoadedRunTestCases.Count -eq 0 
+    }
+    BeforeEach {
+        Remove-Item $testContext.resolvedXmlPath -ErrorAction SilentlyContinue
+        Remove-Item $testContext.resolvedLogPath -ErrorAction SilentlyContinue
+    }
+
+    Context "Run Powershell" {
+        it "Get PSVersion table from <Name> should be <ExpectedVersion>" -TestCases $windowsLoadedRunTestCases -skip:$script:SkipWindowsLoadBehavior {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $ExpectedVersion,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Channel,
+
+                [Bool]
+                $UseAcr
+            )
+
+            if ($UseAcr) {
+                Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+            }
+
+            Get-ContainerPowerShellVersion -TestContext $testContext -Name $LoadedImageName | should -be $ExpectedVersion
+        }
+
+        it "Invoke-WebRequest from <Name> should not fail" -TestCases $webTestCases -skip:$script:SkipWindowsLoadBehavior {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+
+                [Bool]
+                $UseAcr
+            )
+
+            if ($UseAcr) {
+                Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+            }
+
+            $metadataString = Get-MetadataUsingContainer -Name $LoadedImageName
+            $metadataString | Should -Not -BeNullOrEmpty
+            $metadataJson = $metadataString | ConvertFrom-Json -ErrorAction Stop
+            $metadataJson | Select-Object -ExpandProperty StableReleaseTag | Should -Match '^v\d+\.\d+\.\d+.*$'
+        }
+
+        it "Path of <Name> should match the base container" -TestCases $webTestCases -skip:$script:SkipWindowsLoadBehavior {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+
+                [Bool]
+                $UseAcr
+            )
+
+            if ($UseAcr) {
+                Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+            }
+
+            $path = Get-ContainerPath -Name $LoadedImageName
+
+            #TODO: Run the base image and make sure the path is included
+
+            $path | should -Match ([System.Text.RegularExpressions.Regex]::Escape("C:\Windows\system32"))
+        }
+
+        it "Has POWERSHELL_DISTRIBUTION_CHANNEL environment variable defined" -TestCases $windowsLoadedRunTestCases -Skip:$script:SkipWindowsLoadBehavior {
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]
+                $name,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $LoadedImageName,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $ExpectedVersion,
+
+                [Parameter(Mandatory=$true)]
+                [string]
+                $Channel,
+
+                [Bool]
+                $UseAcr
+            )
+
+            if ($UseAcr) {
+                Set-ItResult -Pending -Because "Images that use ACR can't be tested"
+            }
+
+            $psDistChannel = Get-PowerShellDistibutionChannel -TestContext $testContext -Name $LoadedImageName
+            $psDistChannel | Should -BeLike "PSDocker-*"
+        }
+    }
+}
+
+
+Describe "Linux Containers" -Tags 'Behavior', 'Linux' {
+    BeforeAll {
         $testContext = Get-TestContext -type Linux
         $runTestCases = @()
         $script:linuxContainerRunTests | ForEach-Object {
