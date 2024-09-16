@@ -12,7 +12,7 @@ FROM setup-tdnf-repa AS installer-env
 
     # Define Args for the needed to add the package
     ARG PS_VERSION=7.5.0-preview.4
-    ARG PACKAGE_VERSION=7.3.0_preview.8
+    ARG PACKAGE_VERSION=7.5.0_preview.4
     ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.cm.aarch64.rpm
     ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
     ARG PS_INSTALL_VERSION=7-preview
