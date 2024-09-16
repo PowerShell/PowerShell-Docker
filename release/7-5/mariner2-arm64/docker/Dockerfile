@@ -59,7 +59,7 @@ FROM --platform=linux/arm64 mcr.microsoft.com/cbl-mariner/base/core:2.0 AS final
 
     RUN --mount=type=cache,target=/var/cache/tdnf,rw \
         tdnf update -y \
-        && tdnf install -y icu less openssh-clients ca-certificates dotnet-runtime-7.0 \
+        && tdnf install -y icu less openssh-clients ca-certificates dotnet-runtime-9.0 \
         && tdnf upgrade -y \
         && tdnf clean all
 
