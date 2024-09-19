@@ -58,28 +58,3 @@ stages:
         displayName: Check for Duplicate Tags
         condition: succeededOrFailed()
 
-  - stage: Secret_Scan
-    displayName: Secret Scan
-    dependsOn: []
-    jobs:
-    - job: Secret_Scan
-      pool:
-        vmImage: windows-latest
-      displayName: Secret Scan
-
-      steps:
-      - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
-        displayName: 'Scan for secrets'
-        inputs:
-          debugMode: false
-          toolMajorVersion: V2
-
-      - task: securedevelopmentteam.vss-secure-development-tools.build-task-publishsecurityanalysislogs.PublishSecurityAnalysisLogs@2
-        displayName: 'Publish Secret Scan Logs to Build Artifacts'
-        continueOnError: true
-
-      - task: securedevelopmentteam.vss-secure-development-tools.build-task-postanalysis.PostAnalysis@1
-        displayName: 'Check for Failures'
-        inputs:
-          CredScan: true
-          ToolLogsNotFoundAction: Error
