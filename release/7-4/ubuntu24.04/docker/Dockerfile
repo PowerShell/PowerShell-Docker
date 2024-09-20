@@ -6,10 +6,10 @@ ARG hostRegistry=psdockercache.azurecr.io
 FROM ${hostRegistry}/ubuntu:24.04 AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=7.5.0-preview.2
-ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.deb_amd64.deb
+ARG PS_VERSION=7.4.5
+ARG PS_PACKAGE=powershell_${PS_VERSION}-1.deb_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=7-preview
+ARG PS_INSTALL_VERSION=7
 
 RUN --mount=type=cache,target=/var/lib/apt \
     --mount=type=cache,target=/var/cache/apt \
@@ -32,10 +32,10 @@ ARG hostRegistry=psdockercache.azurecr.io
 FROM ${hostRegistry}/ubuntu:24.04 AS final-image
 
 # # Define args needed to add the package
-ARG PS_VERSION=7.5.0-preview.2
-ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.deb_amd64.deb
+ARG PS_VERSION=7.4.5
+ARG PS_PACKAGE=powershell_${PS_VERSION}-1.deb_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-ARG PS_INSTALL_VERSION=7-preview
+ARG PS_INSTALL_VERSION=7
 
 # Define ENVs for Localization/Globalization
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
@@ -92,4 +92,4 @@ RUN --mount=from=installer-env,target=/mnt/pwsh,source=/tmp \
 
 # Use PowerShell as the default shell
 # Use array to avoid Docker prepending /bin/sh -c
-CMD [ "pwsh-preview" ]
+CMD [ "pwsh" ]
