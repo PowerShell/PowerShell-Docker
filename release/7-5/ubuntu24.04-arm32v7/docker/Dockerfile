@@ -15,7 +15,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 RUN mkdir -p ${PS_INSTALL_FOLDER}
 ARG PS_PACKAGE_URL_BASE64
 RUN apt-get update \
-    && apt-get install --no-install-recommends ca-certificates wget --yes
+    && apt-get install --no-install-recommends ca-certificates wget sudo --yes
 RUN echo 'in task' \
     && if [ -n "${PS_PACKAGE_URL_BASE64}" ]; then \
         echo 'using base64' \
