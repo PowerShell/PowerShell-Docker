@@ -29,7 +29,7 @@ RUN echo 'in task' \
     && echo 'task done'
 RUN ls -l /tmp/powershell.tar.gz
     # Unzip the Linux tar.gz
-RUN tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
+RUN sudo tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
 
 ARG hostRegistry=psdockercache.azurecr.io
 FROM --platform=linux/arm/v7 ${hostRegistry}/ubuntu:noble AS final-image
