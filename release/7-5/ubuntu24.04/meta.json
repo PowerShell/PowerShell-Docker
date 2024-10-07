@@ -13,7 +13,7 @@
         "${channelTag}"
     ],
     "TestProperties": {
-        "size": 338
+        "size": 337
     },
     "SubImage": "test-deps",
     "EndOfLife": "2029-04-01",

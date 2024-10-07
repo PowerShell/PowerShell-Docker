@@ -4,7 +4,7 @@
 ARG hostRegistry=psdockercache.azurecr.io
 FROM --platform=linux/arm/v7 ${hostRegistry}/ubuntu:noble AS installer-env
 
-ARG PS_VERSION=7.5.0-preview.2
+ARG PS_VERSION=7.5.0-preview.5
 ENV PS_PACKAGE=powershell-${PS_VERSION}-linux-arm32.tar.gz
 ENV PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7-preview
@@ -36,7 +36,7 @@ FROM --platform=linux/arm/v7 ${hostRegistry}/ubuntu:noble AS final-image
 
 # Define Args and Env needed to create links
 ARG PS_INSTALL_VERSION=7-preview
-ARG PS_VERSION=7.5.0-preview.2
+ARG PS_VERSION=7.5.0-preview.5
 ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
     \
     # Define ENVs for Localization/Globalization
@@ -50,7 +50,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 RUN \
   apt-get update \
-  && apt-get install --no-install-recommends ca-certificates libssl3 libicu74 less --yes
+  && apt-get install --no-install-recommends ca-certificates libssl3t64 libicu74 less --yes
     # Give all user execute permissions and remove write permissions for others
 RUN chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     # Create the pwsh symbolic link that points to powershell
