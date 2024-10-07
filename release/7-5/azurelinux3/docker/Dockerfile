@@ -13,8 +13,8 @@ FROM mcr.microsoft.com/azurelinux/base/core:3.0 AS setup-tdnf-repa
 FROM setup-tdnf-repa AS installer-env
 
     # Define Args for the needed to add the package
-    ARG PS_VERSION=7.5.0-preview.2
-    ARG PACKAGE_VERSION=7.5.0_preview.2
+    ARG PS_VERSION=7.5.0-preview.5
+    ARG PACKAGE_VERSION=7.5.0_preview.5
     ARG PS_PACKAGE=powershell-preview-${PACKAGE_VERSION}-1.cm.x86_64.rpm
     ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
     ARG PS_INSTALL_VERSION=7-preview
@@ -41,7 +41,7 @@ FROM setup-tdnf-repa AS installer-env
 # Start a new stage so we lose all the package download layers from the final image
 FROM setup-tdnf-repa AS powershell
 
-    ARG PS_VERSION=7.5.0-preview.2
+    ARG PS_VERSION=7.5.0-preview.5
     ARG PS_INSTALL_VERSION=7-preview
 
     # Define Args and Env needed to create links

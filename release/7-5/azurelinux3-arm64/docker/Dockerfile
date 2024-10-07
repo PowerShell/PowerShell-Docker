@@ -4,7 +4,7 @@
 FROM --platform=linux/arm64 mcr.microsoft.com/azurelinux/base/core:3.0 AS installer-env
 
     # Define Args for the needed to add the package
-    ARG PS_VERSION=7.4.0-rc.1
+    ARG PS_VERSION=7.5.0-preview.5
     ARG PS_PACKAGE=powershell-${PS_VERSION}-linux-arm64.tar.gz
     ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
     ARG PS_INSTALL_VERSION=7-preview
@@ -42,7 +42,7 @@ FROM --platform=linux/arm64 mcr.microsoft.com/azurelinux/base/core:3.0 AS final-
 
     # Define Args and Env needed to create links
     ARG PS_INSTALL_VERSION=7-preview
-    ARG PS_VERSION=7.4.0-rc.1
+    ARG PS_VERSION=7.5.0-preview.5
 
     ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
         \
