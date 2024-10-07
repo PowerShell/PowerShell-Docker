@@ -6,7 +6,7 @@ ARG hostRegistry=psdockercache.azurecr.io
 FROM ${hostRegistry}/ubuntu:24.04 AS installer-env
 
 # Define Args for the needed to add the package
-ARG PS_VERSION=7.5.0-preview.2
+ARG PS_VERSION=7.5.0-preview.5
 ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.deb_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7-preview
@@ -32,7 +32,7 @@ ARG hostRegistry=psdockercache.azurecr.io
 FROM ${hostRegistry}/ubuntu:24.04 AS final-image
 
 # # Define args needed to add the package
-ARG PS_VERSION=7.5.0-preview.2
+ARG PS_VERSION=7.5.0-preview.5
 ARG PS_PACKAGE=powershell-preview_${PS_VERSION}-1.deb_amd64.deb
 ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
 ARG PS_INSTALL_VERSION=7-preview
