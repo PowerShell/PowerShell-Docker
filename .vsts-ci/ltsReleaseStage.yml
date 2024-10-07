@@ -13,28 +13,8 @@ stages:
   - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
-      imageName: alpine316
-      artifactSuffix: alpine316
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releaseJob.yml@self
-    parameters:
-      archName: 'Build_linux_amd64'
       imageName: alpine317
       artifactSuffix: alpine317
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releaseJob.yml@self
-    parameters:
-      archName: 'Build_linux_amd64'
-      imageName: debian11
-      artifactSuffix: debian11
       poolOS: 'linux'
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
@@ -142,65 +122,5 @@ stages:
       poolHostVersion: '1ESWindows2022'
       windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'
       maxParallel: 3
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releaseJob.yml@self
-    parameters:
-      archName: 'Build_linux_amd64'
-      imageName: alpine316\test-deps
-      artifactSuffix: alpine316_test_deps
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releaseJob.yml@self
-    parameters:
-      archName: 'Build_linux_amd64'
-      imageName: alpine317\test-deps
-      artifactSuffix: alpine317_test_deps
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releaseJob.yml@self
-    parameters:
-      archName: 'Build_linux_amd64'
-      imageName: debian11\test-deps
-      artifactSuffix: debian11_test_deps
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releaseJob.yml@self
-    parameters:
-      archName: 'Build_linux_amd64'
-      imageName: ubi8\test-deps
-      artifactSuffix: ubi8_test_deps
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releaseJob.yml@self
-    parameters:
-      archName: 'Build_linux_amd64'
-      imageName: ubuntu20.04\test-deps
-      artifactSuffix: ubuntu2004_test_deps
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releaseJob.yml@self
-    parameters:
-      archName: 'Build_linux_amd64'
-      imageName: ubuntu22.04\test-deps
-      artifactSuffix: ubuntu2204_test_deps
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}

@@ -680,6 +680,8 @@ class DockerTestArgs
     [PSCustomObject] $TestProperties
     [string] $Channel
     [bool] $UseAcr
+    [string] $LoadPathParentFolder
+    [string] $ShortImageName
 }
 
 function Get-TestParams
@@ -722,6 +724,20 @@ function Get-TestParams
         Write-Verbose -Message "Skipping verification of $($actualTagData.ActualTags[0]) in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
         # The version of nanoserver in CI doesn't have all the changes needed to verify the image
         $skipVerification = $true
+    }
+
+    $loadPathParent = "" # will be "main" or "test" folder name
+    $imageName = "" # also capture image name (without test-deps part) as it may be needed for load tests to derive <imageName>.tar file name
+    if ($dockerFileName.Contains("test-deps"))
+    {
+        $loadPathParent = "test"
+        $dockerFileParts = $dockerFileName.Split("test-deps", [System.StringSplitOptions]::RemoveEmptyEntries)
+        $imageName = $dockerFileParts[0].TrimEnd("\","/")
+    }
+    else
+    {
+        $loadPathParent = "main"
+        $imageName = $dockerFileName
     }
 
     # for the image name label, always use the official image name
@@ -801,6 +817,8 @@ function Get-TestParams
         TestProperties = $allMeta.meta.TestProperties
         Channel = $actualChannel
         UseAcr = $allMeta.meta.UseAcr
+        LoadPathParentFolder = $loadPathParent
+        ShortImageName = $imageName #instead of the official image name (like mcr.microsoft.com/*) just alpine316 for example
     }
 
     return [DockerTestParams] @{
@@ -1100,13 +1118,14 @@ function Invoke-PesterWrapper {
 
     Write-Verbose "Launching pester with $($ExtraParams|Out-String)" -Verbose
 
-    if(!(Get-Module -ListAvailable pester -ErrorAction Ignore) -or $ForcePesterInstall.IsPresent)
+    Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+    if(!(Get-Module "pester" -ListAvailable -ErrorAction Ignore | Where-Object {$_.Version -le "4.99" -and $_.Version -gt "4.00"}) -or $ForcePesterInstall.IsPresent)
     {
-        Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
+        Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99 -Repository PSGallery -SkipPublisherCheck -Verbose
     }
 
     Remove-Module Pester -Force -ErrorAction SilentlyContinue
-    Import-Module pester -MaximumVersion 4.99 -Scope Global
+    Import-Module pester -MaximumVersion 4.99 -Scope Global -Verbose
 
     Write-Verbose -Message "logging to $OutputFile" -Verbose
     $results = $null
@@ -1243,4 +1262,34 @@ function Get-TemplatePopulatedYaml {
 
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)channel: `${{ parameters.channel }}"
     Add-Content -Path $YamlFilePath -Value "$($sixSpace)channelPath: `${{ parameters.channelPath }}"
+}
+
+function Get-ImgMetadataByChannel {
+    param(
+        [string]
+        $Channel,
+
+        [string]
+        $FilePath,
+
+        [object[]]
+        $ImageInfoObjects
+    )
+
+    $imgsForChannelArr = @()
+    foreach ($img in $ImageInfoObjects)
+    {
+        $imgName = $img.Name
+        $tags = $img.Tags
+
+        $tagStr = $tags -join " "
+        $imgOS = $img.IsLinux ? "linux" : "windows"
+        $imgMeta = @{}
+        $imgMeta.Add("name", $imgName)
+        $imgMeta.Add("tags", $tagStr)
+        $imgMeta.Add("os", $imgOS)
+        $imgsForChannelArr += $imgMeta
+    }
+
+    return $imgsForChannelArr
 }

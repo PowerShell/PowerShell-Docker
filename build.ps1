@@ -31,6 +31,14 @@ param(
     [switch]
     $Pull,
 
+    [Parameter(Mandatory, ParameterSetName="TestByName")]
+    [switch]
+    $Load,
+
+    [Parameter(Mandatory, ParameterSetName="TestByName")]
+    [string]
+    $LoadPath,
+
     [Parameter(Mandatory, ParameterSetName="GenerateMatrixJson")]
     [switch]
     $GenerateMatrixJson,
@@ -38,6 +46,14 @@ param(
     [Parameter(Mandatory, ParameterSetName="UpdateBuildYaml")]
     [switch]
     $UpdateBuildYaml,
+
+    [Parameter(Mandatory, ParameterSetName="UpdateImageMetadata")]
+    [switch]
+    $UpdateImageMetadata,
+
+    [Parameter(Mandatory, ParameterSetName="UpdateImageMetadata")]
+    [string]
+    $MetadataFilePath,
 
     [Parameter(ParameterSetName="GenerateMatrixJson")]
     [switch]
@@ -118,6 +134,7 @@ param(
 
     [Parameter(ParameterSetName="GenerateMatrixJson")]
     [Parameter(ParameterSetName="UpdateBuildYaml")]
+    [Parameter(ParameterSetName="UpdateImageMetadata")]
     [Parameter(ParameterSetName="GenerateManifestLists")]
     [Parameter(ParameterSetName="GenerateTagsYaml")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
@@ -126,6 +143,7 @@ param(
 
     [Parameter(ParameterSetName="GenerateMatrixJson")]
     [Parameter(ParameterSetName="UpdateBuildYaml")]
+    [Parameter(ParameterSetName="UpdateImageMetadata")]
     [Parameter(ParameterSetName="GenerateManifestLists")]
     [Parameter(ParameterSetName="GenerateTagsYaml")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
@@ -134,6 +152,7 @@ param(
 
     [Parameter(ParameterSetName="GenerateManifestLists")]
     [Parameter(ParameterSetName="UpdateBuildYaml")]
+    [Parameter(ParameterSetName="UpdateImageMetadata")]
     [Parameter(ParameterSetName="GenerateMatrixJson")]
     [Parameter(ParameterSetName="GenerateTagsYaml")]
     [ValidatePattern('(\d+\.){2}\d(-\w+(\.\d+)?)?')]
@@ -186,7 +205,7 @@ DynamicParam {
     $dockerFileNames = @()
     Get-ImageList -Channel $imageChannel | ForEach-Object { $dockerFileNames += $_ }
 
-    # Create the parameter attributs
+    # Create the parameter attributes
     $Attributes = [System.Collections.ObjectModel.Collection[System.Attribute]]::new()
 
     Add-ParameterAttribute -ParameterSetName 'TestByName' -Attributes $Attributes
@@ -221,6 +240,7 @@ DynamicParam {
     Add-ParameterAttribute -ParameterSetName 'DupeCheck' -Attributes $channelAttributes
     Add-ParameterAttribute -ParameterSetName 'GenerateMatrixJson' -Attributes $channelAttributes -Mandatory $false
     Add-ParameterAttribute -ParameterSetName "UpdateBuildYaml" -Attributes $channelAttributes -Mandatory $false
+    Add-ParameterAttribute -ParameterSetName "UpdateImageMetadata" -Attributes $channelAttributes -Mandatory $false
     Add-ParameterAttribute -ParameterSetName 'GenerateTagsYaml' -Attributes $channelAttributes
     Add-ParameterAttribute -ParameterSetName 'GenerateManifestLists' -Attributes $channelAttributes
 
@@ -245,7 +265,18 @@ Begin {
 
     $ENV:DOCKER_BUILDKIT = 1
 
-    if ($PSCmdlet.ParameterSetName -notin 'GenerateMatrixJson', 'UpdateBuildYaml', 'GenerateTagsYaml', 'DupeCheck', 'GenerateManifestLists' -and $Channel.Count -gt 1)
+    if ($Load.IsPresent)
+    {
+        $loadPathExists = Test-Path -Path $LoadPath
+        if (!$loadPathExists)
+        {
+            throw "Folder specified at $LoadPath does not exist"
+        }
+
+        $ENV:LOAD_PATH = $LoadPath
+    }
+
+    if ($PSCmdlet.ParameterSetName -notin 'GenerateMatrixJson', 'UpdateBuildYaml', 'UpdateImageMetadata', 'GenerateTagsYaml', 'DupeCheck', 'GenerateManifestLists' -and $Channel.Count -gt 1)
     {
         throw "Multiple Channels are not supported in this parameter set"
     }
@@ -446,7 +477,7 @@ End {
                     }
                 }
             }
-            elseif ($GenerateTagsYaml.IsPresent -or $GenerateMatrixJson.IsPresent -or $UpdateBuildYaml.IsPresent -or $GenerateManifestLists.IsPresent) {
+            elseif ($GenerateTagsYaml.IsPresent -or $GenerateMatrixJson.IsPresent -or $UpdateBuildYaml.IsPresent -or $UpdateImageMetadata.IsPresent -or $GenerateManifestLists.IsPresent) {
                 if($Acr -eq 'OnlyAcr' -and !$useAcr)
                 {
                     continue
@@ -479,7 +510,7 @@ End {
 
                 $osVersion = $allMeta.meta.osVersion
                 $manifestLists = $allMeta.meta.ManifestLists
-                if($osVersion -or $GenerateMatrixJson.IsPresent -or $UpdateBuildYaml.IsPresent -or $GenerateManifestLists.IsPresent)
+                if($osVersion -or $GenerateMatrixJson.IsPresent -or $UpdateBuildYaml.IsPresent -or $UpdateImageMetadata.IsPresent -or $GenerateManifestLists.IsPresent)
                 {
                     if ($osVersion) {
                         $osVersion = $osVersion.replace('${fromTag}', $actualTagData.fromTag)
@@ -536,10 +567,15 @@ End {
         $extraParams = @{}
         if($Test.IsPresent)
         {
-            $tags = @('Behavior')
+            $tags = @()
             if($Pull.IsPresent)
             {
+                $tags += 'Behavior'
                 $tags += 'Pull'
+            }
+            elseif ($Load.IsPresent) {
+                $tags += 'LoadBehavior'
+                $tags += 'Load'
             }
 
             $extraParams.Add('Tags',$tags)
@@ -567,8 +603,8 @@ End {
         Invoke-PesterWrapper -Script $testsPath -OutputFile $logPath -ExtraParams $extraParams
     }
 
-    Write-Verbose "!$GenerateTagsYaml -and !$GenerateMatrixJson -and !$UpdateBuildYaml -and !$GenerateManifestLists -and '$($PSCmdlet.ParameterSetName)' -notlike '*All'" -Verbose
-    if (!$GenerateTagsYaml -and !$GenerateMatrixJson -and !$UpdateBuildYaml -and !$GenerateManifestLists -and $PSCmdlet.ParameterSetName -notlike '*All') {
+    Write-Verbose "!$GenerateTagsYaml -and !$GenerateMatrixJson -and !$UpdateBuildYaml -and !$UpdateImageMetadata -and !$GenerateManifestLists -and !$Load -and '$($PSCmdlet.ParameterSetName)' -notlike '*All'" -Verbose
+    if (!$GenerateTagsYaml -and !$GenerateMatrixJson -and !$UpdateBuildYaml -and !$UpdateImageMetadata -and !$GenerateManifestLists -and !$Load -and $PSCmdlet.ParameterSetName -notlike '*All') {
         $dockerImagesToScan = ''
         # print local image names
         # used only with the -Build
@@ -737,15 +773,64 @@ End {
                 foreach ($osGroup in $osGroups) {
                     $architectureGroups = $osGroup.Group | Group-Object -Property Architecture
                     foreach ($architectureGroup in $architectureGroups) {
-                        # Note: For each image to be built (including test-deps images) the <channel>ReleaseStage.yml file needs to have a template call for the image.
+                        # Note: For each image to be built the <channel>ReleaseStage.yml file needs to have a template call for the image.
                         foreach ($tag in $architectureGroup.Group | Sort-Object -Property dockerfile) {
-                            Write-Verbose -Verbose "calling method to populate template call in yaml file for channel: $channelName for image: $($tag.Name)"
-                            Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
+                            if (!$tag.Name.ToString().Contains('test-deps'))
+                            {
+                                Write-Verbose -Verbose "calling method to populate template call in yaml file for channel: $channelName for image: $($tag.Name)"
+                                Get-TemplatePopulatedYaml -YamlFilePath $channelReleaseStagePath -ImageInfo $tag
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    $channelsUsed = @{}
+    $releaseChannelsUsed = @{}
+    $imgsMetadata = @{}
+    $emptyArr = @()
+    if ($UpdateImageMetadata.IsPresent) {
+        foreach ($repo in $tagGroups.Keys | Sort-Object) {
+            $channelGroups = $tagGroups.$repo | Group-Object -Property Channel
+            foreach($channelGroup in $channelGroups)
+            {
+                $channelName = $channelGroup.Name
+                if (!$releaseChannelsUsed.Contains($channelName))
+                {
+                    $releaseChannelsUsed.Add($channelName, $emptyArr)
+                }
+
+                $osGroups = $channelGroup.Group | Group-Object -Property os
+                foreach ($osGroup in $osGroups) {
+                    $architectureGroups = $osGroup.Group | Group-Object -Property Architecture
+                    foreach ($architectureGroup in $architectureGroups) {
+                        foreach ($tag in $architectureGroup.Group | Sort-Object -Property dockerfile) {
+
+                            # for release yaml, need to collect tag object (containing metadata for each image)
+                            $releaseChannelsUsed[$channelName] += $tag
+                        }
+                    }
+                }
+            }
+        }
+
+        $channelsFound = $releaseChannelsUsed.Keys
+        foreach ($channelKey in $channelsFound)
+        {
+            $imgInfoObjArr = $releaseChannelsUsed[$channelKey]
+            $metadataValuesArr = Get-ImgMetadataByChannel -Channel $channelName -ImageInfoObjects $imgInfoObjArr
+            $imgsMetadata.Add($channelName, $metadataValuesArr)
+        }
+
+        $metadataJsonFileExists = Test-Path -Path $MetadataFilePath
+        if ($metadataJsonFileExists)
+        {
+            Remove-Item -Path $MetadataFilePath
+        }
+
+        $imgsMetadata | ConvertTo-Json | Out-File $MetadataFilePath
     }
 
     if ($GenerateManifestLists.IsPresent) {

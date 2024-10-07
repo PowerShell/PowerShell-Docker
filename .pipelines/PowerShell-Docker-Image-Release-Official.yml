@@ -1,0 +1,417 @@
+name: PSDocker-Release-$(Build.BuildId)
+trigger: none
+
+resources:
+  pipelines:
+  - pipeline: BuildPipeline
+    source: PowerShell-Docker-Image-Build-Official
+    trigger:
+      branches:
+        include:
+        - master
+        - master-ado
+        - onebranchbuild
+
+  repositories:
+  - repository: onebranchTemplates
+    type: git
+    name: OneBranch.Pipelines/GovernedTemplates
+    ref: refs/heads/main
+  - repository: Internal-PowerShellTeam-Tools
+    type: git
+    trigger: none
+    name: Internal-PowerShellTeam-Tools
+    ref: main-mirror
+
+variables:
+- name: runCodesignValidationInjection
+  value: false
+- name: DisableDockerDetector
+  value: true
+- name: LinuxContainerImage
+  value: mcr.microsoft.com/onebranch/cbl-mariner/build:2.0
+- name: WindowsContainerImage
+  value: onebranch.azurecr.io/windows/ltsc2019/vse2022:latest
+- group: PipelineExecutionPats
+- group: Build Docker Group
+
+extends:
+  template: v2/OneBranch.Official.CrossPlat.yml@onebranchTemplates
+  parameters:
+    customTags: 'ES365AIMigrationTooling-BulkMigrated'
+    stages:
+    - stage: GetBuildArtifacts
+      displayName: 'Get artifacts from build pipeline'
+      variables:
+        - name: repoRoot
+          value: $(Build.SourcesDirectory)
+      jobs:
+      - job: DownloadMetaArtifactFromBuild
+        displayName: 'Download BuildInfo.json file from build artifact'
+        variables:
+        - name: ob_outputDirectory
+          value: '$(Build.ArtifactStagingDirectory)/ONEBRANCH_ARTIFACT'
+        pool:
+          timeoutInMinutes: 30
+          type: windows
+        steps:
+        - download: BuildPipeline
+          artifact: 'drop_StageResolveVersionandYaml_JobResolveVersions'
+          displayName: 'Download BuildInfo.json file from build artifact'
+        - pwsh: |
+            $buildMetadata = Get-Content -Path "$(Pipeline.Workspace)/BuildPipeline/drop_StageResolveVersionandYaml_JobResolveVersions/buildInfo.json" | ConvertFrom-Json
+            $currentChannel = $($buildMetadata.channel)
+            $currentVersion = $($buildMetadata.releaseVersionTag)
+            $finalVersion = $currentVersion.Trim("v")
+            Write-Verbose -Verbose "version: $finalVersion and channel: $currentChannel"
+            Write-Host "##vso[task.setvariable variable=channel;isOutput=true]$currentChannel"
+            Write-Host "##vso[task.setvariable variable=version;isOutput=true]$finalVersion"
+          displayName: 'Get channel from buildInfo.json'
+          name: setChannelStep
+      - job: DownloadImageArtifactFromBuild
+        dependsOn:
+          - DownloadMetaArtifactFromBuild
+        displayName: 'Download image artifacts from build'
+        variables:
+        - name: ob_outputDirectory
+          value: '$(Build.ArtifactStagingDirectory)/ONEBRANCH_ARTIFACT'
+        - name: channel
+          value: $[ dependencies.DownloadMetaArtifactFromBuild.outputs['setChannelStep.channel'] ]
+        pool:
+          timeoutInMinutes: 30
+          type: windows
+        steps:
+        - checkout: Internal-PowerShellTeam-Tools
+        - pwsh: |
+            Import-Module $(Build.SourcesDirectory)\Internal-PowerShellTeam-Tools\ReleaseTools\AzDO -Force
+            Set-AzDoProjectInfo -ProjectOwner mscodehub -ProjectName PowerShellCore
+            Set-AzDoAuthToken -Token $(mscodehubBuildExecutionPat)
+
+            $triggeredBuildId = "${ENV:RESOURCES_PIPELINE_BUILDPIPELINE_RUNID}"
+            $buildArtifact = Get-AzDOBuildArtifact -Id $triggeredBuildId
+            Write-Verbose -Verbose "build id: $triggeredBuildId"
+            $currentChannel = '$(channel)'
+            $desiredArtifacts = $buildArtifact | Where-Object {$_.name -like "drop_StageGenerateBuild_$($currentChannel)_Job_Build_*" -and $_.name -notlike "*_sdl_analysis" -and $_.name -notlike "*_failed*"}
+
+            $artifactFolderPath = Join-Path -Path '$(Pipeline.Workspace)' -ChildPath 'buildArtifacts'
+            $artifactFolderPathExists = Test-Path -Path $artifactFolderPath
+            if (!$artifactFolderPathExists)
+            {
+              New-Item -Path $artifactFolderPath -ItemType Directory
+            }
+            $desiredArtifacts | Receive-AzdoArtifact -Location '$(Pipeline.Workspace)/buildArtifacts' -expand
+          displayName: Download all artifacts
+        - pwsh: |
+            $sourceFilesFolderPath = Join-Path -Path '$(Pipeline.Workspace)' -ChildPath "SourceFiles"
+            $linuxImagesFolderPath = Join-Path -Path $sourceFilesFolderPath -ChildPath "linux"
+            $windowsImagesFolderPath = Join-Path -Path $sourceFilesFolderPath -ChildPath "windows"
+            New-Item -Path $linuxImagesFolderPath -ItemType Directory
+            New-Item -Path $windowsImagesFolderPath -ItemType Directory
+          displayName: 'Create Linux and Windows tests folders'
+        - pwsh: |
+            $linuxDistros = @{}
+            $windowsDistros = @{}
+            $buildArtifactsPath = Join-Path -Path '$(Pipeline.Workspace)' -ChildPath 'buildArtifacts'
+            $folders = Get-ChildItem $buildArtifactsPath -Exclude '*.zip'
+            $folders | ForEach-Object {
+              $artifactFolderPath = $_.FullName
+              $artifactName = $_.Name
+
+              $fileObj = Get-ChildItem -Path $artifactFolderPath -Filter '*.tar'
+              $srcfilePath = "$($fileObj.FullName)" # example: drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine316/alpine316.tar, drop_StageGenerateBuild_stable_Job_Build_Build_linux_amd64_alpine316_test_deps/alpine316.tar
+              $shortImageName = "$($fileObj.BaseName)" # example: alpine316 
+
+              # group main and regular type images by the short image name, i.e group alpine316.tar main and test images
+              if ($artifactName.Contains("linux"))
+              {
+                if (!$linuxDistros.ContainsKey($shortImageName))
+                {
+                  $linuxDistros.Add($shortImageName, @($srcFilePath))
+                }
+                else {
+                  $linuxDistros[$shortImageName] += $srcfilePath
+                }
+              }
+              elseif ($artifactName.Contains("windows"))
+              {
+                if (!$windowsDistros.ContainsKey($shortImageName))
+                {
+                  $windowsDistros.Add($shortImageName, @($srcFilePath))
+                }
+                else {
+                  $windowsDistros[$shortImageName] += $srcfilePath
+                }
+              }
+            }
+
+            $sourceFilesFolderPath = Join-Path -Path '$(Pipeline.Workspace)' -ChildPath "SourceFiles"
+            $linuxImagesFolderPath = Join-Path -Path $sourceFilesFolderPath -ChildPath "linux"
+            $windowsImagesFolderPath = Join-Path -Path $sourceFilesFolderPath -ChildPath "windows"
+
+            # Create folder with all linux images to provide to linux-based Tests job:
+            $linuxDistroNames = $linuxDistros.Keys
+            foreach ($name in $linuxDistroNames)
+            {
+              $imageFolderPath = Join-Path -Path $linuxImagesFolderPath -ChildPath $name
+              New-Item -Path $imageFolderPath -ItemType Directory
+              $imageMainPath = Join-Path -Path $imageFolderPath -ChildPath "main"
+              $imageTestPath = Join-Path -Path $imageFolderPath -ChildPath "test"
+              New-Item -Path $imageMainPath -ItemType Directory
+              New-Item -Path $imageTestPath -ItemType Directory
+              $tarFilesForDistro = $linuxDistros[$name]
+              foreach ($tarFilePath in $tarFilesForDistro)
+              {
+                $imageParentFolder = $tarFilePath.Contains("_test_deps") ? $imageTestPath : $imageMainPath
+                $destFilePath = Join-Path -Path $imageParentFolder -ChildPath "$($name).tar"
+                Copy-Item -Path $tarFilePath -Destination $destFilePath
+                Write-Verbose -Verbose "copying: $tarFilePath to dest: $destFilePath"
+              }
+            }
+
+            # Create folder with all windows images to provide windows-based Tests job:
+            $windowsDistroNames = $windowsDistros.Keys
+            foreach ($name in $windowsDistroNames)
+            {
+              $imageFolderPath = Join-Path -Path $windowsImagesFolderPath -ChildPath $name
+              New-Item -Path $imageFolderPath -ItemType Directory
+              $imageMainPath = Join-Path -Path $imageFolderPath -ChildPath "main"
+              $imageTestPath = Join-Path -Path $imageFolderPath -ChildPath "test"
+              New-Item -Path $imageMainPath -ItemType Directory
+              New-Item -Path $imageTestPath -ItemType Directory
+              $tarFilesForDistro = $windowsDistros[$name]
+              foreach ($tarFilePath in $tarFilesForDistro)
+              {
+                $imageParentFolder = $tarFilePath.Contains("_test_deps") ? $imageTestPath : $imageMainPath
+                $destFilePath = Join-Path -Path $imageParentFolder -ChildPath "$($name).tar"
+                Copy-Item -Path $tarFilePath -Destination $destFilePath
+                Write-Verbose -Verbose "copying: $tarFilePath to dest: $destFilePath"
+              }
+            }
+
+            $sourceFilesFolderPath = Join-Path -Path '$(Pipeline.Workspace)' -ChildPath "SourceFiles"
+            $linuxSrcFilesFolderPath = Join-Path -Path $sourceFilesFolderPath -ChildPath "linux"
+            $linuxTarGzDestination = Join-Path -Path '$(Pipeline.Workspace)' -ChildPath 'LinuxSrcFiles.tar.gz'
+            tar -czvf $linuxTarGzDestination -C $linuxSrcFilesFolderPath .
+
+            $windowsSrcFilesFolderPath = Join-Path -Path $sourceFilesFolderPath -ChildPath "windows"
+            $windowsTarGzDestination = Join-Path -Path '$(Pipeline.Workspace)' -ChildPath 'WindowsSrcFiles.tar.gz'
+            tar -czvf $windowsTarGzDestination -C $windowsSrcFilesFolderPath .
+          displayName: 'Create linux and windows distro folders and copy image files needed into them for Test jobs'
+        - task: CopyFiles@2
+          inputs:
+            SourceFolder: '$(Pipeline.Workspace)'
+            Contents: '*SrcFiles.tar.gz'
+            TargetFolder: $(ob_outputDirectory)
+          displayName: Copy LinuxSrcFiles.tar.gz and WindowsSrcFiles.tar.gz files to $(ob_outputDirectory)
+    - stage: RunTests
+      displayName: 'Run Container Tests'
+      dependsOn:
+      - GetBuildArtifacts
+      variables:
+        - name: repoRoot
+          value: $(Build.SourcesDirectory)
+        - name: channel
+          value: $[ stageDependencies.GetBuildArtifacts.DownloadMetaArtifactFromBuild.outputs['setChannelStep.channel'] ]
+        - name: version
+          value: $[ stageDependencies.GetBuildArtifacts.DownloadMetaArtifactFromBuild.outputs['setChannelStep.version'] ]
+        - name: ob_outputDirectory
+          value: '$(Build.ArtifactStagingDirectory)/ONEBRANCH_ARTIFACT'
+      jobs:
+      - job: RunLinuxTests
+        pool:
+          type: linux
+          isCustom: true
+          name: PowerShell1ES
+          demands:
+          - ImageOverride -equals PSMMSUbuntu20.04-Secure-120GB
+        steps:
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              targetPath: $(Pipeline.Workspace)
+              pattern: '*LinuxSrcFiles.tar.gz'
+              artifact: drop_GetBuildArtifacts_DownloadImageArtifactFromBuild
+            displayName: 'Download linux SrcFiles.tar.gz artifact, which contains all built images (as .tar files)'
+          - pwsh: |
+              $toolsFolderPath = Join-Path -Path '$(Build.SourcesDirectory)' -ChildPath 'tools'
+              $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
+              $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
+              $pathToTarGz = Join-Path -Path '$(Pipeline.Workspace)' -ChildPath 'LinuxSrcFiles.tar.gz'
+
+              $pathToImgsFolder = Join-Path -Path '$(Pipeline.Workspace)' -ChildPath 'linuxImages'
+              New-Item -Path $pathToImgsFolder -ItemType Directory
+              tar -xzvf $pathToTarGz -C $pathToImgsFolder
+              $linuxFolders = Get-ChildItem -Path $pathToImgsFolder -Directory
+              foreach ($folder in $linuxFolders)
+              {
+                $folderPath = "$($folder.FullName)"
+                $shortImgName = "$($folder.Name)"
+                .\build.ps1 -Test -Name $shortImgName -Load -LoadPath $folderPath -Channel $(channel) -Version $(version) 
+              }
+            displayName: 'Run Tests for all containers'
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(Pipeline.Workspace)'
+              Contents: '**/*.testResults.xml'
+              TargetFolder: $(ob_outputDirectory)
+            displayName: Copy test result file to $(ob_outputDirectory)
+    - stage: PrepForEV2
+      displayName: Copy and prep all files needed for EV2 stage
+      dependsOn:
+      - GetBuildArtifacts
+      - RunTests
+      variables:
+        - name: repoRoot
+          value: $(Build.SourcesDirectory)
+      jobs:
+      - job: CopyEv2FilesToArtifact
+        displayName: Copy EV2 Files To Artifact
+        variables:
+        - name: ob_outputDirectory
+          value: '$(Build.ArtifactStagingDirectory)/ONEBRANCH_ARTIFACT'
+        - name: channel
+          value: $[ stageDependencies.GetBuildArtifacts.DownloadMetaArtifactFromBuild.outputs['setChannelStep.channel'] ]
+        - name: version
+          value: $[ stageDependencies.GetBuildArtifacts.DownloadMetaArtifactFromBuild.outputs['setChannelStep.version'] ]
+        pool:
+          timeoutInMinutes: 30
+          type: windows
+        steps:
+        - task: onebranch.pipeline.signing@1
+          displayName: Sign 1st party files
+          inputs:
+            command: 'sign'
+            signing_profile: external_distribution
+            files_to_sign: '**\*.ps1'
+            search_root: '$(Build.SourcesDirectory)/EV2Specs/ServiceGroupRoot/Shell'
+        - pwsh: |
+            $srcPath = Join-Path '$(Build.SourcesDirectory)/EV2Specs/ServiceGroupRoot' -ChildPath 'Shell'
+            $pathToRunTarFile = Join-Path '$(Build.SourcesDirectory)/EV2Specs/ServiceGroupRoot/Shell' -ChildPath "Run.tar"
+            tar -cvf $pathToRunTarFile -C $srcPath ./Run
+          displayName: Compress Run script into tar file as needed for EV2 Shell extension
+        - pwsh: |
+            $pathToEV2Folder = Join-Path -Path '$(Build.SourcesDirectory)' -ChildPath 'EV2Specs'
+            $pathToServiceGroupRootFolder = Join-Path $pathToEV2Folder -ChildPath 'ServiceGroupRoot'
+            $pathToParametersFolder = Join-Path -Path $pathToServiceGroupRootFolder -ChildPath 'Parameters'
+            New-Item -Path $pathToParametersFolder -ItemType Directory
+            $pathToImageMetadataFile = Join-Path -Path $pathToParametersFolder -ChildPath 'ImageMetadata.json'
+            $pathToChannelJsonFile = Join-Path -Path $pathToParametersFolder -ChildPath 'ChannelInfo.json'
+            $currentChannel = '$(channel)'
+
+            $channelHash = @{channel=$currentChannel}
+            $channelHash | ConvertTo-Json | Out-File $pathToChannelJsonFile
+
+            $toolsFolderPath = Join-Path -Path '$(Build.SourcesDirectory)' -ChildPath 'tools'
+            $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
+            $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
+            Write-Verbose -Verbose "ipmo path: $buildHelperModulePath"
+            Import-Module $buildHelperModulePath
+            if ($currentChannel -eq "stable")
+            {
+              .\build.ps1 -UpdateImageMetadata -Channel $currentChannel -StableVersion '$(version)' -MetadataFilePath $pathToImageMetadataFile
+            }
+            elseif ($currentChannel -eq "preview")
+            {
+              .\build.ps1 -UpdateImageMetadata -Channel $currentChannel -PreviewVersion '$(version)' -MetadataFilePath $pathToImageMetadataFile
+            }
+            elseif ($currentChannel -eq "lts")
+            {
+              .\build.ps1 -UpdateImageMetadata -Channel $currentChannel -LtsVersion '$(version)' -MetadataFilePath $pathToImageMetadataFile
+            }
+
+            $imgMetaJsonPathExists = Test-Path -Path $pathToImageMetadataFile
+            $channelJsonPathExists = Test-Path -Path $pathToChannelJsonFile
+          displayName: 'Create image metadata json needed for EV2 Shell Extension script'
+        - task: DownloadPipelineArtifact@2
+          inputs:
+            targetPath: '$(Build.SourcesDirectory)/EV2Specs/ServiceGroupRoot/SrcFiles'
+            pattern: '*.tar.gz'
+            artifact: drop_GetBuildArtifacts_DownloadImageArtifactFromBuild
+          displayName: 'Download SrcFiles.tar.gz artifact to copy to $(Build.SourcesDirectory)/EV2Specs/ServiceGroupRoot/SrcFiles folder'
+        - pwsh: |
+            $pathToJsonFile = Join-Path -Path '$(Build.SourcesDirectory)/EV2Specs/ServiceGroupRoot' -ChildPath 'UploadLinux.Rollout.json'
+            $content = Get-Content -Path $pathToJsonFile | ConvertFrom-Json
+            $envVarArrayLen = $content.shellExtensions.launch.environmentVariables.Length
+            for ($i=0; $i -lt $envVarArrayLen; $i++)
+            {
+              $name = $($content.shellExtensions.launch.environmentVariables[$i].name)
+              if ($name -eq "DESTINATION_ACR_NAME")
+              {
+                $content.shellExtensions.launch.environmentVariables[$i].value = '$(acr_name)'
+              }
+              elseif ($name -eq "MI_NAME"){
+                $content.shellExtensions.launch.environmentVariables[$i].value = '$(managed_identity_name)'
+              }
+              elseif ($name -eq "MI_CLIENTID")
+              {
+                $content.shellExtensions.launch.environmentVariables[$i].value = '$(managed_identity_clientid)'
+              } 
+            }
+
+            $identityString = "/subscriptions/$(acr_subscription)/resourcegroups/$(acr_resource_group)/providers/Microsoft.ManagedIdentity/userAssignedIdentities/$(managed_identity_name)"
+            $content.shellExtensions.launch.identity.userAssignedIdentities[0] = $identityString
+
+            Remove-Item -Path $pathToJsonFile
+            $content | ConvertTo-Json -Depth 6 | Out-File $pathToJsonFile
+          displayName: 'Replace values in UploadLinux.Rollout.json file'
+        - pwsh: |
+            $pathToJsonFile = Join-Path -Path '$(Build.SourcesDirectory)/EV2Specs/ServiceGroupRoot' -ChildPath 'RolloutSpec.json'
+            $content = Get-Content -Path $pathToJsonFile | ConvertFrom-Json
+            $content.RolloutMetadata.Notification.Email.To = '$(email_address)'
+
+            Remove-Item -Path $pathToJsonFile
+            $content | ConvertTo-Json -Depth 4 | Out-File $pathToJsonFile
+          displayName: 'Replace values in RolloutSpecPath.json'
+        - pwsh: |
+            $pathToJsonFile = Join-Path -Path '$(Build.SourcesDirectory)/EV2Specs/ServiceGroupRoot' -ChildPath 'ServiceModel.json'
+            $content = Get-Content -Path $pathToJsonFile | ConvertFrom-Json
+            $content.ServiceResourceGroups[0].AzureResourceGroupName = '$(acr_resource_group)'
+            $content.ServiceResourceGroups[0].AzureSubscriptionId = '$(acr_subscription)'
+
+            Remove-Item -Path $pathToJsonFile
+            $content | ConvertTo-Json -Depth 9 | Out-File $pathToJsonFile
+          displayName: 'Replace values in ServiceModel.json'
+        - task: CopyFiles@2
+          inputs:
+            Contents: 'EV2Specs/**'
+            TargetFolder: $(ob_outputDirectory)
+    - stage:  'Prod_release'
+      displayName: Deploy Images to ACR with EV2
+      dependsOn:
+      - PrepForEV2
+      variables:
+        - name: ob_release_environment
+          value: "Production"
+        - name: repoRoot
+          value: $(Build.SourcesDirectory)
+      jobs:
+      - job: Prod_ReleaseJob
+        pool:
+          type: release
+        steps:
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              targetPath: '$(Pipeline.Workspace)'
+              artifact: drop_PrepForEV2_CopyEv2FilesToArtifact
+            displayName: 'Download drop_PrepForEV2_CopyEv2FilesToArtifact artifact that has all files needed'
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              buildType: 'current'
+              targetPath: '$(Pipeline.Workspace)'
+            displayName: 'Download to get EV2 Files'
+          - task: vsrm-ev2.vss-services-ev2.adm-release-task.ExpressV2Internal@1
+            displayName: 'Ev2: Push to ACR'
+            inputs:
+              UseServerMonitorTask: true
+              EndpointProviderType: ApprovalService
+              ApprovalServiceEnvironment: Production   
+              ServiceRootPath: '$(Pipeline.Workspace)/drop_PrepForEV2_CopyEv2FilesToArtifact/EV2Specs/ServiceGroupRoot'
+              RolloutSpecPath: '$(Pipeline.Workspace)/drop_PrepForEV2_CopyEv2FilesToArtifact/EV2Specs/ServiceGroupRoot/RolloutSpec.json'
+    # - stage: Create_PR
+    #   condition: succeeded()
+    #   dependsOn: ['Release_preview', 'Release_stable', 'Release_lts']
+    #   displayName: Create McrDocs Pr
+    #   jobs:
+    #   - deployment: ReleaseAutomationKickOff
+    #     displayName: Create McrDocs Pr
+    #     pool: server
+    #     environment: PSDockerMcrDocs
