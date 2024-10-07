@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 ARG hostRegistry=psdockercache.azurecr.io
-FROM --platform=linux/arm/v7 ${hostRegistry}/ubuntu:noble AS installer-env
+FROM --platform=linux/arm/v8 ${hostRegistry}/ubuntu:noble AS installer-env
 
 ARG PS_VERSION=7.5.0-preview.5
 ENV PS_PACKAGE=powershell-${PS_VERSION}-linux-arm32.tar.gz
@@ -15,7 +15,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION
 RUN mkdir -p ${PS_INSTALL_FOLDER}
 ARG PS_PACKAGE_URL_BASE64
 RUN apt-get update \
-    && apt-get install --no-install-recommends ca-certificates wget sudo --yes
+    && apt-get install --no-install-recommends ca-certificates wget --yes
 RUN echo 'in task' \
     && if [ -n "${PS_PACKAGE_URL_BASE64}" ]; then \
         echo 'using base64' \
@@ -29,7 +29,7 @@ RUN echo 'in task' \
     && echo 'task done'
 RUN ls -l /tmp/powershell.tar.gz
     # Unzip the Linux tar.gz
-RUN sudo tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
+RUN tar zxf /tmp/powershell.tar.gz -C ${PS_INSTALL_FOLDER}
 
 ARG hostRegistry=psdockercache.azurecr.io
 FROM --platform=linux/arm/v7 ${hostRegistry}/ubuntu:noble AS final-image
@@ -50,7 +50,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 RUN \
   apt-get update \
-  && apt-get install --no-install-recommends ca-certificates libssl3 libicu74 less --yes
+  && apt-get install --no-install-recommends ca-certificates libssl3t64 libicu74 less --yes
     # Give all user execute permissions and remove write permissions for others
 RUN chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     # Create the pwsh symbolic link that points to powershell
