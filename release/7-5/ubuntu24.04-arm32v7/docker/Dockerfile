@@ -50,7 +50,7 @@ ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
 COPY --from=installer-env ["/opt/microsoft/powershell", "/opt/microsoft/powershell"]
 RUN \
   apt-get update \
-  && apt-get install --no-install-recommends ca-certificates libssl3t64 libicu74 less --yes
+  && apt-get install --no-install-recommends ca-certificates libssl3 libicu74 less --yes
     # Give all user execute permissions and remove write permissions for others
 RUN chmod a+x,o-w ${PS_INSTALL_FOLDER}/pwsh \
     # Create the pwsh symbolic link that points to powershell
