@@ -13,7 +13,7 @@ FROM setup-tdnf-repa AS installer-env
     # Define Args for the needed to add the package
     ARG PS_VERSION=7.4.5
     ARG PACKAGE_VERSION=7.4.5
-    ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.cm.x86_64.rpm
+    ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.cm.aarch64.rpm
     ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
     ARG PS_INSTALL_VERSION=7
 
@@ -27,21 +27,12 @@ FROM setup-tdnf-repa AS installer-env
             tar \
             ca-certificates
 
-    RUN --mount=type=cache,target=/var/cache/tdnf \
-        --mount=type=cache,target=/installTmp \
-        cd /installTmp \
-        && wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh \
-        && chmod +x ./dotnet-install.sh \
-        && ./dotnet-install.sh -Channel 9.0 -Quality ga -Runtime dotnet -InstallDir /usr/share/dotnet
-
     RUN echo ${PS_PACKAGE_URL}
 
 # Start a new stage so we lose all the package download layers from the final image
 FROM setup-tdnf-repa AS powershell
 
     ARG PS_VERSION=7.4.5
-
-    # Define Args and Env needed to create links
     ARG PS_INSTALL_VERSION=7
 
     # Define Args and Env needed to create links
@@ -53,7 +44,7 @@ FROM setup-tdnf-repa AS powershell
         LANG=en_US.UTF-8 \
         # set a fixed location for the Module analysis cache
         PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-        POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-arm64v7-AzureLinux-3
+        POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-AzureLinux-3.0
 
     RUN --mount=type=cache,target=/var/cache/tdnf \
         # install dependencies
@@ -64,6 +55,7 @@ FROM setup-tdnf-repa AS powershell
         less \
         # required for SSH
         openssh-clients \
+        dotnet-runtime-8.0 \
         ca-certificates
 
     # Install dependencies and clean up
@@ -72,16 +64,12 @@ FROM setup-tdnf-repa AS powershell
         # clean cached data
         && tdnf clean all
 
-    COPY --from=installer-env /usr/share/dotnet /usr/share/dotnet
-
-    RUN ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
-
     RUN --mount=type=cache,target=/var/cache/tdnf,rw \
         --mount=from=installer-env,target=/mnt/rpm,source=/tmp \
         rpm -i --nodeps /mnt/rpm/powershell.rpm
 
     # Create the pwsh symbolic link that points to powershell
-    RUN if [ -f "/opt/microsoft/powershell/7-preview/pwsh" ]; then ln -sf /opt/microsoft/powershell/7-preview/pwsh /usr/bin/pwsh; fi
+    RUN if [ -f "/opt/microsoft/powershell/7/pwsh" ]; then ln -sf /opt/microsoft/powershell/7/pwsh /usr/bin/pwsh; fi
 
     # intialize powershell module cache
     # and disable telemetry for this ONE session
