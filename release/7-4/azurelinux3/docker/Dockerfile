@@ -3,7 +3,7 @@
 
 FROM mcr.microsoft.com/azurelinux/base/core:3.0 AS setup-tdnf-repa
 
-    # Use the cache mount since this image does go into the final product
+    # Use the cache mount since this image does go into the final products
     RUN --mount=type=cache,target=/var/cache/tdnf \
         tdnf install -y azurelinux-repos \
         && tdnf makecache
@@ -12,11 +12,11 @@ FROM mcr.microsoft.com/azurelinux/base/core:3.0 AS setup-tdnf-repa
 FROM setup-tdnf-repa AS installer-env
 
     # Define Args for the needed to add the package
-    ARG PS_VERSION=7.5.0-preview.5
-    ARG PACKAGE_VERSION=7.5.0_preview.5
-    ARG PS_PACKAGE=powershell-preview-${PACKAGE_VERSION}-1.cm.x86_64.rpm
+    ARG PS_VERSION=7.4.5
+    ARG PACKAGE_VERSION=7.4.5
+    ARG PS_PACKAGE=powershell-${PACKAGE_VERSION}-1.cm.x86_64.rpm
     ARG PS_PACKAGE_URL=https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/${PS_PACKAGE}
-    ARG PS_INSTALL_VERSION=7-preview
+    ARG PS_INSTALL_VERSION=7
 
     # Download the Linux tar.gz and save it
     ADD ${PS_PACKAGE_URL} /tmp/powershell.rpm
@@ -40,10 +40,10 @@ FROM setup-tdnf-repa AS installer-env
 # Start a new stage so we lose all the package download layers from the final image
 FROM setup-tdnf-repa AS powershell
 
-    ARG PS_VERSION=7.5.0-preview.5
+    ARG PS_VERSION=7.4.5
 
     # Define Args and Env needed to create links
-    ARG PS_INSTALL_VERSION=7-preview
+    ARG PS_INSTALL_VERSION=7
     ENV PS_INSTALL_FOLDER=/opt/microsoft/powershell/$PS_INSTALL_VERSION \
         \
         # Define ENVs for Localization/Globalization
