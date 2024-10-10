@@ -1,0 +1,15 @@
+{
+    "IsLinux" : true,
+    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.cm.x86_64.rpm",
+    "SkipGssNtlmSspTests": true,
+    "osVersion": "Azure Linux 3.0",
+    "shortTags": [
+        {"Tag": "3.0"}
+    ],
+    "ShortDistroName": "azurelinux",
+    "TestProperties": {
+        "size": 335
+    },
+    "EndOfLife": "2025-10-14",
+    "DistributionState": "Validated"
+}

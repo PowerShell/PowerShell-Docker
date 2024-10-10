@@ -1,0 +1,134 @@
+parameters:
+- name: channel
+  default: 'preview'
+- name: channelPath
+  default: ''
+- name: vmImage
+  default: PSMMSUbuntu20.04-Secure
+stages:
+- stage: StageGenerateBuild_preview
+  dependsOn: ['StageResolveVersionandYaml']
+  displayName: Build preview
+  jobs:
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: alpine317
+      artifactSuffix: alpine317
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: debian12
+      artifactSuffix: debian12
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: mariner2
+      artifactSuffix: mariner2
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: ubi8
+      artifactSuffix: ubi8
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: ubi9
+      artifactSuffix: ubi9
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: ubuntu20.04
+      artifactSuffix: ubuntu2004
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: ubuntu22.04
+      artifactSuffix: ubuntu2204
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_arm32'
+      imageName: ubuntu20.04-arm32v7
+      artifactSuffix: ubuntu2004_arm32v7
+      poolOS: 'linux'
+      poolHostArchitecture: 'arm64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_arm32'
+      imageName: ubuntu22.04-arm32v7
+      artifactSuffix: ubuntu2204_arm32v7
+      poolOS: 'linux'
+      poolHostArchitecture: 'arm64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_arm64'
+      imageName: mariner2-arm64
+      artifactSuffix: mariner2_arm64
+      poolOS: 'linux'
+      poolHostArchitecture: 'arm64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_windows_amd64'
+      imageName: windowsserver2022
+      artifactSuffix: windowsserver2022
+      poolOS: 'windows'
+      poolHostVersion: '1ESWindows2022'
+      windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'
+      maxParallel: 3
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_windows_amd64'
+      imageName: windowsservercore2022
+      artifactSuffix: windowsservercore2022
+      poolOS: 'windows'
+      poolHostVersion: '1ESWindows2022'
+      windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'
+      maxParallel: 3
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}

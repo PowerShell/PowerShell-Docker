@@ -1,0 +1,28 @@
+{
+    "$schema": "https://ev2schema.azure.net/schemas/2020-01-01/rolloutSpecification.json",
+    "contentVersion": "1.0.0.0",
+    "RolloutMetadata": {
+      "ServiceModelPath": "ServiceModel.json",
+      "ScopeBindingsPath": "ScopeBindings.json",
+      "Name": "OneBranch-Demo-Container-Deployment",
+      "RolloutType": "Major",
+      "BuildSource": {
+        "Parameters": {
+          "VersionFile": "buildver.txt"
+        }
+      },
+      "Notification": {
+        "Email": {
+          "To": "default"
+        }
+      }
+    },
+    "OrchestratedSteps": [
+      {
+        "Name": "UploadLinuxContainer",
+        "TargetType": "ServiceResource",
+        "TargetName": "LinuxContainerUpload",
+        "Actions": ["Shell/Run"]
+      }
+    ]
+  }

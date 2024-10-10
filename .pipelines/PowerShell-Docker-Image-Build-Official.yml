@@ -1,0 +1,149 @@
+name: PSDocker-Build-$(Build.BuildId)-version_$(releaseVersionTag)_channel_$(releaseChannel)$(Rev:_rr)
+trigger: none
+parameters:
+- name: 'releaseVersionTag'
+  default: 'v7.4.0-preview.5'
+- name: 'releaseChannel'
+  default: 'preview'
+variables:
+- name: POWERSHELL_TELEMETRY_OPTOUT
+  value: 1
+- name: DOCKER_RELEASE
+  value: true
+- name: releaseVersionTag
+  value: ${{ parameters.releaseVersionTag }}
+- name: releaseChannel
+  value: ${{ parameters.releaseChannel }}
+- name: releaseChannelPath
+  value: ''
+- name: runCodesignValidationInjection
+  value: false
+- name: DisableDockerDetector
+  value: true
+- name: LinuxContainerImage
+  value: mcr.microsoft.com/onebranch/cbl-mariner/build:2.0
+- name: WindowsContainerImage
+  value: onebranch.azurecr.io/windows/ltsc2019/vse2022:latest
+- name: ob_sdl_sbom_enabled
+  value: true
+- name: ob_signing_setup_enabled
+  value: true
+#CodeQL tasks added manually to workaround signing failures
+- name: ob_sdl_codeql_compiled_enabled
+  value: false
+resources:
+  repositories:
+  - repository: onebranchTemplates
+    type: git
+    name: OneBranch.Pipelines/GovernedTemplates
+    ref: refs/heads/main
+extends:
+  template: v2/OneBranch.Official.CrossPlat.yml@onebranchTemplates
+  parameters:
+    featureFlags:
+      runHostSDL: true
+    customTags: 'ES365AIMigrationTooling-BulkMigrated'
+    stages:
+    - stage: StageResolveVersionandYaml
+      displayName: Resolve Versions and Populate Channel Based Yamls
+      jobs:
+      - job: JobResolveVersions
+        displayName: Resolve Versions
+        condition: succeededOrFailed()
+        variables:
+        - name: ob_outputDirectory
+          value: '$(Build.ArtifactStagingDirectory)/ONEBRANCH_ARTIFACT'
+        - name: repoRoot
+          value: $(Build.SourcesDirectory)
+        - name: ob_sdl_tsa_configFile
+          value: $(Build.SourcesDirectory)\.config\tsaoptions.json
+        - name: signSrcPath
+          value: $(repoRoot)/out
+        - name: ob_sdl_sbom_enabled
+          value: false
+        - name: ob_signing_setup_enabled
+          value: true
+        #CodeQL tasks added manually to workaround signing failures
+        - name: ob_sdl_codeql_compiled_enabled
+          value: false
+        pool:
+          timeoutInMinutes: 30
+          type: windows
+        steps:
+        - pwsh: |
+            if (($env:RELEASECHANNEL -eq "stable") -or ($env:RELEASECHANNEL -eq "lts"))
+            {
+              if ($env:RELEASEVERSIONTAG -notmatch '^v\d+\.\d+\.\d+$') {
+                throw "${$env:RELEASECHANNEL} release tag is not for a ${$env:RELEASECHANNEL} build: '${$env:RELEASEVERSIONTAG}'"
+              }
+            }
+            elseif ($env:RELEASECHANNEL -eq "preview")
+            {
+              if ($env:RELEASEVERSIONTAG -notmatch '^v\d+\.\d+\.\d+-(preview|rc)\.\d+$') {
+                throw "${$env:RELEASECHANNEL} release tag is not for a ${$env:RELEASECHANNEL} build: '${$env:RELEASEVERSIONTAG}'"
+              }
+            }
+            else
+            {
+              throw "channel ${$env:RELEASECHANNEL} is not a supported channel"
+            }
+          displayName: stop build if release tag does not match release tag format for channel
+        - pwsh: |
+            $toolsFolderPath = Join-Path -Path $(repoRoot) -ChildPath 'tools'
+            $buildHelperFolderPath = Join-Path -Path $toolsFolderPath -ChildPath 'buildHelper'
+            $buildHelperModulePath = Join-Path -Path $buildHelperFolderPath -ChildPath 'buildHelper.psm1'
+            Import-Module $buildHelperModulePath
+            $channelsInfo = Get-ChannelData
+            if ($channelsInfo)
+            {
+              foreach ($channelEntry in $channelsInfo)
+              {
+                Write-Verbose -Verbose "channel path is: $($channelEntry.Path)"
+                if ($($channelEntry.Name) -eq "stable")
+                {
+                  $stablePath = "$($channelEntry.Path)"
+                  Write-Host "##vso[task.setvariable variable=stableChannelPath;isOutput=true]$stablePath"
+                }
+                elseif ($($channelEntry.Name) -eq "preview")
+                {
+                  $previewPath = $($channelEntry.Path)
+                  Write-Host "##vso[task.setvariable variable=previewChannelPath;isOutput=true]$previewPath"
+                }
+                elseif ($($channelEntry.Name) -eq "lts")
+                {
+                  $ltsPath = $($channelEntry.Path)
+                  Write-Host "##vso[task.setvariable variable=ltsChannelPath;isOutput=true]$ltsPath"
+                }
+              }
+            }
+          displayName: 'Get Channel path info'
+          name: setChannelPathInfo
+        - pwsh: |
+            Get-ChildItem env: | Out-String -Width 1000
+          displayName: 'Capture Environment'
+        - pwsh: |
+            $info = @{}
+            $info.Add("channel", $env:RELEASECHANNEL)
+            $info.Add("releaseVersionTag", $env:RELEASEVERSIONTAG)
+            $info | ConvertTo-Json | Out-File -Encoding utf8NoBOM -FilePath ./BuildInfo.json
+          displayName: 'Write build info to file'
+        - task: CopyFiles@2
+          inputs:
+            Contents: '*BuildInfo.json'
+            TargetFolder: $(ob_outputDirectory)
+          displayName: "Copy buildInfo.json file to ob_outputDirectory - '$(ob_outputDirectory)'"
+    - ${{ if eq(parameters.releaseChannel, 'stable') }}:
+      - template: /.vsts-ci/stableReleaseStage.yml@self
+        parameters:
+          channel: ${{ parameters.releaseChannel }}
+          channelPath: 'release/7-4'
+    - ${{ if eq(parameters.releaseChannel, 'preview') }}:
+      - template: /.vsts-ci/previewReleaseStage.yml@self
+        parameters:
+          channel: ${{ parameters.releaseChannel }}
+          channelPath: 'release/7-5'
+    - ${{ if eq(parameters.releaseChannel, 'lts') }}:
+      - template: /.vsts-ci/ltsReleaseStage.yml@self
+        parameters:
+          channel: ${{ parameters.releaseChannel }}
+          channelPath: 'release/7-2'

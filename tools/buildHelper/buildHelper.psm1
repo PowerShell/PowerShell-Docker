@@ -680,6 +680,8 @@ class DockerTestArgs
     [PSCustomObject] $TestProperties
     [string] $Channel
     [bool] $UseAcr
+    [string] $LoadPathParentFolder
+    [string] $ShortImageName
 }
 
 function Get-TestParams
@@ -722,6 +724,20 @@ function Get-TestParams
         Write-Verbose -Message "Skipping verification of $($actualTagData.ActualTags[0]) in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
         # The version of nanoserver in CI doesn't have all the changes needed to verify the image
         $skipVerification = $true
+    }
+
+    $loadPathParent = "" # will be "main" or "test" folder name
+    $imageName = "" # also capture image name (without test-deps part) as it may be needed for load tests to derive <imageName>.tar file name
+    if ($dockerFileName.Contains("test-deps"))
+    {
+        $loadPathParent = "test"
+        $dockerFileParts = $dockerFileName.Split("test-deps", [System.StringSplitOptions]::RemoveEmptyEntries)
+        $imageName = $dockerFileParts[0].TrimEnd("\","/")
+    }
+    else
+    {
+        $loadPathParent = "main"
+        $imageName = $dockerFileName
     }
 
     # for the image name label, always use the official image name
@@ -801,12 +817,145 @@ function Get-TestParams
         TestProperties = $allMeta.meta.TestProperties
         Channel = $actualChannel
         UseAcr = $allMeta.meta.UseAcr
+        LoadPathParentFolder = $loadPathParent
+        ShortImageName = $imageName #instead of the official image name (like mcr.microsoft.com/*) just alpine316 for example
     }
 
     return [DockerTestParams] @{
         TestArgs = $testArgs
         ImageName = $actualTagData.ActualTags[0]
     }
+}
+
+function Get-SASBuildArgs
+{
+    param(
+        [string]
+        $dockerFileName,
+        [string]
+        $psversion,
+        [SasData]
+        $SasData,
+        [string]
+        $actualChannel,
+        [TagData]
+        $actualTagData,
+        [string]
+        $actualVersion,
+        [DockerImageFullMetaData]
+        $allMeta,
+        [switch]
+        $CI,
+        [string]
+        $BaseImage
+    )
+
+    Write-Verbose -Message "To be tested, repository: $($allMeta.FullRepository) fromTag: $($actualTagData.FromTag) Tag: $($actualTagData.ActualTag) PSversion: $psversion" -Verbose
+    # $contextPath = Join-Path -Path $allMeta.imagePath -ChildPath 'docker'
+    $script:ErrorActionPreference = 'stop'
+    # Import-Module (Join-Path -Path $testsPath -ChildPath 'containerTestCommon.psm1') -Force
+    if ($allMeta.meta.IsLinux) {
+        $os = 'linux'
+    }
+    else {
+        $os = 'windows'
+    }
+
+    $skipVerification = $false
+    if($dockerFileName -eq 'nanoserver' -and $CI.IsPresent)
+    {
+        Write-Verbose -Message "Skipping verification of $($actualTagData.ActualTags[0]) in CI because the CI system only supports LTSC and at least 1709 is required." -Verbose
+        # The version of nanoserver in CI doesn't have all the changes needed to verify the image
+        $skipVerification = $true
+    }
+
+    # for the image name label, always use the official image name
+    Write-Verbose -Verbose "made it here"
+    $imageNameParam = "mcr.microsoft.com/$($allMeta.FullRepository):" + $actualTagData.TagList[0]
+    Write-Verbose -Verbose "past first indexing"
+    if($actualChannel -like 'community-*')
+    {
+        # use the image name for pshorg for community images
+        $imageNameParam = 'pshorg/powershellcommunity:' + $actualTagData.TagList[0]
+    }
+
+    $packageVersion = $psversion
+
+    # if the package name ends with rpm
+    # then replace the - in the filename with _ as fpm creates the packages this way.
+    if($allMeta.meta.PackageFormat -and $allMeta.meta.PackageFormat -match 'rpm$')
+    {
+        $packageVersion = $packageVersion -replace '-', '_'
+    }
+
+    $buildArgs = [System.Collections.Generic.Dictionary[string,string]]::new()
+    $buildArgs['fromTag'] = $actualTagData.FromTag
+    $buildArgs['PS_VERSION'] = $psversion
+    $buildArgs['PACKAGE_VERSION'] = $packageVersion
+    $buildArgs['IMAGE_NAME'] = $imageNameParam
+    $buildArgs['BaseImage'] = $BaseImage
+    $buildArgs['PS_INSTALL_VERSION'] = Get-PwshInstallVersion -Channel $actualChannel
+
+    if ($allMeta.meta.PackageFormat)
+    {
+        if($sasData.sasUrl)
+        {
+            $packageUrl = [System.UriBuilder]::new($sasData.sasBase)
+
+            $channelTag = Get-ChannelPackageTag -Channel $actualChannel
+
+            $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
+            $packageName = $packageName -replace '\${channelTag}', $channelTag
+            $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
+            $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
+            $packageUrl.Query = $sasData.sasQuery
+            if($allMeta.meta.Base64EncodePackageUrl)
+            {
+                $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.ToString())
+                $encodedUrl =[Convert]::ToBase64String($urlBytes)
+                $buildArgs.Add('PS_PACKAGE_URL_BASE64', $encodedUrl)
+            }
+            else
+            {
+                $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+            }
+        }
+    }
+
+    $testArgs = @{
+        tags = $actualTagData.ActualTags
+        BuildArgs = $buildArgs
+        ContextPath = $contextPath
+        OS = $os
+        ExpectedVersion = $actualVersion
+        SkipVerification = $skipVerification
+        SkipWebCmdletTests = $allMeta.meta.SkipWebCmdletTests
+        SkipGssNtlmSspTests = $allMeta.meta.SkipGssNtlmSspTests
+        BaseImage = $BaseImage
+        OptionalTests = $allMeta.meta.OptionalTests
+        TestProperties = $allMeta.meta.TestProperties
+        Channel = $actualChannel
+        UseAcr = $allMeta.meta.UseAcr
+    }
+
+    $buildArgsString = ""
+    $buildArgsDict = $testArgs.BuildArgs
+
+    foreach($argKey in $buildArgsDict.Keys)
+    {
+        $value = $buildArgsDict[$argKey]
+        if($UseAcr.IsPresent -and $env:ACR_NAME -and $value -match '&')
+        {
+            throw "$argKey contains '&' and this is not allowed in ACR using the az cli"
+        }
+
+        if($value)
+        {
+            $buildArgsString += " --build-arg $argKey=$value"
+        }
+    }
+
+    return $buildArgsString
 }
 
 class TagData{
@@ -969,13 +1118,14 @@ function Invoke-PesterWrapper {
 
     Write-Verbose "Launching pester with $($ExtraParams|Out-String)" -Verbose
 
-    if(!(Get-Module -ListAvailable pester -ErrorAction Ignore) -or $ForcePesterInstall.IsPresent)
+    Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+    if(!(Get-Module "pester" -ListAvailable -ErrorAction Ignore | Where-Object {$_.Version -le "4.99" -and $_.Version -gt "4.00"}) -or $ForcePesterInstall.IsPresent)
     {
-        Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99
+        Install-module Pester -Scope CurrentUser -Force -MaximumVersion 4.99 -Repository PSGallery -SkipPublisherCheck -Verbose
     }
 
     Remove-Module Pester -Force -ErrorAction SilentlyContinue
-    Import-Module pester -MaximumVersion 4.99 -Scope Global
+    Import-Module pester -MaximumVersion 4.99 -Scope Global -Verbose
 
     Write-Verbose -Message "logging to $OutputFile" -Verbose
     $results = $null
@@ -1029,4 +1179,117 @@ Function ConvertTo-SortedDictionary {
         $sortedDictionary.Add($key, $Hashtable[$key])
     }
     return $sortedDictionary
+}
+
+function Get-StartOfYamlPopulated {
+    param(
+        [string]
+        $Channel,
+
+        [string]
+        $YamlFilePath
+    )
+
+    if (!$YamlFilePath)
+    {
+        throw "Yaml file $YamlFilePath provided as parameter cannot be found."
+    }
+    
+    $doubleSpace = " "*2
+
+    Add-Content -Path $YamlFilePath -Value "parameters:"
+    Add-Content -Path $YamlFilePath -Value "- name: channel"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: 'preview'"
+    Add-Content -Path $YamlFilePath -Value "- name: channelPath"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: ''"
+    Add-Content -Path $YamlFilePath -Value "- name: vmImage"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)default: PSMMSUbuntu20.04-Secure"
+    Add-Content -Path $YamlFilePath -Value "stages:"
+    Add-Content -Path $YamlFilePath -Value "- stage: StageGenerateBuild_$Channel"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)dependsOn: ['StageResolveVersionandYaml']"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)displayName: Build $Channel"
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)jobs:"
+}
+
+function Get-TemplatePopulatedYaml {
+    param(
+        [string]
+        $YamlFilePath,
+
+        [psobject]
+        $ImageInfo
+    )
+
+    if (!$YamlFilePath)
+    {
+        throw "Yaml file $YamlFilePath provided as parameter cannot be found."
+    }
+
+    $doubleSpace = " "*2
+    $fourSpace = " "*4
+    $sixSpace = " "*6
+
+    $imageName = $ImageInfo.Name
+    $artifactSuffix = $ImageInfo.Name.ToString().Replace("\", "_").Replace("-","_").Replace(".","")
+    $architecture = $ImageInfo.Architecture
+    $poolOS = $ImageInfo.IsLinux ? "linux" : "windows"
+    $archBasedJobName = "Build_$($poolOS)_$($architecture)"
+
+    if ($architecture -eq "arm32")
+    {
+        $architecture = "arm64" # we need to use hostArchicture arm64 for pool for arm32
+    }
+
+    Add-Content -Path $YamlFilePath -Value "$($doubleSpace)- template: /.vsts-ci/releaseJob.yml@self"
+    Add-Content -Path $YamlFilePath -Value "$($fourSpace)parameters:"
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)archName: '$archBasedJobName'" # ie: Build_Linux_arm32
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)imageName: $imageName" # ie. imageName: alpine317\test-deps (since this differs from artifactSuffix for test-deps images only, we have a separate entry as the yaml param)
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)artifactSuffix: $artifactSuffix" # i.e artifactSuffix: alpine317_test_deps 
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolOS: '$poolOS'"
+    if ($poolOS -eq "linux")
+    {
+        # only need to specify host architecture for the pool for linux
+        Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolHostArchitecture: '$architecture'"
+        # only need to specify buildKitValue=1 for linux
+        Add-Content -Path $YamlFilePath -Value "$($sixSpace)buildKitValue: 1"
+    }
+    else
+    {
+        Add-Content -Path $YamlFilePath -Value "$($sixSpace)poolHostVersion: '1ESWindows2022'"
+        Add-Content -Path $YamlFilePath -Value "$($sixSpace)windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'"
+        Add-Content -Path $YamlFilePath -Value "$($sixSpace)maxParallel: 3"
+    }
+
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)channel: `${{ parameters.channel }}"
+    Add-Content -Path $YamlFilePath -Value "$($sixSpace)channelPath: `${{ parameters.channelPath }}"
+}
+
+function Get-ImgMetadataByChannel {
+    param(
+        [string]
+        $Channel,
+
+        [string]
+        $FilePath,
+
+        [object[]]
+        $ImageInfoObjects
+    )
+
+    $imgsForChannelArr = @()
+    foreach ($img in $ImageInfoObjects)
+    {
+        $imgName = $img.Name
+        $tags = $img.Tags
+
+        $tagStr = $tags -join " "
+        $imgOS = $img.IsLinux ? "linux" : "windows"
+        $imgMeta = @{}
+        $imgMeta.Add("name", $imgName)
+        $imgMeta.Add("tags", $tagStr)
+        $imgMeta.Add("os", $imgOS)
+        $imgsForChannelArr += $imgMeta
+    }
+
+    return $imgsForChannelArr
 }
