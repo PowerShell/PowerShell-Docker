@@ -1,0 +1,16 @@
+{
+    "IsLinux": true,
+    "UseLinuxVersion": false,
+    "SkipGssNtlmSspTests": true,
+    "osVersion": "Alpine 3.20",
+    "tagTemplates": [
+        "alpine-#shorttag#"
+    ],
+    "OptionalTests": [
+        "test-deps",
+        "test-deps-musl"
+    ],
+    "TestProperties": {
+        "size": 335
+    }
+}
