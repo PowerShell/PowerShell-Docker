@@ -1,0 +1,21 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell-${PS_VERSION}-linux-musl-x64.tar.gz",
+    "osVersion": "Alpine 3.20",
+    "shortDistroName": "alpine",
+    "shortTags": [
+        {"Tag": "3.20"}
+    ],
+    "SkipGssNtlmSspTests": true,
+    "SubImage": "test-deps",
+    "TestProperties": {
+        "size": 252
+    },
+    "EndOfLife": "2025-11-01",
+    "DistributionState": "Validating",
+    "manifestLists": [
+        "${channelTagPrefix}alpine"
+    ],
+    "UseInCi": false
+}
