@@ -128,6 +128,12 @@ jobs:
       targetPath: $(Build.SourcesDirectory)/dst/$(dockerBuildImageName)
       artifact: drop_StageGenerateBuild_${{ parameters.channel }}_Job_PreBuild_${{ parameters.archName }}_${{ parameters.artifactSuffix }}
     displayName: 'Download artifact to which Dockerfile was uploaded'
+  - task: onebranch.pipeline.containercontrol@1
+    displayName: "Login to source ACR"
+    inputs:
+      command: login
+      acr_name: $(ACRName)
+      tenant: MSFT
   - task: onebranch.pipeline.imagebuildinfo@1
     displayName: image build
     inputs:
