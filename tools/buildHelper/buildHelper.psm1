@@ -906,18 +906,18 @@ function Get-SASBuildArgs
 
             $packageName = $allMeta.meta.PackageFormat -replace '\${PS_VERSION}', $packageVersion
             $packageName = $packageName -replace '\${channelTag}', $channelTag
-            $containerName = 'v' + ($psversion -replace '\.', '-') -replace '~', '-'
+            $containerName = 'v' + ($psversion) -replace '~', '-'
             $packageUrl.Path = $packageUrl.Path + $containerName + '/' + $packageName
             $packageUrl.Query = $sasData.sasQuery
             if($allMeta.meta.Base64EncodePackageUrl)
             {
-                $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.ToString())
+                $urlBytes = [System.Text.Encoding]::Unicode.GetBytes($packageUrl.Uri.ToString())
                 $encodedUrl =[Convert]::ToBase64String($urlBytes)
                 $buildArgs.Add('PS_PACKAGE_URL_BASE64', $encodedUrl)
             }
             else
             {
-                $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.ToString())
+                $buildArgs.Add('PS_PACKAGE_URL', $packageUrl.Uri.ToString())
             }
         }
     }
