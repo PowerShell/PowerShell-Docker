@@ -73,7 +73,9 @@ jobs:
     name: setImageNameStep
   - pwsh: |
       $afdUri = "https://powershellinfraartifacts-gkhedzdeaghdezhr.z01.azurefd.net/install/?fakesas=yes"
-      Write-Host "##vso[task.setvariable variable=SasUrl;]$afdUri"
+      $uriObj = [System.Uri]::new($afdUri)
+      $url =  $uriObj.ToString()
+      Write-Host "##vso[task.setvariable variable=SasUrl;]$url"
     displayName: 'Set SasUrl variable'
   - pwsh: |
       Get-ChildItem env: | Out-String -Width 1000
