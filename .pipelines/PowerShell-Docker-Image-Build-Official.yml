@@ -42,6 +42,9 @@ extends:
   parameters:
     featureFlags:
       runHostSDL: true
+      # Work around regression in OneBranch docker builds
+      LinuxHostVersion:
+        Distribution: Ubuntu
     customTags: 'ES365AIMigrationTooling-BulkMigrated'
     stages:
     - stage: StageResolveVersionandYaml
