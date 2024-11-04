@@ -29,7 +29,7 @@ variables:
 - name: DisableDockerDetector
   value: true
 - name: LinuxContainerImage
-  value: mcr.microsoft.com/onebranch/cbl-mariner/build:2.0
+  value: onebranch.azurecr.io/linux/ubuntu-2004:latest
 - name: WindowsContainerImage
   value: onebranch.azurecr.io/windows/ltsc2019/vse2022:latest
 - group: PipelineExecutionPats
@@ -225,6 +225,9 @@ extends:
           demands:
           - ImageOverride -equals PSMMSUbuntu20.04-Secure-120GB
         steps:
+          - checkout: self
+            clean: true
+            lfs: false
           - task: DownloadPipelineArtifact@2
             inputs:
               targetPath: $(Pipeline.Workspace)
