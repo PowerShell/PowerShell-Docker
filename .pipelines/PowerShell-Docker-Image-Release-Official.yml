@@ -225,6 +225,9 @@ extends:
           demands:
           - ImageOverride -equals PSMMSUbuntu20.04-Secure-120GB
         steps:
+          - checkout: self
+            clean: true
+            lfs: false
           - task: DownloadPipelineArtifact@2
             inputs:
               targetPath: $(Pipeline.Workspace)
