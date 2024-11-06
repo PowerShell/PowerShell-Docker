@@ -23,6 +23,26 @@ stages:
   - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
+      imageName: alpine320
+      artifactSuffix: alpine320
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: azurelinux3
+      artifactSuffix: azurelinux3
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
       imageName: debian12
       artifactSuffix: debian12
       poolOS: 'linux'
@@ -95,6 +115,16 @@ stages:
       archName: 'Build_linux_arm32'
       imageName: ubuntu22.04-arm32v7
       artifactSuffix: ubuntu2204_arm32v7
+      poolOS: 'linux'
+      poolHostArchitecture: 'arm64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_arm64'
+      imageName: azurelinux3-arm64
+      artifactSuffix: azurelinux3_arm64
       poolOS: 'linux'
       poolHostArchitecture: 'arm64'
       buildKitValue: 1
