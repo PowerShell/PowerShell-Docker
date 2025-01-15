@@ -1,0 +1,19 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.cm.aarch64.rpm",
+    "osVersion": "Mariner 2.0 ARM 64v7",
+    "SkipGssNtlmSspTests": true,
+    "ShortDistroName": "mariner",
+    "shortTags": [
+        {"Tag": "2.0-arm64"}
+    ],
+    "TestProperties": {
+        "size": 404,
+        "Arm32": true
+    },
+    "EndOfLife": "2023-12-14",
+    "DistributionState": "Validated",
+    "UseInCi": false,
+    "Architecture": "arm64"
+}
