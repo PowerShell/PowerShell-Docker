@@ -140,12 +140,12 @@ extends:
       - template: /.vsts-ci/stableReleaseStage.yml@self
         parameters:
           channel: ${{ parameters.releaseChannel }}
-          channelPath: 'release/7-4'
+          channelPath: 'release/7-5'
     - ${{ if eq(parameters.releaseChannel, 'preview') }}:
       - template: /.vsts-ci/previewReleaseStage.yml@self
         parameters:
           channel: ${{ parameters.releaseChannel }}
-          channelPath: 'release/7-5'
+          channelPath: 'release/7-6'
     - ${{ if eq(parameters.releaseChannel, 'lts') }}:
       - template: /.vsts-ci/ltsReleaseStage.yml@self
         parameters:
