@@ -1,0 +1,15 @@
+{
+    "IsLinux" : true,
+    "PackageFormat": "powershell${channelTag}-${PS_VERSION}-1.cm.x86_64.rpm",
+    "SkipGssNtlmSspTests": true,
+    "osVersion": "Mariner 2.0",
+    "shortTags": [
+        {"Tag": "2.0"}
+    ],
+    "ShortDistroName": "mariner",
+    "TestProperties": {
+        "size": 335
+    },
+    "EndOfLife": "2022-10-14",
+    "DistributionState": "Validated"
+}

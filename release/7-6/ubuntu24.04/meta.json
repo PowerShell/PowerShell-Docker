@@ -1,0 +1,22 @@
+{
+    "IsLinux" : true,
+    "UseLinuxVersion": false,
+    "PackageFormat": "powershell${channelTag}_${PS_VERSION}-1.deb_amd64.deb",
+    "osVersion": "Ubuntu 24.04",
+    "SkipGssNtlmSspTests": false,
+    "ShortDistroName": "ubuntu",
+    "shortTags": [
+        {"Tag": "noble"},
+        {"Tag": "24.04"}
+    ],
+    "manifestLists": [
+        "${channelTag}"
+    ],
+    "TestProperties": {
+        "size": 337
+    },
+    "SubImage": "test-deps",
+    "EndOfLife": "2029-04-01",
+    "DistributionState": "Validating",
+    "UseInCi": false
+}
