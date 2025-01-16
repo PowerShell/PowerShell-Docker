@@ -102,16 +102,6 @@ stages:
       channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releaseJob.yml@self
     parameters:
-      archName: 'Build_linux_amd64'
-      imageName: ubuntu24.04
-      artifactSuffix: ubuntu2404
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releaseJob.yml@self
-    parameters:
       archName: 'Build_linux_arm32'
       imageName: ubuntu20.04-arm32v7
       artifactSuffix: ubuntu2004_arm32v7
