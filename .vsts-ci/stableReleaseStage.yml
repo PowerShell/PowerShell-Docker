@@ -63,26 +63,6 @@ stages:
   - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
-      imageName: ubi8
-      artifactSuffix: ubi8
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releaseJob.yml@self
-    parameters:
-      archName: 'Build_linux_amd64'
-      imageName: ubi9
-      artifactSuffix: ubi9
-      poolOS: 'linux'
-      poolHostArchitecture: 'amd64'
-      buildKitValue: 1
-      channel: ${{ parameters.channel }}
-      channelPath: ${{ parameters.channelPath }}
-  - template: /.vsts-ci/releaseJob.yml@self
-    parameters:
-      archName: 'Build_linux_amd64'
       imageName: ubuntu20.04
       artifactSuffix: ubuntu2004
       poolOS: 'linux'
@@ -95,6 +75,16 @@ stages:
       archName: 'Build_linux_amd64'
       imageName: ubuntu22.04
       artifactSuffix: ubuntu2204
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: ubuntu24.04
+      artifactSuffix: ubuntu2404
       poolOS: 'linux'
       poolHostArchitecture: 'amd64'
       buildKitValue: 1

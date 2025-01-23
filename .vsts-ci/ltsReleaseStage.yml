@@ -23,8 +23,8 @@ stages:
   - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
-      imageName: mariner2
-      artifactSuffix: mariner2
+      imageName: alpine320
+      artifactSuffix: alpine320
       poolOS: 'linux'
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
@@ -33,8 +33,28 @@ stages:
   - template: /.vsts-ci/releaseJob.yml@self
     parameters:
       archName: 'Build_linux_amd64'
-      imageName: ubi8
-      artifactSuffix: ubi8
+      imageName: azurelinux3
+      artifactSuffix: azurelinux3
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: debian12
+      artifactSuffix: debian12
+      poolOS: 'linux'
+      poolHostArchitecture: 'amd64'
+      buildKitValue: 1
+      channel: ${{ parameters.channel }}
+      channelPath: ${{ parameters.channelPath }}
+  - template: /.vsts-ci/releaseJob.yml@self
+    parameters:
+      archName: 'Build_linux_amd64'
+      imageName: mariner2
+      artifactSuffix: mariner2
       poolOS: 'linux'
       poolHostArchitecture: 'amd64'
       buildKitValue: 1
@@ -82,24 +102,22 @@ stages:
       channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releaseJob.yml@self
     parameters:
-      archName: 'Build_windows_amd64'
-      imageName: nanoserver1809
-      artifactSuffix: nanoserver1809
-      poolOS: 'windows'
-      poolHostVersion: '1ESWindows2022'
-      windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'
-      maxParallel: 3
+      archName: 'Build_linux_arm64'
+      imageName: azurelinux3-arm64
+      artifactSuffix: azurelinux3_arm64
+      poolOS: 'linux'
+      poolHostArchitecture: 'arm64'
+      buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releaseJob.yml@self
     parameters:
-      archName: 'Build_windows_amd64'
-      imageName: nanoserver2022
-      artifactSuffix: nanoserver2022
-      poolOS: 'windows'
-      poolHostVersion: '1ESWindows2022'
-      windowsContainerImageValue: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'
-      maxParallel: 3
+      archName: 'Build_linux_arm64'
+      imageName: mariner2-arm64
+      artifactSuffix: mariner2_arm64
+      poolOS: 'linux'
+      poolHostArchitecture: 'arm64'
+      buildKitValue: 1
       channel: ${{ parameters.channel }}
       channelPath: ${{ parameters.channelPath }}
   - template: /.vsts-ci/releaseJob.yml@self
