@@ -10,7 +10,7 @@ resources:
         include:
         - master
         - master-ado
-        - onebranchbuild
+        - release/*
 
   repositories:
   - repository: onebranchTemplates
