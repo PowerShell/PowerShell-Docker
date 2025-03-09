@@ -128,6 +128,9 @@ try {
     $imgJsonFileContent = Get-Content -Path $pathToImgMetadataJson | ConvertFrom-Json
     $images = $imgJsonFileContent.$channel
 
+    # Create variables for lifecycle annotations
+    $endOfLifeDate = Get-Date -Format "yyyy-MM-ddTHH:mm:00Z"
+
     Write-Verbose -Verbose "Push images to ACR"
     foreach ($image in $images)
     {
@@ -151,6 +154,28 @@ try {
                 foreach ($tag in $tags)
                 {
                     Write-Verbose -Verbose "tag: $tag"
+
+                    # check if this rolling tag is associated with an image
+                    $mcrImageFullName = "mcr.microsoft.com/powershell:$tag"
+                    oras manifest fetch $mcrImageFullName > $null
+                    $rollingTagExists = $?
+
+                    if ($rollingTagExists)
+                    {
+                        # If the lineage's rolling tag is already associated with an existing image, attach lifecycle metadata to the existing image to indicate that it is outdated
+                        # Resolve image's digest
+                        $imageDigest = oras resolve $mcrImageName
+
+                        # Import (old) image by digest from MCR into our ACR
+                        $mcrImageNameDigest = "mcr.microsoft.com/powershell@$imageDigest"
+                        $acrEOLImageTag = "$tag-EOL"
+                        az acr import --name $env:DESTINATION_ACR_NAME --source $mcrImageNameDigest --image $acrEOLImageTag
+
+                        # Attach lifecycle annotation, which will eventually get synced to MCR
+                        $acrImageNameDigest = "$env:DESTINATION_ACR_NAME.azurecr.io/public/powershell@$imageDigest"
+                        oras attach --artifact-type "application/vnd.microsoft.artifact.lifecycle" --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$endOfLifeDate" $acrImageNameDigest
+                    }
+
                     # Need to push image for each tag
                     $destination_image_full_name = "$env:DESTINATION_ACR_NAME.azurecr.io/public/powershell:${tag}"
                     Write-Verbose -Verbose "dest img full name: $destination_image_full_name"
