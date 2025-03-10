@@ -162,7 +162,7 @@ try {
 
                     if ($rollingTagExists)
                     {
-                        # If the lineage's rolling tag is already associated with an existing image, attach lifecycle metadata to the existing image to indicate that it is outdated
+                        # If the lineage's rolling tag is already associated with an existing image, then only attach lifecycle metadata to the existing image to indicate that it is outdated
                         # Resolve image's digest
                         $imageDigest = oras resolve $mcrImageName
 
