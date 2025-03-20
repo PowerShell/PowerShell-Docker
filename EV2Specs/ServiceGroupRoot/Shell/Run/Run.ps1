@@ -123,6 +123,7 @@ try {
     Write-Verbose -Verbose "Getting channel info"
     $channelJsonFileContent = Get-Content -Path $pathToChannelJson | ConvertFrom-Json
     $channel = $channelJsonFileContent.channel
+    $whatIf = $channelJsonFileContent.whatIf
 
     Write-Verbose -Verbose "Getting image info"
     $imgJsonFileContent = Get-Content -Path $pathToImgMetadataJson | ConvertFrom-Json
@@ -169,18 +170,38 @@ try {
                         # Import (old) image by digest from MCR into our ACR
                         $mcrImageNameDigest = "mcr.microsoft.com/powershell@$imageDigest"
                         $acrEOLImageTag = "$tag-EOL"
-                        az acr import --name $env:DESTINATION_ACR_NAME --source $mcrImageNameDigest --image $acrEOLImageTag
+                        if (!$whatIf)
+                        {
+                            az acr import --name $env:DESTINATION_ACR_NAME --source $mcrImageNameDigest --image $acrEOLImageTag
+                        }
+                        else {
+                            Write-Verbose -Verbose "az acr import --name $env:DESTINATION_ACR_NAME --source $mcrImageNameDigest --image $acrEOLImageTag"
+                        }
 
                         # Attach lifecycle annotation, which will eventually get synced to MCR
                         $acrImageNameDigest = "$env:DESTINATION_ACR_NAME.azurecr.io/public/powershell@$imageDigest"
-                        oras attach --artifact-type "application/vnd.microsoft.artifact.lifecycle" --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$endOfLifeDate" $acrImageNameDigest
+                        if (!$whatIf)
+                        {
+                            oras attach --artifact-type "application/vnd.microsoft.artifact.lifecycle" --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$endOfLifeDate" $acrImageNameDigest
+                        }
+                        else {
+                            Write-Verbose -Verbose "oras attach --artifact-type `"application/vnd.microsoft.artifact.lifecycle`" --annotation `"vnd.microsoft.artifact.lifecycle.end-of-life.date=$endOfLifeDate`" $acrImageNameDigest"
+                        }
+                        
                     }
 
                     # Need to push image for each tag
                     $destination_image_full_name = "$env:DESTINATION_ACR_NAME.azurecr.io/public/powershell:${tag}"
                     Write-Verbose -Verbose "dest img full name: $destination_image_full_name"
                     Write-Verbose -Verbose "Pushing file $tarballFilePath to $destination_image_full_name"
-                    ./crane push $tarballFilePath $destination_image_full_name
+                    if (!$whatIf)
+                    {
+                        ./crane push $tarballFilePath $destination_image_full_name
+                    }
+                    else {
+                        Write-Verbose "./crane push $tarballFilePath $destination_image_full_name"
+                    }
+                    
                     Write-Verbose -Verbose "done pushing for tag: $tag"
                 }
             }

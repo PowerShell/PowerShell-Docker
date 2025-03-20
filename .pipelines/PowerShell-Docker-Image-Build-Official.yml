@@ -5,6 +5,10 @@ parameters:
   default: 'v7.4.0-preview.5'
 - name: 'releaseChannel'
   default: 'preview'
+- name: 'whatIf'
+  displayName: 'Skip publishing to MCR, but show what would get published and attached'
+  type: boolean
+  default: false  
 variables:
 - name: POWERSHELL_TELEMETRY_OPTOUT
   value: 1
@@ -16,6 +20,8 @@ variables:
   value: ${{ parameters.releaseChannel }}
 - name: releaseChannelPath
   value: ''
+- name: whatIf
+  value: ${{ parameters.whatIf }}
 - name: runCodesignValidationInjection
   value: false
 - name: DisableDockerDetector
@@ -129,6 +135,7 @@ extends:
             $info = @{}
             $info.Add("channel", $env:RELEASECHANNEL)
             $info.Add("releaseVersionTag", $env:RELEASEVERSIONTAG)
+            $info.Add("whatIf", $env:WHATIF)
             $info | ConvertTo-Json | Out-File -Encoding utf8NoBOM -FilePath ./BuildInfo.json
           displayName: 'Write build info to file'
         - task: CopyFiles@2
