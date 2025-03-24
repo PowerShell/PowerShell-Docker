@@ -63,9 +63,11 @@ extends:
             $currentChannel = $($buildMetadata.channel)
             $currentVersion = $($buildMetadata.releaseVersionTag)
             $finalVersion = $currentVersion.Trim("v")
-            Write-Verbose -Verbose "version: $finalVersion and channel: $currentChannel"
+            $whatIfSwitch = $($buildMetadata.whatIf)
+            Write-Verbose -Verbose "version: $finalVersion and channel: $currentChannel and whatIf: $whatIf"
             Write-Host "##vso[task.setvariable variable=channel;isOutput=true]$currentChannel"
             Write-Host "##vso[task.setvariable variable=version;isOutput=true]$finalVersion"
+            Write-Host "##vso[task.setvariable variable=whatIf;isOutput=true]$whatIfSwitch"
           displayName: 'Get channel from buildInfo.json'
           name: setChannelStep
       - job: DownloadImageArtifactFromBuild
@@ -275,6 +277,8 @@ extends:
           value: $[ stageDependencies.GetBuildArtifacts.DownloadMetaArtifactFromBuild.outputs['setChannelStep.channel'] ]
         - name: version
           value: $[ stageDependencies.GetBuildArtifacts.DownloadMetaArtifactFromBuild.outputs['setChannelStep.version'] ]
+        - name: whatIf
+          value: $[ stageDependencies.GetBuildArtifacts.DownloadMetaArtifactFromBuild.outputs['setChannelStep.whatIf'] ]
         pool:
           timeoutInMinutes: 30
           type: windows
@@ -299,6 +303,7 @@ extends:
             $pathToImageMetadataFile = Join-Path -Path $pathToParametersFolder -ChildPath 'ImageMetadata.json'
             $pathToChannelJsonFile = Join-Path -Path $pathToParametersFolder -ChildPath 'ChannelInfo.json'
             $currentChannel = '$(channel)'
+            $currentWhatIfSwitch = '$(whatIf)'
 
             $channelHash = @{channel=$currentChannel}
             $channelHash | ConvertTo-Json | Out-File $pathToChannelJsonFile
