@@ -188,6 +188,16 @@ try {
                             Write-Verbose -Verbose "oras attach --artifact-type `"application/vnd.microsoft.artifact.lifecycle`" --annotation `"vnd.microsoft.artifact.lifecycle.end-of-life.date=$endOfLifeDate`" $acrImageNameDigest"
                         }
                         
+                        if (!$whatIf)
+                        {
+                            $imageAnnotation = oras discover --format json --artifact-type "application/vnd.microsoft.artifact.lifecycle" $acrImageNameDigest
+                            $imageAnnotationJson = $imageAnnotation | ConvertFrom-Json
+                            $eolDateAttached = $imageAnnotationJson.manifests.annotations."vnd.microsoft.artifact.lifecycle.end-of-life.date".ToString("yyyy-MM-ddTHH:mm:00Z")
+                            Write-Verbose -Verbose "date attached: $endOfLifeDate, date found in annotation: $eolDateAttached, match: $($eolDateAttached -eq $endOfLifeDate)"
+                        }
+                        else {
+                            Write-Verbose -Verbose "oras discover --format json --artifact-type `"application/vnd.microsoft.artifact.lifecycle`" $acrImageNameDigest"
+                        }
                     }
 
                     # Need to push image for each tag
