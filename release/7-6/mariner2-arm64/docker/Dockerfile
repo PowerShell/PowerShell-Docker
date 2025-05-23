@@ -51,7 +51,7 @@ FROM setup-tdnf-repa AS powershell
         LANG=en_US.UTF-8 \
         # set a fixed location for the Module analysis cache
         PSModuleAnalysisCachePath=/var/cache/microsoft/powershell/PSModuleAnalysisCache/ModuleAnalysisCache \
-        POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-arm64v7-Mariner-2
+        POWERSHELL_DISTRIBUTION_CHANNEL=PSDocker-arm64v8-Mariner-2
 
     RUN --mount=type=cache,target=/var/cache/tdnf \
         # install dependencies
